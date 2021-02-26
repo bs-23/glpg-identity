@@ -11,6 +11,7 @@ const UserProfile_PermissionSet = require(path.join(process.cwd(), 'src/modules/
 const UserProfile = require(path.join(process.cwd(), 'src/modules/platform/profile/server/user-profile.model.js'));
 const UserRole_PermissionSet = require(path.join(process.cwd(), 'src/modules/platform/permission-set/server/role-permissionSet.model.js'));
 const Role = require(path.join(process.cwd(), 'src/modules/platform/role/server/role.model.js'));
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 async function getPermissionSets(req, res) {
     try {
@@ -48,7 +49,7 @@ async function getPermissionSets(req, res) {
 
         res.json(permissionSets);
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(500).send('Internal server error');
     }
 }
@@ -108,7 +109,7 @@ async function getPermissionSet(req, res) {
 
         res.json(permissionSet.dataValues);
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(500).send('Internal server error');
     }
 }
@@ -161,7 +162,7 @@ async function createPermissionSet(req, res) {
 
         res.json(doc);
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(500).send('Internal server error');
     }
 }
@@ -210,7 +211,7 @@ async function editPermissionSet(req, res) {
 
         res.json(doc);
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(500).send(error);
     }
 }

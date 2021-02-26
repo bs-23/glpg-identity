@@ -1,5 +1,5 @@
 import axios from "axios";
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from "react-toast-notifications";
@@ -78,7 +78,8 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
                         initialValues={{
                             title: preFill ? preFill.title : '',
                             description: preFill ? preFill.description : '',
-                            permissionSets: preFill ? Array.isArray(preFill.permissionssetIDs) ? preFill.permissionssetIDs : [] : []
+                            permissionSets: preFill ? Array.isArray(preFill.permissionssetIDs) ? preFill.permissionssetIDs : [] : [],
+                            permissionSetsError: ''
                         }}
                         displayName="ProfileForm"
                         validationSchema={profileCreateSchema}
@@ -100,9 +101,14 @@ const ProfileForm = ({ onSuccess, permissionSets, preFill }) => {
                                     </div>
                                     <div className="col-12">
                                         <div className="row">
-                                            <FormField name="permissionSets" label="Select Permission Sets">
-                                                <ToggleListSlider name="permissionSets" options={getToggleListOptions()} valueExtractor={item => item.id} idExtractor={item => item.id} labelExtractor={item => item.title} />
+                                            <FormField name="permissionSets" label="Select Permission Sets" required={false}>
+                                                {
+                                                    getToggleListOptions().length
+                                                        ? <ToggleListSlider name="permissionSets" options={getToggleListOptions()} valueExtractor={item => item.id} idExtractor={item => item.id} labelExtractor={item => item.title} />
+                                                        : <div>No custom permission set found. <Link to={{ pathname: "/platform/permission-sets", state: { showCreateModal: true } }}  >Click here to create one.</Link></div>
+                                                }
                                             </FormField>
+                                            <div className="invalid-feedback col-12"><ErrorMessage name="permissionSetsError" /></div>
                                         </div>
                                         <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Submit </button>
                                     </div>
@@ -145,7 +151,7 @@ export default function ManageProfiles() {
         if (!data || !data.up_ps || !data.up_ps.length) return '';
         return data.up_ps.map((item, index) => {
             return <React.Fragment key={item.permissionset_id}>
-                <a type="button" className="link-with-underline" key={item.permissionset_id} onClick={() => handlePermissionSetClick(item.permissionset_id)}>
+                <a className="link-with-underline cursor-pointer" key={item.permissionset_id} onClick={() => handlePermissionSetClick(item.permissionset_id)}>
                     {item.ps.title}
                 </a>
                 {index < data.up_ps.length - 1 ? <span>,&nbsp;</span> : null}
@@ -206,7 +212,7 @@ export default function ManageProfiles() {
                                     <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Manage Profiles</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
-                            <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
+                            <span className="ml-auto mr-3"><i onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary cursor-pointer"></i></span>
                         </nav>
                         <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
                             <Modal.Header closeButton>

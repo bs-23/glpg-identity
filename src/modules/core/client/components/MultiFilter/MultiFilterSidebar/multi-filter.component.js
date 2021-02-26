@@ -338,11 +338,11 @@ const MultiFilter = (props, ref) => {
                                 <div role="group" aria-labelledby="my-radio-group">
                                     <div class="custom-control custom-radio">
                                         <input type="radio" class="custom-control-input mr-2" id="createnew" name="isChosenFromExisting" value="false" onChange={(e) => handleChooseFromExisting(e, formikProps)} checked={formikProps.values.isChosenFromExisting === 'false'} />
-                                        <label class="custom-control-label" type="button" for="createnew">Create New</label>
+                                        <label class="custom-control-label cursor-pointer" for="createnew">Create New</label>
                                     </div>
                                     <div class="custom-control custom-radio my-2">
                                         <input type="radio" class="custom-control-input mr-2" id="chooseformexisting" name="isChosenFromExisting" value="true" onChange={(e) => handleChooseFromExisting(e, formikProps)} checked={formikProps.values.isChosenFromExisting === 'true'} />
-                                        <label class="custom-control-label" type="button" for="chooseformexisting">Choose From Existing</label>
+                                        <label class="custom-control-label cursor-pointer" for="chooseformexisting">Choose From Existing</label>
                                     </div>
                                 </div>
                                 </div>}
@@ -415,18 +415,18 @@ const MultiFilter = (props, ref) => {
                                             onHide={() => setShow({ ...show, addFilter: false })}
                                         />
                                     }
-                                    <span type="button" className="cdp-text-primary filter__add-filter" onClick={() => setShow({ ...show, addFilter: true })}>
+                                    <span className="cdp-text-primary filter__add-filter cursor-pointer" onClick={() => setShow({ ...show, addFilter: true })}>
                                         <i class="fas fa-plus"></i> Manage Filter
                                     </span>
                                     {formikProps.values.filters.length > 0 &&
-                                        <span className="small" type="button" onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
+                                    <span className="small cursor-pointer" onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
                                     }
 
                                 </div>
                                 {(formikProps.values.filters.length > 1) &&
                                     <div className="d-flex flex-column">
                                         <div className="d-flex justify-content-between">
-                                            <span type="button" className="cdp-text-primary mb-2 pt-2" onClick={() => null}>
+                                        <span className="cdp-text-primary mb-2 pt-2 cursor-pointer" onClick={() => null}>
                                                 Add Filter Logic
                                             </span>
                                         </div>
@@ -473,7 +473,7 @@ const MultiFilter = (props, ref) => {
                                                     onChange={(e) => handleSaveOptionChange(e, formikProps)}
                                                     checked={formikProps.values.saveType === 'save_existing'}
                                                 />
-                                                <label class="custom-control-label" type="button" for="save_existing">Save existing</label>
+                                            <label class="custom-control-label cursor-pointer" for="save_existing">Save existing</label>
                                             </div>
                                             <div class="custom-control custom-radio my-2">
                                                 <input
@@ -485,7 +485,7 @@ const MultiFilter = (props, ref) => {
                                                     onChange={(e) => handleSaveOptionChange(e, formikProps)}
                                                     checked={formikProps.values.saveType === 'save_as_new'}
                                                 />
-                                                <label class="custom-control-label" type="button" for="save_as_new">Save as new</label>
+                                            <label class="custom-control-label cursor-pointer" for="save_as_new">Save as new</label>
                                             </div>
                                         </div>}
                                         <div className="">

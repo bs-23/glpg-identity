@@ -15,6 +15,7 @@ const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const { clearApplicationCache } = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.controller'));
 const archiveService = require(path.join(process.cwd(), 'src/modules/core/server/archive/archive.service'));
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 
@@ -117,7 +118,7 @@ async function getConsents(req, res) {
 
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -154,7 +155,7 @@ async function getUserConsents(req, res) {
 
         res.json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -215,7 +216,7 @@ async function getCdpConsents(req, res) {
 
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
 
         res.status(500).send('Internal server error');
     }
@@ -273,7 +274,7 @@ async function getCdpConsent(req, res) {
 
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -357,7 +358,7 @@ async function createConsent(req, res) {
 
                         data.translations.push(consentTransation);
                     } else {
-                        console.error('Create Translation failed: ', translation);
+                        logger.error('Create Translation failed: ', translation);
                     }
                 })
             );
@@ -375,7 +376,7 @@ async function createConsent(req, res) {
 
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -462,7 +463,7 @@ async function updateCdpConsent(req, res) {
 
                             response.translations[idx] = currentTranslationFromDB.dataValues;
                         } catch(err) {
-                            console.error(err);
+                            logger.error(err);
                         }
                     } else {
                         try{
@@ -482,7 +483,7 @@ async function updateCdpConsent(req, res) {
 
                             response.translations[idx] = createdTranslation;
                         } catch(err) {
-                            console.error(err);
+                            logger.error(err);
                         }
                     }
                 })
@@ -522,7 +523,7 @@ async function updateCdpConsent(req, res) {
 
         res.status(200).json(response);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }

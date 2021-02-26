@@ -100,7 +100,7 @@ export default function App() {
 
                 <Route path="/information" component={InformationRoutes}/>
 
-                <Route path="/my-profile" component={MyProfile}/>
+                <PrivateRoute path="/my-profile" component={MyProfile}/>
 
                 <PrivateRoute path="/help" component={HelpComponent}/>
 

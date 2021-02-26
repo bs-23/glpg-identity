@@ -47,3 +47,13 @@
     padding-left: 15px;
     padding-right: 15px;
 }
+
+@media (max-width: $screen-phone) {
+    .rdw-link-modal {
+        left: -100px;
+
+        &-btn {
+            width: 80px;
+        }
+    }
+}

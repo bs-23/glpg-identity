@@ -1,5 +1,7 @@
 const Audit = require('./audit.model');
 const _ = require('lodash');
+const path = require('path');
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 const difference = (updatedValue, previousValue) => {
     const updates = _.transform(updatedValue, function(result, value, key) {
@@ -16,7 +18,7 @@ async function log(data) {
     try {
         await Audit.create(data);
     } catch (error) {
-        console.log(error);
+        logger.error(error);
         return error;
     }
 }

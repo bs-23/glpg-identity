@@ -4,6 +4,7 @@ const Role = require('./role.model');
 const RolePermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/role-permissionSet.model.js"));
 const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model.js"));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 async function getRoles(req, res) {
     try {
@@ -23,7 +24,7 @@ async function getRoles(req, res) {
 
         res.json(roles);
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(500).send('Internal server error');
     }
 }
@@ -63,7 +64,7 @@ async function createRole(req, res) {
 
         res.json(role);
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(500).send('Internal server error');
     }
 }
@@ -107,7 +108,7 @@ async function editRole(req, res) {
 
         res.json(foundRole);
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(500).send('Internal server error');
     }
 }

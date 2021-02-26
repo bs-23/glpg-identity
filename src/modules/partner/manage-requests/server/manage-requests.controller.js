@@ -6,6 +6,7 @@ const ArchiveService = require(path.join(process.cwd(), 'src/modules/core/server
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 async function getPartnerRequests(req, res) {
     try {
@@ -38,7 +39,7 @@ async function getPartnerRequests(req, res) {
 
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -121,7 +122,7 @@ async function createPartnerRequest(req, res) {
 
         res.json(user);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -131,7 +132,7 @@ async function getPartnerRequest(req, res) {
         const data = await PartnerRequest.findOne({ where: { id: req.params.id } });
         res.json(data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -174,8 +175,9 @@ async function sendForm(req, res) {
         const sendFormLink = JSON.parse(metaData[0].dataValues.metadata).request_notification_link;
 
         await axios.post(sendFormLink, payload);
+        res.json('Form sent successfully.');
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -189,7 +191,7 @@ async function updatePartnerRequest(req, res) {
             email,
             mdr_id,
             country_iso2,
-            language,
+            locale,
             uuid,
             is_supplier,
             is_customer,
@@ -199,6 +201,7 @@ async function updatePartnerRequest(req, res) {
             workplace_name,
             workplace_type,
             specialty,
+            status,
             iqvia_wholesaler_id,
         } = req.body;
 
@@ -221,7 +224,8 @@ async function updatePartnerRequest(req, res) {
             email,
             mdr_id,
             country_iso2,
-            locale: language.toLowerCase() + "_" + country_iso2.toUpperCase(),
+            locale,
+            status,
             updated_by: req.user.id
         };
 
@@ -255,7 +259,7 @@ async function updatePartnerRequest(req, res) {
 
         res.json(updated_data);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -295,7 +299,7 @@ async function deletePartnerRequest(req, res) {
 
         res.json(partnerRequest);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }

@@ -8,8 +8,6 @@ import { registerSchema } from "../user.schema";
 import { useToasts } from "react-toast-notifications";
 import Dropdown from 'react-bootstrap/Dropdown';
 import CountryCodes from 'country-codes-list';
-import Modal from 'react-bootstrap/Modal';
-import Faq from '../../../faq/client/faq.component';
 
 export default function UserForm() {
     const dispatch = useDispatch();
@@ -18,10 +16,6 @@ export default function UserForm() {
     const [roles, setRoles] = useState([]);
     const history = useHistory();
     const { addToast } = useToasts();
-
-    const [showFaq, setShowFaq] = useState(false);
-    const handleCloseFaq = () => setShowFaq(false);
-    const handleShowFaq = () => setShowFaq(true);
 
     const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}');
     const countries = useSelector(state => state.countryReducer.countries);
@@ -46,45 +40,12 @@ export default function UserForm() {
     }, []);
 
     return (
-        <main className="app__content cdp-light-bg">
+        <main className="app__content">
             <div className="container-fluid">
-                <div className="row">
-                    <div className="col-12 px-0">
-                        <nav className="breadcrumb justify-content-between align-items-center" aria-label="breadcrumb">
-                            <ol className="rounded-0 m-0 p-0 d-none d-sm-flex">
-                                <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
-                                <li className="breadcrumb-item"><NavLink to="/platform/">Management of Customer Data platform</NavLink></li>
-                                <li className="breadcrumb-item"><NavLink to="/platform/users">CDP User List</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Add New User</span></li>
-                            </ol>
-                            <Dropdown className="dropdown-customize breadcrumb__dropdown d-block d-sm-none ml-2">
-                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center border-0">
-                                    <i className="fas fa-arrow-left mr-2"></i> Back
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                    <Dropdown.Item className="px-2" href="/"><i className="fas fa-link mr-2"></i> Dashboard</Dropdown.Item>
-                                    <Dropdown.Item className="px-2" href="/platform"><i className="fas fa-link mr-2"></i> Management of Customer Data platform</Dropdown.Item>
-                                    <Dropdown.Item className="px-2" href="/platform/user"><i className="fas fa-link mr-2"></i> CDP User List</Dropdown.Item>
-                                    <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Add New User</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                            <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
-                        </nav>
-                        <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
-                            <Modal.Header closeButton>
-                                <Modal.Title>Questions You May Have</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body className="faq__in-modal"><Faq topic="manage-access" /></Modal.Body>
-                        </Modal>
-                    </div>
-                </div>
                 {countries && countries.length &&
                     <div className="row">
                         <div className="col-12">
-                            <div className="shadow-sm bg-white mb-3">
-                                <h2 className="d-flex align-items-center p-3 px-sm-4 py-sm-4 page-title light">
-                                    <span className="page-title__text font-weight-bold py-3">Create New User</span>
-                                </h2>
+                            <div className="bg-white">
                                 <div className="add-user p-3">
                                     <Formik
                                         initialValues={{
@@ -122,7 +83,7 @@ export default function UserForm() {
                                         {formikProps => (
                                             <Form onSubmit={formikProps.handleSubmit}>
                                                 <div className="row">
-                                                    <div className="col-12 col-lg-8 col-xl-6">
+                                                    <div className="col-12 col-lg-12 col-xl-12">
                                                         <div className="row">
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">

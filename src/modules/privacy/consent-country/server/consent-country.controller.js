@@ -8,6 +8,7 @@ const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/con
 const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model.js'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const { clearApplicationCache } = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.controller'));
+const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 function getTranslationViewmodels(translations) {
     return translations.map(t => ({
@@ -41,7 +42,7 @@ async function getCountryConsents(req, res) {
 
         res.json(countryConsents);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -97,7 +98,7 @@ async function assignConsentToCountry(req, res) {
 
         res.json(createdCountryConsent);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -135,7 +136,7 @@ async function updateCountryConsent(req, res) {
 
         res.json(consentCountry);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -165,7 +166,7 @@ async function deleteCountryConsent(req, res) {
 
         res.sendStatus(200);
     } catch (err) {
-        console.error(err);
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }

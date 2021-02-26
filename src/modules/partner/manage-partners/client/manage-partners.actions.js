@@ -2,67 +2,23 @@ import axios from 'axios';
 import Types from './manage-partners.types';
 
 export function getHcpPartners(query = '') {
+    query = !query ? '?type=hcp' : query + '&type=hcp';
     return {
         type: Types.GET_PARTNER,
         payload: axios({
             method: 'get',
-            url: `/api/partners/hcps${query}`
+            url: `/api/partners${query}`
         })
     };
 }
-
-
-export function createHcpPartner(data) {
-    return {
-        type: Types.POST_PARTNER,
-        payload: axios({
-            method: 'post',
-            url: `/api/partners/hcps/`,
-            data
-        })
-    };
-}
-
-export function updateHcpPartner(id, data) {
-    return {
-        type: Types.UPDATE_PARTNER,
-        payload: axios({
-            method: 'put',
-            url: `/api/partners/hcps/${id}`,
-            data
-        })
-    };
-}
-
 
 export function getHcoPartners(query = '') {
+    query = !query ? '?type=hco' : query + '&type=hco';
     return {
         type: Types.GET_PARTNER,
         payload: axios({
             method: 'get',
-            url: `/api/partners/hcos${query}`
-        })
-    };
-}
-
-export function createHcoPartner(data) {
-    return {
-        type: Types.POST_PARTNER,
-        payload: axios({
-            method: 'post',
-            url: `/api/partners/hcos/`,
-            data
-        })
-    };
-}
-
-export function updateHcoPartner(id, data) {
-    return {
-        type: Types.UPDATE_PARTNER,
-        payload: axios({
-            method: 'put',
-            url: `/api/partners/hcos/${id}`,
-            data
+            url: `/api/partners${query}`
         })
     };
 }
