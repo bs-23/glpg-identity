@@ -607,7 +607,7 @@ async function getTrialDetails(req, res) {
         id = req.params.id;
         let result = await Trial.findOne({
             where: {
-                [Op.and]: [
+                [Op.or]: [
                 {trial_fixed_id: id},
                 {id: id}
                 ]
