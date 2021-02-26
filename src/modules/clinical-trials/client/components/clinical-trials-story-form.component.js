@@ -91,7 +91,7 @@ const StoryForm = (props) => {
 
                                             <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor='topics'>Selected Clinical Trials <span className="text-danger">*</span></label>
-                                                <div className= "border rounded tree-view">
+                                                <div className= "border rounded tree-view-main">
                                                     <Tree/>
                                                 </div>
                                             </div>
