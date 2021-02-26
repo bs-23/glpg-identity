@@ -6,6 +6,7 @@ import { useToasts } from 'react-toast-notifications';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
 import StoryForm from './clinical-trials-story-form.component';
+import getTrialItems from './clinical-trials.actions'
 
 var dumpData =  function() {
     const url = `/api/clinical-trials`;
@@ -40,9 +41,10 @@ var showAllClinicalTrials =  function() {
         payload: axios({
             method: 'get',
             url
-        }).then(out=>console.log(out))
+        }).then(out=>console.log('object data-->',out))
     };
 }
+
 
 var mergeProcessData =  function() {
     const url = `/api/clinical-trials/merge-versions`;
@@ -103,6 +105,7 @@ const ClinicalTrials = (props) => {
     const [sort, setSort] = useState({ type: 'asc', value: null });
     const [show, setShow] = useState(false);
     const [addMode, setAddMode] = useState(false);
+    const dispatch = useDispatch();
     const addDataSample = {
         title: 'Sample Title',
         trials : [1,2,3],
@@ -125,11 +128,23 @@ const ClinicalTrials = (props) => {
         return country && country.countryname;
     };
 
+    useEffect(() => {
+        dispatch(getTrialItems);
+    });
+
     let hcpUsers = {
         users: [
             {
                 firstname: 'test1',
                 lastname: 'test2'
+            },
+            {
+                firstname: 'test3',
+                lastname: 'test4'
+            },
+            {
+                firstname: 'test5',
+                lastname: 'test6'
             }
         ]
     }
