@@ -48,6 +48,19 @@ var mergeProcessData =  function() {
     };
 }
 
+var syncGeocodes =  function() {
+    const url = `/api/clinical-trials/sync-geocodes`;
+
+    return {
+        payload: axios({
+            method: 'post',
+            url,
+            data: {
+              }
+        }).then(out=>console.log(out))
+    };
+}
+
 
 const ClinicalTrials = (props) => {
     const showFaq = false;
@@ -354,6 +367,7 @@ const ClinicalTrials = (props) => {
                     <button onClick={dumpData}>Dump Data</button>
                     <button onClick={showAllVersions}>Show All Versions</button>
                     <button onClick={mergeProcessData}>Merge</button>
+                    <button onClick={syncGeocodes}>Sync Geocodes</button>
                 </div>
             </div>
         </main>

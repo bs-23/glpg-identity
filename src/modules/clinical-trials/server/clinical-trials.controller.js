@@ -194,7 +194,7 @@ function genderInputTextMapping(gender) {
     gender = gender? gender.split(',').map(x=>{
         switch(x){
             case 'GENDER_ALL':
-                return 'Child';
+                return 'All';
                 break;
             case 'GENDER_MALE':
                 return 'Male'
@@ -215,7 +215,7 @@ async function dumpAllData(req, res) {
     const { urlToGetData, description } = req.body;
     res.set({ 'content-type': 'application/json; charset=utf-8' });
     try {
-        await new Promise((resolve, reject) => {
+        res.json(await new Promise((resolve, reject) => {
         https.get(urlToGetData, (resp) => {
         let data = '';
             resp.on('data', (chunk) => {
@@ -235,13 +235,13 @@ async function dumpAllData(req, res) {
                 }
 
                 response.data = result;
-                resolve(res.json(response));
+                resolve(response);
             });
 
         }).on('error', (err) => {
             reject('Error: ' + err.message);
         });
-    });
+    }));
     } catch (err) {
         logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
@@ -272,6 +272,56 @@ async function showAllVersions(req, res) {
     }
 }
 
+async function updateLatLngCode(location, count, location_facility, location_zip, latLngNotFound){
+    var {lat,lng} = await getCoordinates(location_facility, location_zip, location.location_city, location.location_state, location.location_country, count.to_update);
+                location.lat = lat;
+                location.lng = lng;
+                count.to_update++;
+                if(!latLngNotFound(location)) {
+                    await location.save({ fields: ['lat', 'lng'] });
+                    count.updated++
+                }
+                return location;
+}
+
+async function syncGeoCodes(req, res) {
+    const response = new Response({}, []);
+    res.set({ 'content-type': 'application/json; charset=utf-8' });
+
+    try {
+        let result = await Location.findAll({
+        });
+        let count = {
+            to_update : 0,
+            updated : 0
+        };
+        await Promise.all(result.map(async (location, index)=>{
+            let latLngNotFound = (location)=>location.lat === -1 && location.lng === -1;
+            if(latLngNotFound(location)) {
+                location = await updateLatLngCode(location, count, location.location_facility, location.location_zip, latLngNotFound);
+                if(latLngNotFound(location)) {
+                    count.to_update--;
+                    location = await updateLatLngCode(location, count, '', location.location_zip, latLngNotFound);
+                    if(latLngNotFound(location)) {
+                        count.to_update--;
+                        location = await updateLatLngCode(location, count, '', '', latLngNotFound);
+                    }
+                }
+            }
+            return location;
+        }));
+
+
+        response.data = {
+            count
+        };
+        res.json(response);
+        } catch (err) {
+            console.error(err);
+            response.errors.push(new CustomError('Internal server error', 500));
+            res.status(500).send(response);
+        }
+}
 
 async function mergeProcessData(req, res) {
     const response = new Response({}, []);
@@ -295,7 +345,15 @@ async function mergeProcessData(req, res) {
                     element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0].toLowerCase().includes('Cystic Fibrosis'.toLowerCase())){
                      return {};
                  }
-                 return {
+
+                var paragraph = element.Study.ProtocolSection.EligibilityModule.EligibilityCriteria;
+                var paragraph_lowercase = paragraph.toLowerCase();
+                var inclusion_label_text = paragraph_lowercase.indexOf('key inclusion criteria')!==-1? 'key inclusion criteria' : 'inclusion criteria';
+                var exclusion_label_text = paragraph_lowercase.lastIndexOf('key exclusion criteria')!==-1? 'key exclusion criteria' : 
+                                            paragraph_lowercase.lastIndexOf('exclusion criteria')!==-1? 'exclusion criteria':
+                                            paragraph_lowercase.lastIndexOf('note')!==-1? 'note': '';
+                var note_label_text = paragraph_lowercase.lastIndexOf('note')!==-1?  'note' : '';
+                 return { 
                     'trial_fixed_id': uuid(),
                     'indication': element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0].capitalize().split('|').join(','),
                     'indication_group': groupIndications(element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0]),
@@ -311,19 +369,54 @@ async function mergeProcessData(req, res) {
                     'std_age': element.Study.ProtocolSection.EligibilityModule.StdAgeList.StdAge.join(','),
                     'phase': element.Study.ProtocolSection.DesignModule.PhaseList.Phase[0],
                     'trial_status': element.Study.ProtocolSection.StatusModule.OverallStatus,
-                    'inclusion_criteria': element.Study.ProtocolSection.EligibilityModule.EligibilityCriteria,
-                    'exclusion_criteria': element.Study.ProtocolSection.EligibilityModule.EligibilityCriteria,
-                    'type_of_drug': element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList && element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.length ? element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.reduce((a,b)=>{a.concat = a.InterventionName+','+b.InterventionName; return a}).concat: null,
+                    'inclusion_criteria': (()=>{
+                        try{
+                            var inclusion_boundary = [paragraph_lowercase.indexOf(inclusion_label_text)+inclusion_label_text.length, paragraph_lowercase.indexOf(exclusion_label_text)];
+                            var inclusion_text = paragraph.substring(inclusion_boundary[0],inclusion_boundary[1]);
+                            var inclusion_html_single_list = `<li>${inclusion_text.replace(/^[ :]+/g,'').split('\n').join('</li><li>')}</li>`;
+                            var inclusion_nested_sections = inclusion_html_single_list.match(/:<\/li>(<li><\/li>.+?<li><\/li>)/g);
+                            var inclusion_html_nested_list = inclusion_html_single_list.split(/:<\/li><li><\/li>.+?<li><\/li>/g);
+                            var inclusion_counter = 0;
+                            var inclusion_html = inclusion_html_nested_list.reduce((a,b)=>`${a}:</li><li>${inclusion_nested_sections[inclusion_counter++].replace(/<li><\/li>/g,'').replace(/:<\/li>/g,'')}</li>${b}`);
+                            inclusion_html = inclusion_html.replace(/<li><\/li>/g,'');
+                            return inclusion_html;
+                        }catch(ex){
+                            return '';
+                        }
+                    })(),
+                    'exclusion_criteria': (()=>{
+                        try{
+                            if (exclusion_label_text === 'note') return '';
+                            var exclusion_end_index = paragraph_lowercase.indexOf(note_label_text) !==-1 && note_label_text !== ''? paragraph_lowercase.indexOf(note_label_text) : paragraph_lowercase.length;
+                            var exclusion_boundary = [paragraph_lowercase.indexOf(exclusion_label_text)+exclusion_label_text.length, exclusion_end_index];
+                            var exclusion_text = paragraph.substring(exclusion_boundary[0],exclusion_boundary[1])
+                            var exclusion_html_single_list = `<li>${exclusion_text.replace(/^[ :]+/g,'').split('\n').join('</li><li>')}</li>`;
+                            var exclusion_nested_sections = exclusion_html_single_list.match(/:<\/li>(<li><\/li>.+?<li><\/li>)/g);
+                            var exclusion_html_nested_list = exclusion_html_single_list.split(/:<\/li><li><\/li>.+?<li><\/li>/g);
+                            var exclusion_counter = 0;
+                            var exclusion_html = exclusion_html_nested_list.reduce((a,b)=>`${a}:</li><li>${exclusion_nested_sections[exclusion_counter++].replace(/<li><\/li>/g,'').replace(/:<\/li>/g,'')}</li>${b}`);
+                            exclusion_html = exclusion_html.replace(/<li><\/li>/g,'');
+                            return exclusion_html
+                        }catch(ex){
+                            return '';
+                        }
+                    })(),
+                    'note_criteria':(()=>{
+                        try{
+                            if(note_label_text == '') return  '';
+                            var note_boundary = [paragraph_lowercase.indexOf(note_label_text)+note_label_text.length, paragraph_lowercase.length];
+                            var note_text = paragraph.substring(note_boundary[0],note_boundary[1]).replace(/^[ :]+/g,'').replace('note:', '');
+                            return note_text;
+                        }catch(ex){
+                            return '';
+                        }
+                    })(),
+                    'type_of_drug': element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList && element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.length ? element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.reduce((a,b)=>{b.InterventionName = a.InterventionName+','+b.InterventionName; return b}).InterventionName: null,
                     'story_telling': 'In this trial, doctors hope to find out how the study drug works together with your current standard treatment in terms of its effects on your lung function and IPF in general. People with IPF have increased levels of something called autotaxin, which is thought to have a role in the progression of IPF. The trial is investigating whether decreasing the activity of autotaxin can have a positive effect. It will also look at how well the study drug is tolerated.',
                     'trial_start_date': new Date(element.Study.ProtocolSection.StatusModule.StartDateStruct.StartDate),
                     'trial_end_date': element.Study.ProtocolSection.StatusModule.CompletionDateStruct.CompletionDate ? new Date(element.Study.ProtocolSection.StatusModule.CompletionDateStruct.CompletionDate) : null,
                     'locations': locationList? await Promise.all(locationList.Location.map(async (location,index)=> {
-                        var {lat,lng} = await getCoordinates(location.LocationFacility,
-                            location.LocationZip,
-                            location.LocationCity,
-                            location.LocationState,
-                            location.LocationCountry,
-                            index);
+                        var {lat,lng} = {lat: -1, lng: -1};  
                         return {
                         'location_status': location.LocationStatus? location.LocationStatus : element.Study.ProtocolSection.StatusModule.OverallStatus,
                         'location_facility': location.LocationFacility,
@@ -386,30 +479,36 @@ async function getTrials(req, res) {
     phase = phaseInputTextMapping(phase);
     age_ranges = ageRangeInputTextMapping(age_ranges);
     gender = genderInputTextMapping(gender);
-    cordinates = await getCoordinates('', zipcode, '', '', country, 1);
+    if (zipcode || country){
+        cordinates = await getCoordinates('', zipcode, '', '', country, 0);
+    } else {
+        cordinates = {lat: -1, lng: -1}
+    }
 
     try {
         let query = {
-            [Op.or]: [
+            [Op.and]: [
             {trial_status: status},
             {indication: indication},
-            {indication_group: indication}
+            {indication_group: indication},
+            {gender: gender},
+            {phase: phase}
             ]
         }
         let remove_index = [];
-        query[[Op.or][0]].forEach((sub_or_query, index) =>{
+        query[[Op.and][0]].forEach((sub_or_query, index) =>{
             Object.keys(sub_or_query).forEach(key=>{
                 if (!sub_or_query[key]){
-                    delete query[[Op.or][0]][index][key]
+                    delete query[[Op.and][0]][index][key]
                     remove_index.push(index);
                 }
         })});
         remove_index.sort(function(a,b){ return b - a; }).forEach(index=>{
-            query[[Op.or][0]].splice(index, 1);
+            query[[Op.and][0]].splice(index, 1);
         });
 
-        if (!query[[Op.or][0]].length){
-            delete query[[Op.or][0]];
+        if (!query[[Op.and][0]].length){
+            delete query[[Op.and][0]];
         }
 
         Object.keys(query).forEach(key=>{
@@ -435,17 +534,59 @@ async function getTrials(req, res) {
             return res.status(204).send(response);
         }
 
+        let search_result = result.map(x=>{ 
+            let least_distance = Number.MAX_SAFE_INTEGER;
+            x.dataValues.locations.map(location=>{
+                let calculated_distance = haversineDistanceInKM(cordinates.lat, cordinates.lng, location.lat, location.lng)
+                least_distance = Math.min(least_distance, calculated_distance);
+                return {...location, calculated_distance};
+            });
+            delete x.dataValues.locations;
+        if(distance){
+            if(distance>= least_distance){
+                return {...x.dataValues,  distance: Math.round(least_distance*10*100) / 100 + ' km'}
+            } else {
+                return '';
+        }} else{
+            return {...x.dataValues,  distance: Math.round(least_distance*10*100) / 100 + ' km'}
+        }
+
+    }).filter(x=>x!=='').filter(x=>{
+        if(! free_text_search){
+            return true;
+        }
+        if(x.indication.includes(free_text_search)){
+            return true;
+        }
+        if(x.indication_group.includes(free_text_search)){
+            return true;
+        }
+        if(x.phase.includes(free_text_search)){
+            return true;
+        }
+        if(x.gender.includes(free_text_search)){
+            return true;
+        }
+        if(x.std_age.includes(free_text_search)){
+            return true;
+        }
+        if(x.clinical_trial_brief_title.includes(free_text_search)){
+            return true;
+        }
+        if(x.official_title.includes(free_text_search)){
+            return true;
+        }
+        if(x.trial_status.includes(free_text_search)){
+            return true;
+        }
+
+        return false;
+
+    });
+
         response.data = {
-           search_result: result.map(x=>{
-                let least_distance = Number.MAX_SAFE_INTEGER;
-                x.dataValues.locations.map(location=>{
-                    let distance = haversineDistanceInKM(cordinates.lat, cordinates.lng, location.lat, location.lng)
-                    least_distance = Math.min(least_distance, distance);
-                    return {...location, distance};
-                });
-                delete x.dataValues.locations;
-            return {...x.dataValues,  distance: Math.round(least_distance*10*100) / 100 + ' km'}}),
-           total_count: total_item_count
+           search_result: search_result,
+           total_count: search_result.length
         }
         res.json(response);
     } catch (err) {
@@ -491,7 +632,122 @@ async function getTrialDetails(req, res) {
 async function getCountryList(req, res) {
     const response = new Response({}, []);
     res.set({ 'content-type': 'application/json; charset=utf-8' });
-    let countriesWithISO = [{'code':'IL','name':'Israel'},{'code':'IT','name':'Italy'},{'code':'JP','name':'Japan'},{'code':'KR','name':'Korea, Republic of'},{'code':'LV','name':'Latvia'},{'code':'MY','name':'Malaysia'},{'code':'MX','name':'Mexico'},{'code':'NZ','name':'New Zealand'},{'code':'MD','name':'Moldova, Republic of'},{'code':'NL','name':'Netherlands'},{'code':'NZ','name':'New Zealand'},{'code':'NO','name':'Norway'},{'code':'OM','name':'Oman'},{'code':'PE','name':'Peru'},{'code':'PL','name':'Poland'},{'code':'PT','name':'Portugal'},{'code':'RO','name':'Romania'},{'code':'RU','name':'Russian Federation'},{'code':'RS','name':'Serbia'},{'code':'SG','name':'Singapore'},{'code':'SK','name':'Slovakia'},{'code':'ZA','name':'South Africa'},{'code':'ES','name':'Spain'},{'code':'LK','name':'Sri Lanka'},{'code':'SE','name':'Sweden'},{'code':'CH','name':'Switzerland'},{'code':'TW','name':'Taiwan'},{'code':'TH','name':'Thailand'},{'code':'TR','name':'Turkey'},{'code':'UA','name':'Ukraine'},{'code':'GB','name':'United Kingdom'},{'code':'US','name':'United States of America'}];
+    let countriesWithISO = [
+        {'code':'AR','name':'Argentina'
+        },
+        {'code':'AU','name':'Australia'
+        },
+        {'code':'AT','name':'Austria'
+        },
+        {'code':'BE','name':'Belgium'
+        },
+        {'code':'BA','name':'Bosnia and Herzegovina'
+        },
+        {'code':'BR','name':'Brazil'
+        },
+        {'code':'BG','name':'Bulgaria'
+        },
+        {'code':'CA','name':'Canada'
+        },
+        {'code':'CL','name':'Chile'
+        },
+        {'code':'CO','name':'Colombia'
+        },
+        {'code':'HR','name':'Croatia'
+        },
+        {'code':'CZ','name':'Czechia'
+        },
+        {'code':'DK','name':'Denmark'
+        },
+        {'code':'EE','name':'Estonia'
+        },
+        {'code':'FI','name':'Finland'
+        },
+        {'code':'FR','name':'France'
+        },
+        {'code':'GE','name':'Georgia'
+        },
+        {'code':'DE','name':'Germany'
+        },
+        {'code':'GR','name':'Greece'
+        },
+        {'code':'GT','name':'Guatemala'
+        },
+        {'code':'HK','name':'Hong Kong'
+        },
+        {'code':'HU','name':'Hungary'
+        },
+        {'code':'IS','name':'Iceland'
+        },
+        {'code':'IN','name':'India'
+        },
+        {'code':'IE','name':'Ireland'
+        },
+        {'code':'IL','name':'Israel'
+        },
+        {'code':'IT','name':'Italy'
+        },
+        {'code':'JP','name':'Japan'
+        },
+        {'code':'KR','name':'Korea, Republic of'
+        },
+        {'code':'LV','name':'Latvia'
+        },
+        {'code':'MY','name':'Malaysia'
+        },
+        {'code':'MX','name':'Mexico'
+        },
+        {'code':'NZ','name':'New Zealand'
+        },
+        {'code':'MD','name':'Moldova, Republic of'
+        },
+        {'code':'NL','name':'Netherlands'
+        },
+        {'code':'NZ','name':'New Zealand'
+        },
+        {'code':'NO','name':'Norway'
+        },
+        {'code':'OM','name':'Oman'
+        },
+        {'code':'PE','name':'Peru'
+        },
+        {'code':'PL','name':'Poland'
+        },
+        {'code':'PT','name':'Portugal'
+        },
+        {'code':'RO','name':'Romania'
+        },
+        {'code':'RU','name':'Russian Federation'
+        },
+        {'code':'RS','name':'Serbia'
+        },
+        {'code':'SG','name':'Singapore'
+        },
+        {'code':'SK','name':'Slovakia'
+        },
+        {'code':'ZA','name':'South Africa'
+        },
+        {'code':'ES','name':'Spain'
+        },
+        {'code':'LK','name':'Sri Lanka'
+        },
+        {'code':'SE','name':'Sweden'
+        },
+        {'code':'CH','name':'Switzerland'
+        },
+        {'code':'TW','name':'Taiwan'
+        },
+        {'code':'TH','name':'Thailand'
+        },
+        {'code':'TR','name':'Turkey'
+        },
+        {'code':'UA','name':'Ukraine'
+        },
+        {'code':'GB','name':'United Kingdom'
+        },
+        {'code':'US','name':'United States of America'
+        }
+    ];
     try {
         response.data = countriesWithISO;
         res.json(response);
@@ -536,10 +792,10 @@ async function getConditionsWithDetails(req, res) {
         {indication: 'Idiopathic Pulmonary Fibrosis', description:  'Idiopathic pulmonary fibrosis (IPF) is a rare, progressive illness of the respiratory system, characterized by the thickening and stiffening of lung tissue, associated with the formation of scar tissue. It is a type of chronic scarring lung disease characterized by a progressive and irreversible decline in lung function.[3][4] The tissue in the lungs becomes thick and stiff, which affects the tissue that surrounds the air sacs in the lungs.'},
         {indication: 'Lupus Erythematosus', description:  'Lupus, technically known as systemic lupus erythematosus (SLE), is an autoimmune disease in which the body\'s immune system mistakenly attacks healthy tissue in many parts of the body.[1] Symptoms vary between people and may be mild to severe.[1] Common symptoms include painful and swollen joints, fever, chest pain, hair loss, mouth ulcers, swollen lymph nodes, feeling tired, and a red rash which is most commonly on the face.[1] Often there are periods of illness, called flares, and periods of remission during which there are few symptoms.'},
         {indication: 'Psoriatic Arthritis', description:  'Psoriatic arthritis is a form of arthritis that affects some people who have psoriasis — a condition that features red patches of skin topped with silvery scales. Most people develop psoriasis first and are later diagnosed with psoriatic arthritis, but the joint problems can sometimes begin before skin patches appear.'},
-        {indication: 'OsteoarthritisOsteoarthritis (OA) is a type of joint disease that results from breakdown of joint cartilage and underlying bone. The most common symptoms are joint pain and stiffness. Usually the symptoms progress slowly over years. Initially they may occur only after exercise but can become constant over time.'},
+        {indication: 'Osteoarthritis', description:'OsteoarthritisOsteoarthritis (OA) is a type of joint disease that results from breakdown of joint cartilage and underlying bone. The most common symptoms are joint pain and stiffness. Usually the symptoms progress slowly over years. Initially they may occur only after exercise but can become constant over time.'},
         {indication: 'Rheumatoid Arthritis', description:  'Rheumatoid arthritis is a chronic inflammatory disorder that can affect more than just your joints. In some people, the condition can damage a wide variety of body systems, including the skin, eyes, lungs, heart and blood vessels.'},
         {indication: 'Sjogren\'s Syndrome', description:  'Sjogren\'s syndrome is an autoimmune disease. This means that your immune system attacks parts of your own body by mistake. In Sjogren\'s syndrome, it attacks the glands that make tears and saliva. This causes a dry mouth and dry eyes. You may have dryness in other places that need moisture, such as your nose, throat, and skin. Sjogren\'s can also affect other parts of the body, including your joints, lungs, kidneys, blood vessels, digestive organs, and nerves.'},
-        {indication: 'Systemic scleroderma, or systemic sclerosis, is an autoimmune rheumatic disease characterised by excessive production and accumulation of collagen, called fibrosis, in the skin and internal organs and by injuries to small arteries. There are two major subgroups of systemic sclerosis based on the extent of skin involvement: limited and diffuse. The limited form affects areas below, but not above, the elbows and knees with or without involvement of the face. The diffuse form also affects the skin above the elbows and knees and can also spread to the torso. Visceral organs, including the kidneys, heart, lungs, and gastrointestinal tract can also be affected by the fibrotic process. Prognosis is determined by the form of the disease and the extent of visceral involvement. Patients with limited systemic sclerosis have a better prognosis than those with the diffuse form. Death is most often caused by lung, heart, and kidney involvement. There is also a slight increase in the risk of cancer.'},
+        {indication: 'Systemic Sclerosis', description:'Systemic scleroderma, or systemic sclerosis, is an autoimmune rheumatic disease characterised by excessive production and accumulation of collagen, called fibrosis, in the skin and internal organs and by injuries to small arteries. There are two major subgroups of systemic sclerosis based on the extent of skin involvement: limited and diffuse. The limited form affects areas below, but not above, the elbows and knees with or without involvement of the face. The diffuse form also affects the skin above the elbows and knees and can also spread to the torso. Visceral organs, including the kidneys, heart, lungs, and gastrointestinal tract can also be affected by the fibrotic process. Prognosis is determined by the form of the disease and the extent of visceral involvement. Patients with limited systemic sclerosis have a better prognosis than those with the diffuse form. Death is most often caused by lung, heart, and kidney involvement. There is also a slight increase in the risk of cancer.'},
         {indication: 'Ulcerative Colitis', description: 'Ulcerative colitis (UC) is a long-term condition that results in inflammation and ulcers of the colon and rectum. The primary symptoms of active disease are abdominal pain and diarrhea mixed with blood. Weight loss, fever, and anemia may also occur.'},
         {indication: 'Uveitis', description:  'Uveitis is a form of eye inflammation. It affects the middle layer of tissue in the eye wall (uvea). Uveitis (u-vee-I-tis) warning signs often come on suddenly and get worse quickly. They include eye redness, pain and blurred vision.'}
     ].sort();
@@ -551,7 +807,6 @@ async function getConditionsWithDetails(req, res) {
         logger.error(err);
     }
 }
-
 
 async function validateAddress(req, res) {
     const response = new Response({}, []);
@@ -575,3 +830,4 @@ exports.getCountryList = getCountryList;
 exports.getConditions = getConditions;
 exports.getConditionsWithDetails = getConditionsWithDetails;
 exports.validateAddress = validateAddress;
+exports.syncGeoCodes = syncGeoCodes;
