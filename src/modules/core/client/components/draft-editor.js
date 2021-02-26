@@ -5,6 +5,7 @@ import { ContentState, EditorState, convertFromHTML } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import 'draft-js/dist/Draft.css';
+import htmlToDraft from 'html-to-draftjs';
 
 String.prototype.escapedHtmlLength = function() {
     return this ? validator.escape(this).length : 0;
@@ -68,14 +69,19 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
     }
 
     const convertHTMLtoState = (html) => {
-        const blocksFromHTML = convertFromHTML(html);
+        // const blocksFromHTML = convertFromHTML(html);
 
-        const state = ContentState.createFromBlockArray(
-            blocksFromHTML.contentBlocks,
-            blocksFromHTML.entityMap,
-        );
+        // const state = ContentState.createFromBlockArray(
+        //     blocksFromHTML.contentBlocks,
+        //     blocksFromHTML.entityMap,
+        // );
 
-        return EditorState.createWithContent(state);
+        // return EditorState.createWithContent(state);
+
+        const blocksFromHtml = htmlToDraft(html);
+        const { contentBlocks, entityMap } = blocksFromHtml;
+        const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap);
+        return EditorState.createWithContent(contentState);
     }
 
     const cleanupEmptyHtmlTags = (html) => {
