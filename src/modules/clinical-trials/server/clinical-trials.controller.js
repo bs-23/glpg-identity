@@ -193,7 +193,7 @@ function genderInputTextMapping(gender) {
     gender = gender? gender.split(',').map(x=>{
         switch(x){
             case 'GENDER_ALL':
-                return 'Child';
+                return 'All';
                 break;
             case 'GENDER_MALE':
                 return 'Male'
@@ -478,30 +478,36 @@ async function getTrials(req, res) {
     phase = phaseInputTextMapping(phase);
     age_ranges = ageRangeInputTextMapping(age_ranges);
     gender = genderInputTextMapping(gender);
-    cordinates = await getCoordinates('', zipcode, '', '', country, 1);
+    if (zipcode || country){
+        cordinates = await getCoordinates('', zipcode, '', '', country, 0);
+    } else {
+        cordinates = {lat: -1, lng: -1}
+    }
 
     try {
         let query = {
-            [Op.or]: [
+            [Op.and]: [
             {trial_status: status},
             {indication: indication},
-            {indication_group: indication}
+            {indication_group: indication},
+            {gender: gender},
+            {phase: phase}
             ]
         }
         let remove_index = [];
-        query[[Op.or][0]].forEach((sub_or_query, index) =>{
+        query[[Op.and][0]].forEach((sub_or_query, index) =>{
             Object.keys(sub_or_query).forEach(key=>{
                 if (!sub_or_query[key]){
-                    delete query[[Op.or][0]][index][key]
+                    delete query[[Op.and][0]][index][key]
                     remove_index.push(index);
                 }
         })});
         remove_index.sort(function(a,b){ return b - a; }).forEach(index=>{
-            query[[Op.or][0]].splice(index, 1);
+            query[[Op.and][0]].splice(index, 1);
         });
 
-        if (!query[[Op.or][0]].length){
-            delete query[[Op.or][0]];
+        if (!query[[Op.and][0]].length){
+            delete query[[Op.and][0]];
         }
 
         Object.keys(query).forEach(key=>{
@@ -527,17 +533,59 @@ async function getTrials(req, res) {
             return res.status(204).send(response);
         }
 
+        let search_result = result.map(x=>{ 
+            let least_distance = Number.MAX_SAFE_INTEGER;
+            x.dataValues.locations.map(location=>{
+                let calculated_distance = haversineDistanceInKM(cordinates.lat, cordinates.lng, location.lat, location.lng)
+                least_distance = Math.min(least_distance, calculated_distance);
+                return {...location, calculated_distance};
+            });
+            delete x.dataValues.locations;
+        if(distance){
+            if(distance>= least_distance){
+                return {...x.dataValues,  distance: Math.round(least_distance*10*100) / 100 + ' km'}
+            } else {
+                return '';
+        }} else{
+            return {...x.dataValues,  distance: Math.round(least_distance*10*100) / 100 + ' km'}
+        }
+
+    }).filter(x=>x!=='').filter(x=>{
+        if(! free_text_search){
+            return true;
+        }
+        if(x.indication.includes(free_text_search)){
+            return true;
+        }
+        if(x.indication_group.includes(free_text_search)){
+            return true;
+        }
+        if(x.phase.includes(free_text_search)){
+            return true;
+        }
+        if(x.gender.includes(free_text_search)){
+            return true;
+        }
+        if(x.std_age.includes(free_text_search)){
+            return true;
+        }
+        if(x.clinical_trial_brief_title.includes(free_text_search)){
+            return true;
+        }
+        if(x.official_title.includes(free_text_search)){
+            return true;
+        }
+        if(x.trial_status.includes(free_text_search)){
+            return true;
+        }
+
+        return false;
+
+    });
+
         response.data = {
-           search_result: result.map(x=>{ 
-                let least_distance = Number.MAX_SAFE_INTEGER;
-                x.dataValues.locations.map(location=>{
-                    let distance = haversineDistanceInKM(cordinates.lat, cordinates.lng, location.lat, location.lng)
-                    least_distance = Math.min(least_distance, distance);
-                    return {...location, distance};
-                });
-                delete x.dataValues.locations;
-            return {...x.dataValues,  distance: Math.round(least_distance*10*100) / 100 + ' km'}}),
-           total_count: total_item_count
+           search_result: search_result,
+           total_count: search_result.length
         }
         res.json(response);
     } catch (err) {
@@ -558,7 +606,7 @@ async function getTrialDetails(req, res) {
         id = req.params.id;
         let result = await Trial.findOne({
             where: {
-                [Op.or]: [
+                [Op.and]: [
                 {trial_fixed_id: id},
                 {id: id}
                 ]
