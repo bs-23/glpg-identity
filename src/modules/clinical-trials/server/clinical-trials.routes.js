@@ -8,11 +8,14 @@ const { ServiceGuard } = require(path.join(process.cwd(), 'src/modules/core/serv
 
 module.exports = app => {
     app.route('/api/clinical-trials-cdp')
-        .get(CDPAuthStrategy, controller.getTrials)
-        
+        .get(CDPAuthStrategy, controller.getTrials);
+
     app.route('/api/clinical-trials')
         .get(auth, controller.getTrials)
         .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.dumpAllData);
+    
+    app.route('/api/clinical-trials/update')
+        .put(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.updateClinicalTrials);
 
     app.route('/api/clinical-trials/versions')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.showAllVersions);

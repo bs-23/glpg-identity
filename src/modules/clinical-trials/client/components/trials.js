@@ -60,6 +60,26 @@ var mergeProcessData =  function() {
     };
 }
 
+var update_clinicalTrials =  function() {
+    const url = `/api/clinical-trials/update`;
+
+    var story_telling = prompt("your story :", "dummy story");
+    var trial_fixed_id = prompt("id :", "f5dc122a-5a78-4d5a-98af-0708db00c398");
+
+    return {
+        payload: axios({
+            method: 'put',
+            url,
+            data: [
+                {
+                    story_telling,
+                    trial_fixed_id
+                }
+            ]
+        }).then(out=>console.log(out))
+    };
+}
+
 var syncGeocodes =  function() {
     const url = `/api/clinical-trials/sync-geocodes`;
     return {
@@ -390,6 +410,7 @@ const ClinicalTrials = (props) => {
                     <button onClick={mergeProcessData}>Merge</button>
                     <button onClick={syncGeocodes}>Sync Geocodes</button>
                     <button onClick={showAllClinicalTrials}>Show All Clinical Trials</button>
+                    <button onClick={update_clinicalTrials}>Update Clinical Trials</button>
                 </div>
             </div>
         </main>

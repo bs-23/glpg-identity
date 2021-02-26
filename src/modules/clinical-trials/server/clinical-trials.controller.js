@@ -629,6 +629,42 @@ async function getTrialDetails(req, res) {
     }
 }
 
+async function updateClinicalTrials(req, res) {
+    const response = new Response({}, []);
+    const reqdata = req.body;
+    res.set({ 'content-type': 'application/json; charset=utf-8' });
+    try {
+        let ids = reqdata.map(x=>x.trial_fixed_id)
+        let trials = await Trial.findAll({
+            where: {
+                [Op.or]: [
+                {trial_fixed_id: ids},
+                {id: ids}
+                ]
+            }
+        });
+
+        let result = trials.map(trial=>{
+            let newStoryItm = reqdata.filter(x=>x.trial_fixed_id === trial.trial_fixed_id)[0];
+            trial.story_telling = newStoryItm.story_telling;
+            trial.save({ fields: ['story_telling'] });
+            return trial; 
+        });
+
+        if (!result) {
+            response.data = [];
+            return res.status(204).send(response);
+        }
+
+        response.data = result;
+        res.json(response);
+    } catch (err) {
+        logger.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
 async function getCountryList(req, res) {
     const response = new Response({}, []);
     res.set({ 'content-type': 'application/json; charset=utf-8' });
@@ -831,3 +867,4 @@ exports.getConditions = getConditions;
 exports.getConditionsWithDetails = getConditionsWithDetails;
 exports.validateAddress = validateAddress;
 exports.syncGeoCodes = syncGeoCodes;
+exports.updateClinicalTrials = updateClinicalTrials;
