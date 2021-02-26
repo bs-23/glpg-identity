@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import validator from 'validator';
 import {stateToHTML} from 'draft-js-export-html';
-import { ContentState, EditorState, convertFromHTML } from 'draft-js';
+import { ContentState, EditorState, convertFromHTML, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import 'draft-js/dist/Draft.css';
 import htmlToDraft from 'html-to-draftjs';
+import draftToHtml from 'draftjs-to-html';
 
 String.prototype.escapedHtmlLength = function() {
     return this ? validator.escape(this).length : 0;
@@ -25,47 +26,55 @@ const jsToInlineStyleMapping = {
     'fontsize': 'font-size'
 }
 
-let draftJsToHTMLOptions = {
-    inlineStyleFn: (styles) => {
-        const inlineStyles = {};
-
-        styles.map((value) => {
-            const styleKey = value.split('-')[0];
-            const styleValue = value.split('-')[1];
-            const inlineStyleKey = jsToInlineStyleMapping[styleKey];
-            if(inlineStyleKey) {
-                inlineStyles[inlineStyleKey] = styleValue;
-            }
-        });
-
-        if(Object.keys(inlineStyles).length > 0) {
-            return {
-                element: 'span',
-                style: inlineStyles
-            }
-        }
-    },
-    entityStyleFn: (entity) => {
-        const entityType = entity.get('type').toLowerCase();
-        if (entityType === 'link') {
-            const data = entity.getData();
-            return {
-                element: 'a',
-                attributes: {
-                    href: data.url,
-                    target: data.targetOption
-                }
-            };
-        }
-    }
+const htmlToDraftCallback = (nodeName, node) => {
+    console.log(nodeName, node);
 }
+
+// let draftJsToHTMLOptions = {
+//     inlineStyleFn: (styles) => {
+//         const inlineStyles = {};
+//         styles.map((value) => {
+//             const styleKey = value.split('-')[0];
+//             const styleValue = value.split('-')[1];
+//             console.log(styleKey, styleValue)
+//             const inlineStyleKey = jsToInlineStyleMapping[styleKey];
+//             if(inlineStyleKey) {
+//                 inlineStyles[inlineStyleKey] = styleValue;
+//             }
+//         });
+
+//         if(Object.keys(inlineStyles).length > 0) {
+//             return {
+//                 element: 'span',
+//                 style: inlineStyles
+//             }
+//         }
+//     },
+//     entityStyleFn: (entity) => {
+//         const entityType = entity.get('type').toLowerCase();
+//         console.log(entityType)
+//         if (entityType === 'link') {
+//             const data = entity.getData();
+//             return {
+//                 element: 'a',
+//                 attributes: {
+//                     href: data.url,
+//                     target: data.targetOption
+//                 }
+//             };
+//         }
+//     }
+// }
 
 export default function DraftEditor({ onChangeHTML, htmlContent }) {
     const [editorState, setEditorState] = React.useState(() => EditorState.createEmpty());
 
     const convertContentToHtml = (state) => {
-        const editorContentInHTML = stateToHTML(state.getCurrentContent(), draftJsToHTMLOptions);
-        return editorContentInHTML;
+        // const editorContentInHTML = stateToHTML(state.getCurrentContent(), draftJsToHTMLOptions);
+        // return editorContentInHTML;
+        const html = draftToHtml(convertToRaw(state.getCurrentContent()));
+        console.log(html);
+        return html;
     }
 
     const convertHTMLtoState = (html) => {
@@ -78,7 +87,7 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
 
         // return EditorState.createWithContent(state);
 
-        const blocksFromHtml = htmlToDraft(html);
+        const blocksFromHtml = htmlToDraft(html, htmlToDraftCallback);
         const { contentBlocks, entityMap } = blocksFromHtml;
         const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap);
         return EditorState.createWithContent(contentState);
