@@ -479,6 +479,7 @@ async function getTrials(req, res) {
     phase = phaseInputTextMapping(phase);
     age_ranges = ageRangeInputTextMapping(age_ranges);
     gender = genderInputTextMapping(gender);
+    free_text_search = free_text_search.toLowerCase();
     if (zipcode || country){
         cordinates = await getCoordinates('', zipcode, '', '', country, 0);
     } else {
@@ -552,34 +553,37 @@ async function getTrials(req, res) {
         }
 
     }).filter(x=>x!=='').filter(x=>{
+        try{
         if(! free_text_search){
             return true;
         }
-        if(x.indication.includes(free_text_search)){
+        if(x.indication.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.indication_group.includes(free_text_search)){
+        if(x.indication_group.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.phase.includes(free_text_search)){
+        if(x.phase.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.gender.includes(free_text_search)){
+        if(x.gender.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.std_age.includes(free_text_search)){
+        if(x.std_age.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.clinical_trial_brief_title.includes(free_text_search)){
+        if(x.clinical_trial_brief_title.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.official_title.includes(free_text_search)){
+        if(x.official_title.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.trial_status.includes(free_text_search)){
+        if(x.trial_status.toLowerCase().includes(free_text_search)){
             return true;
         }
-
+    } catch(ex){
+        
+    }
         return false;
 
     });
