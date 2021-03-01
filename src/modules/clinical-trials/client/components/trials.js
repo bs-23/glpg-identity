@@ -6,6 +6,7 @@ import { useToasts } from 'react-toast-notifications';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
 import StoryForm from './clinical-trials-story-form.component';
+import { getClinicalTrialDetails } from './clinical-trials.actions';
 
 var dumpData =  function() {
     const url = `/api/clinical-trials`;
@@ -40,20 +41,20 @@ var showAllClinicalTrials =  function() {
         payload: axios({
             method: 'get',
             url
-        }).then(out=>console.log(out))
+        })
     };
 }
 
-var getClinicalTrialDetails =  function() {
-    let id = prompt("set your id:", 'bf3fcdd9-2c14-4a1e-b02c-787c379c0aa9');
-    const url = `/api/clinical-trials-cdp/${id}`;
-    return {
-        payload: axios({
-            method: 'get',
-            url
-        }).then(out=>console.log(out))
-    };
-}
+// var getClinicalTrialDetails =  function() {
+//     let id = prompt("set your id:", 'bf3fcdd9-2c14-4a1e-b02c-787c379c0aa9');
+//     const url = `/api/clinical-trials-cdp/${id}`;
+//     return {
+//         payload: axios({
+//             method: 'get',
+//             url
+//         }).then(out => console.log(out))
+//     };
+// }
 
 var mergeProcessData =  function() {
     const url = `/api/clinical-trials/merge-versions`;
@@ -94,6 +95,7 @@ const ClinicalTrials = (props) => {
     const [sort, setSort] = useState({ type: 'asc', value: null });
     const [show, setShow] = useState(false);
     const [addMode, setAddMode] = useState(false);
+    const [formDetails, setFormDetails] = useState(null);
     const addDataSample = {
         title: 'Sample Title',
         trials : [1,2,3],
@@ -102,6 +104,8 @@ const ClinicalTrials = (props) => {
         story_plaintext: 'sample story plain text'
     }
     const allCountries = useSelector(state => state.countryReducer.allCountries);
+    const trialDetails = useSelector(state => state.clinicalTrialsReducer.trialDetails);
+    const dispatch = useDispatch();
     const pageLeft = () => {
         if (hcpUsers.page > 1) urlChange(hcpUsers.page - 1, hcpUsers.codBase, params.get('orderBy'), true);
     };
@@ -124,6 +128,7 @@ const ClinicalTrials = (props) => {
             }
         ]
     }
+    let details = null;
     return (
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
@@ -235,8 +240,9 @@ const ClinicalTrials = (props) => {
                                                     </td>
                                                     <td className="text-break">{row.telephone || '--'}</td>
                                                     <td>
-                                                    <button onClick={()=>{setShow(true); setAddMode(true);}}>Add Story</button>
-                                                    {show ? <StoryForm addMode={addMode} changeShow={(val) => setShow(val)} show={show} trialIDs={[1,2,3]} addData = {addDataSample} /> : null}
+                                                    <button onClick={()=>{setShow(true); setAddMode(true); dispatch(getClinicalTrialDetails())}}>Add Story</button>
+                                                    {/* {console.log('paisi ja', trialDetails?.data)} */}
+                                                    {show ? <StoryForm trialDetails={trialDetails} addMode={addMode} changeShow={(val) => setShow(val)} show={show} trialIDs={[1,2,3]} addData = {addDataSample} /> : null}
                                                     </td>
                                                 </tr>
                                             ))}
@@ -401,7 +407,7 @@ const ClinicalTrials = (props) => {
                     <button onClick={mergeProcessData}>Merge</button>
                     <button onClick={syncGeocodes}>Sync Geocodes</button>
                     <button onClick={showAllClinicalTrials}>Show All Clinical Trials</button>
-                    <button onClick={getClinicalTrialDetails}>Show trial details</button>
+                    {/* <button onClick={getClinicalTrialDetails}>Show trial details</button> */}
                 </div>
             </div>
         </main>

@@ -84,7 +84,7 @@ const StoryForm = (props) => {
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor='title'> Titel of the Story <span className="text-danger">*</span></label>
+                                                <label className="font-weight-bold" htmlFor='title'> Title of the Story <span className="text-danger">*</span></label>
                                                 <Field className="form-control preference" type='text' name='title' id='title' />
                                                 <div className="invalid-feedback"><ErrorMessage name="title" /></div>
                                             </div>
@@ -92,7 +92,7 @@ const StoryForm = (props) => {
                                             <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor='topics'>Selected Clinical Trials <span className="text-danger">*</span></label>
                                                 <div className= "border rounded tree-view">
-                                                    <Tree/>
+                                                    <Tree trialDetails={props.trialDetails}/>
                                                 </div>
                                             </div>
                                             

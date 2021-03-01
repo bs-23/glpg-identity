@@ -5,7 +5,8 @@ const initialState = {
         age : 0,
         gender: 'none'
     },
-    clinialTrial_items: {}
+    clinialTrial_items: {},
+    trialDetails: null
 };
 
 export default function reducer(state = initialState, action) {
@@ -15,7 +16,9 @@ export default function reducer(state = initialState, action) {
             return { ...state, clinialTrial_item: action.payload };
         }
 
-        
+        case Types.GET_TRIAL_DETAILS_FULFILLED: {
+            return {...state, trialDetails: action.payload.data };
+        }
     }
 
     return state;
