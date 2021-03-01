@@ -479,7 +479,7 @@ async function getTrials(req, res) {
     phase = phaseInputTextMapping(phase);
     age_ranges = ageRangeInputTextMapping(age_ranges);
     gender = genderInputTextMapping(gender);
-    free_text_search = free_text_search.toLowerCase();
+    free_text_search = free_text_search? free_text_search.toLowerCase() : '';
     if (zipcode || country){
         cordinates = await getCoordinates('', zipcode, '', '', country, 0);
     } else {

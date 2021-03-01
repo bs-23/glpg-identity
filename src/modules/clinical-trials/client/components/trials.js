@@ -123,6 +123,22 @@ const ClinicalTrials = (props) => {
         story: 'sample story',
         story_plaintext: 'sample story plain text'
     }
+    let [hcpUsers, setHcpUsers] = useState({
+        users: [
+            {
+                firstname: 'test1',
+                lastname: 'test2'
+            },
+            {
+                firstname: 'test3',
+                lastname: 'test4'
+            },
+            {
+                firstname: 'test5',
+                lastname: 'test6'
+            }
+        ]
+    });
     const allCountries = useSelector(state => state.countryReducer.allCountries);
     const pageLeft = () => {
         if (hcpUsers.page > 1) urlChange(hcpUsers.page - 1, hcpUsers.codBase, params.get('orderBy'), true);
@@ -138,29 +154,43 @@ const ClinicalTrials = (props) => {
         return country && country.countryname;
     };
 
-    useEffect(() => {
-        dispatch(getTrialItems);
-    });
+    const setTrials = () => {
+        const url = `/api/clinical-trials-cdp`;
+        axios({
+            method: 'get',
+            url
+        }).then(out=>setHcpUsers(out));
+    };
 
-    let hcpUsers = {
-        users: [
-            {
-                firstname: 'test1',
-                lastname: 'test2'
-            },
-            {
-                firstname: 'test3',
-                lastname: 'test4'
-            },
-            {
-                firstname: 'test5',
-                lastname: 'test6'
-            }
-        ]
-    }
+    useEffect(() => {
+        
+    });
+    
+
+    setTimeout(() => {
+        setHcpUsers({
+            users: [
+                {
+                    firstname: 'x',
+                    lastname: 'test2'
+                },
+                {
+                    firstname: 'y',
+                    lastname: 'test4'
+                },
+                {
+                    firstname: 'z',
+                    lastname: 'test6'
+                }
+            ]
+        });
+        const url = `/api/clinical-trials-cdp`;
+        
+    }, 3000);
+    
     return (
         <main className="app__content cdp-light-bg">
-            <div className="container-fluid">
+            <div  className="container-fluid">
                 <div className="row">
                     <div className="col-12 px-0">
                         <nav className="breadcrumb justify-content-between align-items-center" aria-label="breadcrumb">
