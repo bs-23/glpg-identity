@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import validator from 'validator';
-import {stateToHTML} from 'draft-js-export-html';
+// import {stateToHTML} from 'draft-js-export-html';
 import { ContentState, EditorState, convertFromHTML, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
@@ -19,16 +19,16 @@ const toolbarOptions = {
     }
 }
 
-const jsToInlineStyleMapping = {
-    'color': 'color',
-    'bgcolor': 'background-color',
-    'fontfamily': 'fontFamily',
-    'fontsize': 'font-size'
-}
+// const jsToInlineStyleMapping = {
+//     'color': 'color',
+//     'bgcolor': 'background-color',
+//     'fontfamily': 'fontFamily',
+//     'fontsize': 'font-size'
+// }
 
-const htmlToDraftCallback = (nodeName, node) => {
-    console.log(nodeName, node);
-}
+// const htmlToDraftCallback = (nodeName, node) => {
+//     console.log(nodeName, node);
+// }
 
 // let draftJsToHTMLOptions = {
 //     inlineStyleFn: (styles) => {
@@ -74,6 +74,7 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
         // return editorContentInHTML;
         const html = draftToHtml(convertToRaw(state.getCurrentContent()));
         console.log(html);
+        console.log(cleanupEmptyHtmlTags(html));
         return html;
     }
 
@@ -87,7 +88,7 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
 
         // return EditorState.createWithContent(state);
 
-        const blocksFromHtml = htmlToDraft(html, htmlToDraftCallback);
+        const blocksFromHtml = htmlToDraft(html);
         const { contentBlocks, entityMap } = blocksFromHtml;
         const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap);
         return EditorState.createWithContent(contentState);
@@ -102,11 +103,14 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
                 .replace(/<u[^>]*>(\s|&nbsp;)*<\/u>/g, '')
                 .replace(/<strong[^>]*>(\s|&nbsp;)*<\/strong>/g, '')
                 .replace(/<em[^>]*>(\s|&nbsp;)*<\/em>/g, '')
-                // .replace(/(?<=<p>)(&nbsp;)*/g, '')
+                .replace(/<ins[^>]*>(\s|&nbsp;)*<\/ins>/g, '')
+                .replace(/\s{2,}/g, ' ') // replace more than two spaces with one space
+                .replace(/&nbsp;/g, '')  // remove &nbps
+                .replace(/(\s)*(?=<\/[^>]*>)/g, '') // remove spaces before closing tag
+                .replace(/((<[^/>]*>)\s+)/g, '$2') // replace spaces between opening tag (<>) and text
                 .replace(/(&nbsp;)*(?=<\/p>)/g, '')
+                // .replace(/(?<=<p>)(&nbsp;)*/g, '')
                 // .replace(/(?<=<p>(<strong>|<u>|<em>))&nbsp;/g, '')
-                .replace(/(\s)*(?=<\/[^>]*>)/g, '')
-                .replace(/&nbsp;/g, '');
 
             if(cleanedupHtml.length === html.length) break;
             html = cleanedupHtml;
