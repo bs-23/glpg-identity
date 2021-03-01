@@ -725,8 +725,8 @@ components:
                     items:
                         type: string
         partnerRequestInfo:
-                type: object
-                properties:
+            type: object
+            properties:
                 id:
                     type: string
                 application_id:
@@ -751,7 +751,9 @@ components:
                 uuid:
                     type: string
                 company_codes:
-                    type: string
+                    type: array
+                    items:
+                        type: string
                 country_iso2:
                     type: string
                 locale:

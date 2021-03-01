@@ -247,7 +247,6 @@ const HcoPartnerRequests = () => {
                                             <th>Name</th>
                                             <th>MDR ID</th>
                                             <th>Status</th>
-                                            <th>Partner Type</th>
                                             <th>Email Address</th>
                                             <th>Procurement Contact</th>
                                             <th>Country</th>
@@ -261,7 +260,6 @@ const HcoPartnerRequests = () => {
                                                 <td data-for="Name">{`${row.first_name} ${row.last_name}`}</td>
                                                 <td data-for="MDR ID">{row.mdr_id}</td>
                                                 <td data-for="Status">{row.status}</td>
-                                                <td data-for="Partner Type">{row.partner_type}</td>
                                                 <td data-for="Email Address">{row.email}</td>
                                                 <td data-for="Procurement Contact">{row.procurement_contact}</td>
                                                 <td data-for="Country">{getCountryName(row.country_iso2)}</td>
