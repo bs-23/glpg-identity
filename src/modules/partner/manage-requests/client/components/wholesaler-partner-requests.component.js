@@ -252,7 +252,7 @@ const WholesalerPartnerRequests = () => {
                                                     <td data-for="Status">{row.status}</td>
                                                     <td data-for="Company Code">
                                                     {
-                                                        row.company_codes.map((companyCode, idx) => (
+                                                        row.company_codes && row.company_codes.length && row.company_codes.map((companyCode, idx) => (
                                                             <span className="badge badge-pill badge-light mr-1" key={idx}>{companyCode}</span>
                                                         ))
                                                     }
