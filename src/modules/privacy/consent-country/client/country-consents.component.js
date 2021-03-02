@@ -147,7 +147,7 @@ const CountryConsents = () => {
                                     <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Manage Consent Per Country</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
-                            <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
+                            <span className="ml-auto mr-3"><i onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary cursor-pointer"></i></span>
                         </nav>
 
                         <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
@@ -160,10 +160,10 @@ const CountryConsents = () => {
                 </div>
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-end align-items-center mb-3 mt-4">
+                        <div className="d-flex justify-content-end align-items-center py-3 cdp-table__responsive-sticky-panel">
                             <div class="d-flex justify-content-between align-items-center">
                                 <button onClick={() => { setShow(true); setEditable(false); setEditOption(null); }} className="btn cdp-btn-secondary text-white ml-2">
-                                    <i className="icon icon-plus pr-1"></i> Assign consent to country
+                                    <i className="icon icon-plus pr-1"></i> <span className="d-none d-sm-inline-block pl-1">Assign consent to country</span>
                                 </button>
                                 {cdp_consents &&
                                     <CountryConsentForm
@@ -203,7 +203,7 @@ const CountryConsents = () => {
                                                 (
                                                     <tr key={coonsentIndex}>
                                                         <td data-for="Preference/Purpose">
-                                                            <span type="button" className="btn btn-link cdp-text-primary p-0 text-left" onClick={() => showConsentDetailsModal(consent.id)}>
+                                                                <span className="btn btn-link cdp-text-primary p-0 text-left cursor-pointer" onClick={() => showConsentDetailsModal(consent.id)}>
                                                                 <i className="fas fa-caret-right mr-1"></i>{consent.preference} {consent.is_active ? '' : '(Inactive)'}
                                                             </span>
                                                         </td>

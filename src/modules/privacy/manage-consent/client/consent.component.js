@@ -111,7 +111,7 @@ const ConsentComponent = ({ consentId, setConsentId }) => {
                                                     <Card.Body className="ml-0 accordion-consent__body"><div>{parse(translation.rich_text)}</div></Card.Body>
                                                 </Accordion.Collapse>
                                                 <Card.Header className="p-0">
-                                                    <Accordion.Toggle as={Card.Header} variant="link" eventKey={'locale-' + index} type="button" className="card-header d-flex justify-content-between">
+                                                    <Accordion.Toggle as={Card.Header} variant="link" eventKey={'locale-' + index} className="card-header d-flex justify-content-between cursor-pointer">
                                                         {translation.locale}
                                                         <i class="icon icon-arrow-down ml-2 faq__icon-down"></i>
                                                     </Accordion.Toggle>
