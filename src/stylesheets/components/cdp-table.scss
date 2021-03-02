@@ -272,6 +272,14 @@
 
             thead {
                 display: none;
+
+                &.cdp-table__responsive-header-block {
+                    display: block !important;
+
+                    th {
+                        border: none;
+                    }
+                }
             }
 
             tbody {
