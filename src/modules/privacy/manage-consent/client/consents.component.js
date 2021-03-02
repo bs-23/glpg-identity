@@ -59,18 +59,18 @@ const ConsentsComponent = () => {
                 </div>
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                            <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">CDP Consents</h4>
+                        <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel">
+                            <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">CDP Consents</h4>
                             <div class="d-flex justify-content-between align-items-center">
                                 <NavLink to="/consent/create" className="btn cdp-btn-secondary text-white ml-2">
-                                    <i className="icon icon-plus pr-1"></i> Create new consent
+                                    <i className="icon icon-plus pr-1"></i> <span className="d-none d-sm-inline-block pl-1">Create new consent</span>
                                 </NavLink>
                             </div>
                         </div>
 
                         {cdp_consents && cdp_consents.length > 0 &&
-                            <div className="table-responsive shadow-sm bg-white">
-                                <table className="table table-hover table-sm mb-0 cdp-table">
+                            <div className="table-responsive shadow-sm bg-white mb-3 cdp-table__responsive-wrapper">
+                            <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th>Preference</th>
@@ -85,8 +85,8 @@ const ConsentsComponent = () => {
                                     <tbody className="cdp-table__body bg-white">
                                         {cdp_consents.map((row, index) => (
                                             <tr key={index}>
-                                                <td>{row.preference}</td>
-                                                <td>
+                                                <td data-for="Preference">{row.preference}</td>
+                                                <td data-for="Preference">
                                                     {row.translations && row.translations.length > 0 && row.translations.map(translation => (
                                                         <OverlayTrigger key={translation.id}
                                                             placement="top"
@@ -104,11 +104,11 @@ const ConsentsComponent = () => {
                                                         </OverlayTrigger>
                                                     ))}
                                                 </td>
-                                                <td>{row.consent_category ? row.consent_category.title : ''}</td>
-                                                <td>{row.is_active ? 'Active' : 'Inactive'}</td>
-                                                <td>{row.createdBy}</td>
-                                                <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
-                                                <td><Dropdown className="ml-auto dropdown-customize">
+                                                <td data-for="Available Localizations">{row.consent_category ? row.consent_category.title : ''}</td>
+                                                <td data-for="Status">{row.is_active ? 'Active' : 'Inactive'}</td>
+                                                <td data-for="Created By">{row.createdBy}</td>
+                                                <td data-for="Created On">{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
+                                                <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>

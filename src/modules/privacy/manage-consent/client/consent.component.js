@@ -43,35 +43,35 @@ const ConsentComponent = ({ consentId, setConsentId }) => {
         </Modal.Header>
         <Modal.Body>
             {consent ? (
-                <div className="px-4 py-3">
+                <div className="px-3 px-sm-4 py-3">
                     <div className="row">
-                        <div className="col-12 pb-3 px-0">
-                            <label className="mt-1 font-weight-bold">Preference / Purpose</label>
-                            <div className="">{consent.preference}</div>
+                        <div className="col-12 pb-0 pb-sm-3 px-0 row">
+                            <label className="mt-1 font-weight-bold col-5 col-sm-12">Preference / Purpose</label>
+                            <div className="col-7 col-sm-12">{consent.preference}</div>
                         </div>
-                        <div className="col-12 col-sm-6 pb-3 px-0">
-                            <label className="mt-1 font-weight-bold">Consent Type</label>
-                            <div>{consent.consent_category ? consent.consent_category.title : ''}</div>
+                        <div className="col-12 col-sm-6 pb-0 pb-sm-3 px-0 row">
+                            <label className="mt-1 font-weight-bold col-5 col-sm-12">Consent Type</label>
+                            <div className="col-7 col-sm-12">{consent.consent_category ? consent.consent_category.title : ''}</div>
                         </div>
-                        <div className="col-12 col-sm-6 pb-3 px-0">
-                            <label className="mt-1 font-weight-bold">Status</label>
-                            <div>{consent.is_active ? 'Active' : 'Inactive'}</div>
+                        <div className="col-12 col-sm-6 pb-0 pb-sm-3 px-0 row">
+                            <label className="mt-1 font-weight-bold col-5 col-sm-12">Status</label>
+                            <div className="col-7 col-sm-12">{consent.is_active ? 'Active' : 'Inactive'}</div>
                         </div>
-                        <div className="col-12 col-sm-6 pb-3 px-0">
-                            <label className="mt-1 font-weight-bold">Created By</label>
-                            <div>{consent.createdBy || '--'}</div>
+                        <div className="col-12 col-sm-6 pb-0 pb-sm-3 px-0 row">
+                            <label className="mt-1 font-weight-bold col-5 col-sm-12">Created By</label>
+                            <div className="col-7 col-sm-12">{consent.createdBy || '--'}</div>
                         </div>
-                        <div className="col-12 col-sm-6 pb-3 px-0">
-                            <label className="mt-1 font-weight-bold">Created On</label>
-                            <div>{(new Date(consent.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
+                        <div className="col-12 col-sm-6 pb-0 pb-sm-3 px-0 row">
+                            <label className="mt-1 font-weight-bold col-5 col-sm-12">Created On</label>
+                            <div className="col-7 col-sm-12">{(new Date(consent.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                         </div>
-                        <div className="col-12 col-sm-6 pb-3 px-0">
-                            <label className="mt-1 font-weight-bold">Last Updated By</label>
-                            <div>{consent.updatedBy || '--'}</div>
+                        <div className="col-12 col-sm-6 pb-0 pb-sm-3 px-0 row">
+                            <label className="mt-1 font-weight-bold col-5 col-sm-12">Last Updated By</label>
+                            <div className="col-7 col-sm-12">{consent.updatedBy || '--'}</div>
                         </div>
-                        <div className="col-12 col-sm-6 pb-3 px-0">
-                            <label className="mt-1 font-weight-bold">Last Updated On</label>
-                            <div>{(new Date(consent.updated_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
+                        <div className="col-12 col-sm-6 pb-3 px-0 row">
+                            <label className="mt-1 font-weight-bold col-5 col-sm-12">Last Updated On</label>
+                            <div className="col-7 col-sm-12">{(new Date(consent.updated_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
                         </div>
                         <div className="col-12 pb-3 px-0">
                             <label className="mt-1 font-weight-bold">Assigned Countries</label>
