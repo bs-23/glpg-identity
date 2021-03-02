@@ -182,8 +182,8 @@ const CountryConsents = () => {
                         {
                             getGroupedCountryConsents().map((countryConsent, countryConsentIndex) =>
                             (
-                                    <div className="table-responsive shadow-sm bg-white mb-3  cdp-table__responsive-wrapper" key={countryConsentIndex}>
-                                    <table className="table table-hover table-sm mb-0 cdp-table mb-2 cdp-table__responsive">
+                                    <div className="table-responsive shadow-sm bg-white mb-4 cdp-table__responsive-wrapper" key={countryConsentIndex}>
+                                    <table className="table table-hover table-sm mb-0 cdp-table mb-0 cdp-table__responsive">
                                         <thead className="cdp-bg-primary-lighter cdp-table__header cdp-table__responsive-header-block">
                                             <tr>
                                                 <th colSpan="4"><div className="d-flex align-items-center text-white"><img alt={countryConsent.name} src={countryConsent.flagUrl} height="18" className="mr-2" /> {countryConsent.name}</div></th>
