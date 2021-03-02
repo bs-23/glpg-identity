@@ -49,12 +49,14 @@ paths:
                                     - patient_org
                                 registration_number:
                                     type: string
+                                    description: Required when individual_type is "individual"
                                 country_iso2:
                                     type: string
                                 locale:
                                     type: string
                                 uuid:
                                     type: string
+                                    description: Required when individual_type is "legal_entity"
                                 is_italian_hcp:
                                     type: boolean
                                     description: Only for HCP
@@ -75,6 +77,10 @@ paths:
                                     type: string
                                 currency:
                                     type: string
+                                swift_code:
+                                    type: string
+                                routing:
+                                    type: string
                                 documents:
                                     type: array
                                     description: Upto 5 files each upto 5 MB in size. File name may contain a-zA-Z0-9/!\'() .*-_
@@ -89,7 +95,6 @@ paths:
                               - email
                               - country_iso2
                               - locale
-                              - uuid
             responses:
                 200:
                     description: The request has succeeded.
@@ -196,12 +201,14 @@ paths:
                                     - patient_org
                                 registration_number:
                                     type: string
+                                    description: Required when individual_type is "legal_entity"
                                 country_iso2:
                                     type: string
                                 locale:
                                     type: string
                                 uuid:
                                     type: string
+                                    description: Required when individual_type is "individual"
                                 is_italian_hcp:
                                     type: boolean
                                     description: Only for HCP
@@ -222,6 +229,10 @@ paths:
                                     type: string
                                 currency:
                                     type: string
+                                swift_code:
+                                    type: string
+                                routing:
+                                    type: string
                                 documents:
                                     type: array
                                     description: Upto 5 files each upto 5 MB in size. File name may contain a-zA-Z0-9/!\'() .*-_
@@ -232,6 +243,14 @@ paths:
                                     type: array
                                     items:
                                         type: string
+                            required:
+                              - type
+                              - request_id
+                              - first_name
+                              - last_name
+                              - email
+                              - country_iso2
+                              - locale
             responses:
                 200:
                     description: The request has succeeded.
@@ -335,6 +354,10 @@ paths:
                                 bank_account_no:
                                     type: string
                                 currency:
+                                    type: string
+                                swift_code:
+                                    type: string
+                                routing:
                                     type: string
                                 documents:
                                     type: array
@@ -492,6 +515,10 @@ paths:
                                 bank_account_no:
                                     type: string
                                 currency:
+                                    type: string
+                                swift_code:
+                                    type: string
+                                routing:
                                     type: string
                                 documents:
                                     type: array

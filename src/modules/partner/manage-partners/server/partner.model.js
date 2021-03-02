@@ -68,7 +68,6 @@ const Partner = sequelize.cdpConnector.define('partners', {
         type: DataTypes.STRING
     },
     uuid: {
-        allowNull: false,
         type: DataTypes.STRING(20)
     },
     onekey_id: {
@@ -94,6 +93,12 @@ const Partner = sequelize.cdpConnector.define('partners', {
         type: DataTypes.STRING
     },
     currency: {
+        type: DataTypes.STRING
+    },
+    swift_code: {
+        type: DataTypes.STRING
+    },
+    routing: {
         type: DataTypes.STRING
     },
     status: {
