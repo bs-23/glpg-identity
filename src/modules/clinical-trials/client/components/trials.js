@@ -6,7 +6,7 @@ import { useToasts } from 'react-toast-notifications';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
 import StoryForm from './clinical-trials-story-form.component';
-import getTrialItems from './clinical-trials.actions'
+import {getTrialItems} from './clinical-trials.actions'
 
 var dumpData =  function() {
     const url = `/api/clinical-trials`;
@@ -108,6 +108,7 @@ var syncGeocodes =  function() {
 const ClinicalTrials = (props) => {
     const showFaq = false;
     const isFilterEnabled = false;
+    const trialItems = useSelector(state => state.clinicalTrialsReducer);
     const { addToast } = useToasts();
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
@@ -163,9 +164,13 @@ const ClinicalTrials = (props) => {
     };
 
     useEffect(() => {
-        
-    });
-    
+        dispatch(getTrialItems());
+        //setTrialItems(selectedTrialItems);
+    },[]);
+
+    //let topic = ['desease 1', 'desease 2', 'desease 3'];
+    const topic = false;
+    const serviceTopics = [{title : 'desease 1'}, {title : 'desease 2'}, {title : 'desease 3'}];
 
     setTimeout(() => {
         setHcpUsers({
@@ -221,7 +226,7 @@ const ClinicalTrials = (props) => {
                 </div>
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-between align-items-end mt-1">
+                        <div className="d-flex justify-content-between align-items-center py-3  cdp-table__responsive-sticky-panel">
                             {/* <div>
                                 <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1 pb-2">Manage Content For Each Clinical Trial</h4>
                                 <div>
@@ -229,7 +234,30 @@ const ClinicalTrials = (props) => {
                                     <div className="custom-tab px-3 py-3 cdp-border-primary active">CRDLP</div>
                                 </div>
                             </div> */}
+                             <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">
+                             Manage Content For Each Clinical Trial
+                                
+                            </h4>
+
+
+
                             <div className="d-flex pt-3 pt-sm-0 mb-2">
+                                <Dropdown className="ml-auto dropdown-customize">
+                                        <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
+                                            <i className="icon icon-filter mr-2 mb-n1"></i> <span className="d-none d-sm-inline-block">{!topic ? 'Filter by Condition' : serviceTopics.find(x => x.slug === topic).title}</span>
+                                        </Dropdown.Toggle>
+                                        <Dropdown.Menu>
+                                            {serviceTopics.length > 0 && topic && <Dropdown.Item href={`/platform/manage-faq`}>All</Dropdown.Item>}
+
+                                            {
+                                                serviceTopics.length > 0 && serviceTopics.map((item, index) => (
+                                                    item.title !== topic && <Dropdown.Item href={`/platform/manage-faq?page=1&topic=${item.slug}`} key={index}>{item.title}</Dropdown.Item>
+                                                ))
+                                            }
+                                        </Dropdown.Menu>
+                                </Dropdown>
+
+                                
                                 <button className={`btn  ${isFilterEnabled ? 'multifilter_enabled cdp-btn-primary text-white' : 'cdp-btn-outline-primary'}`} onClick={() => setShowFilterSidebar(true)} >
                                     <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
                                     <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
@@ -249,7 +277,8 @@ const ClinicalTrials = (props) => {
                             </div>
                         </div>
 
-                        {hcpUsers['users'] && hcpUsers['users'].length > 0 &&
+                        {/* {hcpUsers['users'] && hcpUsers['users'].length > 0 && */}
+                        { trialItems['clinialTrial_items'] && trialItems.clinialTrial_items.data.search_result.length > 0 &&
                             <React.Fragment>
                                 <div className="table-responsive shadow-sm bg-white">
                                     <table className="table table-hover table-sm mb-0 cdp-table">
@@ -257,51 +286,69 @@ const ClinicalTrials = (props) => {
                                             <tr>
                                                 <th width="10%"><span className={sort.value === 'firstname' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'firstname')}>Clinical Gov. ID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                <th width="10%"><span className={sort.value === 'lastname' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'lastname')}>Study Title<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="25%"><span className={sort.value === 'lastname' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'lastname')}>Study Title<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                <th width="7%"><span className={sort.value === 'ind_status_desc' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'ind_status_desc')}>Conditions<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="10%"><span className={sort.value === 'ind_status_desc' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'ind_status_desc')}>Conditions<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                <th width="15%"><span className={sort.value === 'uuid_1' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'uuid_1')}>Phase<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="7%"><span className={sort.value === 'uuid_1' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'uuid_1')}>Phase<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                <th width="15%"><span className={sort.value === 'individual_id_onekey' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'individual_id_onekey')}>Gender<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="7%"><span className={sort.value === 'individual_id_onekey' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'individual_id_onekey')}>Gender<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                <th width="8%"><span className={sort.value === 'country_iso2' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'country_iso2')}>Trial Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="7%"><span className={sort.value === 'country_iso2' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'country_iso2')}>Trial Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                <th width="15%">Age</th>
+                                                <th width="7%">Age</th>
 
-                                                <th width="10%">Actual Number of Enrolled</th>
+                                                <th width="7%">Actual Number of Enrolled</th>
 
-                                                <th width="10%">%</th>
+                                                <th width="7%">%</th>
+
+                                                <th width="7%">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody className="cdp-table__body bg-white">
-                                            {hcpUsers.users.map((row, idx) => (
+                                            {/* {hcpUsers.users.map((row, idx) => ( */}
+                                            {trialItems.clinialTrial_items.data.search_result.map((row, idx) => (   
                                                 <tr key={'user-' + idx}>
-                                                    <td className="text-break">{row.firstname || '--'}</td>
-                                                    <td className="text-break">{row.lastname || '--'}</td>
+                                                    <td className="text-break">{row.gov_identifier || '--'}</td>
+                                                    <td className="text-break">{row.clinical_trial_brief_title || '--'}</td>
                                                     <td>
                                                         {row.ind_status_desc ?
                                                             <span>
                                                                 <i className={`fa fa-xs fa-circle ${(row.ind_status_desc || '').toLowerCase() === 'valid' ? 'text-success' : 'text-danger'} pr-2 hcp-status-icon`}></i>
                                                                 {row.ind_status_desc}
                                                             </span>
-                                                            : '--'
+                                                            : row.indication
                                                         }
                                                     </td>
-                                                    <td className="text-break">{row.uuid_1 || '--'}</td>
-                                                    <td className="text-break">{row.individual_id_onekey || '--'}</td>
-                                                    <td>{getCountryName(row.country_iso2) || '--'}</td>
+                                                    <td className="text-break">{row.phase.match(/\d+/)[0]}</td>
+                                                    <td className="text-break">{row.gender}</td>
+                                                    <td>{getCountryName(row.country_iso2) || row.trial_status}</td>
                                                     <td>
-                                                        {row.specialties && row.specialties.length ?
-                                                            (row.specialties || []).map(s => s.description).join(', ')
-                                                            : '--'
+                                                        {row.max_age == null ?
+                                                            (row.min_age + '+')
+                                                            : (row.min_age + '-' + row.max_age)
                                                         }
                                                     </td>
-                                                    <td className="text-break">{row.telephone || '--'}</td>
-                                                    <td>
-                                                    <button onClick={()=>{setShow(true); setAddMode(true);}}>Add Story</button>
-                                                    {show ? <StoryForm addMode={addMode} changeShow={(val) => setShow(val)} show={show} trialIDs={[1,2,3]} addData = {addDataSample} /> : null}
-                                                    </td>
+                                                    <td className="text-break" >{'--'}</td>
+                                                    <td className="text-break" >{'--'}</td>
+                                        
+                                                    {/* <button onClick={()=>{setShow(true); setAddMode(true);}}>Add Story</button> */}
+                                                    <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
+                                                    <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle"></Dropdown.Toggle>
+                                                    <Dropdown.Menu>
+                                                        <Dropdown.Item onClick={() => { setShow(true); setAddMode(true);  }}>
+                                                            Write Story
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => { setShow(true); setEditMode(true); setEditData(row); }}>
+                                                            Edit Story
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item className="text-danger bg-white" onClick={() => { setShowDelete(true); setDeleteId(row.id); }}>Delete</Dropdown.Item>
+                                                    </Dropdown.Menu>
+                                                </Dropdown></td>
+
+
+                                                    {/* {show ? <StoryForm addMode={addMode} changeShow={(val) => setShow(val)} show={show} trialIDs={[1,2,3]} addData = {addDataSample} /> : null} */}
+                                                    
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -328,7 +375,7 @@ const ClinicalTrials = (props) => {
                                 </div>
                             </div>
                         }
-
+                        {show ? <StoryForm addMode={addMode} changeShow={(val) => setShow(val)} show={show} trialIDs={[1,2,3]} addData = {addDataSample} /> : null}
                         <Modal
                             size="lg"
                             show={!!profileDetails}
@@ -467,6 +514,7 @@ const ClinicalTrials = (props) => {
                     <button onClick={showAllClinicalTrials}>Show All Clinical Trials</button>
                     <button onClick={update_clinicalTrials}>Update Clinical Trials</button>
                     <button onClick={getClinicalTrialDetails}>Show trial details</button>
+                    <button onClick={()=>{setShow(true); setAddMode(true);}}>Add Story</button>
                 </div>
             </div>
         </main>
