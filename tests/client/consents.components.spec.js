@@ -16,6 +16,8 @@ import { login } from '../../src/modules/platform/user/client/user.actions';
 
 configure({ adapter: new Adapter() });
 
+jest.setTimeout(20000);
+
 describe('Manage consents component', () => {
     let mockAxios;
     let savedUser;

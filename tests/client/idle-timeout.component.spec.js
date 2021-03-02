@@ -15,6 +15,8 @@ import { login } from '../../src/modules/platform/user/client/user.actions';
 
 configure({ adapter: new Adapter() });
 
+jest.setTimeout(20000);
+
 describe('Idle time out component', () => {
     let mockAxios;
     let savedUser;

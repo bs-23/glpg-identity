@@ -11,6 +11,8 @@ import ForgotPassword from '../../src/modules/platform/user/client/components/fo
 
 configure({ adapter: new Adapter() });
 
+jest.setTimeout(20000);
+
 describe('Forgot password component', () => {
     const wrapperComponent = () => (
             <Provider store={store}>

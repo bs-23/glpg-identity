@@ -14,6 +14,8 @@ import { getHcpProfiles } from '../../src/modules/information/hcp/client/hcp.act
 
 configure({ adapter: new Adapter() });
 
+jest.setTimeout(20000);
+
 describe('Hcp user component', () => {
     let fakeAxios;
     let savedUser;
