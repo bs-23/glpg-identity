@@ -29,7 +29,8 @@ describe("Manage Faq component", () => {
             "countries": [],
             "email": "test@gmail.com",
             "name": "a",
-            "serviceCategories": []
+            "serviceCategories": [],
+            "services": []
         };
         fakeAxios.onPost('/api/login').reply(200, savedUser);
 

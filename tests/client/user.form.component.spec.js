@@ -31,6 +31,7 @@ describe('UserForm component', () => {
             "email": "test@gmail.com",
             "name": "a",
             "serviceCategories": [],
+            "services": []
         };
         mockAxios.onPost('/api/login').reply(200, savedUser);
 

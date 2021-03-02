@@ -32,7 +32,8 @@ describe('Consent form component', () => {
             "countries": [],
             "email": "test@gmail.com",
             "name": "a",
-            "serviceCategories": []
+            "serviceCategories": [],
+            "services": []
         };
         mockAxios.onPost('/api/login').reply(200, savedUser);
 

@@ -29,7 +29,8 @@ describe('Idle time out component', () => {
             "countries": [],
             "email": "test@gmail.com",
             "name": "a",
-            "serviceCategories": []
+            "serviceCategories": [],
+            "services": []
         };
         mockAxios.onPost('/api/login').reply(200, savedUser);
         mockAxios.onGet('/api/logout').reply(200);
