@@ -158,7 +158,7 @@ async function createPartner(req, res) {
     try {
         const files = req.files;
 
-        const { type, request_id, first_name, last_name, organization_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, individual_type, organization_type, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency } = req.body;
+        const { type, request_id, first_name, last_name, organization_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, individual_type, organization_type, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency, swift_code, routing } = req.body;
 
         const entityType = type;
 
@@ -182,12 +182,13 @@ async function createPartner(req, res) {
         }
 
         const data = {
-            request_id, first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency
+            request_id, first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, iban, bank_name, bank_account_no, currency, swift_code, routing
         };
 
         data.entity_type = entityType;
         if (entityType === 'hcp') {
             data.individual_type = individual_type;
+            data.beneficiary_category = beneficiary_category;
         }
 
         if (entityType === 'hco') {
@@ -245,7 +246,7 @@ async function updatePartner(req, res) {
     try {
         const files = req.files;
 
-        const { type, first_name, last_name, organization_name, address, city, post_code, email, telephone, individual_type, organization_type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency, remove_files } = req.body;
+        const { type, first_name, last_name, organization_name, address, city, post_code, email, telephone, individual_type, organization_type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency, swift_code, routing, remove_files } = req.body;
 
         const partner = await Partner.findOne({
             where: {
@@ -260,7 +261,7 @@ async function updatePartner(req, res) {
         }
 
         const data = {
-            first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, iban, bank_name, bank_account_no, currency
+            first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, iban, bank_name, bank_account_no, currency, swift_code, routing
         };
 
         if (partner.dataValues.entity_type === 'hcp') {
@@ -444,7 +445,7 @@ async function createPartnerVendor(req, res) {
     try {
         const files = req.files;
 
-        const { request_id, type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency } = req.body;
+        const { request_id, type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, swift_code, routing } = req.body;
 
         if (response.errors.length) return res.status(400).send(response);
 
@@ -466,7 +467,7 @@ async function createPartnerVendor(req, res) {
         }
 
         const data = {
-            request_id, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency
+            request_id, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, swift_code, routing
         };
 
         data.entity_type = type;
@@ -513,7 +514,7 @@ async function updatePartnerVendor(req, res) {
     try {
         const files = req.files;
 
-        const { type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, remove_files } = req.body;
+        const { type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, swift_code, routing, remove_files } = req.body;
 
         const partner = await PartnerVendors.findOne({
             where: {
@@ -527,7 +528,7 @@ async function updatePartnerVendor(req, res) {
         }
 
         const data = {
-            type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency,
+            type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, swift_code, routing,
             entity_type: type
         };
 

@@ -127,6 +127,12 @@ const PartnerVendors = sequelize.cdpConnector.define('partner_vendors', {
     currency: {
         type: DataTypes.STRING
     },
+    swift_code: {
+        type: DataTypes.STRING
+    },
+    routing: {
+        type: DataTypes.STRING
+    },
     status: {
         allowNull: false,
         type: DataTypes.ENUM,
