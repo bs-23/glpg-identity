@@ -37,7 +37,7 @@ async function getConsents(req, res) {
     const response = new Response({}, []);
 
     try {
-        let { country_iso2, locale } = req.query;
+        let { country_iso2, locale, category } = req.query;
 
         if (!country_iso2) {
             response.errors.push(new CustomError('Invalid query parameters'));
@@ -46,23 +46,33 @@ async function getConsents(req, res) {
 
         locale = locale || 'en';
 
+        const conditions = {
+            country_iso2: {
+                [Op.iLike]: country_iso2
+            },
+            '$consent.is_active$': true
+        };
+
+        if (category) {
+            conditions['$consent.consent_category.slug$'] = category;
+        }
+
         const consentCountries = await ConsentCountry.findAll({
-            where: {
-                country_iso2: {
-                    [Op.or]: [
-                        country_iso2.toUpperCase(),
-                        country_iso2.toLowerCase()
-                    ]
-                },
-                "$consent.is_active$": true
-            }, include: [{
+            where: conditions,
+            include: [{
                 model: Consent,
                 as: 'consent',
                 include: [{
-                    model: ConsentCategory
+                    model: ConsentCategory,
+                    as: 'consent_category'
                 }]
             }]
         });
+
+        if (!consentCountries || !consentCountries.length) {
+            response.errors.push(new CustomError(`No consent of this category found for ${country_iso2}`, 404));
+            return res.status(404).send(response);
+        }
 
         const consentLocales = await Promise.all(consentCountries.map(async consentCountry => {
             return await ConsentLocale.findAll({
@@ -85,10 +95,7 @@ async function getConsents(req, res) {
             const consentCountry = await ConsentCountry.findOne({
                 where: {
                     country_iso2: {
-                        [Op.or]: [
-                            country_iso2.toUpperCase(),
-                            country_iso2.toLowerCase()
-                        ]
+                        [Op.iLike]: country_iso2
                     },
                     consent_id: consentLang.consent_id
                 }
@@ -119,6 +126,7 @@ async function getConsents(req, res) {
         res.json(response);
     } catch (err) {
         logger.error(err);
+        console.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
