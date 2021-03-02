@@ -13,6 +13,8 @@ import MyProfile from '../../src/modules/platform/user/client/components/my-prof
 
 configure({ adapter: new Adapter() });
 
+jest.setTimeout(20000);
+
 describe('Users component', () => {
     let mockAxios;
     let loggedInUser;

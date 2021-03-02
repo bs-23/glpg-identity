@@ -8,6 +8,8 @@ import { Provider } from 'react-redux';
 import store from '../../src/modules/core/client/store';
 import { ManageProfiles } from '../../src/modules/platform';
 
+jest.setTimeout(20000);
+
 describe('Profiles component', () => {
     let fakeAxios;
 

@@ -8,6 +8,8 @@ import { Provider } from 'react-redux';
 import store from '../../src/modules/core/client/store';
 import { ManagePermissionSets } from '../../src/modules/platform';
 
+jest.setTimeout(20000);
+
 describe('Permission sets component', () => {
     let fakeAxios;
 

@@ -14,6 +14,8 @@ import { act } from 'react-dom/test-utils';
 
 configure({ adapter: new Adapter() });
 
+jest.setTimeout(20000);
+
 describe('Login component', () => {
     let fakeAxios;
 

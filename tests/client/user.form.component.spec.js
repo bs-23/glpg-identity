@@ -13,6 +13,8 @@ import { login } from '../../src/modules/platform/user/client/user.actions';
 
 configure({ adapter: new Adapter() });
 
+jest.setTimeout(20000);
+
 describe('UserForm component', () => {
     let mockAxios;
     let savedUser;
