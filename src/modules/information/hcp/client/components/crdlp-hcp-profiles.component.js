@@ -25,7 +25,6 @@ export default function CrdlpHcpProfiles() {
     const hcpFilterRef = useRef();
 
     const hcpUsers = useSelector(state => state.hcpReducer.crdlpHcps);
-    const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
     const params = new URLSearchParams(window.location.search);
 
@@ -54,7 +53,7 @@ export default function CrdlpHcpProfiles() {
                 }
                 : null;
             dispatch(getCrdlpHcpProfiles(location.search, filterSetting));
-        };
+        }
     }, [location]);
 
     const resetFilter = async () => {
@@ -152,7 +151,7 @@ export default function CrdlpHcpProfiles() {
         }
         else {
             history.push(`/information/list/crdlp`);
-        };
+        }
         setIsFilterEnabled(true);
     }
 

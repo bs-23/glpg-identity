@@ -161,7 +161,7 @@ export default function hcpUsers() {
         }
         else {
             history.push(`/information/list/cdp`);
-        };
+        }
         setIsFilterEnabled(true);
     }
 
@@ -517,9 +517,9 @@ export default function hcpUsers() {
     }
 
     const getQueryString = () => {
-        const params = new URLSearchParams(location.search);
-        params.delete('status');
-        const queryString = params.toString();
+        const params1 = new URLSearchParams(location.search);
+        params1.delete('status');
+        const queryString = params1.toString();
         return '?' + queryString;
     }
 
@@ -576,7 +576,7 @@ export default function hcpUsers() {
             }
 
             loadHcpProfiles(filterSetting);
-        };
+        }
     }, [location]);
 
     return (

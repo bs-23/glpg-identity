@@ -144,15 +144,15 @@ const MultiFilter = (props, ref) => {
         }
     }
 
-    const handleRemoveFilter = async (index, props1) => {
+    const handleRemoveFilter = async (idx, props1) => {
         const allFilters = props1.values.filters;
         if (allFilters) {
-            const allFiltersAfterRemoval = allFilters.filter((value, ind) => ind !== index).map((filter, index) => {
-                filter.name = String(index + 1);
+            const allFiltersAfterRemoval = allFilters.filter((value, ind) => ind !== idx).map((filter, idx) => {
+                filter.name = String(idx + 1);
                 return filter;
             });
 
-            const updatedLogic = buildLogicAfterRemoval(props1.values.logic, index);
+            const updatedLogic = buildLogicAfterRemoval(props1.values.logic, idx);
 
             await props1.setFieldValue('filters', allFiltersAfterRemoval);
             await props1.setFieldValue('logic', updatedLogic);
