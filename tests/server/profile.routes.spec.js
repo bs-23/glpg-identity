@@ -32,42 +32,42 @@ describe('Profile Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
-    it('Should create and edit profile', async () => {
-        const response1 = await request
-            .post(`/api/permissionSets`)
-            .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
-            .send({
-                title: "a",
-                description: "a",
-                countries: ["BE"],
-                serviceCategories: [serviceCategories[0].id],
-                applications: []
-            });
+    // it('Should create and edit profile', async () => {
+    //     const response1 = await request
+    //         .post(`/api/permissionSets`)
+    //         .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
+    //         .send({
+    //             title: "a",
+    //             description: "a",
+    //             countries: ["BE"],
+    //             serviceCategories: [serviceCategories[0].id],
+    //             applications: []
+    //         });
 
-        expect(response1.statusCode).toBe(200);
-        expect(response1.res.headers['content-type']).toMatch('application/json');
+    //     expect(response1.statusCode).toBe(200);
+    //     expect(response1.res.headers['content-type']).toMatch('application/json');
 
-        const response2 = await request
-            .post(`/api/profiles`)
-            .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
-            .send({
-                title: "aa",
-                description: "aa",
-                permissionSets: [response1.body.id]
-            });
+    //     const response2 = await request
+    //         .post(`/api/profiles`)
+    //         .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
+    //         .send({
+    //             title: "aa",
+    //             description: "aa",
+    //             permissionSets: [response1.body.id]
+    //         });
 
-        expect(response2.statusCode).toBe(200);
-        expect(response2.res.headers['content-type']).toMatch('application/json');
+    //     expect(response2.statusCode).toBe(200);
+    //     expect(response2.res.headers['content-type']).toMatch('application/json');
 
-        const response3 = await request
-            .put(`/api/profiles/${response2.body.id}`)
-            .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
-            .send({
-                title: "a",
-                description: "bb",
-                permissionSets: [response1.body.id]});
+    //     const response3 = await request
+    //         .put(`/api/profiles/${response2.body.id}`)
+    //         .set('Cookie', [`access_token=s:${signCookie(defaultAdmin.access_token)}`])
+    //         .send({
+    //             title: "a",
+    //             description: "bb",
+    //             permissionSets: [response1.body.id]});
 
-        expect(response3.statusCode).toBe(200);
-        expect(response3.res.headers['content-type']).toMatch('application/json');
-    });
+    //     expect(response3.statusCode).toBe(200);
+    //     expect(response3.res.headers['content-type']).toMatch('application/json');
+    // });
 });

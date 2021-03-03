@@ -64,10 +64,10 @@ const SearchProfessionalHcp = (props) => {
         if (params.get('id')) history.push('/information/discover-professionals');
     };
 
-    const getUuidLabel = (selectedCountries) => {
-        if (!selectedCountries || !selectedCountries.length) return 'UUID';
+    const getUuidLabel = (selectedCountryList) => {
+        if (!selectedCountryList || !selectedCountryList.length) return 'UUID';
 
-        const authorityByCountry = uuidAuthorities.filter(a => selectedCountries.some(s => a.codbase.toLowerCase() === s.value.toLowerCase())).map(a => a.name);
+        const authorityByCountry = uuidAuthorities.filter(a => selectedCountryList.some(s => a.codbase.toLowerCase() === s.value.toLowerCase())).map(a => a.name);
 
         return authorityByCountry.join('/');
     };
@@ -82,10 +82,10 @@ const SearchProfessionalHcp = (props) => {
             .then(response => {
                 setUsers(response.data);
                 setCurrentPage(newPage);
-                try{
+                try {
                     scrollToResult(response.data.results.length === 0);
                 }
-                catch(err){
+                catch (err) {
                     console.log(err);
                 }
             })
@@ -116,11 +116,11 @@ const SearchProfessionalHcp = (props) => {
         const groupedSpecialties = [];
         let idx = 0;
 
-        specialtyList.forEach( specialty => {
+        specialtyList.forEach(specialty => {
             const value = specialty.codDescription.toLowerCase().split(' ').join('');
-            if(!specialty.codIdOnekey) return;
+            if (!specialty.codIdOnekey) return;
 
-            if(!marked[value]){
+            if (!marked[value]) {
                 marked[value] = true;
                 idxMap[value] = idx++;
                 groupedSpecialties.push({
@@ -213,11 +213,11 @@ const SearchProfessionalHcp = (props) => {
         }
     }
 
-    const CustomOption = ({ children, ...props }) => {
+    const CustomOption = ({ children, ...props1 }) => {
         return (
-            <components.Option {...props}>
+            <components.Option {...props1}>
                 <div className="custom-control custom-checkbox">
-                    <input type="checkbox" className="custom-control-input" checked={props.isSelected} onChange={() => null} />
+                    <input type="checkbox" className="custom-control-input" checked={props1.isSelected} onChange={() => null} />
                     <label className="custom-control-label" for="customCheck1">{children}</label>
                 </div>
             </components.Option>
@@ -355,10 +355,10 @@ const SearchProfessionalHcp = (props) => {
                                                 setFormData(data);
                                                 setCurrentPage(1);
                                                 actions.setSubmitting(false);
-                                                try{
+                                                try {
                                                     scrollToResult(response.data.results.length === 0);
                                                 }
-                                                catch(err){
+                                                catch (err) {
                                                     addToast('Error! Please try again.', {
                                                         appearance: 'error',
                                                         autoDismiss: true
@@ -608,7 +608,7 @@ const SearchProfessionalHcp = (props) => {
                                                                     <div key={idxOfWorkPlace} className="currentWorkplace">
                                                                         <span className="okla-search__workplace-icons position-relative">
                                                                             {
-                                                                            item.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>
+                                                                                item.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>
                                                                             }
                                                                             {
                                                                                 item.isValid ? <i className="fas fa-check cdp-text-primary border-left"></i> : <i className="fas fa-times cdp-text-secondary border-left"></i>
