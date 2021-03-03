@@ -41,7 +41,7 @@ class Tree extends React.Component {
     return (
       <div>
         {/* {console.log('props ja pelam', this.props.trialDetails)} */}
-        <TreeView key={this.props.trialDetails?.data?.id} nodeLabel='Click for details'>
+        <TreeView defaultCollapsed={true} key={this.props.trialDetails?.data?.id} nodeLabel='Click for details'>
           <div className='info'><b>Brief Summary:</b> {this.props.trialDetails?.data?.clinical_trial_brief_summary}</div>
           <div className='info'><b>Brief Title:</b> {this.props.trialDetails?.data?.clinical_trial_brief_title}</div>
           <div className='info'><b>Eudract Number:</b> {this.props.trialDetails?.data?.eudract_number}</div>

@@ -6,8 +6,7 @@ import { useToasts } from 'react-toast-notifications';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
 import StoryForm from './clinical-trials-story-form.component';
-import {getTrialItems, getClinicalTrialDetails } from './clinical-trials.actions';
-
+import {getTrialItems, getClinicalTrialDetails, getTrialConditions } from './clinical-trials.actions';
 var dumpData =  function() {
     const url = `/api/clinical-trials`;
     var urlToGetData = prompt("urlToGetData:", "https://clinicaltrials.gov/api/query/full_studies?expr=%28gilead+%5BLeadSponsorName%5D+AND+filgotinib+%5BInterventionName%5D+AND+NOT+Phase+1%5BPhase%5D%29+OR+%28galapagos+%5BLeadSponsorName%5D+AND+NOT+Phase+1%5BPhase%5D%29%0D%0A&min_rnk=1&max_rnk=100&fmt=json");
@@ -44,17 +43,6 @@ var showAllClinicalTrials =  function() {
         }).then(out=>console.log('object data-->',out))
     };
 }
-
-// var getClinicalTrialDetails =  function() {
-//     let id = prompt("set your id:", 'bf3fcdd9-2c14-4a1e-b02c-787c379c0aa9');
-//     const url = `/api/clinical-trials-cdp/${id}`;
-//     return {
-//         payload: axios({
-//             method: 'get',
-//             url
-//         }).then(out => console.log(out))
-//     };
-// }
 
 var mergeProcessData =  function() {
     const url = `/api/clinical-trials/merge-versions`;
@@ -106,9 +94,9 @@ var syncGeocodes =  function() {
 
 
 const ClinicalTrials = (props) => {
-    const showFaq = false;
     const isFilterEnabled = false;
     const trialItems = useSelector(state => state.clinicalTrialsReducer);
+    const trialConditions = useSelector(state => state.clinicalTrialsReducer.trialConditions.data);
     const { addToast } = useToasts();
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
@@ -116,8 +104,7 @@ const ClinicalTrials = (props) => {
     const [sort, setSort] = useState({ type: 'asc', value: null });
     const [show, setShow] = useState(false);
     const [addMode, setAddMode] = useState(false);
-    const [formDetails, setFormDetails] = useState(null);
-    const dispatch = useDispatch();
+    const [test, setTest] = useState(false);
     const addDataSample = {
         title: 'Sample Title',
         trials : [1,2,3],
@@ -147,7 +134,7 @@ const ClinicalTrials = (props) => {
     const pageLeft = () => {
         if (hcpUsers.page > 1) urlChange(hcpUsers.page - 1, hcpUsers.codBase, params.get('orderBy'), true);
     };
-
+    const testFunc = ()=>{console.log('just checking')};
     const pageRight = () => {
         if (hcpUsers.end !== hcpUsers.total) urlChange(hcpUsers.page + 1, hcpUsers.codBase, params.get('orderBy'), true);
     };
@@ -158,44 +145,17 @@ const ClinicalTrials = (props) => {
         return country && country.countryname;
     };
 
-    const setTrials = () => {
-        const url = `/api/clinical-trials-cdp`;
-        axios({
-            method: 'get',
-            url
-        }).then(out=>setHcpUsers(out));
-    };
-
     useEffect(() => {
         dispatch(getTrialItems());
-        //setTrialItems(selectedTrialItems);
+        dispatch(getTrialConditions());
     },[]);
 
-    //let topic = ['desease 1', 'desease 2', 'desease 3'];
+    const [filteredTopic, setFilter] = useState('All');
     const topic = false;
-    const serviceTopics = [{title : 'desease 1'}, {title : 'desease 2'}, {title : 'desease 3'}];
+   
+    const seectedTopics = [];
 
-    setTimeout(() => {
-        setHcpUsers({
-            users: [
-                {
-                    firstname: 'x',
-                    lastname: 'test2'
-                },
-                {
-                    firstname: 'y',
-                    lastname: 'test4'
-                },
-                {
-                    firstname: 'z',
-                    lastname: 'test6'
-                }
-            ]
-        });
-        const url = `/api/clinical-trials-cdp`;
-        
-    }, 3000);
-    
+
     return (
         <main className="app__content cdp-light-bg">
             <div  className="container-fluid">
@@ -250,11 +210,11 @@ const ClinicalTrials = (props) => {
                                             <i className="icon icon-filter mr-2 mb-n1"></i> <span className="d-none d-sm-inline-block">{!topic ? 'Filter by Condition' : serviceTopics.find(x => x.slug === topic).title}</span>
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
-                                            {serviceTopics.length > 0 && topic && <Dropdown.Item href={`/platform/manage-faq`}>All</Dropdown.Item>}
+                                            {trialConditions.length > 0 && filteredTopic!=='All' && <Dropdown.Item href={`#`} onClick={()=>{setFilter('All');}}>All</Dropdown.Item>}
 
                                             {
-                                                serviceTopics.length > 0 && serviceTopics.map((item, index) => (
-                                                    item.title !== topic && <Dropdown.Item href={`/platform/manage-faq?page=1&topic=${item.slug}`} key={index}>{item.title}</Dropdown.Item>
+                                                trialConditions.length > 0 && trialConditions.map((item, index) => (
+                                                    item !== topic && <Dropdown.Item href={`#`} onClick={()=>{setFilter(item);}} key={index}>{item}</Dropdown.Item>
                                                 ))
                                             }
                                         </Dropdown.Menu>
@@ -280,7 +240,7 @@ const ClinicalTrials = (props) => {
                             </div>
                         </div>
 
-                        {/* {hcpUsers['users'] && hcpUsers['users'].length > 0 && */}
+                    
                         { trialItems['clinialTrial_items'] && trialItems.clinialTrial_items.data.search_result.length > 0 &&
                             <React.Fragment>
                                 <div className="table-responsive shadow-sm bg-white">
@@ -309,11 +269,12 @@ const ClinicalTrials = (props) => {
                                             </tr>
                                         </thead>
                                         <tbody className="cdp-table__body bg-white">
-                                            {/* {hcpUsers.users.map((row, idx) => ( */}
-                                            {trialItems.clinialTrial_items.data.search_result.map((row, idx) => (   
+                                            {trialItems.clinialTrial_items.data.search_result.map((row, idx) =>{return (row.indication_group ===filteredTopic || filteredTopic ==='All' ) ? (   
                                                 <tr key={'user-' + idx}>
                                                     <td className="text-break">{row.gov_identifier || '--'}</td>
-                                                    <td className="text-break">{row.clinical_trial_brief_title || '--'}</td>
+                                                    <td className="text-break">{row.clinical_trial_brief_title || '--'}
+                    
+                                                    </td>
                                                     <td>
                                                         {row.ind_status_desc ?
                                                             <span>
@@ -334,12 +295,11 @@ const ClinicalTrials = (props) => {
                                                     </td>
                                                     <td className="text-break" >{'--'}</td>
                                                     <td className="text-break" >{'--'}</td>
-                                        
-                                                    {/* <button onClick={()=>{setShow(true); setAddMode(true);}}>Add Story</button> */}
+                                    
                                                     <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle"></Dropdown.Toggle>
                                                     <Dropdown.Menu>
-                                                        <Dropdown.Item onClick={() => { setShow(true); setAddMode(true); dispatch(getClinicalTrialDetails()); }}>
+                                                        <Dropdown.Item onClick={() => { setShow(true); setAddMode(true); dispatch(getClinicalTrialDetails([row.trial_fixed_id])) }}>
                                                             Write Story
                                                         </Dropdown.Item>
                                                         <Dropdown.Item onClick={() => { setShow(true); setEditMode(true); setEditData(row); }}>
@@ -349,11 +309,8 @@ const ClinicalTrials = (props) => {
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
 
-
-                                                    {/* {show ? <StoryForm addMode={addMode} changeShow={(val) => setShow(val)} show={show} trialIDs={[1,2,3]} addData = {addDataSample} /> : null} */}
-                                                    
                                                 </tr>
-                                            ))}
+                                            ): null })}
                                         </tbody>
                                     </table>
                                     {((hcpUsers.page === 1 &&
@@ -378,7 +335,7 @@ const ClinicalTrials = (props) => {
                                 </div>
                             </div>
                         }
-                        {show ? <StoryForm addMode={addMode} changeShow={(val) => setShow(val)} show={show} trialIDs={[1,2,3]} addData = {addDataSample} /> : null}
+                        {show ? <StoryForm seectedTopics ={seectedTopics} trialDetails={trialDetails} addMode={addMode} changeShow={(val) => setShow(val)} show={show} trialIDs={[1,2,3]} addData = {addDataSample} /> : null}
                         <Modal
                             size="lg"
                             show={!!profileDetails}
@@ -518,6 +475,10 @@ const ClinicalTrials = (props) => {
                     <button onClick={update_clinicalTrials}>Update Clinical Trials</button>
                     <button onClick={getClinicalTrialDetails}>Show trial details</button>
                     <button onClick={()=>{setShow(true); setAddMode(true);}}>Add Story</button>
+                    
+                </div>
+                <div class="tooltip">Hover over me
+                        <span class="tooltiptext">Tooltip text</span>
                 </div>
             </div>
         </main>

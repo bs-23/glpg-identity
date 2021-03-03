@@ -32,7 +32,7 @@ const StoryForm = (props) => {
         dispatch(fetchTrialItem(1));
     },[]);
 
-    
+    console.log('here is the props', props);
     return (
         <Modal size="lg" centered show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
@@ -91,7 +91,7 @@ const StoryForm = (props) => {
 
                                             <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor='topics'>Selected Clinical Trials <span className="text-danger">*</span></label>
-                                                <div className= "border rounded tree-view">
+                                                <div className= "border rounded tree-view-main">
                                                     <Tree trialDetails={props.trialDetails}/>
                                                 </div>
                                             </div>

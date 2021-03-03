@@ -5,8 +5,15 @@ const initialState = {
         age : 0,
         gender: 'none'
     },
-    clinialTrial_items: {},
-    trialDetails: null
+    clinialTrial_items: {
+        data:{
+            search_result:[]
+        }
+    },
+    trialDetails: null,
+    trialConditions: {
+        data: []
+    }
 };
 
 export default function reducer(state = initialState, action) {
@@ -21,6 +28,9 @@ export default function reducer(state = initialState, action) {
 
         case Types.GET_TRIAL_DETAILS_FULFILLED: {
             return {...state, trialDetails: action.payload.data };
+        }
+        case Types.GET_TRIAL_CONDITIONS_FULFILLED: {
+            return {...state, trialConditions: action.payload.data };
         }
     }
 
