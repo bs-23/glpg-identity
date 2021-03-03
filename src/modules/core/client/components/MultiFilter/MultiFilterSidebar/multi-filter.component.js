@@ -56,7 +56,7 @@ const MultiFilter = (props, ref) => {
     }
 
     const tempResetFilter = async (formikProps) => {
-        const {setFieldValue, setTouched} = formikProps || formikBag;
+        const { setFieldValue, setTouched } = formikProps || formikBag;
 
         await setFieldValue('isChosenFromExisting', 'false');
         await setFieldValue('filters', []);
@@ -85,7 +85,7 @@ const MultiFilter = (props, ref) => {
     }
 
     const handleOnClick = (e) => {
-        if(e.target === e.currentTarget) if(hideOnClickAway === true) onHide();
+        if (e.target === e.currentTarget) if (hideOnClickAway === true) onHide();
     };
 
     const handleAddFilterDone = (filters, logic, formikProps) => {
@@ -103,13 +103,13 @@ const MultiFilter = (props, ref) => {
     };
 
     const getFieldDisplayText = (fieldName) => {
-        const filter = options.find(filter => filter.fieldName === fieldName);
+        const filter = options.find(filt => filt.fieldName === fieldName);
         return filter ? filter.displayText : '';
     };
 
     const getOperatorDisplayText = (fieldName, operatorName) => {
-        const filter = options.find(filter => filter.fieldName === fieldName);
-        if(!filter) return '';
+        const filter = options.find(filt => filt.fieldName === fieldName);
+        if (!filter) return '';
         const operator = filter.operators.find(op => op.key === operatorName);
         return operator ? operator.displayText : '';
     };
@@ -146,9 +146,9 @@ const MultiFilter = (props, ref) => {
 
     const handleRemoveFilter = async (index, props) => {
         const allFilters = props.values.filters;
-        if(allFilters) {
+        if (allFilters) {
             const allFiltersAfterRemoval = allFilters.filter((value, ind) => ind !== index).map((filter, index) => {
-                filter.name = String(index+1);
+                filter.name = String(index + 1);
                 return filter;
             });
 
@@ -173,7 +173,7 @@ const MultiFilter = (props, ref) => {
     };
 
     const handleExecute = (values, actions) => {
-        if(!values.shouldSaveFilter && values.selectedSettingID && hasFilterBeenModified(values)) {
+        if (!values.shouldSaveFilter && values.selectedSettingID && hasFilterBeenModified(values)) {
             values.selectedSettingID = '';
             values.selectedSettingFilters = []
             values.selectedSettingLogic = '';
@@ -207,7 +207,7 @@ const MultiFilter = (props, ref) => {
     const handlePresetChange = (e) => {
         const selectedPresetID = e.target.value;
 
-        if(selectedPresetID === '') {   // Removing Selected Filter
+        if (selectedPresetID === '') {   // Removing Selected Filter
             removeSelectedFilter(formikBag);
             formikBag.setFieldValue('logic', '');
             formikBag.setFieldValue('filters', []);
@@ -218,7 +218,7 @@ const MultiFilter = (props, ref) => {
 
         const filterPreset = filterPresets.find(fp => fp.id === selectedPresetID);
 
-        if(!filterPreset) return;
+        if (!filterPreset) return;
 
         const { filters, logic } = filterPreset.settings;
 
@@ -242,13 +242,13 @@ const MultiFilter = (props, ref) => {
         formikProps.setFieldValue('isChosenFromExisting', value);
         formikProps.setTouched({ 'selectedFilterSettingName': false });
 
-        if(value === 'true') formikProps.setFieldValue('shouldSaveFilter', true);
-        if(value === 'false') formikProps.setFieldValue('shouldSaveFilter', false);
+        if (value === 'true') formikProps.setFieldValue('shouldSaveFilter', true);
+        if (value === 'false') formikProps.setFieldValue('shouldSaveFilter', false);
     }
 
     const handleSaveOptionChange = (e, formikProps) => {
         const saveType = e.target.value;
-        if(saveType === 'save_as_new') {
+        if (saveType === 'save_as_new') {
             formikProps.setFieldValue('newFilterSettingName', '');
         }
         formikProps.handleChange(e);
@@ -271,7 +271,7 @@ const MultiFilter = (props, ref) => {
     }
 
     useEffect(() => {
-        if(formikBag && selectedSetting) {
+        if (formikBag && selectedSetting) {
             const { values, touched, resetForm } = formikBag;
 
             values.isChosenFromExisting = selectedSettingID ? 'true' : 'false';
@@ -283,14 +283,14 @@ const MultiFilter = (props, ref) => {
             values.selectedFilterSettingName = selectedSettingTitle || '';
             values.newFilterSettingName = '';
             values.saveType = selectedSettingID ? 'save_existing' : 'save_as_new';
-            if(!touched.shouldSaveFilter) values.shouldSaveFilter = selectedSettingID ? true : false;
+            if (!touched.shouldSaveFilter) values.shouldSaveFilter = selectedSettingID ? true : false;
 
             resetForm({ values, touched: {} });
         }
     }, [selectedSetting, selectedSettingTitle, selectedSettingID])
 
     useEffect(() => {
-        if(selectedScopeKey && scopeOptions) {
+        if (selectedScopeKey && scopeOptions) {
             const scope = scopeOptions.find(sc => sc.key === selectedScopeKey);
             setSelectedScopre(scope);
         }
@@ -303,145 +303,145 @@ const MultiFilter = (props, ref) => {
     }));
 
     return <Formik
-                innerRef={formikRef}
-                onSubmit={handleExecute}
-                initialValues={{
-                    scope: '',
-                    filters: selectedSetting
-                        ? selectedSetting.filters
-                        : [],
-                    logic: selectedSetting
-                        ? selectedSetting.logic
-                        : '',
-                    shouldSaveFilter: selectedSettingID ? true : false,
-                    selectedFilterSettingName: selectedSettingTitle || '',
-                    newFilterSettingName: '',
-                    selectedSettingID: selectedSettingID || '',
-                    selectedSettingFilters: selectedSetting
-                        ? selectedSetting.filters
-                        : [],
-                    selectedSettingLogic: selectedSetting
-                        ? selectedSetting.logic
-                        : '',
-                    isChosenFromExisting: selectedSettingID ? 'true' : 'false',
-                    saveType: 'save_as_new'
-                }}
-                validationSchema={multiFilterSchema}
-            >
+        innerRef={formikRef}
+        onSubmit={handleExecute}
+        initialValues={{
+            scope: '',
+            filters: selectedSetting
+                ? selectedSetting.filters
+                : [],
+            logic: selectedSetting
+                ? selectedSetting.logic
+                : '',
+            shouldSaveFilter: selectedSettingID ? true : false,
+            selectedFilterSettingName: selectedSettingTitle || '',
+            newFilterSettingName: '',
+            selectedSettingID: selectedSettingID || '',
+            selectedSettingFilters: selectedSetting
+                ? selectedSetting.filters
+                : [],
+            selectedSettingLogic: selectedSetting
+                ? selectedSetting.logic
+                : '',
+            isChosenFromExisting: selectedSettingID ? 'true' : 'false',
+            saveType: 'save_as_new'
+        }}
+        validationSchema={multiFilterSchema}
+    >
         {(formikProps) =>
             showSidePanel &&
             <div className="filter" onClick={handleOnClick}>
                 <div className="filter__panel">
                     <h3 className="px-3 pt-3 cdp-text-primary filter__header">Filters</h3>
                     <div className="bg-light p-3 filter__section">
-                                {filterPresets && filterPresets.length > 0 && <div role="group" aria-labelledby="my-radio-group">
-                                <div role="group" aria-labelledby="my-radio-group">
-                                    <div class="custom-control custom-radio">
-                                        <input type="radio" class="custom-control-input mr-2" id="createnew" name="isChosenFromExisting" value="false" onChange={(e) => handleChooseFromExisting(e, formikProps)} checked={formikProps.values.isChosenFromExisting === 'false'} />
-                                        <label class="custom-control-label cursor-pointer" for="createnew">Create New</label>
-                                    </div>
-                                    <div class="custom-control custom-radio my-2">
-                                        <input type="radio" class="custom-control-input mr-2" id="chooseformexisting" name="isChosenFromExisting" value="true" onChange={(e) => handleChooseFromExisting(e, formikProps)} checked={formikProps.values.isChosenFromExisting === 'true'} />
-                                        <label class="custom-control-label cursor-pointer" for="chooseformexisting">Choose From Existing</label>
-                                    </div>
+                        {filterPresets && filterPresets.length > 0 && <div role="group" aria-labelledby="my-radio-group">
+                            <div role="group" aria-labelledby="my-radio-group">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input mr-2" id="createnew" name="isChosenFromExisting" value="false" onChange={(e) => handleChooseFromExisting(e, formikProps)} checked={formikProps.values.isChosenFromExisting === 'false'} />
+                                    <label class="custom-control-label cursor-pointer" for="createnew">Create New</label>
                                 </div>
-                                </div>}
-                                {scopeOptions &&
-                                    <div className="mb-3">
-                                        <label className="d-block mb-1" for="scope">
-                                        Scope
+                                <div class="custom-control custom-radio my-2">
+                                    <input type="radio" class="custom-control-input mr-2" id="chooseformexisting" name="isChosenFromExisting" value="true" onChange={(e) => handleChooseFromExisting(e, formikProps)} checked={formikProps.values.isChosenFromExisting === 'true'} />
+                                    <label class="custom-control-label cursor-pointer" for="chooseformexisting">Choose From Existing</label>
+                                </div>
+                            </div>
+                        </div>}
+                        {scopeOptions &&
+                            <div className="mb-3">
+                                <label className="d-block mb-1" for="scope">
+                                    Scope
                                         <OverlayTrigger trigger="click" rootClose placement="top" overlay={scopeHintPopup}>
                                         <i className="fas fa-info-circle ml-2 text-secondary" role="button"></i>
-                                        </OverlayTrigger>
-                                        </label>
-                                        <Dropdown className="filter__scope-dropdown">
-                                            <Dropdown.Toggle
-                                                variant=""
-                                                className="cdp-btn-outline-primary dropdown-toggle btn btn-block btn-sm d-flex justify-content-between dropdown-toggle">
-                                                {selectedScope
-                                                    ? <><span><i className={`${selectedScope.icon} mr-2 cdp-text-primary`}></i> {selectedScope.text}</span></>
-                                                    : 'Select a scope'
-                                                }
-                                            </Dropdown.Toggle>
-                                            <Dropdown.Menu>
-                                                {scopeOptions.map((scope, idx) => (
-                                                    <Dropdown.Item
-                                                        key={'scope-' + idx}
-                                                        disabled={!scope.enabled}
-                                                        onClick={() => { setSelectedScopre(scope); }}>
-                                                        <i className={`${scope.icon} mr-2 cdp-text-primary`}></i> {scope.text}
-                                                    </Dropdown.Item>
-                                                ))}
-                                            </Dropdown.Menu>
-                                        </Dropdown>
-                                    </div>
-                                }
-                                {
-                                    formikProps.values.isChosenFromExisting === 'true' && filterPresets && filterPresets.length > 0 &&
-                                    <div className="mb-3">
-                                        <label className="pt-2 mb-1">Select From Existing Filters</label>
-                                        <Field as="select" className="form-control form-control-sm" name="selectedSettingID" onChange={handlePresetChange}>
-                                            <option value="">Select an option</option>
-                                            {
-                                                filterPresets.map((filter, index) =>
-                                                    <option key={filter.id} value={filter.id}>{filter.title}</option>
-                                                )
-                                            }
-                                        </Field>
-                                    </div>
-                                }
-                                {formikProps.values.filters.map((filter, index) =>
-                                    <div className="mb-2" key={index}>
-                                        <FilterSummary
-                                            fieldName={getFieldDisplayText(filter.fieldName)}
-                                            operatorName={getOperatorDisplayText(filter.fieldName, filter.operator)}
-                                            values={getSummaryValueText(filter)}
-                                            index={index}
-                                            onRemove={(index) => handleRemoveFilter(index, formikProps)}
-                                        />
-                                    </div>
-                                )}
-
-                                <div className="d-flex justify-content-between py-2 align-items-center">
-                                    {show.addFilter &&
-                                        <AddFilter
-                                            filterPresets={filterPresets}
-                                            filters={formikProps.values.filters}
-                                            filterOptions={options}
-                                            logic={formikProps.values.logic}
-                                            maxNumberOfFilters={maxNumberOfFilters}
-                                            maxNumberOfValues={maxNumberOfValues}
-                                            onDone={(filters, logic) => handleAddFilterDone(filters, logic, formikProps)}
-                                            onHide={() => setShow({ ...show, addFilter: false })}
-                                        />
+                                    </OverlayTrigger>
+                                </label>
+                                <Dropdown className="filter__scope-dropdown">
+                                    <Dropdown.Toggle
+                                        variant=""
+                                        className="cdp-btn-outline-primary dropdown-toggle btn btn-block btn-sm d-flex justify-content-between dropdown-toggle">
+                                        {selectedScope
+                                            ? <><span><i className={`${selectedScope.icon} mr-2 cdp-text-primary`}></i> {selectedScope.text}</span></>
+                                            : 'Select a scope'
+                                        }
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        {scopeOptions.map((scope, idx) => (
+                                            <Dropdown.Item
+                                                key={'scope-' + idx}
+                                                disabled={!scope.enabled}
+                                                onClick={() => { setSelectedScopre(scope); }}>
+                                                <i className={`${scope.icon} mr-2 cdp-text-primary`}></i> {scope.text}
+                                            </Dropdown.Item>
+                                        ))}
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </div>
+                        }
+                        {
+                            formikProps.values.isChosenFromExisting === 'true' && filterPresets && filterPresets.length > 0 &&
+                            <div className="mb-3">
+                                <label className="pt-2 mb-1">Select From Existing Filters</label>
+                                <Field as="select" className="form-control form-control-sm" name="selectedSettingID" onChange={handlePresetChange}>
+                                    <option value="">Select an option</option>
+                                    {
+                                        filterPresets.map((filter, index) =>
+                                            <option key={filter.id} value={filter.id}>{filter.title}</option>
+                                        )
                                     }
-                                    <span className="cdp-text-primary filter__add-filter cursor-pointer" onClick={() => setShow({ ...show, addFilter: true })}>
-                                        <i class="fas fa-plus"></i> Manage Filter
+                                </Field>
+                            </div>
+                        }
+                        {formikProps.values.filters.map((filter, index) =>
+                            <div className="mb-2" key={index}>
+                                <FilterSummary
+                                    fieldName={getFieldDisplayText(filter.fieldName)}
+                                    operatorName={getOperatorDisplayText(filter.fieldName, filter.operator)}
+                                    values={getSummaryValueText(filter)}
+                                    index={index}
+                                    onRemove={(index) => handleRemoveFilter(index, formikProps)}
+                                />
+                            </div>
+                        )}
+
+                        <div className="d-flex justify-content-between py-2 align-items-center">
+                            {show.addFilter &&
+                                <AddFilter
+                                    filterPresets={filterPresets}
+                                    filters={formikProps.values.filters}
+                                    filterOptions={options}
+                                    logic={formikProps.values.logic}
+                                    maxNumberOfFilters={maxNumberOfFilters}
+                                    maxNumberOfValues={maxNumberOfValues}
+                                    onDone={(filters, logic) => handleAddFilterDone(filters, logic, formikProps)}
+                                    onHide={() => setShow({ ...show, addFilter: false })}
+                                />
+                            }
+                            <span className="cdp-text-primary filter__add-filter cursor-pointer" onClick={() => setShow({ ...show, addFilter: true })}>
+                                <i class="fas fa-plus"></i> Manage Filter
                                     </span>
-                                    {formikProps.values.filters.length > 0 &&
-                                    <span className="small cursor-pointer" onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
-                                    }
+                            {formikProps.values.filters.length > 0 &&
+                                <span className="small cursor-pointer" onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
+                            }
 
-                                </div>
-                                {(formikProps.values.filters.length > 1) &&
-                                    <div className="d-flex flex-column">
-                                        <div className="d-flex justify-content-between">
-                                        <span className="cdp-text-primary mb-2 pt-2 cursor-pointer" onClick={() => null}>
-                                                Add Filter Logic
+                        </div>
+                        {(formikProps.values.filters.length > 1) &&
+                            <div className="d-flex flex-column">
+                                <div className="d-flex justify-content-between">
+                                    <span className="cdp-text-primary mb-2 pt-2 cursor-pointer" onClick={() => null}>
+                                        Add Filter Logic
                                             </span>
-                                        </div>
-                                        <FilterLogic
-                                            className=""
-                                            logic={formikProps.values.logic}
-                                            numberOfFilters={formikProps.values.filters.length}
-                                            onLogicChange={(logic) => handleLogicChange(logic, formikProps)}
-                                        />
-                                        <div className="invalid-feedback">
-                                            <ErrorMessage name="logic" />
-                                        </div>
-                                    </div>
-                                }
-                                {formikProps.values.filters.length > 0 &&
+                                </div>
+                                <FilterLogic
+                                    className=""
+                                    logic={formikProps.values.logic}
+                                    numberOfFilters={formikProps.values.filters.length}
+                                    onLogicChange={(logic) => handleLogicChange(logic, formikProps)}
+                                />
+                                <div className="invalid-feedback">
+                                    <ErrorMessage name="logic" />
+                                </div>
+                            </div>
+                        }
+                        {formikProps.values.filters.length > 0 &&
                             <React.Fragment>
                                 <label className="d-flex  align-items-center border-top mt-3 pt-2">
                                     <span className="switch-label text-left pr-3">Save Filter</span>
@@ -473,7 +473,7 @@ const MultiFilter = (props, ref) => {
                                                     onChange={(e) => handleSaveOptionChange(e, formikProps)}
                                                     checked={formikProps.values.saveType === 'save_existing'}
                                                 />
-                                            <label class="custom-control-label cursor-pointer" for="save_existing">Save existing</label>
+                                                <label class="custom-control-label cursor-pointer" for="save_existing">Save existing</label>
                                             </div>
                                             <div class="custom-control custom-radio my-2">
                                                 <input
@@ -485,7 +485,7 @@ const MultiFilter = (props, ref) => {
                                                     onChange={(e) => handleSaveOptionChange(e, formikProps)}
                                                     checked={formikProps.values.saveType === 'save_as_new'}
                                                 />
-                                            <label class="custom-control-label cursor-pointer" for="save_as_new">Save as new</label>
+                                                <label class="custom-control-label cursor-pointer" for="save_as_new">Save as new</label>
                                             </div>
                                         </div>}
                                         <div className="">
@@ -505,7 +505,7 @@ const MultiFilter = (props, ref) => {
                             </React.Fragment>
                         }
 
-                            </div>
+                    </div>
                     <div className="p-3 d-flex filter__section-btn">
                         <Button
                             className="btn cdp-btn-secondary mr-1 btn-block text-white"
@@ -521,8 +521,8 @@ const MultiFilter = (props, ref) => {
                     </div>
                 </div>
             </div>
-            }
-        </Formik>
+        }
+    </Formik>
 }
 
 export default React.forwardRef(MultiFilter);
