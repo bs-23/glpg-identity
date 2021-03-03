@@ -147,7 +147,7 @@ const CountryConsents = () => {
                                     <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Manage Consent Per Country</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
-                            <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
+                            <span className="ml-auto mr-3"><i onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary cursor-pointer"></i></span>
                         </nav>
 
                         <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
@@ -160,10 +160,10 @@ const CountryConsents = () => {
                 </div>
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-end align-items-center mb-3 mt-4">
+                        <div className="d-flex justify-content-end align-items-center py-3 cdp-table__responsive-sticky-panel">
                             <div class="d-flex justify-content-between align-items-center">
                                 <button onClick={() => { setShow(true); setEditable(false); setEditOption(null); }} className="btn cdp-btn-secondary text-white ml-2">
-                                    <i className="icon icon-plus pr-1"></i> Assign consent to country
+                                    <i className="icon icon-plus pr-1"></i> <span className="d-none d-sm-inline-block pl-1">Assign consent to country</span>
                                 </button>
                                 {cdp_consents &&
                                     <CountryConsentForm
@@ -182,9 +182,9 @@ const CountryConsents = () => {
                         {
                             getGroupedCountryConsents().map((countryConsent, countryConsentIndex) =>
                             (
-                                <div className="table-responsive shadow-sm bg-white mb-3" key={countryConsentIndex}>
-                                    <table className="table table-hover table-sm mb-0 cdp-table mb-2">
-                                        <thead className="cdp-bg-primary-lighter cdp-table__header">
+                                    <div className="table-responsive shadow-sm bg-white mb-4 cdp-table__responsive-wrapper" key={countryConsentIndex}>
+                                    <table className="table table-hover table-sm mb-0 cdp-table mb-0 cdp-table__responsive">
+                                        <thead className="cdp-bg-primary-lighter cdp-table__header cdp-table__responsive-header-block">
                                             <tr>
                                                 <th colSpan="4"><div className="d-flex align-items-center text-white"><img alt={countryConsent.name} src={countryConsent.flagUrl} height="18" className="mr-2" /> {countryConsent.name}</div></th>
                                             </tr>
@@ -202,12 +202,12 @@ const CountryConsents = () => {
                                                 countryConsent.consents.map((consent, coonsentIndex) =>
                                                 (
                                                     <tr key={coonsentIndex}>
-                                                        <td>
-                                                            <span type="button" className="btn btn-link cdp-text-primary p-0" onClick={() => showConsentDetailsModal(consent.id)}>
+                                                        <td data-for="Preference/Purpose">
+                                                                <span className="btn btn-link cdp-text-primary p-0 text-left cursor-pointer" onClick={() => showConsentDetailsModal(consent.id)}>
                                                                 <i className="fas fa-caret-right mr-1"></i>{consent.preference} {consent.is_active ? '' : '(Inactive)'}
                                                             </span>
                                                         </td>
-                                                        <td>
+                                                        <td data-for="Available Localizations">
                                                             {consent.translations && consent.translations.length > 0 && consent.translations.map(translation => (
                                                                 <OverlayTrigger key={translation.id}
                                                                     placement="top"
@@ -224,8 +224,8 @@ const CountryConsents = () => {
                                                                     <span className="badge badge-secondary-light shadow-sm font-weight-bold-light mr-1 text-dark">{translation.locale}</span>
                                                                 </OverlayTrigger>
                                                             ))}</td>
-                                                        <td>{consent.optType.text}</td>
-                                                        <td>
+                                                            <td data-for="Opt Type">{consent.optType.text}</td>
+                                                            <td data-for="Action">
                                                             <button className="btn btn-link cdp-text-primary p-0 mr-3" onClick={() => setEdit(consent)}><i className="fas fa-tasks mr-1"></i>Manage opt type</button> <button onClick={() => setDeleteModal(consent.country_consent_id, consent.preference, countryConsent.name)} className="btn btn-link text-danger p-0"><i className="far fa-trash-alt mr-1"></i>Remove</button>
                                                         </td>
                                                     </tr>

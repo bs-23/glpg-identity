@@ -128,7 +128,7 @@ const ConsentForm = (props) => {
                     <div className="row border border-primary rounded pb-3 mb-3 mx-0 shadow-sm">
                         <label className="col-12 font-weight-bold d-flex justify-content-between align-items-center bg-light py-2 border-bottom rounded-top">
                             {formikProps?.values?.preference}
-                            <i className="fas fa-minus-circle text-danger fa-2x hover-opacity ml-auto" type="button" title="Remove" onClick={() => showRemoveTranslationModal(idx)}></i>
+                            <i className="fas fa-minus-circle text-danger fa-2x hover-opacity ml-auto cursor-pointer" title="Remove" onClick={() => showRemoveTranslationModal(idx)}></i>
                         </label>
                         <div className="col-12 col-sm-6">
                             <div className="form-group">
@@ -189,7 +189,7 @@ const ConsentForm = (props) => {
                                         <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> {consentId ? 'Edit Consent' : 'Add new Consent'}</Dropdown.Item>
                                     </Dropdown.Menu>
                                 </Dropdown>
-                                <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
+                                <span className="ml-auto mr-3"><i onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary cursor-pointer"></i></span>
                             </nav>
                             <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
                                 <Modal.Header closeButton>
@@ -332,7 +332,7 @@ const ConsentForm = (props) => {
 
                                                                 <div className="col-12">
                                                                     <div className="form-group">
-                                                                        <label className="d-flex align-items-center cdp-text-primary hover-opacity" type="button" onClick={() => addNewTranslation(formikProps)}>
+                                                                    <label className="d-flex align-items-center cdp-text-primary hover-opacity cursor-pointer" onClick={() => addNewTranslation(formikProps)}>
                                                                             <i className="fas fa-plus  fa-2x mr-3" ></i>
                                                                             <span className="h4 mb-0">Add Localizations</span>
                                                                         </label>

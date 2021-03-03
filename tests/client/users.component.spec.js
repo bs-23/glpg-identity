@@ -13,6 +13,8 @@ import { getSignedInUserProfile } from '../../src/modules/platform/user/client/u
 
 configure({ adapter: new Adapter() });
 
+jest.setTimeout(20000);
+
 describe('Users component', () => {
     let mockAxios;
 

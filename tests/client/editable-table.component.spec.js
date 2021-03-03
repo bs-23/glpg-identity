@@ -6,6 +6,8 @@ import EditableTable from '../../src/modules/core/client/components/EditableTabl
 
 configure({ adapter: new Adapter() });
 
+jest.setTimeout(20000);
+
 describe('Forgot password component', () => {
     const wrapperComponent = () => {
         const rows = [

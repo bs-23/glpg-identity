@@ -6,6 +6,8 @@ const app = require(path.join(process.cwd(), 'src/config/server/lib/express'));
 
 let request;
 
+jest.setTimeout(20000);
+
 beforeAll(async () => {
     const config = require(path.join(process.cwd(), 'src/config/server/config'));
     await config.initEnvironmentVariables();
