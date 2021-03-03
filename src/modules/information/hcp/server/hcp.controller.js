@@ -415,6 +415,7 @@ async function updateHcps(req, res) {
 
         await Promise.all(Hcps.map(async hcp => {
             const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, telephone, _rowIndex } = trimRequestBody(hcp);
+            let individual_id_onekey;
 
             if (!id) {
                 response.errors.push(new Error(_rowIndex, 'id', 'ID is missing.'));
@@ -484,6 +485,12 @@ async function updateHcps(req, res) {
                     response.errors.push(new Error(_rowIndex, 'uuid', 'UUID already exists.'));
                 }
 
+                if (Object.keys(master_data).length) {
+                    individual_id_onekey = master_data.individual_id_onekey || null;
+                } else {
+                    individual_id_onekey = null;
+                }
+
                 if (uuidsToUpdate.has(uuid_from_master_data || uuid)) {
                     uuidsToUpdate.get(uuid_from_master_data || uuid).push(_rowIndex);
                 } else {
@@ -498,7 +505,8 @@ async function updateHcps(req, res) {
                 last_name,
                 specialty_onekey,
                 country_iso2,
-                telephone
+                telephone,
+                individual_id_onekey
             });
 
             HcpUser.dataValues._rowIndex = _rowIndex;
@@ -525,7 +533,7 @@ async function updateHcps(req, res) {
             const updatedPropertiesLog = [];
 
             Object.keys(hcpsToUpdate[index]).forEach(key => {
-                if (hcpsToUpdate[index][key]) {
+                if (hcpsToUpdate[index][key] || hcpsToUpdate[index][key] === null) {
                     const updatedPropertyLogObject = {
                         field: key,
                         old_value: hcp.dataValues[key],
@@ -553,7 +561,7 @@ async function updateHcps(req, res) {
         hcpModelInstances.map((hcpModelIns, idx) => {
             const { _rowIndex } = hcpModelIns.dataValues;
             Object.keys(hcpsToUpdate[idx]).forEach(key => {
-                if (hcpsToUpdate[idx][key]) response.data.push(new Data(_rowIndex, key, hcpModelIns.dataValues[key]));
+                if (hcpsToUpdate[idx][key] || hcpsToUpdate[idx][key] === null) response.data.push(new Data(_rowIndex, key, hcpModelIns.dataValues[key]));
             })
         });
 
