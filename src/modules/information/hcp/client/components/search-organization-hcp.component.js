@@ -42,10 +42,10 @@ const SearchOrganizationHcp = () => {
         props.resetForm();
     };
 
-    const getUuidLabel = (selectedCountries) => {
-        if (!selectedCountries || !selectedCountries.length) return 'UUID';
+    const getUuidLabel = (selectedCountryList) => {
+        if (!selectedCountryList || !selectedCountryList.length) return 'UUID';
 
-        const authorityByCountry = uuidAuthorities.filter(a => selectedCountries.some(s => a.codbase.toLowerCase() === s.value.toLowerCase())).map(a => a.name);
+        const authorityByCountry = uuidAuthorities.filter(a => selectedCountryList.some(s => a.codbase.toLowerCase() === s.value.toLowerCase())).map(a => a.name);
 
         return authorityByCountry.join('/');
     };
@@ -120,11 +120,11 @@ const SearchOrganizationHcp = () => {
         const groupedSpecialties = [];
         let idx = 0;
 
-        specialtyList.forEach( specialty => {
-            if(!specialty.codIdOnekey) return;
+        specialtyList.forEach(specialty => {
+            if (!specialty.codIdOnekey) return;
             const value = specialty.codDescription.toLowerCase().split(' ').join('');
 
-            if(!marked[value]){
+            if (!marked[value]) {
                 marked[value] = true;
                 idxMap[value] = idx++;
                 groupedSpecialties.push({
@@ -297,7 +297,7 @@ const SearchOrganizationHcp = () => {
                                                 </div>
                                                 <div className="col-12 col-sm-6 col-lg-4 pt-3">
                                                     <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
-                                                        <Field type="checkbox" className="custom-control-input" name="isInContract" id="customControlInline"/>
+                                                        <Field type="checkbox" className="custom-control-input" name="isInContract" id="customControlInline" />
                                                         <label className="custom-control-label" for="customControlInline">In My Contract</label>
                                                     </div>
                                                 </div>
@@ -305,11 +305,11 @@ const SearchOrganizationHcp = () => {
                                                     <div className="form-group">
                                                         <label className="d-block">Influence Search Results</label>
                                                         <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
-                                                            <Field type="checkbox" className="custom-control-input" name="phonetic" id="customControlInline2"/>
+                                                            <Field type="checkbox" className="custom-control-input" name="phonetic" id="customControlInline2" />
                                                             <label className="custom-control-label" for="customControlInline2">Phonetic</label>
                                                         </div>
                                                         <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-2">
-                                                            <Field type="checkbox" className="custom-control-input" name="duplicates" id="customControlInline3"/>
+                                                            <Field type="checkbox" className="custom-control-input" name="duplicates" id="customControlInline3" />
                                                             <label className="custom-control-label" for="customControlInline3">Duplicates</label>
                                                         </div>
                                                     </div>

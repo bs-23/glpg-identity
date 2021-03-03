@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { NavLink, useHistory } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage } from "formik";
@@ -46,7 +46,7 @@ export default function UserForm() {
                                             first_name: "",
                                             last_name: "",
                                             email: "",
-                                            country_code: countryList[selectedCountryCode] ? `+${countryList[selectedCountryCode].countryCallingCode}`: "",
+                                            country_code: countryList[selectedCountryCode] ? `+${countryList[selectedCountryCode].countryCallingCode}` : "",
                                             phone: '',
                                             profile: '',
                                             role: '',
@@ -108,35 +108,35 @@ export default function UserForm() {
                                                                             <span className="input-group-btn">
                                                                                 <Dropdown>
                                                                                     {
-                                                                                    countryList.map((country, index) => {
+                                                                                        countryList.map((country, index) => {
 
-                                                                                        return (index === selectedCountryCode ?
-                                                                                            <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
-                                                                                                <span height="20" width="25">{country.flag} </span>
-                                                                                                <span className="country-phone-code pl-1">{`+${country.countryCallingCode}`}</span>
-                                                                                            </Dropdown.Toggle> : null)
-                                                                                    })
+                                                                                            return (index === selectedCountryCode ?
+                                                                                                <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
+                                                                                                    <span height="20" width="25">{country.flag} </span>
+                                                                                                    <span className="country-phone-code pl-1">{`+${country.countryCallingCode}`}</span>
+                                                                                                </Dropdown.Toggle> : null)
+                                                                                        })
                                                                                     }
                                                                                     <Dropdown.Menu>
                                                                                         {
-                                                                                        countryList.map((country, index) => {
-                                                                                            return index === selectedCountryCode ? null :
+                                                                                            countryList.map((country, index) => {
+                                                                                                return index === selectedCountryCode ? null :
                                                                                                     (<Dropdown.Item onClick={() => {
                                                                                                         setSelectedCountryCode(index);
                                                                                                         const countryCode = country.countryCallingCode;
                                                                                                         formikProps.setFieldValue('country_code', countryCode);
-                                                                                                    phoneFieldRef.focus();
+                                                                                                        phoneFieldRef.focus();
                                                                                                     }} key={index} className="px-2 d-flex align-items-center">
-                                                                                                    <span height="20" width="20">{country.flag} </span>
-                                                                                                    <span className="country-name pl-2">{country.countryNameEn}</span>
-                                                                                                    <span className="country-phone-code pl-1">{`+${country.countryCallingCode}`}</span>
+                                                                                                        <span height="20" width="20">{country.flag} </span>
+                                                                                                        <span className="country-name pl-2">{country.countryNameEn}</span>
+                                                                                                        <span className="country-phone-code pl-1">{`+${country.countryCallingCode}`}</span>
                                                                                                     </Dropdown.Item>)
-                                                                                        })
+                                                                                            })
                                                                                         }
                                                                                     </Dropdown.Menu>
                                                                                 </Dropdown>
                                                                             </span>
-                                                                        <Field innerRef={(ele) => setPhoneFieldRef(ele)} data-testid="phone" className="form-control rounded" type="text" name="phone"/>
+                                                                            <Field innerRef={(ele) => setPhoneFieldRef(ele)} data-testid="phone" className="form-control rounded" type="text" name="phone" />
                                                                         </div>
                                                                     </div>
                                                                     <div className="invalid-feedback">
