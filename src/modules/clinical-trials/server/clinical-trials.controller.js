@@ -479,6 +479,7 @@ async function getTrials(req, res) {
     phase = phaseInputTextMapping(phase);
     age_ranges = ageRangeInputTextMapping(age_ranges);
     gender = genderInputTextMapping(gender);
+    free_text_search = free_text_search? free_text_search.toLowerCase() : '';
     if (zipcode || country){
         cordinates = await getCoordinates('', zipcode, '', '', country, 0);
     } else {
@@ -522,7 +523,7 @@ async function getTrials(req, res) {
         }
         let result = await Trial.findAll({
             where: query,
-            attributes: ['protocol_number', 'indication_group', 'indication', 'trial_fixed_id', 'trial_status', 'max_age', 'min_age', 'official_title', 'gender', 'clinical_trial_brief_title', 'phase', 'std_age'],
+            attributes: ['gov_identifier','protocol_number', 'indication_group', 'indication', 'trial_fixed_id', 'trial_status', 'max_age', 'min_age', 'official_title', 'gender', 'clinical_trial_brief_title', 'phase', 'std_age'],
             include: ['locations'], ...pageing});
 
         let total_item_count = await Trial.count({
@@ -552,34 +553,37 @@ async function getTrials(req, res) {
         }
 
     }).filter(x=>x!=='').filter(x=>{
+        try{
         if(! free_text_search){
             return true;
         }
-        if(x.indication.includes(free_text_search)){
+        if(x.indication.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.indication_group.includes(free_text_search)){
+        if(x.indication_group.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.phase.includes(free_text_search)){
+        if(x.phase.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.gender.includes(free_text_search)){
+        if(x.gender.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.std_age.includes(free_text_search)){
+        if(x.std_age.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.clinical_trial_brief_title.includes(free_text_search)){
+        if(x.clinical_trial_brief_title.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.official_title.includes(free_text_search)){
+        if(x.official_title.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.trial_status.includes(free_text_search)){
+        if(x.trial_status.toLowerCase().includes(free_text_search)){
             return true;
         }
-
+    } catch(ex){
+        
+    }
         return false;
 
     });
@@ -613,6 +617,42 @@ async function getTrialDetails(req, res) {
                 ]
             },
             include: ['locations']
+        });
+
+        if (!result) {
+            response.data = [];
+            return res.status(204).send(response);
+        }
+
+        response.data = result;
+        res.json(response);
+    } catch (err) {
+        logger.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
+async function updateClinicalTrials(req, res) {
+    const response = new Response({}, []);
+    const reqdata = req.body;
+    res.set({ 'content-type': 'application/json; charset=utf-8' });
+    try {
+        let ids = reqdata.map(x=>x.trial_fixed_id)
+        let trials = await Trial.findAll({
+            where: {
+                [Op.or]: [
+                {trial_fixed_id: ids},
+                {id: ids}
+                ]
+            }
+        });
+
+        let result = trials.map(trial=>{
+            let newStoryItm = reqdata.filter(x=>x.trial_fixed_id === trial.trial_fixed_id)[0];
+            trial.story_telling = newStoryItm.story_telling;
+            trial.save({ fields: ['story_telling'] });
+            return trial; 
         });
 
         if (!result) {
@@ -831,3 +871,4 @@ exports.getConditions = getConditions;
 exports.getConditionsWithDetails = getConditionsWithDetails;
 exports.validateAddress = validateAddress;
 exports.syncGeoCodes = syncGeoCodes;
+exports.updateClinicalTrials = updateClinicalTrials;
