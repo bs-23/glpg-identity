@@ -43,6 +43,10 @@ const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
         allowNull: false,
         type: DataTypes.STRING(5)
     },
+    type: {
+        type: DataTypes.ENUM,
+        values: ['hcp', 'business-partner'],
+    },
     created_by: {
         type: DataTypes.UUID
     },
