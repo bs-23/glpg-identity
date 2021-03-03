@@ -18,7 +18,7 @@ import { getHcpProfiles, getHCPSpecialities } from '../hcp.actions';
 import { HcpInlineEditSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
 import EditableTable from '../../../../core/client/components/EditableTable/EditableTable';
-import { HCPFilter }  from "../../../../information";
+import { HCPFilter } from "../../../../information";
 
 const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     const [comment, setComment] = useState("");
@@ -119,7 +119,7 @@ export default function hcpUsers() {
         const filterID = multiFilterSetting.selectedSettingID;
         const shouldUpdateFilter = multiFilterSetting.saveType === 'save_existing';
 
-        if(multiFilterSetting.shouldSaveFilter) {
+        if (multiFilterSetting.shouldSaveFilter) {
             const settingName = multiFilterSetting.saveType === 'save_existing'
                 ? multiFilterSetting.selectedFilterSettingName
                 : multiFilterSetting.newFilterSettingName;
@@ -133,24 +133,24 @@ export default function hcpUsers() {
                 }
             }
 
-            if(filterID && shouldUpdateFilter) {
-                try{
+            if (filterID && shouldUpdateFilter) {
+                try {
                     await axios.put(`/api/filter/${filterID}`, filterSetting);
                     history.push(`/information/list/cdp?filter=${filterID}`);
-                }catch(err){
-                    const errorMessage = err.response.data && err.response.data || 'There was an error updating the filter setting.';
+                } catch (err) {
+                    const errorMessage = err.response.data ? err.response.data : 'There was an error updating the filter setting.';
                     addToast(errorMessage, {
                         appearance: 'error',
                         autoDismiss: true
                     });
                     return Promise.reject();
                 }
-            }else {
-                try{
+            } else {
+                try {
                     const { data } = await axios.post('/api/filter', filterSetting);
                     history.push(`/information/list/cdp?filter=${data.id}`);
-                }catch(err){
-                    const errorMessage = err.response.data && err.response.data || 'There was an error updating the filter setting.';
+                } catch (err) {
+                    const errorMessage = err.response.data ? err.response.data : 'There was an error updating the filter setting.';
                     addToast(errorMessage, {
                         appearance: 'error',
                         autoDismiss: true
@@ -352,7 +352,7 @@ export default function hcpUsers() {
     }
 
     const renderOptInTypes = ({ value }) => {
-        if(!value) return null;
+        if (!value) return null;
 
         const allOptTypes = ['single-opt-in', 'double-opt-in', 'opt-out'];
 
@@ -549,7 +549,7 @@ export default function hcpUsers() {
         const params = new URLSearchParams(location.search);
         const filterID = params.get('filter');
 
-        if(filterID) axios.get(`/api/filter/${filterID}`)
+        if (filterID) axios.get(`/api/filter/${filterID}`)
             .then(res => {
                 setSelectedFilterSetting(res.data);
                 setIsFilterEnabled(true);
@@ -558,13 +558,13 @@ export default function hcpUsers() {
         else {
             let filterSetting;
 
-            if(location.state && location.state.filterSetting) {
+            if (location.state && location.state.filterSetting) {
                 filterSetting = location.state.filterSetting;
 
                 setIsFilterEnabled(true);
                 setSelectedFilterSetting({ settings: filterSetting });
             }
-            else{
+            else {
                 const { filters, logic } = hcpFilterRef.current.multiFilterProps.values || {};
 
                 filterSetting = filters && filters.length

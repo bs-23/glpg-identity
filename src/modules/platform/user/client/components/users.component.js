@@ -89,7 +89,7 @@ export default function Users() {
 
         const filterID = params.get('filter');
 
-        if(filterID) axios.get(`/api/filter/${filterID}`)
+        if (filterID) axios.get(`/api/filter/${filterID}`)
             .then(res => {
                 setSelectedFilterSetting(res.data);
                 setIsFilterEnabled(true);
@@ -158,7 +158,7 @@ export default function Users() {
         const filterID = multiFilterSetting.selectedSettingID;
         const shouldUpdateFilter = multiFilterSetting.saveType === 'save_existing';
 
-        if(multiFilterSetting.shouldSaveFilter) {
+        if (multiFilterSetting.shouldSaveFilter) {
             const settingName = multiFilterSetting.saveType === 'save_existing'
                 ? multiFilterSetting.selectedFilterSettingName
                 : multiFilterSetting.newFilterSettingName;
@@ -172,24 +172,24 @@ export default function Users() {
                 }
             }
 
-            if(filterID && shouldUpdateFilter) {
-                try{
+            if (filterID && shouldUpdateFilter) {
+                try {
                     await axios.put(`/api/filter/${filterID}`, filterSetting);
                     history.push(`${location.pathname}?filter=${filterID}`);
-                }catch(err){
-                    const errorMessage = err.response.data && err.response.data || 'There was an error updating the filter setting.';
+                } catch (err) {
+                    const errorMessage = err.response.data ? err.response.data : 'There was an error updating the filter setting.';
                     addToast(errorMessage, {
                         appearance: 'error',
                         autoDismiss: true
                     });
                     return Promise.reject();
                 }
-            }else {
-                try{
+            } else {
+                try {
                     const { data } = await axios.post('/api/filter', filterSetting);
                     history.push(`${location.pathname}?filter=${data.id}`);
-                }catch(err){
-                    const errorMessage = err.response.data && err.response.data || 'There was an error updating the filter setting.';
+                } catch (err) {
+                    const errorMessage = err.response.data ? err.response.data : 'There was an error updating the filter setting.';
                     addToast(errorMessage, {
                         appearance: 'error',
                         autoDismiss: true
@@ -269,7 +269,7 @@ export default function Users() {
                                     className={`btn cdp-btn-outline-primary ${isFilterEnabled ? 'multifilter_enabled' : ''}`}
                                     onClick={() => setShowFilter(true)}
                                 >
-                                    <i className={`fas fa-filter  ${isFilterEnabled ? '' : ''}`}></i>
+                                    <i className={`fas fa-filter`}></i>
                                     <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon' : 'd-none'}`}></i>
                                     <span className="d-none d-sm-inline-block ml-2">Filter</span>
                                 </button>
@@ -292,8 +292,8 @@ export default function Users() {
 
                         {userdata['users'] && userdata['users'].length > 0 &&
                             <React.Fragment>
-                            <div className="table-responsive shadow-sm bg-white mb-3 cdp-table__responsive-wrapper">
-                                <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
+                                <div className="table-responsive shadow-sm bg-white mb-3 cdp-table__responsive-wrapper">
+                                    <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
                                                 <th width="12%"><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
