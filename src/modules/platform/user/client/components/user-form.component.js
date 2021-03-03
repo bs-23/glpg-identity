@@ -125,7 +125,6 @@ export default function UserForm() {
                                                                                                         setSelectedCountryCode(index);
                                                                                                         const countryCode = country.countryCallingCode;
                                                                                                         formikProps.setFieldValue('country_code', countryCode);
-                                                                                                    console.log("input: ", phoneFieldRef);
                                                                                                     phoneFieldRef.focus();
                                                                                                     }} key={index} className="px-2 d-flex align-items-center">
                                                                                                     <span height="20" width="20">{country.flag} </span>
