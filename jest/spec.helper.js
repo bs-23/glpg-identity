@@ -9,6 +9,7 @@ process.env.CONSENT_CONFIRMATION_TOKEN_SECRET = 'consent-confirmation-secret';
 const defaultUserId = 'ce2f07f9-c40b-43b8-8200-124de9fc2e46';
 const defaultAdminId = 'f29b63e5-36c7-4210-a5a8-c1e9d0c5b9e4';
 const defaultApplicationId = '9017a1ee-3391-40a0-ad50-70bc7f1657f0';
+const partnerRequestApplicationId = '8efce9d4-a01c-4f48-b114-4f0e6597f55a';
 const defaultHCPuserId = 'db2baac3-46d1-425f-b62d-3730a294fd0e';
 const demoConsentCategoryId = 'fe037405-c676-4d98-bd05-85008900c838';
 const demoFaqId = '169e974d-8474-4a5f-87ae-5d7d66796a1a';
@@ -31,10 +32,10 @@ const ConsentCategoryManagementServiceCategoryID = '3ffe73e9-7922-4640-ba0c-3628
 const ConsentCountryManagementServiceCategoryID = '3ffe73e9-7922-4640-ba0c-3628b3358ad9';
 const ConsentPerformanceReportServiceCategoryID = '3ffe73e9-7922-4640-ba0c-3628b3358ae9';
 
-const BusinessPartnerServiceCategoryID = '4ffe73e9-7922-4640-ba0c-3628b3358aa9';
-const VendorManagementServiceCategoryID = '4ffe73e9-7922-4640-ba0c-3628b3358ab9';
-const HCPRequestManagementServiceCategoryID = '4ffe73e9-7922-4640-ba0c-3628b3358ac9';
-const PartnerManagementServiceCategoryID = '4ffe73e9-7922-4640-ba0c-3628b3358ad9';
+const BusinessPartnerServiceCategoryID = '3730e090-cf4d-48e1-bcbe-d06796f0c7e3';
+const VendorManagementServiceCategoryID = '7cb535aa-c286-4674-bf60-54bb797f836f';
+const HCPRequestManagementServiceCategoryID = '17769868-7b35-4f39-b08e-abbf34d696d4';
+const PartnerManagementServiceCategoryID = '9718f1f9-6cb1-4caa-ac6f-d07e4a2d6b94';
 
 const systemAdminPermissionSetID = '1ffe73e9-7922-4640-ba0c-3628b3358aa8';
 const SystemAdminProfileID = '1ffe73e9-7922-4640-ba0c-3628b3358aa9';
@@ -76,6 +77,21 @@ module.exports = {
             id: defaultApplicationId,
             email: 'hcp-portal@glpg.com',
         }, process.env.APPLICATION_TOKEN_SECRET, { expiresIn: '30d', issuer: defaultApplicationId }),
+    },
+    partnerRequestApplication: {
+        id: partnerRequestApplicationId,
+        name: 'Patients Organization',
+        slug: 'Patients Organization',
+        email: 'patients-organization@glpg.com',
+        password: 'P@ssword123',
+        approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+        auth_secret: 'b248eaa4-583f-4ecd-9e9c-be8f58ab3c3e',
+        logo_link: 'a',
+        created_by: defaultAdminId,
+        updated_by: defaultAdminId,
+        metadata: JSON.stringify({
+            request_notification_link: 'https://onboarding-business-partner-dev.glpg.com/bin/public/glpg-forms/sendForm.invitation.html'
+        })
     },
     users: {
         defaultAdmin: {
@@ -229,9 +245,9 @@ module.exports = {
         { id: ConsentCountryManagementServiceCategoryID, title: "Assign Consent to Country", slug: "consent-country", parent_id: DPOServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
         { id: ConsentPerformanceReportServiceCategoryID, title: "Generate Data Privacy & Consent Performance Report", slug: "consent-performance", parent_id: DPOServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
 
-        // { id: VendorManagementServiceCategoryID, title: "Manage Vendor Request", slug: "manage-vendor-request", parent_id: BusinessPartnerServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
-        // { id: HCPRequestManagementServiceCategoryID, title: "Manage Healthcare Entity Request", slug: "manage-entity-request", parent_id: BusinessPartnerServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
-        // { id: PartnerManagementServiceCategoryID, title: "Business Partner Management to Submit to ERP Systems", slug: "manage-business-partners", parent_id: BusinessPartnerServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+        { id: VendorManagementServiceCategoryID, title: "Manage Vendor Request", slug: "manage-vendor-request", parent_id: BusinessPartnerServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+        { id: HCPRequestManagementServiceCategoryID, title: "Manage Healthcare Entity Request", slug: "manage-entity-request", parent_id: BusinessPartnerServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+        { id: PartnerManagementServiceCategoryID, title: "Business Partner Management to Submit to ERP Systems", slug: "manage-business-partners", parent_id: BusinessPartnerServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
     ],
     permissionSet: [
         { id: systemAdminPermissionSetID, title: "System Admin Permission Set", slug: "system_admin", type: 'standard', countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for System Admin", created_by: defaultAdminId, updated_by: defaultAdminId, },
@@ -256,9 +272,9 @@ module.exports = {
         { permissionset_id: systemAdminPermissionSetID, service_id: ConsentCountryManagementServiceCategoryID },
         { permissionset_id: systemAdminPermissionSetID, service_id: ConsentPerformanceReportServiceCategoryID },
 
-        // { permissionset_id: systemAdminPermissionSetID, service_id: VendorManagementServiceCategoryID },
-        // { permissionset_id: systemAdminPermissionSetID, service_id: HCPManagementServiceCategoryID },
-        // { permissionset_id: systemAdminPermissionSetID, service_id: PartnerManagementServiceCategoryID }
+        { permissionset_id: systemAdminPermissionSetID, service_id: VendorManagementServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, service_id: HCPRequestManagementServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, service_id: PartnerManagementServiceCategoryID }
     ],
     userProfile: [
         { id: SystemAdminProfileID, title: "System Admin", slug: "system_admin", type: 'standard', description: "This is the default profile for System Admin", created_by: defaultAdminId, updated_by: defaultAdminId }
