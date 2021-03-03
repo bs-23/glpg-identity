@@ -165,7 +165,7 @@ describe('Cdp consent performance report component', () => {
             expect(screen.getByText('First Name')).toBeTruthy();
             expect(screen.getByText('Last Name')).toBeTruthy();
             expect(screen.getByText('Email')).toBeTruthy();
-            expect(screen.getByText('Consent Type')).toBeTruthy();
+            expect(screen.getByText('Consent Category')).toBeTruthy();
             expect(screen.getByText('Opt Type')).toBeTruthy();
             expect(screen.getByText('Legal Basis')).toBeTruthy();
             expect(screen.getByText('Preferences')).toBeTruthy();

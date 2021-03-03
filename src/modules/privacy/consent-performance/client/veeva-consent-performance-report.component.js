@@ -314,8 +314,8 @@ const ConsentPerformanceReport = () => {
 
                             {consents_report['hcp_consents'] && consents_report['hcp_consents'].length > 0 &&
                                 <React.Fragment>
-                                    <div className="shadow-sm bg-white table-responsive">
-                                        <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm">
+                                <div className="shadow-sm bg-white table-responsive cdp-table__responsive-wrapper">
+                                    <table className="table table-hover table-sm mb-0 cdp-table cdp-table-sm cdp-table__responsive">
                                             <thead className="cdp-bg-primary text-white cdp-table__header">
                                                 <tr>
                                                     <th>
@@ -390,13 +390,13 @@ const ConsentPerformanceReport = () => {
                                             <tbody className="cdp-table__body bg-white">
                                                 {consents_report['hcp_consents'].map((row, index) => (
                                                     <tr key={index}>
-                                                        <td>{row.name}</td>
-                                                        <td>{row.email}</td>
-                                                        <td>{row.preference}</td>
-                                                        <td>{titleCase(row.opt_type)}</td>
-                                                        <td>{titleCase(row.legal_basis)}</td>
-                                                        <td>{(new Date(row.given_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
-                                                        <td>
+                                                        <td data-for="Name">{row.name}</td>
+                                                        <td data-for="Email">{row.email}</td>
+                                                        <td data-for="Content Type">{row.preference}</td>
+                                                        <td data-for="Opt Type">{titleCase(row.opt_type)}</td>
+                                                        <td data-for="Legal Basis">{titleCase(row.legal_basis)}</td>
+                                                        <td data-for="Date">{(new Date(row.given_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
+                                                        <td data-for="Action">
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
                                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary font-weight-bold-light dropdown-toggle-without-icon btn-sm py-0 px-1 ">

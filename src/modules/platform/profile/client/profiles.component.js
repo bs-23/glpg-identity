@@ -148,7 +148,7 @@ export default function ManageProfiles() {
     }
 
     const extractPermissionSetNames = (data) => {
-        if (!data || !data.up_ps || !data.up_ps.length) return '';
+        if (!data || !data.up_ps || !data.up_ps.length) return '--';
         return data.up_ps.map((item, index) => {
             return <React.Fragment key={item.permissionset_id}>
                 <a className="link-with-underline cursor-pointer" key={item.permissionset_id} onClick={() => handlePermissionSetClick(item.permissionset_id)}>

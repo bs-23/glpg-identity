@@ -28,6 +28,7 @@ describe('PasswordForm component', () => {
             "email": "test@gmail.com",
             "name": "a",
             "serviceCategories": [],
+            "services": []
         };
         fakeAxios.onPost('/api/login').reply(200, savedUser);
 

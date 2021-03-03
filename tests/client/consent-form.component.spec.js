@@ -22,6 +22,7 @@ describe('Consent form component', () => {
     let savedUser;
     let consent_categories;
     let consent;
+    let localizations;
     jest.useFakeTimers();
 
     beforeEach( async () => {
@@ -116,6 +117,17 @@ describe('Consent form component', () => {
             "translations": []
         }
         mockAxios.onGet('/api/cdp-consents/1').reply(200, consent);
+
+        localizations = [
+            {
+                "id": "321cb02f-886f-4ff2-aaa6-67dd51d34a9a",
+                "language_family": "English",
+                "language_variant": "British English",
+                "country_iso2": "GB",
+                "locale": "en_GB",
+            }
+        ];
+        mockAxios.onGet('/api/localizations').reply(200, localizations);
     });
 
     const userSlice = () => store.getState().userReducer;
