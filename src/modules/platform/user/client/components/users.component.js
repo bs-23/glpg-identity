@@ -105,7 +105,7 @@ export default function Users() {
                 }
                 : null;
             dispatch(getUsers(searchObj.page, searchObj.codbase, searchObj.orderBy, searchObj.orderType, filterSetting));
-        };
+        }
 
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
     }, [location]);
@@ -200,7 +200,7 @@ export default function Users() {
         }
         else {
             history.push(location.pathname);
-        };
+        }
         setIsFilterEnabled(true);
     }
 

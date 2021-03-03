@@ -703,7 +703,7 @@ async function createHcpProfile(req, res) {
                 if (!consentDetails) {
                     response.errors.push(new CustomError('Invalid consents.', 400));
                     return;
-                };
+                }
 
                 const currentCountry = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
 
