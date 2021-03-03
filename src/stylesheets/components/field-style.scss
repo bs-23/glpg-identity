@@ -151,6 +151,11 @@ textarea.form-control {
             }
         }
 
+        &-menu {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
         &-item {
             .country-name,
             .country-phone-code {
