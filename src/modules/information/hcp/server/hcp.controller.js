@@ -134,9 +134,9 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
 
     if (table === 'datasync_hcp_profiles') {
         const getUserPermittedCodbases = async () => {
-            const allCountries = await getAllCountries();
+            const allCountryList = await getAllCountries();
 
-            const userCodBases = allCountries.filter(c => userPermittedCountries.includes(c.country_iso2)).map(c => c.codbase.toLowerCase());
+            const userCodBases = allCountryList.filter(c => userPermittedCountries.includes(c.country_iso2)).map(c => c.codbase.toLowerCase());
             return userCodBases;
         };
 
@@ -181,9 +181,9 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
 
             const selected_iso2_list_for_codbase = country_iso2_list_for_codbase.filter(i => user_country_iso2_list.includes(i));
             const ignorecase_of_selected_iso2_list_for_codbase = [].concat.apply([], selected_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
-            queryValue = ignorecase_of_selected_iso2_list_for_codbase.length
-                ? ignorecase_of_selected_iso2_list_for_codbase
-                : null;
+            // queryValue = ignorecase_of_selected_iso2_list_for_codbase.length
+            //     ? ignorecase_of_selected_iso2_list_for_codbase
+            //     : null;
 
             delete customFilter.country_iso2;
             return {
@@ -774,7 +774,7 @@ async function createHcpProfile(req, res) {
             }));
         }
 
-        if(response.errors.length) {
+        if (response.errors.length) {
             return res.status(400).send(response);
         }
 

@@ -147,8 +147,8 @@ const MultiFilter = (props, ref) => {
     const handleRemoveFilter = async (idx, props1) => {
         const allFilters = props1.values.filters;
         if (allFilters) {
-            const allFiltersAfterRemoval = allFilters.filter((value, ind) => ind !== idx).map((filter, idx) => {
-                filter.name = String(idx + 1);
+            const allFiltersAfterRemoval = allFilters.filter((value, ind) => ind !== idx).map((filter, indx) => {
+                filter.name = String(indx + 1);
                 return filter;
             });
 

@@ -546,8 +546,8 @@ export default function hcpUsers() {
     }, []);
 
     useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const filterID = params.get('filter');
+        const urlParams = new URLSearchParams(location.search);
+        const filterID = urlParams.get('filter');
 
         if (filterID) axios.get(`/api/filter/${filterID}`)
             .then(res => {
