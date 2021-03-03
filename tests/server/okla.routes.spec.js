@@ -27,7 +27,7 @@ beforeAll(async () => {
             searchOutputFormatVersion: 1.4,
             success: true,
             status: 'SUCCESS',
-            resultSize: 17,
+            resultSize: 30,
             totalNumberOfResults: 18,
             numberOfIndividuals: 5,
             numberOfActivities: 17,
@@ -261,7 +261,7 @@ describe('Okla Routes', () => {
         const searchResponse = {
             totalNumberOfResults: 18,
             numberOfWorkplaces: 17,
-            resultSize: 17,
+            resultSize: 30,
             results: [
                 {
                     name: 'Centre Médical Malou',
@@ -318,6 +318,7 @@ describe('Okla Routes', () => {
                 id: 'WBEH01410437',
                 isInContract: false,
                 isValid: true,
+                country: "BELGIUM",
                 name: 'Centre Médical Malou',
                 address: 'Mont Saint-Lambert 5',
                 location: { latitude: 50.88632762432098, longitude: 4.30989414453506 },
@@ -353,7 +354,8 @@ describe('Okla Routes', () => {
             address: 'Mont Saint-Lambert 5',
             location: { latitude: 50.88632762432098, longitude: 4.30989414453506 },
             city: 'Sint-Niklaas',
-            contactNumbers: []
+            contactNumbers: [],
+            externalIdentifiers: [],
         }
 
         const response = await request

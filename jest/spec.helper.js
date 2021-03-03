@@ -13,11 +13,31 @@ const defaultHCPuserId = 'db2baac3-46d1-425f-b62d-3730a294fd0e';
 const demoConsentCategoryId = 'fe037405-c676-4d98-bd05-85008900c838';
 const demoFaqId = '169e974d-8474-4a5f-87ae-5d7d66796a1a';
 const demoConsentId = '3bb2057b-3006-4c87-9ce1-166bd291e86f';
-const userManagementServiceCategoryID = 'bd2b3849-a1a0-40ab-900a-346926edc572';
+
+const CDPServiceCategoryID = 'bd2b3849-a1a0-40ab-900a-346926eda572';
+const UserManagementServiceCategoryID = 'bd2b3849-a1a0-40ab-900a-346926edb572';
+const ProfileManagementServiceCategoryID = 'bd2b3849-a1a0-40ab-900a-346926edc572';
+const RoleManagementServiceCategoryID = 'bd2b3849-a1a0-40ab-900a-346926edd572';
+const PermissionSetManagementServiceCategoryID = 'bd2b3849-a1a0-40ab-900a-346926ede572';
+const FaqManagementServiceCategoryID = 'bd2b3849-a1a0-40ab-900a-346926edf572';
+
+const HCPServiceCategoryID = '2ffe73e9-7922-4640-ba0c-3628b3358aa9';
+const HCPManagementServiceCategoryID = '2ffe73e9-7922-4640-ba0c-3628b3358ab9';
+const DiscoverHcpHcoServiceCategoryID = '2ffe73e9-7922-4640-ba0c-3628b3358ac9';
+
+const DPOServiceCategoryID = '3ffe73e9-7922-4640-ba0c-3628b3358aa9';
+const ConsentManagementServiceCategoryID = '3ffe73e9-7922-4640-ba0c-3628b3358ab9';
+const ConsentCategoryManagementServiceCategoryID = '3ffe73e9-7922-4640-ba0c-3628b3358ac9';
+const ConsentCountryManagementServiceCategoryID = '3ffe73e9-7922-4640-ba0c-3628b3358ad9';
+const ConsentPerformanceReportServiceCategoryID = '3ffe73e9-7922-4640-ba0c-3628b3358ae9';
+
+const BusinessPartnerServiceCategoryID = '4ffe73e9-7922-4640-ba0c-3628b3358aa9';
+const VendorManagementServiceCategoryID = '4ffe73e9-7922-4640-ba0c-3628b3358ab9';
+const HCPRequestManagementServiceCategoryID = '4ffe73e9-7922-4640-ba0c-3628b3358ac9';
+const PartnerManagementServiceCategoryID = '4ffe73e9-7922-4640-ba0c-3628b3358ad9';
+
 const systemAdminPermissionSetID = '1ffe73e9-7922-4640-ba0c-3628b3358aa8';
 const SystemAdminProfileID = '1ffe73e9-7922-4640-ba0c-3628b3358aa9';
-const HCPServiceCategoryID = '1ffe73e9-7922-4640-ba0c-3628b3358ab9';
-const DPOServiceCategoryID = '1ffe73e9-7922-4640-ba0c-3628b3358ac9';
 const hcpValidUserId = '1ffe73e9-7922-4640-ba0c-3628b3358ab8';
 const hcpInvalidUserId = '1ffe73e9-7922-4640-ba0c-3628b3358ba8';
 
@@ -190,17 +210,55 @@ module.exports = {
 
     },
     serviceCategories: [
-        { id: userManagementServiceCategoryID, title: "Management of Customer Data Platform", slug: "platform", created_by: defaultAdminId, updated_by: defaultAdminId },
+        { id: CDPServiceCategoryID, title: "Management of Customer Data Platform", slug: "platform", created_by: defaultAdminId, updated_by: defaultAdminId },
         { id: HCPServiceCategoryID, title: "HCP", slug: "information", created_by: defaultAdminId, updated_by: defaultAdminId },
-        { id: DPOServiceCategoryID, title: "DPO", slug: "privacy", created_by: defaultAdminId, updated_by: defaultAdminId }
+        { id: DPOServiceCategoryID, title: "DPO", slug: "privacy", created_by: defaultAdminId, updated_by: defaultAdminId },
+        { id: BusinessPartnerServiceCategoryID, title: "Business Partner Management", slug: "business-partner", created_by: defaultAdminId, updated_by: defaultAdminId },
+
+        { id: UserManagementServiceCategoryID, title: "User & Access Management", slug: "manage-user", parent_id: CDPServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+        { id: ProfileManagementServiceCategoryID, title: "Manage Profiles", slug: "manage-profile", parent_id: CDPServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+        { id: RoleManagementServiceCategoryID, title: "Define Roles", slug: "manage-role", parent_id: CDPServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+        { id: PermissionSetManagementServiceCategoryID, title: "Manage Permission Sets", slug: "manage-permission-sets", parent_id: CDPServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+        { id: FaqManagementServiceCategoryID, title: "Manage FAQs", slug: "manage-faqs", parent_id: CDPServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+
+        { id: HCPManagementServiceCategoryID, title: "Manage HCP Master Data", slug: "manage-hcp", parent_id: HCPServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+        { id: DiscoverHcpHcoServiceCategoryID, title: "Discover Missing HCPs and HCOs", slug: "discover-hcp-hco", parent_id: HCPServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+
+        { id: ConsentManagementServiceCategoryID, title: "Manage New Consent", slug: "manage-consent", parent_id: DPOServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+        { id: ConsentCategoryManagementServiceCategoryID, title: "Configure Consent Category", slug: "consent-category", parent_id: DPOServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+        { id: ConsentCountryManagementServiceCategoryID, title: "Assign Consent to Country", slug: "consent-country", parent_id: DPOServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+        { id: ConsentPerformanceReportServiceCategoryID, title: "Generate Data Privacy & Consent Performance Report", slug: "consent-performance", parent_id: DPOServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+
+        // { id: VendorManagementServiceCategoryID, title: "Manage Vendor Request", slug: "manage-vendor-request", parent_id: BusinessPartnerServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+        // { id: HCPRequestManagementServiceCategoryID, title: "Manage Healthcare Entity Request", slug: "manage-entity-request", parent_id: BusinessPartnerServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+        // { id: PartnerManagementServiceCategoryID, title: "Business Partner Management to Submit to ERP Systems", slug: "manage-business-partners", parent_id: BusinessPartnerServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
     ],
     permissionSet: [
         { id: systemAdminPermissionSetID, title: "System Admin Permission Set", slug: "system_admin", type: 'standard', countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for System Admin", created_by: defaultAdminId, updated_by: defaultAdminId, },
     ],
     permissionSet_service: [
-        { permissionset_id: systemAdminPermissionSetID, service_id: userManagementServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, service_id: CDPServiceCategoryID },
         { permissionset_id: systemAdminPermissionSetID, service_id: HCPServiceCategoryID },
-        { permissionset_id: systemAdminPermissionSetID, service_id: DPOServiceCategoryID }
+        { permissionset_id: systemAdminPermissionSetID, service_id: DPOServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, service_id: BusinessPartnerServiceCategoryID },
+
+        { permissionset_id: systemAdminPermissionSetID, service_id: UserManagementServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, service_id: ProfileManagementServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, service_id: RoleManagementServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, service_id: PermissionSetManagementServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, service_id: FaqManagementServiceCategoryID },
+
+        { permissionset_id: systemAdminPermissionSetID, service_id: HCPManagementServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, service_id: DiscoverHcpHcoServiceCategoryID },
+
+        { permissionset_id: systemAdminPermissionSetID, service_id: ConsentManagementServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, service_id: ConsentCategoryManagementServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, service_id: ConsentCountryManagementServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, service_id: ConsentPerformanceReportServiceCategoryID },
+
+        // { permissionset_id: systemAdminPermissionSetID, service_id: VendorManagementServiceCategoryID },
+        // { permissionset_id: systemAdminPermissionSetID, service_id: HCPManagementServiceCategoryID },
+        // { permissionset_id: systemAdminPermissionSetID, service_id: PartnerManagementServiceCategoryID }
     ],
     userProfile: [
         { id: SystemAdminProfileID, title: "System Admin", slug: "system_admin", type: 'standard', description: "This is the default profile for System Admin", created_by: defaultAdminId, updated_by: defaultAdminId }
