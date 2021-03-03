@@ -229,9 +229,9 @@ module.exports = {
         { id: ConsentCountryManagementServiceCategoryID, title: "Assign Consent to Country", slug: "consent-country", parent_id: DPOServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
         { id: ConsentPerformanceReportServiceCategoryID, title: "Generate Data Privacy & Consent Performance Report", slug: "consent-performance", parent_id: DPOServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
 
-        { id: VendorManagementServiceCategoryID, title: "Manage Vendor Request", slug: "manage-vendor-request", parent_id: businessPartner.id, created_by: admin.id, updated_by: admin.id },
-        { id: HCPRequestManagementServiceCategoryID, title: "Manage Healthcare Entity Request", slug: "manage-entity-request", parent_id: businessPartner.id, created_by: admin.id, updated_by: admin.id },
-        { id: PartnerManagementServiceCategoryID, title: "Business Partner Management to Submit to ERP Systems", slug: "manage-business-partners", parent_id: businessPartner.id, created_by: admin.id, updated_by: admin.id },
+        { id: VendorManagementServiceCategoryID, title: "Manage Vendor Request", slug: "manage-vendor-request", parent_id: BusinessPartnerServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+        { id: HCPRequestManagementServiceCategoryID, title: "Manage Healthcare Entity Request", slug: "manage-entity-request", parent_id: BusinessPartnerServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+        { id: PartnerManagementServiceCategoryID, title: "Business Partner Management to Submit to ERP Systems", slug: "manage-business-partners", parent_id: BusinessPartnerServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
     ],
     permissionSet: [
         { id: systemAdminPermissionSetID, title: "System Admin Permission Set", slug: "system_admin", type: 'standard', countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for System Admin", created_by: defaultAdminId, updated_by: defaultAdminId, },
