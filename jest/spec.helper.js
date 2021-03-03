@@ -31,9 +31,13 @@ const ConsentCategoryManagementServiceCategoryID = '3ffe73e9-7922-4640-ba0c-3628
 const ConsentCountryManagementServiceCategoryID = '3ffe73e9-7922-4640-ba0c-3628b3358ad9';
 const ConsentPerformanceReportServiceCategoryID = '3ffe73e9-7922-4640-ba0c-3628b3358ae9';
 
+const BusinessPartnerServiceCategoryID = '4ffe73e9-7922-4640-ba0c-3628b3358aa9';
+const VendorManagementServiceCategoryID = '4ffe73e9-7922-4640-ba0c-3628b3358ab9';
+const HCPRequestManagementServiceCategoryID = '4ffe73e9-7922-4640-ba0c-3628b3358ac9';
+const PartnerManagementServiceCategoryID = '4ffe73e9-7922-4640-ba0c-3628b3358ad9';
+
 const systemAdminPermissionSetID = '1ffe73e9-7922-4640-ba0c-3628b3358aa8';
 const SystemAdminProfileID = '1ffe73e9-7922-4640-ba0c-3628b3358aa9';
-const BusinessPartnerServiceCategoryID = '1ffe73e9-7922-4640-ba0c-3628b3358ad9';
 const hcpValidUserId = '1ffe73e9-7922-4640-ba0c-3628b3358ab8';
 const hcpInvalidUserId = '1ffe73e9-7922-4640-ba0c-3628b3358ba8';
 
@@ -223,7 +227,11 @@ module.exports = {
         { id: ConsentManagementServiceCategoryID, title: "Manage New Consent", slug: "manage-consent", parent_id: DPOServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
         { id: ConsentCategoryManagementServiceCategoryID, title: "Configure Consent Category", slug: "consent-category", parent_id: DPOServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
         { id: ConsentCountryManagementServiceCategoryID, title: "Assign Consent to Country", slug: "consent-country", parent_id: DPOServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
-        { id: ConsentPerformanceReportServiceCategoryID, title: "Generate Data Privacy & Consent Performance Report", slug: "consent-performance", parent_id: DPOServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId }
+        { id: ConsentPerformanceReportServiceCategoryID, title: "Generate Data Privacy & Consent Performance Report", slug: "consent-performance", parent_id: DPOServiceCategoryID, created_by: defaultAdminId, updated_by: defaultAdminId },
+
+        { id: VendorManagementServiceCategoryID, title: "Manage Vendor Request", slug: "manage-vendor-request", parent_id: businessPartner.id, created_by: admin.id, updated_by: admin.id },
+        { id: HCPRequestManagementServiceCategoryID, title: "Manage Healthcare Entity Request", slug: "manage-entity-request", parent_id: businessPartner.id, created_by: admin.id, updated_by: admin.id },
+        { id: PartnerManagementServiceCategoryID, title: "Business Partner Management to Submit to ERP Systems", slug: "manage-business-partners", parent_id: businessPartner.id, created_by: admin.id, updated_by: admin.id },
     ],
     permissionSet: [
         { id: systemAdminPermissionSetID, title: "System Admin Permission Set", slug: "system_admin", type: 'standard', countries: ["BE", "FR", "DE", "IT", "NL", "ES", "GB"], description: "This is the default permission set for System Admin", created_by: defaultAdminId, updated_by: defaultAdminId, },
@@ -246,7 +254,11 @@ module.exports = {
         { permissionset_id: systemAdminPermissionSetID, service_id: ConsentManagementServiceCategoryID },
         { permissionset_id: systemAdminPermissionSetID, service_id: ConsentCategoryManagementServiceCategoryID },
         { permissionset_id: systemAdminPermissionSetID, service_id: ConsentCountryManagementServiceCategoryID },
-        { permissionset_id: systemAdminPermissionSetID, service_id: ConsentPerformanceReportServiceCategoryID }
+        { permissionset_id: systemAdminPermissionSetID, service_id: ConsentPerformanceReportServiceCategoryID },
+
+        { permissionset_id: systemAdminPermissionSetID, service_id: VendorManagementServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, service_id: HCPManagementServiceCategoryID },
+        { permissionset_id: systemAdminPermissionSetID, service_id: PartnerManagementServiceCategoryID }
     ],
     userProfile: [
         { id: SystemAdminProfileID, title: "System Admin", slug: "system_admin", type: 'standard', description: "This is the default profile for System Admin", created_by: defaultAdminId, updated_by: defaultAdminId }
