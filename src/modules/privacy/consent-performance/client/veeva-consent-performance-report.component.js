@@ -168,19 +168,20 @@ const ConsentPerformanceReport = () => {
                 <div className="row">
                     <div className="col-12">
                         <div>
+                            <h4 className="cdp-text-primary font-weight-bold my-3">Consent Performance Report</h4>
                             <div className="d-sm-flex justify-content-between align-items-end mb-0 mt-4">
                                 <div>
-                                    <h4 className="cdp-text-primary font-weight-bold mb-4">Consent Performance Report</h4>
+                                   
                                     <div>
-                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/consent/consent-performance-report/cdp">Customer Data Platform</NavLink>
-                                        <NavLink className="custom-tab px-4 py-3 cdp-border-primary" to="/consent/consent-performance-report/veeva-crm"><img alt="Veeva CRM LOGO" src="/assets/logo/logo-veevacrm.svg" height="13" /></NavLink>
+                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/consent/consent-performance-report/cdp"><span className="d-block d-lg-none">CDP</span><span className="d-none d-lg-block">Customer Data Platform</span></NavLink>
+                                        <NavLink className="custom-tab px-3 px-lg-4 py-3 cdp-border-primary" to="/consent/consent-performance-report/veeva-crm"><img alt="Veeva CRM LOGO" src="/assets/logo/logo-veevacrm.svg" height="13" /></NavLink>
                                     </div>
                                 </div>
 
                                 <div className="d-flex pt-3 pt-sm-0 mb-2">
 
                                     <React.Fragment>
-                                        <button className="btn cdp-btn-outline-primary mr-2" onClick={() => exportExcelFile()}><i className="fas fa-download pr-1"></i> Export Full Report</button>
+                                        <button className="btn cdp-btn-outline-primary mr-2" onClick={() => exportExcelFile()}><i className="fas fa-download"></i> <span className="d-none d-lg-block pl-1">Export Full Report</span></button>
 
                                         {countries && consents_report['countries'] &&
                                             <Dropdown className="ml-auto dropdown-customize mr-2">

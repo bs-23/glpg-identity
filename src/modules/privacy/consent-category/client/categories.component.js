@@ -73,7 +73,7 @@ const ConsentCategories = () => {
                             <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">Consent Categories </h4>
                             <div class="d-flex justify-content-between align-items-center">
                                 <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
-                                    <i className="icon icon-plus pr-1"></i> <span className="d-none d-sm-inline-block pl-1">Create new category</span>
+                                    <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Create new category</span>
                                 </button>
                             </div>
                         </div>
