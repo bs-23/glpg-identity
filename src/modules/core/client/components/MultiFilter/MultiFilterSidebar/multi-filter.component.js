@@ -127,11 +127,11 @@ const MultiFilter = (props, ref) => {
             filters: formikValues.filters,
             logic: formikValues.logic
         }
-        const selectedSetting = {
+        const selectedSettingObj = {
             filters: formikValues.selectedSettingFilters,
             logic: formikValues.selectedSettingLogic
         }
-        return !_.isEqual(selectedSetting, currentSetting);
+        return !_.isEqual(selectedSettingObj, currentSetting);
     }
 
     const trackFilterModifications = (formikProps) => {
@@ -144,32 +144,32 @@ const MultiFilter = (props, ref) => {
         }
     }
 
-    const handleRemoveFilter = async (index, props) => {
-        const allFilters = props.values.filters;
+    const handleRemoveFilter = async (index, props1) => {
+        const allFilters = props1.values.filters;
         if (allFilters) {
             const allFiltersAfterRemoval = allFilters.filter((value, ind) => ind !== index).map((filter, index) => {
                 filter.name = String(index + 1);
                 return filter;
             });
 
-            const updatedLogic = buildLogicAfterRemoval(props.values.logic, index);
+            const updatedLogic = buildLogicAfterRemoval(props1.values.logic, index);
 
-            await props.setFieldValue('filters', allFiltersAfterRemoval);
-            await props.setFieldValue('logic', updatedLogic);
+            await props1.setFieldValue('filters', allFiltersAfterRemoval);
+            await props1.setFieldValue('logic', updatedLogic);
 
-            const values = { ...props.values };
+            const values = { ...props1.values };
             values.filters = allFiltersAfterRemoval;
             values.logic = updatedLogic;
 
-            const updatedProps = { ...props, values: values }
+            const updatedProps = { ...props1, values: values }
 
             trackFilterModifications(updatedProps);
         }
     };
 
-    const handleRemoveAll = (props) => {
-        props.setFieldValue('filters', []);
-        props.setFieldValue('logic', '');
+    const handleRemoveAll = (props2) => {
+        props2.setFieldValue('filters', []);
+        props2.setFieldValue('logic', '');
     };
 
     const handleExecute = (values, actions) => {
@@ -260,8 +260,8 @@ const MultiFilter = (props, ref) => {
         await formikProps.setFieldValue('logic', logic);
         const values = { ...formikProps.values };
         values.logic = logic;
-        const props = { ...formikProps, values: values };
-        trackFilterModifications(props);
+        const props3 = { ...formikProps, values: values };
+        trackFilterModifications(props3);
     }
 
     const handleClose = (formikProps) => {
@@ -397,7 +397,7 @@ const MultiFilter = (props, ref) => {
                                     operatorName={getOperatorDisplayText(filter.fieldName, filter.operator)}
                                     values={getSummaryValueText(filter)}
                                     index={index}
-                                    onRemove={(index) => handleRemoveFilter(index, formikProps)}
+                                    onRemove={(idx) => handleRemoveFilter(idx, formikProps)}
                                 />
                             </div>
                         )}
