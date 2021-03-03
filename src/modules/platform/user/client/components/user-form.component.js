@@ -12,11 +12,11 @@ import CountryCodes from 'country-codes-list';
 export default function UserForm() {
     const dispatch = useDispatch();
     const [selectedCountryCode, setSelectedCountryCode] = useState(0);
+    const [phoneFieldRef, setPhoneFieldRef] = useState(null);
     const [profiles, setProfiles] = useState([]);
     const [roles, setRoles] = useState([]);
     const history = useHistory();
     const { addToast } = useToasts();
-
     const countryList = CountryCodes.all();
 
     useEffect(() => {
@@ -112,7 +112,7 @@ export default function UserForm() {
 
                                                                                         return (index === selectedCountryCode ?
                                                                                             <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
-                                                                                                <span height="20" width="20">{country.flag} </span>
+                                                                                                <span height="20" width="25">{country.flag} </span>
                                                                                                 <span className="country-phone-code pl-1">{`+${country.countryCallingCode}`}</span>
                                                                                             </Dropdown.Toggle> : null)
                                                                                     })
@@ -125,6 +125,7 @@ export default function UserForm() {
                                                                                                         setSelectedCountryCode(index);
                                                                                                         const countryCode = country.countryCallingCode;
                                                                                                         formikProps.setFieldValue('country_code', countryCode);
+                                                                                                    phoneFieldRef.focus();
                                                                                                     }} key={index} className="px-2 d-flex align-items-center">
                                                                                                     <span height="20" width="20">{country.flag} </span>
                                                                                                     <span className="country-name pl-2">{country.countryNameEn}</span>
@@ -135,7 +136,7 @@ export default function UserForm() {
                                                                                     </Dropdown.Menu>
                                                                                 </Dropdown>
                                                                             </span>
-                                                                            <Field data-testid="phone" className="form-control rounded" type="text" name="phone" />
+                                                                        <Field innerRef={(ele) => setPhoneFieldRef(ele)} data-testid="phone" className="form-control rounded" type="text" name="phone"/>
                                                                         </div>
                                                                     </div>
                                                                     <div className="invalid-feedback">

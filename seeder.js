@@ -454,7 +454,8 @@ async function init() {
             const consent_categories = [
                 { id: 'fe037405-c676-4d98-bd05-85008900c838', title: 'Direct Marketing', type: 'dm', slug: convertToSlug('Direct Marketing'), created_by: admin.id },
                 { id: '29374bce-7c3f-4408-a138-c062143d2247', title: 'Medical Consent', type: 'mc', slug: convertToSlug('Medical Consent'), created_by: admin.id },
-                { id: '59953d51-2449-4b65-950f-9f88654019bb', title: 'General Consent', type: 'general', slug: convertToSlug('General Consent'), created_by: admin.id }
+                { id: '59953d51-2449-4b65-950f-9f88654019bb', title: 'General Consent', type: 'general', slug: convertToSlug('General Consent'), created_by: admin.id },
+                { id: '3e1dff97-cea9-48cb-a37a-e3210269783b', title: 'Business Partner', type: 'bp', slug: convertToSlug('Business Partner'), created_by: admin.id }
             ];
 
             const consents = [
