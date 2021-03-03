@@ -129,7 +129,7 @@ export default function CrdlpHcpProfiles() {
                     await axios.put(`/api/filter/${filterID}`, filterSetting);
                     history.push(`/information/list/crdlp?filter=${filterID}`);
                 } catch (err) {
-                    const errorMessage = (err.response.data && err.response.data) || 'There was an error updating the filter setting.';
+                    const errorMessage = err.response.data ? err.response.data : 'There was an error updating the filter setting.';
                     addToast(errorMessage, {
                         appearance: 'error',
                         autoDismiss: true
@@ -141,7 +141,7 @@ export default function CrdlpHcpProfiles() {
                     const { data } = await axios.post('/api/filter', filterSetting);
                     history.push(`/information/list/crdlp?filter=${data.id}`);
                 } catch (err) {
-                    const errorMessage = (err.response.data && err.response.data) || 'There was an error updating the filter setting.';
+                    const errorMessage = err.response.data ? err.response.data : 'There was an error updating the filter setting.';
                     addToast(errorMessage, {
                         appearance: 'error',
                         autoDismiss: true
