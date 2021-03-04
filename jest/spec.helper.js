@@ -41,6 +41,7 @@ const systemAdminPermissionSetID = '1ffe73e9-7922-4640-ba0c-3628b3358aa8';
 const SystemAdminProfileID = '1ffe73e9-7922-4640-ba0c-3628b3358aa9';
 const hcpValidUserId = '1ffe73e9-7922-4640-ba0c-3628b3358ab8';
 const hcpInvalidUserId = '1ffe73e9-7922-4640-ba0c-3628b3358ba8';
+const PartnerRequestID = 'febcccb6-f102-4251-af9e-db44a2d554f6';
 
 module.exports = {
     signCookie: (value) => {
@@ -292,5 +293,24 @@ module.exports = {
         { language_family: 'French', language_variant: 'Luxembourgish French', country_iso2: 'LU', locale: 'fr_LU' },
         { language_family: 'German', language_variant: 'Standard German', country_iso2: 'DE', locale: 'de_DE' },
         { language_family: 'Spanish', language_variant: 'Castilian Spanish', country_iso2: 'ES', locale: 'es_ES' },
-    ]
+    ],
+    partner_request: {
+        id: PartnerRequestID,
+        application_id: partnerRequestApplicationId,
+        entity_type: "hco",
+        first_name: "a",
+        last_name: "a",
+        email: "a@gmail.com",
+        mdr_id: "a",
+        country_iso2: "BE",
+        locale: "fr_BE",
+        procurement_contact: "a@gmail.com",
+        uuid: "a",
+        workplace_name: "test_workplace_name",
+        workplace_type: "healthcare_org",
+        specialty: "SP.WBE.21",
+        status: 'pending',
+        created_by: defaultAdminId,
+        updated_by: defaultAdminId
+    }
 };
