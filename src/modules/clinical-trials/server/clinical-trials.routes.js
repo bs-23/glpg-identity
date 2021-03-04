@@ -38,6 +38,9 @@ module.exports = app => {
     app.route('/api/clinical-trials/conditions')
         .get(auth, controller.getConditions);
 
+    app.route('/api/clinical-trials/conditions-cdp')
+        .get(CDPAuthStrategy, controller.getConditions);
+
     app.route('/api/clinical-trials/:id')
         .get(auth, controller.getTrialDetails);
 

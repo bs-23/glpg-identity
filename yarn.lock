@@ -2300,7 +2300,7 @@ awesome-phonenumber@^2.44.0:
   resolved "https://registry.yarnpkg.com/awesome-phonenumber/-/awesome-phonenumber-2.44.0.tgz#c974e791d13c1b0c9e60415d71682ff5266c4db1"
   integrity sha512-ixw3fz6mlPsvuczXvs0J6P7E9aeFSM0H5D3RryBCINCkWFE/w0c8/Pe/B11IWQ1Qr3JlYq/aEbqiKs0YiftRzw==
 
-aws-sdk@^2.830.0:
+aws-sdk@2.830.0:
   version "2.830.0"
   resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.830.0.tgz#1d3631d573d18c48373046da7ad92855a7fd1636"
   integrity sha512-vFatoWkdJmRzpymWbqsuwVsAJdhdAvU2JcM9jKRENTNKJw90ljnLyeP1eKCp4O3/4Lg43PVBwY/KUqPy4wL+OA==

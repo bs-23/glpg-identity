@@ -13,6 +13,18 @@ export function fetchTrialItem(id) {
     };
 }
 
+export function getClinicalTrialDetails(ids) {
+    //let id = prompt("set your id:", 'bf3fcdd9-2c14-4a1e-b02c-787c379c0aa9');
+    let id = ids[0];
+    const url = `/api/clinical-trials-cdp/${id}`;
+    return {
+        type: Types.GET_TRIAL_DETAILS,
+        payload: axios({
+            method: 'get',
+            url
+        })
+    }
+}
 
 export function getTrialItems() {
     const url = `/api/clinical-trials-cdp`;
@@ -24,3 +36,16 @@ export function getTrialItems() {
         })
     };
 }
+
+export function getTrialConditions() {
+    const url = `/api/clinical-trials/conditions-cdp`;
+    return {
+        type: Types.GET_TRIAL_CONDITIONS,
+        payload:  axios({
+            method: 'get',
+            url
+        })
+    };
+}
+
+
