@@ -320,7 +320,7 @@ async function createUser(req, res) {
         role
     } = req.body;
 
-    const phone_number = phone ? country_code + phone : '';
+    const phone_number = phone ? phone : '';
     const validForMonths = 6
     const currentDate = new Date()
 

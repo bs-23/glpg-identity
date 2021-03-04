@@ -70,7 +70,7 @@ export const registerSchema = object().shape({
     last_name: cdpUserSchema.last_name,
     email: cdpUserSchema.email,
     phone: string()
-        .matches(/^[0-9]*$/, 'This field only contains digits')
+        .matches(/^[0-9\+]*$/, 'This field only contains digits')
         .min(4, 'This field must be at least 4 characters long')
         .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`,
             function () {
