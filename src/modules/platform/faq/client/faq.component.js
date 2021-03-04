@@ -37,8 +37,7 @@ export default function Faq(props) {
                             </Accordion.Toggle>
                         </Card>
                     ))}
-
-                    {faqData.metadata && faqData.metadata.total > 5 &&
+                    {faqData.metadata && faqData.metadata.total_items > 5 &&
                         <Card className="border-0">
                             <NavLink to="/help" className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
                                 Visit CDP help center for more
