@@ -47,16 +47,16 @@ paths:
                                     enum:
                                     - healthcare_org
                                     - patient_org
-                                registration_number:
+                                uuid:
                                     type: string
                                     description: Required when individual_type is "individual"
+                                registration_number:
+                                    type: string
+                                    description: Required when individual_type is "legal_entity"
                                 country_iso2:
                                     type: string
                                 locale:
                                     type: string
-                                uuid:
-                                    type: string
-                                    description: Required when individual_type is "legal_entity"
                                 is_italian_hcp:
                                     type: boolean
                                     description: Only for HCP
@@ -87,6 +87,12 @@ paths:
                                     items:
                                         type: string
                                         format: binary
+                                consents:
+                                    type: array
+                                    items:
+                                        type: object
+                                        description: Key value pair of consent id and answer
+                                        example: { "id": true }
                             required:
                               - type
                               - request_id

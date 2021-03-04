@@ -320,13 +320,6 @@ async function getHcps(req, res) {
 
         const hcps = await Hcp.findAll({
             where: filterOptions,
-            include: !fields || fields.includes('hcpConsent')
-                ? [{
-                    model: HcpConsents,
-                    as: 'hcpConsents',
-                    attributes: ['consent_id', 'consent_confirmed', 'opt_type'],
-                }]
-                : null,
             attributes: getAttributes(),
             offset,
             limit,
@@ -334,18 +327,19 @@ async function getHcps(req, res) {
         });
 
         if (!fields || !fields.length) {
-            hcps.map(hcp => {
+            await Promise.all(hcps.map(async hcp => {
                 const opt_types = new Set();
 
-                hcp['hcpConsents'].map(hcpConsent => {
+                const hcpConsents = await HcpConsents.findAll({ where: { user_id: hcp.id } });
+
+                hcpConsents.map(hcpConsent => {
                     if (hcpConsent.consent_confirmed || hcpConsent.opt_type === 'opt-out') {
                         opt_types.add(hcpConsent.opt_type);
                     }
                 });
 
                 hcp.dataValues.opt_types = [...opt_types];
-                delete hcp.dataValues['hcpConsents'];
-            });
+            }));
         }
 
         const totalUser = await Hcp.count({ where: filterOptions });
@@ -776,6 +770,7 @@ async function createHcpProfile(req, res) {
                     opt_type: consentCountry.opt_type,
                     rich_text: validator.unescape(consentLocale.rich_text),
                     consent_locale: richTextLocale,
+                    type: 'hcp',
                     created_by: req.user.id,
                     updated_by: req.user.id
                 });
