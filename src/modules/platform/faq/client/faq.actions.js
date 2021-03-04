@@ -16,7 +16,10 @@ export function getFaqItems(query = "") {
         type: Types.GET_FAQ_ITEMS,
         payload: axios({
             method: 'get',
-            url: `/api/faq${query}`
+            url: `/api/faq${query}`,
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate'
+            }
         })
     };
 }

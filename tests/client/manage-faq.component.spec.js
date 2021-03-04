@@ -15,11 +15,14 @@ import { login } from "../../src/modules/platform/user/client/user.actions";
 
 configure({ adapter: new Adapter() });
 
+jest.setTimeout(20000);
+
 describe("Manage Faq component", () => {
     let fakeAxios;
     let savedUser;
 
     beforeAll(async () => {
+        console.error = jest.fn();
         fakeAxios = new MockAdapter(axios);
 
         savedUser = {
@@ -27,7 +30,8 @@ describe("Manage Faq component", () => {
             "countries": [],
             "email": "test@gmail.com",
             "name": "a",
-            "serviceCategories": []
+            "serviceCategories": [],
+            "services": []
         };
         fakeAxios.onPost('/api/login').reply(200, savedUser);
 
@@ -183,7 +187,7 @@ describe("Manage Faq component", () => {
         await waitFor(() => {
             const tbody = container.querySelector("tbody");
             expect(tbody).toBeTruthy();
-            expect(tbody.childElementCount).toBe(1);
+            expect(tbody.childElementCount).toBe(2);
         });
 
         const filtered_faq = await waitFor(() =>

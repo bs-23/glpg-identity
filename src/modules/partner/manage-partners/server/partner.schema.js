@@ -33,9 +33,6 @@ const createPartnerSchema = object().shape({
         .matches(/^.*[a-z]+.*@/, 'This field should be a valid email address.')
         .max(100, 'This field must be at most 100 characters long.')
         .required('This field must not be empty.'),
-    uuid: string()
-        .max(20, 'This field must be at most 20 characters long.')
-        .required('This field must not be empty.'),
     telephone: string()
         .matches(/^(?:[+]?[0-9]*|[0-9]{2,3}[\/]?[0-9]*)$/, 'This field must be a valid phone number.')
         .transform(value => value === '' ? undefined : value)
@@ -52,6 +49,19 @@ const createPartnerSchema = object().shape({
             is: 'hcp',
             then: string()
                 .oneOf(['individual', 'legal_entity'], 'Type must be either individual or legal_entity')
+                .required('This field must not be empty.')
+        }),
+    uuid: string()
+        .when('individual_type', {
+            is: 'individual',
+            then: string()
+                .max(20, 'This field must be at most 20 characters long.')
+                .required('This field must not be empty.')
+        }),
+    registration_number: string()
+        .when('individual_type', {
+            is: 'legal_entity',
+            then: string()
                 .required('This field must not be empty.')
         }),
     organization_type: string()
@@ -91,9 +101,6 @@ const updatePartnerSchema = object().shape({
         .matches(/^.*[a-z]+.*@/, 'This field should be a valid email address.')
         .max(100, 'This field must be at most 100 characters long.')
         .required('This field must not be empty.'),
-    uuid: string()
-        .max(20, 'This field must be at most 20 characters long.')
-        .required('This field must not be empty.'),
     telephone: string()
         .matches(/^(?:[+]?[0-9]*|[0-9]{2,3}[\/]?[0-9]*)$/, 'This field must be a valid phone number.')
         .transform(value => value === '' ? undefined : value)
@@ -110,6 +117,19 @@ const updatePartnerSchema = object().shape({
             is: 'hcp',
             then: string()
                 .oneOf(['individual', 'legal_entity'], 'Type must be either individual or legal_entity')
+                .required('This field must not be empty.')
+        }),
+    uuid: string()
+        .when('individual_type', {
+            is: 'individual',
+            then: string()
+                .max(20, 'This field must be at most 20 characters long.')
+                .required('This field must not be empty.')
+        }),
+    registration_number: string()
+        .when('individual_type', {
+            is: 'legal_entity',
+            then: string()
                 .required('This field must not be empty.')
         }),
     organization_type: string()

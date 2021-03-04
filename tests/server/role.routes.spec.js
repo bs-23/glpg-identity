@@ -39,7 +39,7 @@ describe('Role Routes', () => {
                 title: "b",
                 description: "b",
                 countries: ["BE"],
-                serviceCategories: [serviceCategories[0].id],
+                services: [serviceCategories[0].id],
                 applications: []
             });
 

@@ -260,6 +260,12 @@
                         white-space: inherit;
                     }
                 }
+
+                &-title {
+                    position: sticky;
+                    top: 0px;
+                    z-index: 100;
+                }
             }
 
             &-wrapper {
@@ -272,6 +278,14 @@
 
             thead {
                 display: none;
+
+                &.cdp-table__responsive-header-block {
+                    display: block !important;
+
+                    th {
+                        border: none;
+                    }
+                }
             }
 
             tbody {

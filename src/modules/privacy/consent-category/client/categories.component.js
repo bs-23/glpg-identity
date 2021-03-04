@@ -57,7 +57,7 @@ const ConsentCategories = () => {
                                     <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Consent Categories</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
-                            <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
+                            <span className="ml-auto mr-3"><i onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary cursor-pointer"></i></span>
                         </nav>
                         <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
                             <Modal.Header closeButton>
@@ -69,18 +69,18 @@ const ConsentCategories = () => {
                 </div>
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                            <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Consent Categories </h4>
+                        <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel">
+                            <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">Consent Categories </h4>
                             <div class="d-flex justify-content-between align-items-center">
                                 <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
-                                    <i className="icon icon-plus pr-1"></i> Create new category
+                                    <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Create new category</span>
                                 </button>
                             </div>
                         </div>
 
                         {consent_categories.length > 0 &&
-                            <div className="table-responsive shadow-sm bg-white">
-                                <table className="table table-hover table-sm mb-0 cdp-table">
+                            <div className="table-responsive shadow-sm bg-white mb-3 cdp-table__responsive-wrapper">
+                            <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th>Title</th>
@@ -93,11 +93,11 @@ const ConsentCategories = () => {
                                     <tbody className="cdp-table__body bg-white">
                                         {consent_categories.map((row, index) => (
                                             <tr key={index}>
-                                                <td>{row.title}</td>
-                                                <td>{row.slug}</td>
-                                                <td>{row.createdBy || '--'}</td>
-                                                <td>{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
-                                                <td>
+                                                <td data-for="Title">{row.title}</td>
+                                                <td data-for="Slug">{row.slug}</td>
+                                                <td data-for="Created By">{row.createdBy || '--'}</td>
+                                                <td data-for="Created Date">{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
+                                                <td data-for="Action">
                                                     <button className="btn cdp-btn-link-primary p-0 mr-3" onClick={() => { toggleForm(row.id) }}>
                                                         <i className="fas fa-pen mr-2"></i>Edit
                                                     </button>

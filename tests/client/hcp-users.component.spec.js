@@ -14,6 +14,8 @@ import { getHcpProfiles } from '../../src/modules/information/hcp/client/hcp.act
 
 configure({ adapter: new Adapter() });
 
+jest.setTimeout(20000);
+
 describe('Hcp user component', () => {
     let fakeAxios;
     let savedUser;
@@ -29,8 +31,9 @@ describe('Hcp user component', () => {
             "countries": [],
             "email": "test@gmail.com",
             "name": "a",
-            "serviceCategories": []
-        }
+            "serviceCategories": [],
+            "services": []
+        };
         fakeAxios.onPost('/api/login').reply(200, savedUser);
 
         await store.dispatch(login({

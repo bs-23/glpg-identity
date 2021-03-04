@@ -8,6 +8,7 @@ import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
 import ResetPassword from '../../src/modules/platform/user/client/components/reset-password.component';
 
+jest.setTimeout(20000);
 
 describe('Reset password component', () => {
     const wrapperComponent = () => (

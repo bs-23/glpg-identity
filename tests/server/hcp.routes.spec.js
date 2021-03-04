@@ -236,7 +236,7 @@ describe('HCP Routes', () => {
                 locale: 'nl_nl',
                 country_iso2: 'nl',
                 consents: [
-                    { [demoConsent.slug] : true }
+                    { [demoConsent.id] : true }
                 ]
             }
 
@@ -244,7 +244,7 @@ describe('HCP Routes', () => {
                 locale: 'nl_be',
                 country_iso2: 'be',
                 consents: [
-                    { [demoConsent.slug] : true }
+                    { [demoConsent.id] : true }
                 ]
             }
 
@@ -264,8 +264,8 @@ describe('HCP Routes', () => {
 
         describe('Valid UUID Single Opt In', () => {
             beforeAll(async (done) => {
-                await HCPModel.destroy({ where: {} });
-                await HCPConsents.destroy({ where: {} });
+                await HCPModel.destroy({ truncate: { cascade: true } });
+                await HCPConsents.destroy({ truncate: { cascade: true } });
                 done();
             });
 
@@ -306,8 +306,8 @@ describe('HCP Routes', () => {
 
         describe('Valid UUID Double Opt In', () => {
             beforeAll(async (done) => {
-                await HCPModel.destroy({ where: {} });
-                await HCPConsents.destroy({ where: {} });
+                await HCPModel.destroy({ truncate: { cascade: true } });
+                await HCPConsents.destroy({ truncate: { cascade: true } });
                 done();
             });
 
@@ -355,8 +355,8 @@ describe('HCP Routes', () => {
 
         describe('Invalid UUID Single Opt In', () => {
             beforeAll(async (done) => {
-                await HCPModel.destroy({ where: {} });
-                await HCPConsents.destroy({ where: {} });
+                await HCPModel.destroy({ truncate: { cascade: true } });
+                await HCPConsents.destroy({ truncate: { cascade: true } });
                 done();
             });
 
@@ -395,7 +395,7 @@ describe('HCP Routes', () => {
             });
 
             it('Should reject not verified HCP user', async () => {
-                await HCPModel.destroy({ where: {} });
+                await HCPModel.destroy({ truncate: { cascade: true } });
 
                 const { body: { data: hcp }} = await request.post('/api/hcp-profiles')
                     .set('Authorization', 'bearer ' + defaultApplication.access_token)
@@ -419,8 +419,8 @@ describe('HCP Routes', () => {
 
         describe('Invalid UUID Double Opt In', () => {
             beforeAll(async (done) => {
-                await HCPModel.destroy({ where: {} });
-                await HCPConsents.destroy({ where: {} });
+                await HCPModel.destroy({ truncate: { cascade: true } });
+                await HCPConsents.destroy({ truncate: { cascade: true } });
                 done();
             });
 
