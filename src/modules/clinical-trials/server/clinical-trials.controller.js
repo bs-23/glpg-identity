@@ -272,30 +272,30 @@ async function showAllVersions(req, res) {
     }
 }
 
-async function addStory(req, res) {
-    const response = new Response({}, []);
-    try{
-        let result = await History.create({
-            trial_fixed_id: req.trial_fixed_id,
-            version = req.version,
-            value: req.value,
-            
-        });
+// async function addStory(req, res) {
+//     const response = new Response({}, []);
+//     try{
+//         let result = await History.create({
+//             trial_fixed_id: req.trial_fixed_id,
+//             version = req.version,
+//             value: req.value,
 
-        if (!result) {
-            response.data = [];
-            return res.status(204).send(response);
-        }
+//         });
 
-        response.data = result;
-        res.json(response);
-    } catch (err) {
-        logger.error(err);
-        response.errors.push(new CustomError('Internal server error', 500));
-        res.status(500).send(response);
-    }
+//         if (!result) {
+//             response.data = [];
+//             return res.status(204).send(response);
+//         }
 
-}
+//         response.data = result;
+//         res.json(response);
+//     } catch (err) {
+//         logger.error(err);
+//         response.errors.push(new CustomError('Internal server error', 500));
+//         res.status(500).send(response);
+//     }
+
+// }
 
 
 async function updateLatLngCode(location, count, location_facility, location_zip, latLngNotFound){
