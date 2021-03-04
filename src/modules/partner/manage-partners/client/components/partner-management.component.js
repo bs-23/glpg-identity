@@ -204,7 +204,7 @@ const PartnerManagement = () => {
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <Dropdown.Item onClick={() => { setDetailShow(true); setPartner(item); }}>Profile</Dropdown.Item>
-                                                            {item.status === 'pending' &&
+                                                            {item.status === 'not_approved' &&
                                                                 <>
                                                                     <Dropdown.Item onClick={() => { setStatusShow(true); setPartner(item); }}>Manage Status</Dropdown.Item>
 

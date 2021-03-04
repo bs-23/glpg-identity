@@ -152,13 +152,6 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
     if (!currentFilterSettings || !currentFilterSettings.filters || currentFilterSettings.filter === 0)
         return defaultFilter;
 
-    // if (currentFilter.option.filters.length === 1 || !currentFilter.option.logic) {
-    //     const filter = currentFilter.option.filters[0];
-    //     defaultFilter[filter.fieldName] = filterService.getQueryValue(filter);
-
-    //     return defaultFilter;
-    // }
-
     let customFilter = { ...defaultFilter };
 
     const nodes = currentFilterSettings.logic && currentFilterSettings.filters.length > 1
@@ -181,9 +174,6 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
 
             const selected_iso2_list_for_codbase = country_iso2_list_for_codbase.filter(i => user_country_iso2_list.includes(i));
             const ignorecase_of_selected_iso2_list_for_codbase = [].concat.apply([], selected_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
-            // queryValue = ignorecase_of_selected_iso2_list_for_codbase.length
-            //     ? ignorecase_of_selected_iso2_list_for_codbase
-            //     : null;
 
             delete customFilter.country_iso2;
             return {
@@ -776,7 +766,6 @@ async function createHcpProfile(req, res) {
                     opt_type: consentCountry.opt_type,
                     rich_text: validator.unescape(consentLocale.rich_text),
                     consent_locale: richTextLocale,
-                    type: 'hcp',
                     created_by: req.user.id,
                     updated_by: req.user.id
                 });
@@ -1663,29 +1652,6 @@ async function getHcpsFromDatasync(req, res) {
         });
 
         const totalUsers = await DatasyncHcp.count({ where: filterOptions });
-
-        // const individualIdOnekeyList = hcps.map(h => h.individual_id_onekey);
-        // const hcpSpecialties = await sequelize.datasyncConnector.query(`
-        //     SELECT h.*, s.cod_description, s.cod_locale
-        //     FROM ciam.vwmaphcpspecialty AS h
-        //     INNER JOIN ciam.vwspecialtymaster AS s
-        //     ON (h.specialty_code = s.cod_id_onekey)
-        //     WHERE individual_id_onekey = ANY($individualIdOnekeyList) AND cod_locale='en'`, {
-        //     bind: {
-        //         individualIdOnekeyList: individualIdOnekeyList,
-        //     },
-        //     type: QueryTypes.SELECT
-        // });
-
-        // if (hcpSpecialties) {
-        //     hcps.forEach(hcp => {
-        //         const specialties = hcpSpecialties.filter(s => s.individual_id_onekey === hcp.individual_id_onekey);
-        //         hcp.dataValues.specialties = specialties.map(s => ({
-        //             description: s.cod_description,
-        //             code: s.specialty_code
-        //         }));
-        //     });
-        // }
 
         hcps.forEach(hcp => {
             const specialties = [

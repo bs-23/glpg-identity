@@ -104,8 +104,8 @@ const Partner = sequelize.cdpConnector.define('partners', {
     status: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['pending', 'approved', 'rejected'],
-        defaultValue: 'pending'
+        values: ['not_approved', 'approved'],
+        defaultValue: 'not_approved'
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
