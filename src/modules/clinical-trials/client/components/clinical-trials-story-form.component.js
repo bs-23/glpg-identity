@@ -3,11 +3,30 @@ import Modal from 'react-bootstrap/Modal';
 import { Form, Formik, Field, ErrorMessage, FieldArray } from "formik";
 import { useToasts } from 'react-toast-notifications';
 import DraftEditor from '../../../core/client/components/draft-editor';
-import {fetchTrialItem} from './clinical-trials.actions'
+import {fetchTrialItem, getTrialItems} from './clinical-trials.actions'
 import { useDispatch , useSelector} from 'react-redux';
 import parse from 'html-react-parser';
 import Tree from './clinical-trials-treeView.component'
 import './clinical-trials-story-form.component.scss'
+import axios from 'axios';
+
+var update_clinicalTrials =  function(trial_fixed_id,story_telling) {
+    const url = `/api/clinical-trials/update`;
+
+    console.log('checking type',typeof(trial_fixed_id))
+    return {
+        payload: axios({
+            method: 'put',
+            url,
+            data: [
+                {
+                    story_telling,
+                    trial_fixed_id
+                }
+            ]
+        }).then(out=>console.log(out))
+    };
+}
 
 const StoryForm = (props) => {
     const [, setShow] = useState(false);
@@ -15,6 +34,7 @@ const StoryForm = (props) => {
     const [trials, setTrials] = useState([]);
     const { addToast } = useToasts();
     const dispatch = useDispatch();
+    const [refresh, setRefresh] = useState(false);
 
     const handleClose = () => {
         setShow(false);
@@ -52,6 +72,14 @@ const StoryForm = (props) => {
                         //validationSchema={faqSchema}
                         displayName="StoryForm"
                         onSubmit={(values, actions) => {
+
+                            if(!refresh){
+                                update_clinicalTrials(props.trialDetails.data.trial_fixed_id,values.story_plaintext);
+                                setRefresh(true);
+                                dispatch(getTrialItems());
+                                handleClose();
+                            }
+                            
                             if (props.addMode) {
                                 dispatch(createStoryItem(values)).then(() => {
                                     actions.resetForm();
@@ -112,8 +140,8 @@ const StoryForm = (props) => {
                                     </div>
                                 </Modal.Body>
                                 <Modal.Footer className="border-0  pt-0 px-3">
-                                    {/*<button type="button" className="btn cdp-btn-secondary text-white shadow-sm" onClick={handleClose}>Close</button>*/}
-                                    <button type="submit" className="btn btn-block cdp-btn-secondary mt-3 text-white ">Submit</button>
+                                    {/* {onClick={()=>{update_clinicalTrials("41d239af-2cc4-400e-b774-444177ab6ed3","checking update");}}} */}
+                                    <button  type="submit" className="btn btn-block cdp-btn-secondary mt-3 text-white ">Submit</button>
                                 </Modal.Footer>
                             </Form>
                         )}

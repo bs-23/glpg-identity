@@ -150,6 +150,10 @@ const ClinicalTrials = (props) => {
         dispatch(getTrialConditions());
     },[]);
 
+    useEffect(() => {
+        dispatch(getTrialItems());
+    },[show]);
+
     const [filteredTopic, setFilter] = useState('All');
     const [story, setStory] = useState('write a story');
     const topic = false;
