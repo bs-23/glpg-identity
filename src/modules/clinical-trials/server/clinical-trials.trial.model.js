@@ -66,7 +66,7 @@ let trialModel = {
         type_of_drug: {
             unique: false,
             allowNull: true,
-            type: DataTypes.STRING(60)
+            type: DataTypes.STRING(500)
         },
         eudract_number: {
             unique: false,
@@ -127,7 +127,7 @@ let trialModel = {
     },
     db_schema: {
         schema: `${nodecache.getValue('POSTGRES_CLINICAL_TRIALS_SCHEMA')}`,
-        tableName: this.name,
+        tableName: 'clinical_trials',
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',

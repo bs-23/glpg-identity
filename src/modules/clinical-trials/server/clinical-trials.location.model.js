@@ -50,7 +50,7 @@ let locationModel = {
     },
     db_schema: {
         schema: `${nodecache.getValue('POSTGRES_CLINICAL_TRIALS_SCHEMA')}`,
-        tableName: this.name,
+        tableName: 'locations',
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
