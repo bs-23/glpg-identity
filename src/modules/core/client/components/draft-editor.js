@@ -23,8 +23,6 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
 
     const convertContentToHtml = (state) => {
         const html = draftToHtml(convertToRaw(state.getCurrentContent()));
-        console.log(html);
-        console.log(cleanupEmptyHtmlTags(html));
         return html;
     }
 
