@@ -22,6 +22,7 @@ describe("Manage Faq component", () => {
     let savedUser;
 
     beforeAll(async () => {
+        console.error = jest.fn();
         fakeAxios = new MockAdapter(axios);
 
         savedUser = {
