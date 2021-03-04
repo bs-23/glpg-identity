@@ -159,7 +159,6 @@ const UpdateMyProfile = () => {
     }
 
     const handleCountryFlagClick = (index, formikProps) => {
-        console.log("index: ", index, "----props: ", formikProps);
         const { setFieldValue, values, dirty} = formikProps;
         setFieldValue('isCountryFlagActive', true);
         setSelectedCountryCode(index);

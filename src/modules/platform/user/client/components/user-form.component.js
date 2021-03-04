@@ -8,7 +8,7 @@ import { registerSchema } from "../user.schema";
 import { useToasts } from "react-toast-notifications";
 import Dropdown from 'react-bootstrap/Dropdown';
 import CountryCodes from 'country-codes-list';
-
+import PhoneNumber from 'awesome-phonenumber';
 export default function UserForm() {
     const dispatch = useDispatch();
     const [selectedCountryCode, setSelectedCountryCode] = useState(0);
@@ -18,7 +18,7 @@ export default function UserForm() {
     const history = useHistory();
     const { addToast } = useToasts();
     const countryList = CountryCodes.all();
-
+    const desiredCountryList = countryList.filter(country => country.region === 'Europe' || country.countryCode === 'BD' || country.countryCode === 'AU' );
     useEffect(() => {
         async function getProfile() {
             const response = await axios.get('/api/profiles');
@@ -32,11 +32,15 @@ export default function UserForm() {
         getProfile();
         getRole();
     }, []);
-
+    const editFlag = (phoneNumber) => {
+        const phoneNumberCountryISO = new PhoneNumber(phoneNumber).getRegionCode();
+        let countryData = CountryCodes.findOne('countryCode', phoneNumberCountryISO);
+        return countryData === undefined ? null: countryData;
+    }
     return (
         <main className="app__content">
             <div className="container-fluid">
-                {countryList && countryList.length &&
+                {desiredCountryList && desiredCountryList.length &&
                     <div className="row">
                         <div className="col-12">
                             <div className="bg-white">
@@ -46,8 +50,7 @@ export default function UserForm() {
                                             first_name: "",
                                             last_name: "",
                                             email: "",
-                                            country_code: countryList[selectedCountryCode] ? `+${countryList[selectedCountryCode].countryCallingCode}` : "",
-                                            phone: '',
+                                            phone: "",
                                             profile: '',
                                             role: '',
                                             permission_sets: []
@@ -55,7 +58,6 @@ export default function UserForm() {
                                         displayName="UserForm"
                                         validationSchema={registerSchema}
                                         onSubmit={(values, actions) => {
-                                            values.country_code = `+${countryList[selectedCountryCode].countryCallingCode}`;
                                             dispatch(createUser(values))
                                                 .then(res => {
                                                     actions.resetForm();
@@ -108,23 +110,24 @@ export default function UserForm() {
                                                                             <span className="input-group-btn">
                                                                                 <Dropdown>
                                                                                     {
-                                                                                        countryList.map((country, index) => {
-
-                                                                                            return (index === selectedCountryCode ?
-                                                                                                <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
-                                                                                                    <span height="20" width="25">{country.flag} </span>
-                                                                                                    <span className="country-phone-code pl-1">{`+${country.countryCallingCode}`}</span>
-                                                                                                </Dropdown.Toggle> : null)
-                                                                                        })
+                                                                                    desiredCountryList.map((country, index) => {
+                                                                                        return (index === selectedCountryCode ?
+                                                                                            <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
+                                                                                                <span height="20" width="25">{
+                                                                                                        editFlag(formikProps.values.phone) === null ? 'Select' : editFlag(formikProps.values.phone).flag } </span>
+                                                                                                <span className="country-phone-code pl-1">{editFlag(formikProps.values.phone) === null ? "" : editFlag(formikProps.values.phone).countryCode }</span>
+                                                                                            </Dropdown.Toggle> : null)
+                                                                                    })
                                                                                     }
                                                                                     <Dropdown.Menu>
                                                                                         {
-                                                                                            countryList.map((country, index) => {
-                                                                                                return index === selectedCountryCode ? null :
+                                                                                        desiredCountryList.map((country, index) => {
+                                                                                            return index === selectedCountryCode ? null :
                                                                                                     (<Dropdown.Item onClick={() => {
                                                                                                         setSelectedCountryCode(index);
                                                                                                         const countryCode = country.countryCallingCode;
                                                                                                         formikProps.setFieldValue('country_code', countryCode);
+                                                                                                        formikProps.setFieldValue('phone', `+${countryCode}`);
                                                                                                         phoneFieldRef.focus();
                                                                                                     }} key={index} className="px-2 d-flex align-items-center">
                                                                                                         <span height="20" width="20">{country.flag} </span>
