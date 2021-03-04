@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import validator from 'validator';
-// import {stateToHTML} from 'draft-js-export-html';
-import { ContentState, EditorState, convertFromHTML, convertToRaw } from 'draft-js';
+import { ContentState, EditorState, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import 'draft-js/dist/Draft.css';
@@ -19,59 +18,10 @@ const toolbarOptions = {
     }
 }
 
-// const jsToInlineStyleMapping = {
-//     'color': 'color',
-//     'bgcolor': 'background-color',
-//     'fontfamily': 'fontFamily',
-//     'fontsize': 'font-size'
-// }
-
-// const htmlToDraftCallback = (nodeName, node) => {
-//     console.log(nodeName, node);
-// }
-
-// let draftJsToHTMLOptions = {
-//     inlineStyleFn: (styles) => {
-//         const inlineStyles = {};
-//         styles.map((value) => {
-//             const styleKey = value.split('-')[0];
-//             const styleValue = value.split('-')[1];
-//             console.log(styleKey, styleValue)
-//             const inlineStyleKey = jsToInlineStyleMapping[styleKey];
-//             if(inlineStyleKey) {
-//                 inlineStyles[inlineStyleKey] = styleValue;
-//             }
-//         });
-
-//         if(Object.keys(inlineStyles).length > 0) {
-//             return {
-//                 element: 'span',
-//                 style: inlineStyles
-//             }
-//         }
-//     },
-//     entityStyleFn: (entity) => {
-//         const entityType = entity.get('type').toLowerCase();
-//         console.log(entityType)
-//         if (entityType === 'link') {
-//             const data = entity.getData();
-//             return {
-//                 element: 'a',
-//                 attributes: {
-//                     href: data.url,
-//                     target: data.targetOption
-//                 }
-//             };
-//         }
-//     }
-// }
-
 export default function DraftEditor({ onChangeHTML, htmlContent }) {
     const [editorState, setEditorState] = React.useState(() => EditorState.createEmpty());
 
     const convertContentToHtml = (state) => {
-        // const editorContentInHTML = stateToHTML(state.getCurrentContent(), draftJsToHTMLOptions);
-        // return editorContentInHTML;
         const html = draftToHtml(convertToRaw(state.getCurrentContent()));
         console.log(html);
         console.log(cleanupEmptyHtmlTags(html));
@@ -79,15 +29,6 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
     }
 
     const convertHTMLtoState = (html) => {
-        // const blocksFromHTML = convertFromHTML(html);
-
-        // const state = ContentState.createFromBlockArray(
-        //     blocksFromHTML.contentBlocks,
-        //     blocksFromHTML.entityMap,
-        // );
-
-        // return EditorState.createWithContent(state);
-
         const blocksFromHtml = htmlToDraft(html);
         const { contentBlocks, entityMap } = blocksFromHtml;
         const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap);
@@ -99,21 +40,11 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
 
         while(true) {
             cleanedupHtml = html
-                // .replace(/<p[^>]*>(\s|&nbsp;)*<\/p>/g, '')
-                // .replace(/<u[^>]*>(\s|&nbsp;)*<\/u>/g, '')
-                // .replace(/<strong[^>]*>(\s|&nbsp;)*<\/strong>/g, '')
-                // .replace(/<em[^>]*>(\s|&nbsp;)*<\/em>/g, '')
-                // .replace(/<ins[^>]*>(\s|&nbsp;)*<\/ins>/g, '')
-                // .replace(/\s{2,}/g, ' ') // replace more than two spaces with one space
-                // .replace(/&nbsp;/g, '')  // remove &nbps
-                // .replace(/(\s)*(?=<\/[^>]*>)/g, '') // remove spaces before closing tag
-                // .replace(/(?<=<p>)(&nbsp;)*/g, '')
-                // .replace(/(?<=<p>(<strong>|<u>|<em>))&nbsp;/g, '')
-                // .replace(/((<[^/>]*>)\s+)/g, '$2') // replace spaces between opening tag (<>) and text
-                .replace(/<[^/>]*>(\s*)<\/[^>]*>/g, "$1")
-                .replace(/(&nbsp;)*(?=<\/p>)/g, '')
-                .replace(/\s+((<\/[^>]*>)*<\/p>)/g, '$1')
-                .replace(/(<p>(<[^\/>]*>)*)(\s|&nbsp;)+/g, '$1')
+                .replace(/<[^/>]*>(\s*)<\/[^>]*>/g, "$1") // remove tags with whitespace children but keep the whitespace
+                .replace(/(\s|&nbsp;)+((<\/[^>]*>)*<\/p>)/g, '$2') // remove whitespace at the end
+                .replace(/(<p>(<[^\/>]*>)*)(\s|&nbsp;)+/g, '$1') // remove whitespace at the beginning
+                .replace(/<a[^>]*>(\s|&nbsp;)*<\/a>/g, '') // remove empty anchor
+                .replace(/(\s|&nbsp;){2,}/g, ' ') // replace more than one spaces with one space
 
             if(cleanedupHtml.length === html.length) break;
             html = cleanedupHtml;
