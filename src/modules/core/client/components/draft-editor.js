@@ -99,18 +99,21 @@ export default function DraftEditor({ onChangeHTML, htmlContent }) {
 
         while(true) {
             cleanedupHtml = html
-                .replace(/<p[^>]*>(\s|&nbsp;)*<\/p>/g, '')
-                .replace(/<u[^>]*>(\s|&nbsp;)*<\/u>/g, '')
-                .replace(/<strong[^>]*>(\s|&nbsp;)*<\/strong>/g, '')
-                .replace(/<em[^>]*>(\s|&nbsp;)*<\/em>/g, '')
-                .replace(/<ins[^>]*>(\s|&nbsp;)*<\/ins>/g, '')
-                .replace(/\s{2,}/g, ' ') // replace more than two spaces with one space
-                .replace(/&nbsp;/g, '')  // remove &nbps
-                .replace(/(\s)*(?=<\/[^>]*>)/g, '') // remove spaces before closing tag
-                .replace(/((<[^/>]*>)\s+)/g, '$2') // replace spaces between opening tag (<>) and text
-                .replace(/(&nbsp;)*(?=<\/p>)/g, '')
+                // .replace(/<p[^>]*>(\s|&nbsp;)*<\/p>/g, '')
+                // .replace(/<u[^>]*>(\s|&nbsp;)*<\/u>/g, '')
+                // .replace(/<strong[^>]*>(\s|&nbsp;)*<\/strong>/g, '')
+                // .replace(/<em[^>]*>(\s|&nbsp;)*<\/em>/g, '')
+                // .replace(/<ins[^>]*>(\s|&nbsp;)*<\/ins>/g, '')
+                // .replace(/\s{2,}/g, ' ') // replace more than two spaces with one space
+                // .replace(/&nbsp;/g, '')  // remove &nbps
+                // .replace(/(\s)*(?=<\/[^>]*>)/g, '') // remove spaces before closing tag
                 // .replace(/(?<=<p>)(&nbsp;)*/g, '')
                 // .replace(/(?<=<p>(<strong>|<u>|<em>))&nbsp;/g, '')
+                // .replace(/((<[^/>]*>)\s+)/g, '$2') // replace spaces between opening tag (<>) and text
+                .replace(/<[^/>]*>(\s*)<\/[^>]*>/g, "$1")
+                .replace(/(&nbsp;)*(?=<\/p>)/g, '')
+                .replace(/\s+((<\/[^>]*>)*<\/p>)/g, '$1')
+                .replace(/(<p>(<[^\/>]*>)*)(\s|&nbsp;)+/g, '$1')
 
             if(cleanedupHtml.length === html.length) break;
             html = cleanedupHtml;
