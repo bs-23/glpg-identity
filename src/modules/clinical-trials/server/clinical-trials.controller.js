@@ -561,7 +561,8 @@ async function getTrials(req, res) {
         let result = await Trial.findAll({
             where: query,
             attributes: ['story_telling','gov_identifier','protocol_number', 'indication_group', 'indication', 'trial_fixed_id', 'trial_status', 'max_age', 'min_age', 'official_title', 'gender', 'clinical_trial_brief_title', 'phase', 'std_age'],
-            include: ['locations'], ...pageing});
+            include: ['locations'], 
+            ...paging});
 
         let total_item_count = await Trial.count({
             where: query
