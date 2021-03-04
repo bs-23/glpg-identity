@@ -25,7 +25,6 @@ export default function CrdlpHcpProfiles() {
     const hcpFilterRef = useRef();
 
     const hcpUsers = useSelector(state => state.hcpReducer.crdlpHcps);
-    const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
     const params = new URLSearchParams(window.location.search);
 
@@ -39,7 +38,7 @@ export default function CrdlpHcpProfiles() {
         setSort({ type: params.get('orderType') || 'asc', value: params.get('orderBy') });
 
         const filterID = params.get('filter');
-        if(filterID) axios.get(`/api/filter/${filterID}`)
+        if (filterID) axios.get(`/api/filter/${filterID}`)
             .then(res => {
                 setSelectedFilterSetting(res.data);
                 setIsFilterEnabled(true);
@@ -54,7 +53,7 @@ export default function CrdlpHcpProfiles() {
                 }
                 : null;
             dispatch(getCrdlpHcpProfiles(location.search, filterSetting));
-        };
+        }
     }, [location]);
 
     const resetFilter = async () => {
@@ -110,7 +109,7 @@ export default function CrdlpHcpProfiles() {
         const filterID = multiFilterSetting.selectedSettingID;
         const shouldUpdateFilter = multiFilterSetting.saveType === 'save_existing';
 
-        if(multiFilterSetting.shouldSaveFilter) {
+        if (multiFilterSetting.shouldSaveFilter) {
             const settingName = multiFilterSetting.saveType === 'save_existing'
                 ? multiFilterSetting.selectedFilterSettingName
                 : multiFilterSetting.newFilterSettingName;
@@ -124,24 +123,24 @@ export default function CrdlpHcpProfiles() {
                 }
             }
 
-            if(filterID && shouldUpdateFilter) {
-                try{
+            if (filterID && shouldUpdateFilter) {
+                try {
                     await axios.put(`/api/filter/${filterID}`, filterSetting);
                     history.push(`/information/list/crdlp?filter=${filterID}`);
-                }catch(err){
-                    const errorMessage = err.response.data && err.response.data || 'There was an error updating the filter setting.';
+                } catch (err) {
+                    const errorMessage = err.response.data ? err.response.data : 'There was an error updating the filter setting.';
                     addToast(errorMessage, {
                         appearance: 'error',
                         autoDismiss: true
                     });
                     return Promise.reject();
                 }
-            }else {
-                try{
+            } else {
+                try {
                     const { data } = await axios.post('/api/filter', filterSetting);
                     history.push(`/information/list/crdlp?filter=${data.id}`);
-                }catch(err){
-                    const errorMessage = err.response.data && err.response.data || 'There was an error updating the filter setting.';
+                } catch (err) {
+                    const errorMessage = err.response.data ? err.response.data : 'There was an error updating the filter setting.';
                     addToast(errorMessage, {
                         appearance: 'error',
                         autoDismiss: true
@@ -152,7 +151,7 @@ export default function CrdlpHcpProfiles() {
         }
         else {
             history.push(`/information/list/crdlp`);
-        };
+        }
         setIsFilterEnabled(true);
     }
 

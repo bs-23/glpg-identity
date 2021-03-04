@@ -1,11 +1,16 @@
 const path = require('path');
-const url = require('url');
+const { Op, QueryTypes } = require('sequelize');
+const validator = require('validator');
+
+const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const Partner = require('./partner.model');
 const PartnerVendors = require('./partner-vendor.model');
-const { Op } = require('sequelize');
-const { string } = require('yup');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const PartnerRequest = require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model'));
+const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
+const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model'));
+const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model'));
+const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
 const storageService = require(path.join(process.cwd(), 'src/modules/core/server/storage/storage.service'));
 const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
@@ -162,8 +167,6 @@ async function createPartner(req, res) {
 
         const entityType = type;
 
-        if (response.errors.length) return res.status(400).send(response);
-
         const partnerRequest = await PartnerRequest.findOne({
             where: {
                 id: request_id,
@@ -197,6 +200,91 @@ async function createPartner(req, res) {
         }
         data.onekey_id = partnerRequest.onekey_id;
 
+        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+
+        let hasDoubleOptIn = false;
+        let consentArr = [];
+
+        const consents = JSON.parse('[' + req.body.consents + ']');
+
+        if (consents && consents.length) {
+            await Promise.all(consents.map(async consent => {
+                const preferenceId = Object.keys(consent)[0];
+                const consentResponse = Object.values(consent)[0];
+                const language_code = locale.split('_')[0];
+                let richTextLocale = `${language_code}_${country_iso2.toUpperCase()}`;
+
+                if (!consentResponse) return;
+
+                const consentDetails = await Consent.findOne({ where: { id: preferenceId } });
+
+                if (!consentDetails) {
+                    response.errors.push(new CustomError('Invalid consents.', 400));
+                    return;
+                };
+
+                const currentCountry = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                const baseCountry = countries.find(c => c.countryname === currentCountry.codbase_desc);
+
+                const consentCountry = await ConsentCountry.findOne({
+                    where: {
+                        country_iso2: {
+                            [Op.iLike]: baseCountry.country_iso2
+                        },
+                        consent_id: consentDetails.id
+                    }
+                });
+
+                if (!consentCountry) {
+                    response.errors.push(new CustomError('Invalid consent country.', 400));
+                    return;
+                }
+
+                let consentLocale = await ConsentLocale.findOne({
+                    where: {
+                        consent_id: preferenceId,
+                        locale: { [Op.iLike]: `${language_code}_${country_iso2}` }
+                    }
+                });
+
+                if (!consentLocale) {
+                    const codbaseCountry = countries.filter(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                    const localeUsingParentCountryISO = `${language_code}_${(codbaseCountry[0].country_iso2 || '').toUpperCase()}`;
+
+                    consentLocale = await ConsentLocale.findOne({
+                        where: {
+                            consent_id: preferenceId,
+                            locale: { [Op.iLike]: localeUsingParentCountryISO }
+                        }
+                    });
+
+                    richTextLocale = localeUsingParentCountryISO;
+                }
+
+                if (!consentLocale) {
+                    response.errors.push(new CustomError('Invalid consent locale.', 400));
+                    return;
+                }
+
+                if (consentCountry.opt_type === 'double-opt-in') {
+                    hasDoubleOptIn = true;
+                }
+
+                consentArr.push({
+                    consent_id: consentDetails.id,
+                    consent_confirmed: hasDoubleOptIn ? false : true,
+                    opt_type: consentCountry.opt_type,
+                    rich_text: validator.unescape(consentLocale.rich_text),
+                    consent_locale: richTextLocale,
+                    type: 'business-partner',
+                    created_by: req.user.id,
+                    updated_by: req.user.id
+                });
+            }));
+        }
+
         const [partnerHcx, created] = await Partner.findOrCreate({
             where: { request_id: request_id },
             defaults: data
@@ -210,6 +298,17 @@ async function createPartner(req, res) {
         await partnerRequest.update({ status: 'submitted' });
 
         await uploadDucuments(partnerHcx, entityType, files);
+
+        if (consentArr.length) {
+            consentArr = consentArr.map(c => {
+                c.user_id = partnerHcx.id
+                return c;
+            });
+            await HcpConsents.bulkCreate(consentArr, {
+                returning: true,
+                ignoreDuplicates: false
+            });
+        }
 
         partnerHcx.dataValues.type = partnerHcx.dataValues.individual_type;
 

@@ -63,7 +63,7 @@ const ConsentsComponent = () => {
                             <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">CDP Consents</h4>
                             <div class="d-flex justify-content-between align-items-center">
                                 <NavLink to="/consent/create" className="btn cdp-btn-secondary text-white ml-2">
-                                    <i className="icon icon-plus pr-1"></i> <span className="d-none d-sm-inline-block pl-1">Create new consent</span>
+                                    <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Create new consent</span>
                                 </NavLink>
                             </div>
                         </div>
@@ -109,7 +109,7 @@ const ConsentsComponent = () => {
                                                 <td data-for="Created By">{row.createdBy}</td>
                                                 <td data-for="Created On">{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                 <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
-                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
+                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-2 px-sm-1 dropdown-toggle ">
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item as={NavLink} to={`/consent/edit/${row.id}`}>

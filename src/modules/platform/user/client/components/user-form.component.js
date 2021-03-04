@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { NavLink, useHistory } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage } from "formik";
@@ -130,16 +130,16 @@ export default function UserForm() {
                                                                                                         formikProps.setFieldValue('phone', `+${countryCode}`);
                                                                                                         phoneFieldRef.focus();
                                                                                                     }} key={index} className="px-2 d-flex align-items-center">
-                                                                                                    <span height="20" width="20">{country.flag} </span>
-                                                                                                    <span className="country-name pl-2">{country.countryNameEn}</span>
-                                                                                                    <span className="country-phone-code pl-1">{`+${country.countryCallingCode}`}</span>
+                                                                                                        <span height="20" width="20">{country.flag} </span>
+                                                                                                        <span className="country-name pl-2">{country.countryNameEn}</span>
+                                                                                                        <span className="country-phone-code pl-1">{`+${country.countryCallingCode}`}</span>
                                                                                                     </Dropdown.Item>)
-                                                                                        })
+                                                                                            })
                                                                                         }
                                                                                     </Dropdown.Menu>
                                                                                 </Dropdown>
                                                                             </span>
-                                                                        <Field innerRef={(ele) => setPhoneFieldRef(ele)} data-testid="phone" className="form-control rounded" type="text" name="phone"/>
+                                                                            <Field innerRef={(ele) => setPhoneFieldRef(ele)} data-testid="phone" className="form-control rounded" type="text" name="phone" />
                                                                         </div>
                                                                     </div>
                                                                     <div className="invalid-feedback">
