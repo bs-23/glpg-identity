@@ -32,11 +32,13 @@ export default function UserForm() {
         getProfile();
         getRole();
     }, []);
+
     const editFlag = (phoneNumber) => {
         const phoneNumberCountryISO = new PhoneNumber(phoneNumber).getRegionCode();
-        let countryData = CountryCodes.findOne('countryCode', phoneNumberCountryISO);
-        return countryData === undefined ? null: countryData;
+        let selectedCountry = desiredCountryList.find(country => country.countryCode === phoneNumberCountryISO);
+        return selectedCountry === undefined ? null : selectedCountry;
     }
+
     return (
         <main className="app__content">
             <div className="container-fluid">
