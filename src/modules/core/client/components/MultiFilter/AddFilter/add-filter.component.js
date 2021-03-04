@@ -6,7 +6,8 @@ import { Button } from '../common';
 import { Filter } from './components';
 import { buildLogicAfterAddition, buildLogicAfterRemoval } from '../utils';
 
-const generateRandomKey = () => `${Math.random()}_${Math.random()}`;
+const random = window.crypto.getRandomValues(new Uint32Array(2))[0] / 0x100000000;
+const generateRandomKey = () => `${random}_${random}`;
 
 const AddFilter = (props) => {
     const {
