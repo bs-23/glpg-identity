@@ -186,7 +186,7 @@ describe("Manage Faq component", () => {
         await waitFor(() => {
             const tbody = container.querySelector("tbody");
             expect(tbody).toBeTruthy();
-            expect(tbody.childElementCount).toBe(1);
+            expect(tbody.childElementCount).toBe(2);
         });
 
         const filtered_faq = await waitFor(() =>

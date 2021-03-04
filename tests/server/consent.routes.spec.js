@@ -71,8 +71,7 @@ describe('Consent Routes', () => {
                 translations: [
                     {
                         id: "d95abe6c-d71b-4124-9ebb-e5daf73869e7",
-                        country_iso2: "be",
-                        lang_code: "nl",
+                        locale: "nl_BE",
                         rich_text: "<p>a</p>"
                     }
                 ],
@@ -92,8 +91,7 @@ describe('Consent Routes', () => {
                 translations: [
                     {
                         id: "d95abe6c-d71b-4124-9ebb-e5daf73869e7",
-                        country_iso2: "be",
-                        lang_code: "nl",
+                        locale: "nl_BE",
                         rich_text: "<p>a</p>"
                     }
                 ],
@@ -140,8 +138,7 @@ describe('Consent Routes', () => {
                 translations: [
                     {
                         id: "d95abe6c-d71b-4124-9ebb-e5daf73869e7",
-                        country_iso2: "be",
-                        lang_code: "nl",
+                        locale: "nl_BE",
                         rich_text: "<p>a</p>"
                     }
                 ],
