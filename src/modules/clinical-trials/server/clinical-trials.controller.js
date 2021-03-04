@@ -68,7 +68,6 @@ function uuid() {
 function groupIndications(indication) {
     switch(indication){
         case 'Ankylosing Spondylitis':
-        case 'Rheumatoid Arthritis':
         case 'Arthritis, Rheumatoid':
         case 'Rheumatoid Arthritis|Psoriatic Arthritis|Ankylosing Spondylitis|Non-Radiographical Axial Spondyloarthritis':
             return 'Ankylosing Spondylitis';
@@ -272,6 +271,32 @@ async function showAllVersions(req, res) {
     }
 }
 
+// async function addStory(req, res) {
+//     const response = new Response({}, []);
+//     try{
+//         let result = await History.create({
+//             trial_fixed_id: req.trial_fixed_id,
+//             version = req.version,
+//             value: req.value,
+
+//         });
+
+//         if (!result) {
+//             response.data = [];
+//             return res.status(204).send(response);
+//         }
+
+//         response.data = result;
+//         res.json(response);
+//     } catch (err) {
+//         logger.error(err);
+//         response.errors.push(new CustomError('Internal server error', 500));
+//         res.status(500).send(response);
+//     }
+
+// }
+
+
 async function updateLatLngCode(location, count, location_facility, location_zip, latLngNotFound){
     var {lat,lng} = await getCoordinates(location_facility, location_zip, location.location_city, location.location_state, location.location_country, count.to_update);
                 location.lat = lat;
@@ -348,11 +373,11 @@ async function mergeProcessData(req, res) {
 
                 var paragraph = element.Study.ProtocolSection.EligibilityModule.EligibilityCriteria;
                 var paragraph_lowercase = paragraph.toLowerCase();
+                var note_label_text = paragraph_lowercase.lastIndexOf('note:')!==-1?  'note:' : '';
                 var inclusion_label_text = paragraph_lowercase.indexOf('key inclusion criteria')!==-1? 'key inclusion criteria' : 'inclusion criteria';
                 var exclusion_label_text = paragraph_lowercase.lastIndexOf('key exclusion criteria')!==-1? 'key exclusion criteria' : 
                                             paragraph_lowercase.lastIndexOf('exclusion criteria')!==-1? 'exclusion criteria':
-                                            paragraph_lowercase.lastIndexOf('note')!==-1? 'note': '';
-                var note_label_text = paragraph_lowercase.lastIndexOf('note')!==-1?  'note' : '';
+                                            paragraph_lowercase.lastIndexOf(note_label_text)!==-1? note_label_text : '';
                  return { 
                     'trial_fixed_id': uuid(),
                     'indication': element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0].capitalize().split('|').join(','),
@@ -436,7 +461,7 @@ async function mergeProcessData(req, res) {
         data = await Trial.bulkCreate(data,
                     {
                     returning: true,
-                    ignoreDuplicates: false,
+                    ignoreDuplicates: false, 
                     include: { model: Location, as: 'locations' }
                 });
 
@@ -464,7 +489,6 @@ async function getTrials(req, res) {
         status,
         gender,
         distance,
-        search_term,
         free_text_search,
         age_ranges,
         country,
@@ -479,7 +503,9 @@ async function getTrials(req, res) {
     phase = phaseInputTextMapping(phase);
     age_ranges = ageRangeInputTextMapping(age_ranges);
     gender = genderInputTextMapping(gender);
-    if (zipcode || country){
+    free_text_search = free_text_search? free_text_search.toLowerCase() : '';
+    distance = distance ? Number(distance) : 10000;
+    if (zipcode && country){
         cordinates = await getCoordinates('', zipcode, '', '', country, 0);
     } else {
         cordinates = {lat: -1, lng: -1}
@@ -489,16 +515,28 @@ async function getTrials(req, res) {
         let query = {
             [Op.and]: [
             {trial_status: status},
-            {indication: indication},
-            {indication_group: indication},
+            {
+                [Op.or] : [
+                {indication: indication},
+                {indication_group: indication}
+                ]
+            },
             {gender: gender},
-            {phase: phase}
+            {phase: phase},
+            {std_age: age_ranges}
             ]
         }
         let remove_index = [];
-        query[[Op.and][0]].forEach((sub_or_query, index) =>{
-            Object.keys(sub_or_query).forEach(key=>{
-                if (!sub_or_query[key]){
+        if (!indication){
+            query[[Op.and][0]][1] = {};
+        }
+        query[[Op.and][0]].forEach((sub_query, index) =>{
+            if(JSON.stringify(sub_query) === JSON.stringify({})){
+                remove_index.push(index);
+                delete query[[Op.and][0]][index];
+            } 
+            Object.keys(sub_query).forEach(key=>{
+                if (!sub_query[key]){
                     delete query[[Op.and][0]][index][key]
                     remove_index.push(index);
                 }
@@ -516,14 +554,15 @@ async function getTrials(req, res) {
                 delete query[key]
             }
         });
-        let pageing = {
+        let paging = {
             offset: items_per_page * Number(page_number - 1),
             limit: items_per_page,
         }
         let result = await Trial.findAll({
             where: query,
-            attributes: ['protocol_number', 'indication_group', 'indication', 'trial_fixed_id', 'trial_status', 'max_age', 'min_age', 'official_title', 'gender', 'clinical_trial_brief_title', 'phase', 'std_age'],
-            include: ['locations'], ...pageing});
+            attributes: ['story_telling','gov_identifier','protocol_number', 'indication_group', 'indication', 'trial_fixed_id', 'trial_status', 'max_age', 'min_age', 'official_title', 'gender', 'clinical_trial_brief_title', 'phase', 'std_age'],
+            include: ['locations'], 
+            ...paging});
 
         let total_item_count = await Trial.count({
             where: query
@@ -537,56 +576,80 @@ async function getTrials(req, res) {
         let search_result = result.map(x=>{ 
             let least_distance = Number.MAX_SAFE_INTEGER;
             x.dataValues.locations.map(location=>{
+                if (country && zipcode){
                 let calculated_distance = haversineDistanceInKM(cordinates.lat, cordinates.lng, location.lat, location.lng)
                 least_distance = Math.min(least_distance, calculated_distance);
                 return {...location, calculated_distance};
+                }
+                else if (country && location && location.location_country){
+                    if(location.location_country.toLowerCase() === country.toLowerCase()){
+                        least_distance = 0;
+                    }
+                    return location;
+                }
+                else {
+                    least_distance = 0;
+                    return location;
+                }
             });
             delete x.dataValues.locations;
-        if(distance){
-            if(distance>= least_distance){
-                return {...x.dataValues,  distance: Math.round(least_distance*10*100) / 100 + ' km'}
+            if(least_distance === Number.MAX_SAFE_INTEGER) {
+                return '';
+            }else if(least_distance === 0) { // same country
+                return {...x.dataValues,  distance: Math.round(0*10*100) / 100 + ' km', distance_value: Math.round(0*10*100) / 100};
+            }else if(distance) {
+                if(least_distance <= distance){
+                    return {...x.dataValues,  distance: Math.round(least_distance*10*100) / 100 + ' km', distance_value: Math.round(least_distance*10*100) / 100}
             } else {
                 return '';
-        }} else{
-            return {...x.dataValues,  distance: Math.round(least_distance*10*100) / 100 + ' km'}
+        }}
+        else{
+            return {...x.dataValues,  distance: Math.round(least_distance*10*100) / 100 + ' km', distance_value: Math.round(least_distance*10*100) / 100}
         }
 
-    }).filter(x=>x!=='').filter(x=>{
+    }).filter(x=>x!=='').sort(function(a, b) {return a.distance_value - b.distance_value});
+
+    let freetext_search_result = search_result.filter(x=>{
+        try{
         if(! free_text_search){
             return true;
         }
-        if(x.indication.includes(free_text_search)){
+        if(x.indication.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.indication_group.includes(free_text_search)){
+        if(x.indication_group.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.phase.includes(free_text_search)){
+        if(x.phase.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.gender.includes(free_text_search)){
+        if(x.gender.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.std_age.includes(free_text_search)){
+        if(x.std_age.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.clinical_trial_brief_title.includes(free_text_search)){
+        if(x.clinical_trial_brief_title.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.official_title.includes(free_text_search)){
+        if(x.official_title.toLowerCase().includes(free_text_search)){
             return true;
         }
-        if(x.trial_status.includes(free_text_search)){
+        if(x.trial_status.toLowerCase().includes(free_text_search)){
             return true;
         }
-
+        if(String(x.distance).includes(free_text_search)){
+            return true;
+        }
+    } catch(ex){
+    }
         return false;
 
     });
 
         response.data = {
-           search_result: search_result,
-           total_count: search_result.length
+           search_result: freetext_search_result,
+           total_count: freetext_search_result.length
         }
         res.json(response);
     } catch (err) {
@@ -613,6 +676,42 @@ async function getTrialDetails(req, res) {
                 ]
             },
             include: ['locations']
+        });
+
+        if (!result) {
+            response.data = [];
+            return res.status(204).send(response);
+        }
+
+        response.data = result;
+        res.json(response);
+    } catch (err) {
+        logger.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
+async function updateClinicalTrials(req, res) {
+    const response = new Response({}, []);
+    const reqdata = req.body;
+    res.set({ 'content-type': 'application/json; charset=utf-8' });
+    try {
+        let ids = reqdata.map(x=>x.trial_fixed_id)
+        let trials = await Trial.findAll({
+            where: {
+                [Op.or]: [
+                {trial_fixed_id: ids},
+                {id: ids}
+                ]
+            }
+        });
+
+        let result = trials.map(trial=>{
+            let newStoryItm = reqdata.filter(x=>x.trial_fixed_id === trial.trial_fixed_id)[0];
+            trial.story_telling = newStoryItm.story_telling;
+            trial.save({ fields: ['story_telling'] });
+            return trial; 
         });
 
         if (!result) {
@@ -831,3 +930,4 @@ exports.getConditions = getConditions;
 exports.getConditionsWithDetails = getConditionsWithDetails;
 exports.validateAddress = validateAddress;
 exports.syncGeoCodes = syncGeoCodes;
+exports.updateClinicalTrials = updateClinicalTrials;

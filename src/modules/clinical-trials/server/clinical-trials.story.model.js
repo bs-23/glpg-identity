@@ -3,8 +3,8 @@ const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
-let historyModel = {
-    name: 'history',
+let storyModel = {
+    name: 'story',
     db_properties: {
         id: {
             allowNull: false,
@@ -12,25 +12,32 @@ let historyModel = {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4
         },
-        description: {
+        trial_fixed_id: {
             unique: false,
             allowNull: true,
             type: DataTypes.STRING(60)
+        },
+        version: {
+            unique: true,
+            allowNull: false,
+            type: DataTypes.INTEGER()
         },
         value: {
             unique: false,
             allowNull: false,
             type: DataTypes.STRING(10485760)
         },
-        log: {
-            unique: false,
-            allowNull: true,
-            type: DataTypes.STRING(1024)
+        created_by: {
+            type: DataTypes.UUID
+        },
+        updated_by: {
+            type: DataTypes.UUID
         }
+        
     },
     db_schema: {
         schema: `${nodecache.getValue('POSTGRES_CLINICAL_TRIALS_SCHEMA')}`,
-        tableName: 'history',
+        tableName: 'story',
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
@@ -39,6 +46,6 @@ let historyModel = {
     }
 };
 
-const history = sequelize.clinitalTrialsConnector.define(historyModel.name, historyModel.db_properties, historyModel.db_schema);
+const story = sequelize.clinitalTrialsConnector.define(storyModel.name, storyModel.db_properties, storyModel.db_schema);
 
-module.exports = history;
+module.exports = story;
