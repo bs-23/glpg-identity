@@ -32,7 +32,7 @@ const StoryForm = (props) => {
         dispatch(fetchTrialItem(1));
     },[]);
 
-    console.log('here is the props', props);
+
     return (
         <Modal size="lg" centered show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
@@ -46,7 +46,7 @@ const StoryForm = (props) => {
                             title: props.addMode ? props.addData.title : '',
                             trials: props.addMode ? props.addData.trials : [],
                             version: props.addMode ? props.addData.version : 'v1',
-                            story: props.addMode ? parse(props.addData.story) : '',
+                            story: props.addMode ? parse(props.story) : '',
                             story_plaintext: props.addMode ? parse(props.addData.story) : ''
                         }}
                         //validationSchema={faqSchema}

@@ -151,6 +151,7 @@ const ClinicalTrials = (props) => {
     },[]);
 
     const [filteredTopic, setFilter] = useState('All');
+    const [story, setStory] = useState('write a story');
     const topic = false;
    
     const seectedTopics = [];
@@ -299,7 +300,7 @@ const ClinicalTrials = (props) => {
                                                     <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle"></Dropdown.Toggle>
                                                     <Dropdown.Menu>
-                                                        <Dropdown.Item onClick={() => { setShow(true); setAddMode(true); dispatch(getClinicalTrialDetails([row.trial_fixed_id])) }}>
+                                                        <Dropdown.Item onClick={() => { setShow(true); setAddMode(true); setStory(row.story_telling); dispatch(getClinicalTrialDetails([row.trial_fixed_id])) }}>
                                                             Write Story
                                                         </Dropdown.Item>
                                                         <Dropdown.Item onClick={() => { setShow(true); setEditMode(true); setEditData(row); }}>
@@ -335,7 +336,7 @@ const ClinicalTrials = (props) => {
                                 </div>
                             </div>
                         }
-                        {show ? <StoryForm seectedTopics ={seectedTopics} trialDetails={trialDetails} addMode={addMode} changeShow={(val) => setShow(val)} show={show} trialIDs={[1,2,3]} addData = {addDataSample} /> : null}
+                        {show ? <StoryForm story={story} seectedTopics ={seectedTopics} trialDetails={trialDetails} addMode={addMode} changeShow={(val) => setShow(val)} show={show} trialIDs={[1,2,3]} addData = {addDataSample} /> : null}
                         <Modal
                             size="lg"
                             show={!!profileDetails}

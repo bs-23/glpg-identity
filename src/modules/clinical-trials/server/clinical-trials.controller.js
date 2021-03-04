@@ -272,6 +272,32 @@ async function showAllVersions(req, res) {
     }
 }
 
+async function addStory(req, res) {
+    const response = new Response({}, []);
+    try{
+        let result = await History.create({
+            trial_fixed_id: req.trial_fixed_id,
+            version = req.version,
+            value: req.value,
+            
+        });
+
+        if (!result) {
+            response.data = [];
+            return res.status(204).send(response);
+        }
+
+        response.data = result;
+        res.json(response);
+    } catch (err) {
+        logger.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+
+}
+
+
 async function updateLatLngCode(location, count, location_facility, location_zip, latLngNotFound){
     var {lat,lng} = await getCoordinates(location_facility, location_zip, location.location_city, location.location_state, location.location_country, count.to_update);
                 location.lat = lat;
@@ -523,7 +549,7 @@ async function getTrials(req, res) {
         }
         let result = await Trial.findAll({
             where: query,
-            attributes: ['gov_identifier','protocol_number', 'indication_group', 'indication', 'trial_fixed_id', 'trial_status', 'max_age', 'min_age', 'official_title', 'gender', 'clinical_trial_brief_title', 'phase', 'std_age'],
+            attributes: ['story_telling','gov_identifier','protocol_number', 'indication_group', 'indication', 'trial_fixed_id', 'trial_status', 'max_age', 'min_age', 'official_title', 'gender', 'clinical_trial_brief_title', 'phase', 'std_age'],
             include: ['locations'], ...pageing});
 
         let total_item_count = await Trial.count({
