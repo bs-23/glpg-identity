@@ -1,11 +1,11 @@
-const path = require("path");
-const { DataTypes } = require("sequelize");
-const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
+const path = require('path');
+const { DataTypes } = require('sequelize');
+const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const validator = require('validator');
 
-const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
+const PartnerConsent = sequelize.cdpConnector.define('partner_consents', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -51,15 +51,14 @@ const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
-    tableName: "hcp_consents",
+    tableName: 'partner_consents',
     timestamps: true,
-    createdAt: "created_at",
-    updatedAt: "updated_at"
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
 });
 
-HcpConsents.belongsTo(Consent, {
+PartnerConsent.belongsTo(Consent, {
     foreignKey: 'consent_id'
 });
 
-
-module.exports = HcpConsents;
+module.exports = PartnerConsent;

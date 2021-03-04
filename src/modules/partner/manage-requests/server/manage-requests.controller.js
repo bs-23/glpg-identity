@@ -162,7 +162,7 @@ async function sendForm(req, res) {
             first_name,
             last_name,
             email,
-            partner_type: partner_type.toLowerCase(),
+            partner_type: partner_type ? partner_type.toLowerCase() : undefined,
             country_iso2: country_iso2.toLowerCase(),
             locale: locale
         };

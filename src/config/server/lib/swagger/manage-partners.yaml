@@ -249,9 +249,14 @@ paths:
                                     type: array
                                     items:
                                         type: string
+                                consents:
+                                    type: array
+                                    items:
+                                        type: object
+                                        description: Key value pair of consent id and answer
+                                        example: { "id": true }
                             required:
                               - type
-                              - request_id
                               - first_name
                               - last_name
                               - email

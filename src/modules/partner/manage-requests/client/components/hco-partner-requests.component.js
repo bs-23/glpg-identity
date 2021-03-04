@@ -174,7 +174,7 @@ const HcoPartnerRequests = () => {
     useEffect(() => {
         if (formData) {
             dispatch(sendForm(formData)).then(() => {
-                dispatch(updatePartnerRequest(formData.id, { ...formData, status: "pending" }));
+                dispatch(updatePartnerRequest(formData.id, { ...formData, status: 'email_sent' }));
             }).catch(() => {
                 addToast('An error occured. Please try again.', {
                     appearance: 'error',
@@ -259,19 +259,24 @@ const HcoPartnerRequests = () => {
                                                 <td data-for="UUID">{row.uuid}</td>
                                                 <td data-for="Name">{`${row.first_name} ${row.last_name}`}</td>
                                                 <td data-for="MDR ID">{row.mdr_id}</td>
-                                                <td data-for="Status">{row.status}</td>
+                                                <td data-for="Status" class="text-capitalize">{row.status.replaceAll('_', ' ')}</td>
                                                 <td data-for="Email Address">{row.email}</td>
                                                 <td data-for="Procurement Contact">{row.procurement_contact}</td>
                                                 <td data-for="Country">{getCountryName(row.country_iso2)}</td>
-                                                <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
-                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
-                                                    </Dropdown.Toggle>
-                                                    <Dropdown.Menu>
-                                                        <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                        <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
-                                                    </Dropdown.Menu>
-                                                </Dropdown></td>
+                                                <td data-for="Action">
+                                                    {row.status === 'new_request' ?
+                                                        <Dropdown className="ml-auto dropdown-customize">
+                                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
+                                                            </Dropdown.Toggle>
+                                                            <Dropdown.Menu>
+                                                                <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
+                                                                <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
+                                                                <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
+                                                            </Dropdown.Menu>
+                                                        </Dropdown>
+                                                        : '--'
+                                                    }
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>
