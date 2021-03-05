@@ -72,10 +72,8 @@ describe('Manage Partners Routes', () => {
             .set('Authorization', `bearer ${partnerRequestApplication.access_token}`)
             .send({...partner, type: 'hco', first_name: 'bb' });
 
-        console.log('===========================================>', response.body)
-
         expect(response.statusCode).toBe(200);
-        // expect(response.body.data.first_name).toEqual('b');
+        expect(response.body.data.first_name).toEqual('bb');
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 });
