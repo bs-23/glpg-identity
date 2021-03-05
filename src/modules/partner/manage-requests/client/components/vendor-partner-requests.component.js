@@ -249,7 +249,7 @@ const VendorPartnerRequests = () => {
                                             (
                                                 <tr key={index}>
                                                     <td data-for="Name">{`${row.first_name} ${row.last_name}`}</td>
-                                                    <td data-for="Status" class="text-capitalize">{row.status.replaceAll('_', ' ')}</td>
+                                                    <td data-for="Status" class="text-capitalize">{row.status.split('_').join(' ')}</td>
                                                     <td data-for="Company Code">
                                                     {
                                                         row.company_codes && row.company_codes.length && row.company_codes.map((companyCode, idx) => (

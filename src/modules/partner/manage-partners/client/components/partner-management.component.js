@@ -172,6 +172,7 @@ const PartnerManagement = () => {
                                             {(detailType === 'hcps' || detailType === 'hcos') && <th><span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>}
                                             {(detailType === 'hcps' || detailType === 'hcos') && <th><span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>}
                                             {(detailType === 'vendors' || detailType === 'wholesalers') && <th><span className={sort.value === 'name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'name')}>Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>}
+                                            <th>Status</th>
                                             <th><span className={sort.value === 'locale' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'locale')}>Locale<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
                                             <th>Street House No</th>
                                             <th><span className={sort.value === 'city' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'city')}>City<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -195,6 +196,12 @@ const PartnerManagement = () => {
                                                     {(detailType === 'hcps' || detailType === 'hcos') && <td data-for="First Name"> {item.first_name} </td>}
                                                     {(detailType === 'hcps' || detailType === 'hcos') && <td data-for="Last Name"> {item.last_name} </td>}
                                                     {(detailType === 'vendors' || detailType === 'wholesalers') && <td data-for="Name"> {item.name}</td>}
+                                                    <td data-for="Status" class="text-capitalize">
+                                                        <span>
+                                                            <i className={`fa fa-xs fa-circle text-${item.status === 'approved' ? 'success' : 'warning'} pr-2 hcp-status-icon`}></i>
+                                                            {item.status.split('_').join(' ')}
+                                                        </span>
+                                                    </td>
                                                     <td data-for="Locale">{item.locale}</td>
                                                     <td data-for="Street House No">{item.address}</td>
                                                     <td data-for="City">{item.city}</td>
@@ -207,10 +214,8 @@ const PartnerManagement = () => {
                                                             {item.status === 'not_approved' &&
                                                                 <>
                                                                     <Dropdown.Item onClick={() => { setStatusShow(true); setPartner(item); }}>Manage Status</Dropdown.Item>
-
                                                                 </>
                                                             }
-
                                                         </Dropdown.Menu>
                                                     </Dropdown></td>
                                                 </tr>
