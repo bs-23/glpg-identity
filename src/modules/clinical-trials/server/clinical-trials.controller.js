@@ -15,6 +15,122 @@ const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston')
 
 var seed = 1;
 var API_KEY = nodecache.getValue('GOOGLE_MAP_API_KEY');
+var countriesWithISO = [
+    {'code':'AR','name':'Argentina'
+    },
+    {'code':'AU','name':'Australia'
+    },
+    {'code':'AT','name':'Austria'
+    },
+    {'code':'BE','name':'Belgium'
+    },
+    {'code':'BA','name':'Bosnia and Herzegovina'
+    },
+    {'code':'BR','name':'Brazil'
+    },
+    {'code':'BG','name':'Bulgaria'
+    },
+    {'code':'CA','name':'Canada'
+    },
+    {'code':'CL','name':'Chile'
+    },
+    {'code':'CO','name':'Colombia'
+    },
+    {'code':'HR','name':'Croatia'
+    },
+    {'code':'CZ','name':'Czechia'
+    },
+    {'code':'DK','name':'Denmark'
+    },
+    {'code':'EE','name':'Estonia'
+    },
+    {'code':'FI','name':'Finland'
+    },
+    {'code':'FR','name':'France'
+    },
+    {'code':'GE','name':'Georgia'
+    },
+    {'code':'DE','name':'Germany'
+    },
+    {'code':'GR','name':'Greece'
+    },
+    {'code':'GT','name':'Guatemala'
+    },
+    {'code':'HK','name':'Hong Kong'
+    },
+    {'code':'HU','name':'Hungary'
+    },
+    {'code':'IS','name':'Iceland'
+    },
+    {'code':'IN','name':'India'
+    },
+    {'code':'IE','name':'Ireland'
+    },
+    {'code':'IL','name':'Israel'
+    },
+    {'code':'IT','name':'Italy'
+    },
+    {'code':'JP','name':'Japan'
+    },
+    {'code':'KR','name':'Korea, Republic of'
+    },
+    {'code':'LV','name':'Latvia'
+    },
+    {'code':'MY','name':'Malaysia'
+    },
+    {'code':'MX','name':'Mexico'
+    },
+    {'code':'NZ','name':'New Zealand'
+    },
+    {'code':'MD','name':'Moldova, Republic of'
+    },
+    {'code':'NL','name':'Netherlands'
+    },
+    {'code':'NZ','name':'New Zealand'
+    },
+    {'code':'NO','name':'Norway'
+    },
+    {'code':'OM','name':'Oman'
+    },
+    {'code':'PE','name':'Peru'
+    },
+    {'code':'PL','name':'Poland'
+    },
+    {'code':'PT','name':'Portugal'
+    },
+    {'code':'RO','name':'Romania'
+    },
+    {'code':'RU','name':'Russian Federation'
+    },
+    {'code':'RS','name':'Serbia'
+    },
+    {'code':'SG','name':'Singapore'
+    },
+    {'code':'SK','name':'Slovakia'
+    },
+    {'code':'ZA','name':'South Africa'
+    },
+    {'code':'ES','name':'Spain'
+    },
+    {'code':'LK','name':'Sri Lanka'
+    },
+    {'code':'SE','name':'Sweden'
+    },
+    {'code':'CH','name':'Switzerland'
+    },
+    {'code':'TW','name':'Taiwan'
+    },
+    {'code':'TH','name':'Thailand'
+    },
+    {'code':'TR','name':'Turkey'
+    },
+    {'code':'UA','name':'Ukraine'
+    },
+    {'code':'GB','name':'United Kingdom'
+    },
+    {'code':'US','name':'United States'
+    }
+];
 
 async function getCoordinates(facility, zip, city, state, country, index)
 {
@@ -436,7 +552,7 @@ async function mergeProcessData(req, res) {
                             return '';
                         }
                     })(),
-                    'type_of_drug': element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList && element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.length ? element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.reduce((a,b)=>{b.InterventionName = a.InterventionName+','+b.InterventionName; return b}).InterventionName: null,
+                    'type_of_drug': element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList && element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.length ? element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention[0].InterventionName: null,
                     'story_telling': 'In this trial, doctors hope to find out how the study drug works together with your current standard treatment in terms of its effects on your lung function and IPF in general. People with IPF have increased levels of something called autotaxin, which is thought to have a role in the progression of IPF. The trial is investigating whether decreasing the activity of autotaxin can have a positive effect. It will also look at how well the study drug is tolerated.',
                     'trial_start_date': new Date(element.Study.ProtocolSection.StatusModule.StartDateStruct.StartDate),
                     'trial_end_date': element.Study.ProtocolSection.StatusModule.CompletionDateStruct.CompletionDate ? new Date(element.Study.ProtocolSection.StatusModule.CompletionDateStruct.CompletionDate) : null,
@@ -458,12 +574,21 @@ async function mergeProcessData(req, res) {
         }));
 
         data = data.filter((el) => {return Object.keys(el).length != 0})
+        previous_data = await Trial.findAll({ where: {}, include: ['locations']});
+        if (previous_data.length){
+            previous_data.forEach(itm=>{
+                let in_exact_match_data = data.filter(x=>x.gov_identifier === itm.gov_identifier)[0];
+                itm = Object.assign(itm,in_exact_match_data);
+                itm.save();
+            });
+        }else {
         data = await Trial.bulkCreate(data,
                     {
                     returning: true,
                     ignoreDuplicates: false, 
                     include: { model: Location, as: 'locations' }
                 });
+        }
 
         if (!result) {
             response.data = [];
@@ -505,6 +630,7 @@ async function getTrials(req, res) {
     gender = genderInputTextMapping(gender);
     free_text_search = free_text_search? free_text_search.toLowerCase() : '';
     distance = distance ? Number(distance) : 10000;
+    country = countriesWithISO.filter(x=>x.code === country).length? countriesWithISO.filter(x=>x.code === country)[0].name : '';
     if (zipcode && country){
         cordinates = await getCoordinates('', zipcode, '', '', country, 0);
     } else {
@@ -531,10 +657,6 @@ async function getTrials(req, res) {
             query[[Op.and][0]][1] = {};
         }
         query[[Op.and][0]].forEach((sub_query, index) =>{
-            if(JSON.stringify(sub_query) === JSON.stringify({})){
-                remove_index.push(index);
-                delete query[[Op.and][0]][index];
-            } 
             Object.keys(sub_query).forEach(key=>{
                 if (!sub_query[key]){
                     delete query[[Op.and][0]][index][key]
@@ -596,15 +718,15 @@ async function getTrials(req, res) {
             if(least_distance === Number.MAX_SAFE_INTEGER) {
                 return '';
             }else if(least_distance === 0) { // same country
-                return {...x.dataValues,  distance: Math.round(0*10*100) / 100 + ' km', distance_value: Math.round(0*10*100) / 100};
+                return {...x.dataValues,  distance: ''};
             }else if(distance) {
                 if(least_distance <= distance){
-                    return {...x.dataValues,  distance: Math.round(least_distance*10*100) / 100 + ' km', distance_value: Math.round(least_distance*10*100) / 100}
+                    return {...x.dataValues,  distance: Math.round(least_distance*100) / 100 + ' km', distance_value: Math.round(least_distance*100) / 100}
             } else {
                 return '';
         }}
         else{
-            return {...x.dataValues,  distance: Math.round(least_distance*10*100) / 100 + ' km', distance_value: Math.round(least_distance*10*100) / 100}
+            return {...x.dataValues,  distance: Math.round(least_distance*100) / 100 + ' km', distance_value: Math.round(least_distance*100) / 100}
         }
 
     }).filter(x=>x!=='').sort(function(a, b) {return a.distance_value - b.distance_value});
@@ -731,122 +853,6 @@ async function updateClinicalTrials(req, res) {
 async function getCountryList(req, res) {
     const response = new Response({}, []);
     res.set({ 'content-type': 'application/json; charset=utf-8' });
-    let countriesWithISO = [
-        {'code':'AR','name':'Argentina'
-        },
-        {'code':'AU','name':'Australia'
-        },
-        {'code':'AT','name':'Austria'
-        },
-        {'code':'BE','name':'Belgium'
-        },
-        {'code':'BA','name':'Bosnia and Herzegovina'
-        },
-        {'code':'BR','name':'Brazil'
-        },
-        {'code':'BG','name':'Bulgaria'
-        },
-        {'code':'CA','name':'Canada'
-        },
-        {'code':'CL','name':'Chile'
-        },
-        {'code':'CO','name':'Colombia'
-        },
-        {'code':'HR','name':'Croatia'
-        },
-        {'code':'CZ','name':'Czechia'
-        },
-        {'code':'DK','name':'Denmark'
-        },
-        {'code':'EE','name':'Estonia'
-        },
-        {'code':'FI','name':'Finland'
-        },
-        {'code':'FR','name':'France'
-        },
-        {'code':'GE','name':'Georgia'
-        },
-        {'code':'DE','name':'Germany'
-        },
-        {'code':'GR','name':'Greece'
-        },
-        {'code':'GT','name':'Guatemala'
-        },
-        {'code':'HK','name':'Hong Kong'
-        },
-        {'code':'HU','name':'Hungary'
-        },
-        {'code':'IS','name':'Iceland'
-        },
-        {'code':'IN','name':'India'
-        },
-        {'code':'IE','name':'Ireland'
-        },
-        {'code':'IL','name':'Israel'
-        },
-        {'code':'IT','name':'Italy'
-        },
-        {'code':'JP','name':'Japan'
-        },
-        {'code':'KR','name':'Korea, Republic of'
-        },
-        {'code':'LV','name':'Latvia'
-        },
-        {'code':'MY','name':'Malaysia'
-        },
-        {'code':'MX','name':'Mexico'
-        },
-        {'code':'NZ','name':'New Zealand'
-        },
-        {'code':'MD','name':'Moldova, Republic of'
-        },
-        {'code':'NL','name':'Netherlands'
-        },
-        {'code':'NZ','name':'New Zealand'
-        },
-        {'code':'NO','name':'Norway'
-        },
-        {'code':'OM','name':'Oman'
-        },
-        {'code':'PE','name':'Peru'
-        },
-        {'code':'PL','name':'Poland'
-        },
-        {'code':'PT','name':'Portugal'
-        },
-        {'code':'RO','name':'Romania'
-        },
-        {'code':'RU','name':'Russian Federation'
-        },
-        {'code':'RS','name':'Serbia'
-        },
-        {'code':'SG','name':'Singapore'
-        },
-        {'code':'SK','name':'Slovakia'
-        },
-        {'code':'ZA','name':'South Africa'
-        },
-        {'code':'ES','name':'Spain'
-        },
-        {'code':'LK','name':'Sri Lanka'
-        },
-        {'code':'SE','name':'Sweden'
-        },
-        {'code':'CH','name':'Switzerland'
-        },
-        {'code':'TW','name':'Taiwan'
-        },
-        {'code':'TH','name':'Thailand'
-        },
-        {'code':'TR','name':'Turkey'
-        },
-        {'code':'UA','name':'Ukraine'
-        },
-        {'code':'GB','name':'United Kingdom'
-        },
-        {'code':'US','name':'United States of America'
-        }
-    ];
     try {
         response.data = countriesWithISO;
         res.json(response);
