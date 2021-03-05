@@ -205,7 +205,7 @@ async function createPartner(req, res) {
         let hasDoubleOptIn = false;
         let consentArr = [];
 
-        const consents = JSON.parse('[' + req.body.consents + ']');
+        const consents = JSON.parse('[' + (req.body.consents || '') + ']');
 
         if (consents && consents.length) {
             await Promise.all(consents.map(async consent => {
@@ -360,7 +360,7 @@ async function updatePartner(req, res) {
 
         const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
         let consentArr = [];
-        const consents = JSON.parse('[' + req.body.consents + ']');
+        const consents = JSON.parse('[' + (req.body.consents || '') + ']');
 
         if (consents && consents.length) {
             await Promise.all(consents.map(async x => {
@@ -668,6 +668,90 @@ async function createPartnerVendor(req, res) {
 
         data.entity_type = type;
 
+        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+
+        let hasDoubleOptIn = false;
+        let consentArr = [];
+
+        const consents = JSON.parse('[' + (req.body.consents || '') + ']');
+
+        if (consents && consents.length) {
+            await Promise.all(consents.map(async consent => {
+                const consentId = Object.keys(consent)[0];
+                const consentResponse = Object.values(consent)[0];
+                const language_code = locale.split('_')[0];
+                let richTextLocale = `${language_code}_${country_iso2.toUpperCase()}`;
+
+                if (!consentResponse) return;
+
+                const consentDetails = await Consent.findOne({ where: { id: consentId } });
+
+                if (!consentDetails) {
+                    response.errors.push(new CustomError('Invalid consents.', 400));
+                    return;
+                };
+
+                const currentCountry = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                const baseCountry = countries.find(c => c.countryname === currentCountry.codbase_desc);
+
+                const consentCountry = await ConsentCountry.findOne({
+                    where: {
+                        country_iso2: {
+                            [Op.iLike]: baseCountry.country_iso2
+                        },
+                        consent_id: consentDetails.id
+                    }
+                });
+
+                if (!consentCountry) {
+                    response.errors.push(new CustomError('Invalid consent country.', 400));
+                    return;
+                }
+
+                let consentLocale = await ConsentLocale.findOne({
+                    where: {
+                        consent_id: consentId,
+                        locale: { [Op.iLike]: `${language_code}_${country_iso2}` }
+                    }
+                });
+
+                if (!consentLocale) {
+                    const codbaseCountry = countries.filter(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                    const localeUsingParentCountryISO = `${language_code}_${(codbaseCountry[0].country_iso2 || '').toUpperCase()}`;
+
+                    consentLocale = await ConsentLocale.findOne({
+                        where: {
+                            consent_id: consentId,
+                            locale: { [Op.iLike]: localeUsingParentCountryISO }
+                        }
+                    });
+
+                    richTextLocale = localeUsingParentCountryISO;
+                }
+
+                if (!consentLocale) {
+                    response.errors.push(new CustomError('Invalid consent locale.', 400));
+                    return;
+                }
+
+                if (consentCountry.opt_type === 'double-opt-in') {
+                    hasDoubleOptIn = true;
+                }
+
+                consentArr.push({
+                    consent_id: consentDetails.id,
+                    consent_confirmed: hasDoubleOptIn ? false : true,
+                    opt_type: consentCountry.opt_type,
+                    rich_text: validator.unescape(consentLocale.rich_text),
+                    consent_locale: richTextLocale,
+                    created_by: req.user.id,
+                    updated_by: req.user.id
+                });
+            }));
+        }
+
         const [partnerVendor, created] = await PartnerVendors.findOrCreate({
             where: {
                 [Op.or]: [
@@ -691,6 +775,17 @@ async function createPartnerVendor(req, res) {
         await partnerRequest.update({ status: 'request_processed' });
 
         await uploadDucuments(partnerVendor, type, files);
+
+        if (consentArr.length) {
+            consentArr = consentArr.map(c => {
+                c.user_id = partnerVendor.id
+                return c;
+            });
+            await PartnerConsent.bulkCreate(consentArr, {
+                returning: true,
+                ignoreDuplicates: false
+            });
+        }
 
         delete partnerVendor.dataValues.created_at;
         delete partnerVendor.dataValues.updated_at;
@@ -721,6 +816,93 @@ async function updatePartnerVendor(req, res) {
         if (!partner) {
             response.errors.push(new CustomError('Partner not found.', 400));
             return res.status(400).send(response);
+        }
+
+        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+        let consentArr = [];
+        const consents = JSON.parse('[' + (req.body.consents || '') + ']');
+
+        if (consents && consents.length) {
+            await Promise.all(consents.map(async x => {
+                const consentId = Object.keys(x)[0];
+                const consentResponse = Object.values(x)[0];
+
+                const partnerConsent = await PartnerConsent.findOne({ where: { user_id: partner.id, consent_id: consentId } });
+
+                if (partnerConsent) {
+                    await partnerConsent.update({
+                        opt_type: consentResponse ? 'single-opt-in' : 'opt-out',
+                        consent_confirmed: consentResponse
+                    });
+                } else {
+                    const language_code = locale.split('_')[0];
+                    let richTextLocale = `${language_code}_${country_iso2.toUpperCase()}`;
+
+                    if (!consentResponse) return;
+
+                    const consentDetails = await Consent.findOne({ where: { id: consentId } });
+
+                    if (!consentDetails) {
+                        response.errors.push(new CustomError('Invalid consents.', 400));
+                        return;
+                    };
+
+                    const currentCountry = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                    const baseCountry = countries.find(c => c.countryname === currentCountry.codbase_desc);
+
+                    const consentCountry = await ConsentCountry.findOne({
+                        where: {
+                            country_iso2: {
+                                [Op.iLike]: baseCountry.country_iso2
+                            },
+                            consent_id: consentDetails.id
+                        }
+                    });
+
+                    if (!consentCountry) {
+                        response.errors.push(new CustomError('Invalid consent country.', 400));
+                        return;
+                    }
+
+                    let consentLocale = await ConsentLocale.findOne({
+                        where: {
+                            consent_id: consentId,
+                            locale: { [Op.iLike]: `${language_code}_${country_iso2}` }
+                        }
+                    });
+
+                    if (!consentLocale) {
+                        const codbaseCountry = countries.filter(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                        const localeUsingParentCountryISO = `${language_code}_${(codbaseCountry[0].country_iso2 || '').toUpperCase()}`;
+
+                        consentLocale = await ConsentLocale.findOne({
+                            where: {
+                                consent_id: consentId,
+                                locale: { [Op.iLike]: localeUsingParentCountryISO }
+                            }
+                        });
+
+                        richTextLocale = localeUsingParentCountryISO;
+                    }
+
+                    if (!consentLocale) {
+                        response.errors.push(new CustomError('Invalid consent locale.', 400));
+                        return;
+                    }
+
+                    consentArr.push({
+                        consent_id: consentDetails.id,
+                        consent_confirmed: true,
+                        opt_type: consentCountry.opt_type,
+                        rich_text: validator.unescape(consentLocale.rich_text),
+                        consent_locale: richTextLocale,
+                        created_by: req.user.id,
+                        updated_by: req.user.id
+                    });
+                }
+            }));
         }
 
         const data = {
@@ -757,11 +939,20 @@ async function updatePartnerVendor(req, res) {
 
         }
 
-
-
         const updated_data = await partner.update(data);
 
         await uploadDucuments(partner, updated_data.dataValues.entity_type, files);
+
+        if (consentArr.length) {
+            consentArr = consentArr.map(c => {
+                c.user_id = updated_data.id
+                return c;
+            });
+            await PartnerConsent.bulkCreate(consentArr, {
+                returning: true,
+                ignoreDuplicates: false
+            });
+        }
 
         delete updated_data.dataValues.created_at;
         delete updated_data.dataValues.updated_at;
