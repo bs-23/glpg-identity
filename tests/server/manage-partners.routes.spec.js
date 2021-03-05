@@ -4,10 +4,11 @@ const supertest = require('supertest');
 const specHelper = require(path.join(process.cwd(), 'jest/spec.helper'));
 const app = require(path.join(process.cwd(), 'src/config/server/lib/express'));
 
-const { defaultApplication } = specHelper;
+const { defaultApplication, partnerRequestApplication } = specHelper;
 const { signCookie } = specHelper;
 const { consent: { demoConsent } } = specHelper;
 const { defaultAdmin, defaultUser } = specHelper.users;
+const { partner } = specHelper;
 
 let request;
 
@@ -56,5 +57,25 @@ describe('Manage Partners Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
+    it('Should get partner by id', async () => {
+        const response = await request
+            .get(`/api/partners/${partner.id}`)
+            .set('Authorization', `bearer ${partnerRequestApplication.access_token}`);
 
+        expect(response.statusCode).toBe(200);
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
+
+    it('Should update partner by id', async () => {
+        const response = await request
+            .put(`/api/partners/${partner.id}`)
+            .set('Authorization', `bearer ${partnerRequestApplication.access_token}`)
+            .send({...partner, type: 'hco', first_name: 'bb' });
+
+        console.log('===========================================>', response.body)
+
+        expect(response.statusCode).toBe(200);
+        // expect(response.body.data.first_name).toEqual('b');
+        expect(response.res.headers['content-type']).toMatch('application/json');
+    });
 });

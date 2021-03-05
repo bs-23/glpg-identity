@@ -42,6 +42,7 @@ const SystemAdminProfileID = '1ffe73e9-7922-4640-ba0c-3628b3358aa9';
 const hcpValidUserId = '1ffe73e9-7922-4640-ba0c-3628b3358ab8';
 const hcpInvalidUserId = '1ffe73e9-7922-4640-ba0c-3628b3358ba8';
 const PartnerRequestID = 'febcccb6-f102-4251-af9e-db44a2d554f6';
+const PartnerID = 'b3c7c678-fcb3-4341-8e70-bd95efcf10d4';
 
 module.exports = {
     signCookie: (value) => {
@@ -92,7 +93,11 @@ module.exports = {
         updated_by: defaultAdminId,
         metadata: JSON.stringify({
             request_notification_link: 'https://onboarding-business-partner-dev.glpg.com/bin/public/glpg-forms/sendForm.invitation.html'
-        })
+        }),
+        access_token: jwt.sign({
+            id: partnerRequestApplicationId,
+            email: 'patients-organization@glpg.com',
+        }, process.env.APPLICATION_TOKEN_SECRET, { expiresIn: '30d', issuer: defaultApplicationId }),
     },
     users: {
         defaultAdmin: {
@@ -298,19 +303,34 @@ module.exports = {
         id: PartnerRequestID,
         application_id: partnerRequestApplicationId,
         entity_type: "hco",
-        first_name: "a",
-        last_name: "a",
+        first_name: "aa",
+        last_name: "aa",
         email: "a@gmail.com",
         mdr_id: "a",
         country_iso2: "BE",
         locale: "fr_BE",
         procurement_contact: "a@gmail.com",
-        uuid: "a",
+        uuid: "aa",
         workplace_name: "test_workplace_name",
         workplace_type: "healthcare_org",
         specialty: "SP.WBE.21",
         status: 'email_sent',
         created_by: defaultAdminId,
         updated_by: defaultAdminId
+    },
+    partner: {
+        id: PartnerID,
+        entity_type: 'hco',
+        request_id: PartnerRequestID,
+        first_name: "aa",
+        last_name: "aa",
+        email: "a@gmail.com",
+        organization_name: 'aa',
+        organization_type: 'healthcare_org',
+        individual_type: 'individual',
+        country_iso2: "BE",
+        locale: "fr_BE",
+        uuid: "aa",
+        status: 'not_approved',
     }
 };
