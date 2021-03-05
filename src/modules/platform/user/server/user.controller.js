@@ -540,9 +540,11 @@ async function getUsers(req, res) {
             order.splice(1, 0, [{ model: User, as: 'createdByUser' }, 'last_name', orderType]);
         }
 
+        const systemAdminProfile = await UserProfile.findOne({ where: { slug: 'system_admin' }});
+
         const defaultFilter = {
             id: { [Op.ne]: signedInId },
-            type: 'basic'
+            profile_id: { [Op.ne]: systemAdminProfile.id }
         };
 
         const currentFilter = req.body;
