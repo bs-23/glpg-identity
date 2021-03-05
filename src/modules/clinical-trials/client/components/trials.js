@@ -252,6 +252,12 @@ const ClinicalTrials = (props) => {
                                     <table className="table table-hover table-sm mb-0 cdp-table">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
+                                                 <th width="10%">
+                                                    <div className="custom-control custom-checkbox">
+                                                        <input type="checkbox" className="custom-control-input" id="customControlAutosizing" />
+                                                        <label className="custom-control-label" for="customControlAutosizing"></label>
+                                                    </div>
+                                                </th>
                                                 <th width="10%"><span className={sort.value === 'firstname' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'firstname')}>Clinical Gov. ID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
                                                 <th width="25%"><span className={sort.value === 'lastname' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'lastname')}>Study Title<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -276,6 +282,12 @@ const ClinicalTrials = (props) => {
                                         <tbody className="cdp-table__body bg-white">
                                             {trialItems.clinialTrial_items.data.search_result.map((row, idx) =>{return (row.indication_group ===filteredTopic || filteredTopic ==='All' ) ? (   
                                                 <tr key={'user-' + idx}>
+                                                    <td>
+                                                        <div className="custom-control custom-checkbox">
+                                                            <input type="checkbox" className="custom-control-input" id="customControlAutosizing" />
+                                                            <label className="custom-control-label" for="customControlAutosizing"></label>
+                                                        </div>
+                                                    </td>
                                                     <td className="text-break">{row.gov_identifier || '--'}</td>
                                                     <td className="text-break">{row.clinical_trial_brief_title || '--'}
                     
