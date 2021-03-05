@@ -58,6 +58,7 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-vendor.model'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner.model'));
+    require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-consents.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 
     await sequelize.cdpConnector.sync();
