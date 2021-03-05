@@ -74,5 +74,5 @@ module.exports = async function () {
     await Faq.create(specHelper.faq.demoFaq);
     await Localization.bulkCreate(specHelper.localizations, { returning: true, ignoreDuplicates: false });
     await PartnerRequest.create(specHelper.partner_request);
-    await Partner.create(specHelper.partner);
+    // await Partner.create(specHelper.partner);
 };

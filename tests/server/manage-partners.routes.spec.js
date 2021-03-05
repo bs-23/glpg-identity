@@ -57,23 +57,31 @@ describe('Manage Partners Routes', () => {
         expect(response.res.headers['content-type']).toMatch('application/json');
     });
 
-    it('Should get partner by id', async () => {
-        const response = await request
-            .get(`/api/partners/${partner.id}`)
-            .set('Authorization', `bearer ${partnerRequestApplication.access_token}`);
+    it('Should create, update and get partner', async () => {
+        const response1 = await request
+            .post(`/api/partners`)
+            .set('Authorization', `bearer ${partnerRequestApplication.access_token}`)
+            .send({ ...partner, type: 'hco' });
 
-        expect(response.statusCode).toBe(200);
-        expect(response.res.headers['content-type']).toMatch('application/json');
-    });
+        expect(response1.statusCode).toBe(200);
+        expect(response1.body).toHaveProperty('data');
+        expect(response1.body.errors).toHaveLength(0);
+        expect(response1.res.headers['content-type']).toMatch('application/json');
 
-    it('Should update partner by id', async () => {
-        const response = await request
-            .put(`/api/partners/${partner.id}`)
+        const response2 = await request
+            .put(`/api/partners/${response1.body.data.id}`)
             .set('Authorization', `bearer ${partnerRequestApplication.access_token}`)
             .send({...partner, type: 'hco', first_name: 'bb' });
 
-        expect(response.statusCode).toBe(200);
-        expect(response.body.data.first_name).toEqual('bb');
-        expect(response.res.headers['content-type']).toMatch('application/json');
+        expect(response2.statusCode).toBe(200);
+        expect(response2.body.data.first_name).toEqual('bb');
+        expect(response2.res.headers['content-type']).toMatch('application/json');
+
+        const response3 = await request
+            .get(`/api/partners/${response1.body.data.id}`)
+            .set('Authorization', `bearer ${partnerRequestApplication.access_token}`);
+
+        expect(response3.statusCode).toBe(200);
+        expect(response3.res.headers['content-type']).toMatch('application/json');
     });
 });
