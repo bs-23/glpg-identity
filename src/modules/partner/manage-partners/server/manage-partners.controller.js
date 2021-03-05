@@ -809,7 +809,8 @@ async function updatePartnerVendor(req, res) {
 
         const partner = await PartnerVendors.findOne({
             where: {
-                id: req.params.id
+                id: req.params.id,
+                entity_type: type
             }
         });
 
