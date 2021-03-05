@@ -70,8 +70,7 @@ async function init() {
             where: { email: 'glpg@brainstation-23.com' }, defaults: {
                 first_name: 'System',
                 last_name: 'Admin',
-                password: 'P@ssword123',
-                type: 'admin'
+                password: 'P@ssword123'
             }
         }).then(function () {
             callback();

@@ -94,13 +94,13 @@ paths:
                                         description: Key value pair of consent id and answer
                                         example: { "id": true }
                             required:
-                              - type
-                              - request_id
-                              - first_name
-                              - last_name
-                              - email
-                              - country_iso2
-                              - locale
+                                - type
+                                - request_id
+                                - first_name
+                                - last_name
+                                - email
+                                - country_iso2
+                                - locale
             responses:
                 200:
                     description: The request has succeeded.
@@ -256,12 +256,12 @@ paths:
                                         description: Key value pair of consent id and answer
                                         example: { "id": true }
                             required:
-                              - type
-                              - first_name
-                              - last_name
-                              - email
-                              - country_iso2
-                              - locale
+                                - type
+                                - first_name
+                                - last_name
+                                - email
+                                - country_iso2
+                                - locale
             responses:
                 200:
                     description: The request has succeeded.
@@ -376,15 +376,21 @@ paths:
                                     items:
                                         type: string
                                         format: binary
+                                consents:
+                                    type: array
+                                    items:
+                                        type: object
+                                        description: Key value pair of consent id and answer
+                                        example: { "id": true }
                             required:
-                              - request_id
-                              - name
-                              - registration_number
-                              - address
-                              - city
-                              - ordering_email
-                              - country_iso2
-                              - locale
+                                - request_id
+                                - name
+                                - registration_number
+                                - address
+                                - city
+                                - ordering_email
+                                - country_iso2
+                                - locale
             responses:
                 200:
                     description: The request has succeeded.
@@ -463,8 +469,6 @@ paths:
                                     type: string
                                 locale:
                                     type: string
-                                request_id:
-                                    type: string
                                 requestor_first_name:
                                     type: string
                                 requestor_last_name:
@@ -541,6 +545,20 @@ paths:
                                     type: array
                                     items:
                                         type: string
+                                consents:
+                                    type: array
+                                    items:
+                                        type: object
+                                        description: Key value pair of consent id and answer
+                                        example: { "id": true }
+                            required:
+                                - name
+                                - registration_number
+                                - address
+                                - city
+                                - ordering_email
+                                - country_iso2
+                                - locale
             responses:
                 200:
                     description: The request has succeeded.
