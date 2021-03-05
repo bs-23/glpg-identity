@@ -849,7 +849,7 @@ async function getCountryList(req, res) {
         },
         {'code':'GB','name':'United Kingdom'
         },
-        {'code':'US','name':'United States of America'
+        {'code':'US','name':'United States'
         }
     ];
     try {
