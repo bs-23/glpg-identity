@@ -309,7 +309,7 @@ module.exports = {
         workplace_name: "test_workplace_name",
         workplace_type: "healthcare_org",
         specialty: "SP.WBE.21",
-        status: 'pending',
+        status: 'email_sent',
         created_by: defaultAdminId,
         updated_by: defaultAdminId
     }
