@@ -7,6 +7,7 @@ import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
 import StoryForm from './clinical-trials-story-form.component';
 import {getTrialItems, getClinicalTrialDetails, getTrialConditions } from './clinical-trials.actions';
+import './trials.scss'
 var dumpData =  function() {
     const url = `/api/clinical-trials`;
     var urlToGetData = prompt("urlToGetData:", "https://clinicaltrials.gov/api/query/full_studies?expr=%28gilead+%5BLeadSponsorName%5D+AND+filgotinib+%5BInterventionName%5D+AND+NOT+Phase+1%5BPhase%5D%29+OR+%28galapagos+%5BLeadSponsorName%5D+AND+NOT+Phase+1%5BPhase%5D%29%0D%0A&min_rnk=1&max_rnk=100&fmt=json");
@@ -253,9 +254,9 @@ const ClinicalTrials = (props) => {
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
                                                  <th width="10%">
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input type="checkbox" className="custom-control-input" id="customControlAutosizing" />
-                                                        <label className="custom-control-label" for="customControlAutosizing"></label>
+                                                    <div className="custom-control custom-checkbox without-bg">
+                                                        <input type="checkbox" className="custom-control-input" id="customControlAutosizingf" />
+                                                        <label className="custom-control-label" for="customControlAutosizingf"></label>
                                                     </div>
                                                 </th>
                                                 <th width="10%"><span className={sort.value === 'firstname' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'firstname')}>Clinical Gov. ID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -284,8 +285,8 @@ const ClinicalTrials = (props) => {
                                                 <tr key={'user-' + idx}>
                                                     <td>
                                                         <div className="custom-control custom-checkbox">
-                                                            <input type="checkbox" className="custom-control-input" id="customControlAutosizing" />
-                                                            <label className="custom-control-label" for="customControlAutosizing"></label>
+                                                            <input type="checkbox" className="custom-control-input" id="aa" />
+                                                            <label className="custom-control-label" for="aa"></label>
                                                         </div>
                                                     </td>
                                                     <td className="text-break">{row.gov_identifier || '--'}</td>

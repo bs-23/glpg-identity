@@ -436,7 +436,7 @@ async function mergeProcessData(req, res) {
                             return '';
                         }
                     })(),
-                    'type_of_drug': element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList && element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.length ? element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.reduce((a,b)=>{b.InterventionName = a.InterventionName+','+b.InterventionName; return b}).InterventionName: null,
+                    'type_of_drug': element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList && element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.length ? element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention[0].InterventionName: null,
                     'story_telling': 'In this trial, doctors hope to find out how the study drug works together with your current standard treatment in terms of its effects on your lung function and IPF in general. People with IPF have increased levels of something called autotaxin, which is thought to have a role in the progression of IPF. The trial is investigating whether decreasing the activity of autotaxin can have a positive effect. It will also look at how well the study drug is tolerated.',
                     'trial_start_date': new Date(element.Study.ProtocolSection.StatusModule.StartDateStruct.StartDate),
                     'trial_end_date': element.Study.ProtocolSection.StatusModule.CompletionDateStruct.CompletionDate ? new Date(element.Study.ProtocolSection.StatusModule.CompletionDateStruct.CompletionDate) : null,
@@ -458,12 +458,21 @@ async function mergeProcessData(req, res) {
         }));
 
         data = data.filter((el) => {return Object.keys(el).length != 0})
+        previous_data = await Trial.findAll({ where: {}, include: ['locations']});
+        if (previous_data.length){
+            previous_data.forEach(itm=>{
+                let in_exact_match_data = data.filter(x=>x.gov_identifier === itm.gov_identifier)[0];
+                itm = Object.assign(itm,in_exact_match_data);
+                itm.save();
+            });
+        }else {
         data = await Trial.bulkCreate(data,
                     {
                     returning: true,
                     ignoreDuplicates: false, 
                     include: { model: Location, as: 'locations' }
                 });
+        }
 
         if (!result) {
             response.data = [];
@@ -531,10 +540,6 @@ async function getTrials(req, res) {
             query[[Op.and][0]][1] = {};
         }
         query[[Op.and][0]].forEach((sub_query, index) =>{
-            if(JSON.stringify(sub_query) === JSON.stringify({})){
-                remove_index.push(index);
-                delete query[[Op.and][0]][index];
-            } 
             Object.keys(sub_query).forEach(key=>{
                 if (!sub_query[key]){
                     delete query[[Op.and][0]][index][key]
