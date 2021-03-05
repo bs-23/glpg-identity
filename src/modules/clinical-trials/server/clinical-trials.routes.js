@@ -7,9 +7,15 @@ const { Services } = require(path.join(process.cwd(), 'src/modules/core/server/a
 const { ServiceGuard } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.middleware.js'));
 
 module.exports = app => {
+    app.route('/api/clinical-trials-cdp')
+        .get(CDPAuthStrategy, controller.getTrials);
+
     app.route('/api/clinical-trials')
         .get(auth, controller.getTrials)
         .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.dumpAllData);
+    
+    app.route('/api/clinical-trials/update')
+        .put(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.updateClinicalTrials);
 
     app.route('/api/clinical-trials/versions')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.showAllVersions);
@@ -32,6 +38,12 @@ module.exports = app => {
     app.route('/api/clinical-trials/conditions')
         .get(auth, controller.getConditions);
 
+    app.route('/api/clinical-trials/conditions-cdp')
+        .get(CDPAuthStrategy, controller.getConditions);
+
     app.route('/api/clinical-trials/:id')
         .get(auth, controller.getTrialDetails);
+
+    app.route('/api/clinical-trials-cdp/:id')
+        .get(CDPAuthStrategy, controller.getTrialDetails);
 };

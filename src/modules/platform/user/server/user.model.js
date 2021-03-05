@@ -82,24 +82,10 @@ const User = sequelize.cdpConnector.define('users', {
         type: DataTypes.STRING
     },
     created_by: {
-        type: DataTypes.UUID,
-        validate: {
-            customValidator(value) {
-                if (value === null && this.type !== 'admin') {
-                    throw new Error("created_by is required for basic user");
-                }
-            }
-        }
+        type: DataTypes.UUID
     },
     updated_by: {
-        type: DataTypes.UUID,
-        validate: {
-            customValidator(value) {
-                if (value === null && this.type !== 'admin') {
-                    throw new Error("updated_by is required for basic user");
-                }
-            }
-        }
+        type: DataTypes.UUID
     },
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,

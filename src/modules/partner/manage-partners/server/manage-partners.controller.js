@@ -10,7 +10,7 @@ const PartnerRequest = require(path.join(process.cwd(), 'src/modules/partner/man
 const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
 const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model'));
 const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model'));
-const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
+const PartnerConsent = require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-consents.model'));
 const storageService = require(path.join(process.cwd(), 'src/modules/core/server/storage/storage.service'));
 const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
@@ -179,7 +179,7 @@ async function createPartner(req, res) {
             return res.status(404).send(response);
         }
 
-        if (partnerRequest && partnerRequest.status !== 'pending') {
+        if (partnerRequest && partnerRequest.status !== 'email_sent') {
             response.errors.push(new CustomError('Invalid partner request status.', 400));
             return res.status(400).send(response);
         }
@@ -209,14 +209,14 @@ async function createPartner(req, res) {
 
         if (consents && consents.length) {
             await Promise.all(consents.map(async consent => {
-                const preferenceId = Object.keys(consent)[0];
+                const consentId = Object.keys(consent)[0];
                 const consentResponse = Object.values(consent)[0];
                 const language_code = locale.split('_')[0];
                 let richTextLocale = `${language_code}_${country_iso2.toUpperCase()}`;
 
                 if (!consentResponse) return;
 
-                const consentDetails = await Consent.findOne({ where: { id: preferenceId } });
+                const consentDetails = await Consent.findOne({ where: { id: consentId } });
 
                 if (!consentDetails) {
                     response.errors.push(new CustomError('Invalid consents.', 400));
@@ -243,7 +243,7 @@ async function createPartner(req, res) {
 
                 let consentLocale = await ConsentLocale.findOne({
                     where: {
-                        consent_id: preferenceId,
+                        consent_id: consentId,
                         locale: { [Op.iLike]: `${language_code}_${country_iso2}` }
                     }
                 });
@@ -255,7 +255,7 @@ async function createPartner(req, res) {
 
                     consentLocale = await ConsentLocale.findOne({
                         where: {
-                            consent_id: preferenceId,
+                            consent_id: consentId,
                             locale: { [Op.iLike]: localeUsingParentCountryISO }
                         }
                     });
@@ -278,7 +278,6 @@ async function createPartner(req, res) {
                     opt_type: consentCountry.opt_type,
                     rich_text: validator.unescape(consentLocale.rich_text),
                     consent_locale: richTextLocale,
-                    type: 'business-partner',
                     created_by: req.user.id,
                     updated_by: req.user.id
                 });
@@ -295,7 +294,7 @@ async function createPartner(req, res) {
             return res.status(400).send(response);
         }
 
-        await partnerRequest.update({ status: 'submitted' });
+        await partnerRequest.update({ status: 'request_processed' });
 
         await uploadDucuments(partnerHcx, entityType, files);
 
@@ -304,7 +303,7 @@ async function createPartner(req, res) {
                 c.user_id = partnerHcx.id
                 return c;
             });
-            await HcpConsents.bulkCreate(consentArr, {
+            await PartnerConsent.bulkCreate(consentArr, {
                 returning: true,
                 ignoreDuplicates: false
             });
@@ -359,6 +358,93 @@ async function updatePartner(req, res) {
             return res.status(400).send(response);
         }
 
+        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+        let consentArr = [];
+        const consents = JSON.parse('[' + req.body.consents + ']');
+
+        if (consents && consents.length) {
+            await Promise.all(consents.map(async x => {
+                const consentId = Object.keys(x)[0];
+                const consentResponse = Object.values(x)[0];
+
+                const partnerConsent = await PartnerConsent.findOne({ where: { user_id: partner.id, consent_id: consentId } });
+
+                if (partnerConsent) {
+                    await partnerConsent.update({
+                        opt_type: consentResponse ? 'single-opt-in' : 'opt-out',
+                        consent_confirmed: consentResponse
+                    });
+                } else {
+                    const language_code = locale.split('_')[0];
+                    let richTextLocale = `${language_code}_${country_iso2.toUpperCase()}`;
+
+                    if (!consentResponse) return;
+
+                    const consentDetails = await Consent.findOne({ where: { id: consentId } });
+
+                    if (!consentDetails) {
+                        response.errors.push(new CustomError('Invalid consents.', 400));
+                        return;
+                    };
+
+                    const currentCountry = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                    const baseCountry = countries.find(c => c.countryname === currentCountry.codbase_desc);
+
+                    const consentCountry = await ConsentCountry.findOne({
+                        where: {
+                            country_iso2: {
+                                [Op.iLike]: baseCountry.country_iso2
+                            },
+                            consent_id: consentDetails.id
+                        }
+                    });
+
+                    if (!consentCountry) {
+                        response.errors.push(new CustomError('Invalid consent country.', 400));
+                        return;
+                    }
+
+                    let consentLocale = await ConsentLocale.findOne({
+                        where: {
+                            consent_id: consentId,
+                            locale: { [Op.iLike]: `${language_code}_${country_iso2}` }
+                        }
+                    });
+
+                    if (!consentLocale) {
+                        const codbaseCountry = countries.filter(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                        const localeUsingParentCountryISO = `${language_code}_${(codbaseCountry[0].country_iso2 || '').toUpperCase()}`;
+
+                        consentLocale = await ConsentLocale.findOne({
+                            where: {
+                                consent_id: consentId,
+                                locale: { [Op.iLike]: localeUsingParentCountryISO }
+                            }
+                        });
+
+                        richTextLocale = localeUsingParentCountryISO;
+                    }
+
+                    if (!consentLocale) {
+                        response.errors.push(new CustomError('Invalid consent locale.', 400));
+                        return;
+                    }
+
+                    consentArr.push({
+                        consent_id: consentDetails.id,
+                        consent_confirmed: true,
+                        opt_type: consentCountry.opt_type,
+                        rich_text: validator.unescape(consentLocale.rich_text),
+                        consent_locale: richTextLocale,
+                        created_by: req.user.id,
+                        updated_by: req.user.id
+                    });
+                }
+            }));
+        }
+
         const data = {
             first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, iban, bank_name, bank_account_no, currency, swift_code, routing
         };
@@ -407,6 +493,17 @@ async function updatePartner(req, res) {
         const updated_data = await partner.update(data);
 
         await uploadDucuments(partner, updated_data.dataValues.entity_type, files);
+
+        if (consentArr.length) {
+            consentArr = consentArr.map(c => {
+                c.user_id = updated_data.id
+                return c;
+            });
+            await PartnerConsent.bulkCreate(consentArr, {
+                returning: true,
+                ignoreDuplicates: false
+            });
+        }
 
         delete updated_data.dataValues.created_at;
         delete updated_data.dataValues.updated_at;
@@ -560,7 +657,7 @@ async function createPartnerVendor(req, res) {
             return res.status(404).send(response);
         }
 
-        if (partnerRequest && partnerRequest.status !== 'pending') {
+        if (partnerRequest && partnerRequest.status !== 'email_sent') {
             response.errors.push(new CustomError('Invalid partner request status.', 400));
             return res.status(404).send(response);
         }
@@ -591,7 +688,7 @@ async function createPartnerVendor(req, res) {
             return res.status(400).send(response);
         }
 
-        await partnerRequest.update({ status: 'submitted' });
+        await partnerRequest.update({ status: 'request_processed' });
 
         await uploadDucuments(partnerVendor, type, files);
 
@@ -720,7 +817,7 @@ async function approvePartner(req, res) {
 
         if (!partner) return res.status(404).send(`The ${entityType} partner does not exist`);
 
-        if (partner.status !== 'pending') return res.status(400).send(`The ${entityType} partner has already been approved/rejected`);
+        if (partner.status !== 'not_approved') return res.status(400).send(`The ${entityType} partner has already been approved`);
 
         await partner.update({ status: 'approved' });
 

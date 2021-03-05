@@ -200,7 +200,7 @@ const UserDetails = (props) => {
                                                 <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
                                                     <div className="profile-detail__col-fluid pb-3 pr-0 pr-sm-3">
                                                         <span className="mr-2 d-block profile-detail__label">Profile</span>
-                                                        <span className="profile-detail__value">{userInfo.profiles ? userInfo.profiles : nullValueToken}</span>
+                                                        <span className="profile-detail__value">{userInfo.profiles ? userInfo.profiles.title : nullValueToken}</span>
                                                     </div>
                                                     <div className="profile-detail__col-fluid pb-3 pr-0 pr-sm-3">
                                                         <span className="mr-2 d-block profile-detail__label">Role</span>
@@ -226,12 +226,12 @@ const UserDetails = (props) => {
                                                                 as="select"
                                                                 name="status"
                                                                 className="form-control cdp-border-primary"
-                                                                disabled={userInfo.type === 'admin'}
+                                                                disabled={userInfo.profiles ? userInfo.profiles.slug === 'system_admin' : true}
                                                             >
                                                                 <option value="active">Active</option>
                                                                 <option value="inactive">Inactive</option>
                                                             </Field>
-                                                            <button type="submit" className="btn btn-block text-white cdp-btn-secondary btn-sm mt-4 p-2" disabled={formikProps.isSubmitting || userInfo.type === 'admin'}>Save Changes</button>
+                                                            <button type="submit" className="btn btn-block text-white cdp-btn-secondary btn-sm mt-4 p-2" disabled={formikProps.isSubmitting || userInfo.profiles ? userInfo.profiles.slug === 'system_admin' : true}>Save Changes</button>
                                                     </div>
                                                 </div>
                                                 <PermissionSetDetailsModal
