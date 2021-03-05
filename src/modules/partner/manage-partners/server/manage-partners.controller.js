@@ -16,7 +16,7 @@ const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/f
 const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
-async function uploadDucuments(owner, type, files) {
+async function uploadDucuments(owner, type, files = []) {
     const bucketName = 'cdp-development';
     for (const file of files) {
         const uploadOptions = {
