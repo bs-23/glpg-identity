@@ -1161,13 +1161,17 @@ async function exportApprovedPartners(req, res) {
 
 
 async function getPartnerVendorById(req, res) {
+    const response = new Response({}, []);
     try {
         const partnerVendor = await PartnerVendors.findOne({
             where: { id: req.params.id },
             attributes: { exclude: ['entity_type', 'created_at', 'updated_at'] }
         });
 
-        if (!partnerVendor) return res.status(404).send('The partner vendor does not exist');
+        if (!partnerVendor) {
+            response.errors.push(new CustomError('The partner does not exist.', 404));
+            return res.status(404).send(response);
+        }
 
         partnerVendor.dataValues.type = partnerVendor.dataValues.individual_type;
         delete partnerVendor.dataValues.individual_type;
@@ -1179,7 +1183,22 @@ async function getPartnerVendorById(req, res) {
             id: d.dataValues.id
         }));
 
-        res.json(partnerVendor);
+        const consents = await PartnerConsent.findAll({ where: { user_id: partnerVendor.id } });
+
+        partnerVendor.dataValues.consents = consents.map(c => {
+            return {
+                rich_text: c.rich_text,
+                id: c.id,
+                consent_id: c.consnet_id,
+                consent_confirmed: c.consent_confirmed,
+                opt_type: c.opt_type,
+                consent_locale: c.consent_locale
+            };
+        });
+
+        response.data = partnerVendor;
+
+        res.json(response);
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
@@ -1187,13 +1206,17 @@ async function getPartnerVendorById(req, res) {
 }
 
 async function getPartnerById(req, res) {
+    const response = new Response({}, []);
     try {
         const partner = await Partner.findOne({
             where: { id: req.params.id },
             attributes: { exclude: ['created_at', 'updated_at'] }
         });
 
-        if (!partner) return res.status(404).send('The partner does not exist');
+        if (!partner) {
+            response.errors.push(new CustomError('The partner does not exist.', 404));
+            return res.status(404).send(response);
+        }
 
         if (partner.dataValues.entity_type === 'hcp') {
             delete partner.dataValues.organization_name;
@@ -1217,7 +1240,21 @@ async function getPartnerById(req, res) {
             id: d.dataValues.id
         }));
 
-        res.json(partner);
+        const consents = await PartnerConsent.findAll({ where: { user_id: partner.id } });
+
+        partner.dataValues.consents = consents.map(c => {
+            return {
+                rich_text: c.rich_text,
+                id: c.id,
+                consent_id: c.consnet_id,
+                consent_confirmed: c.consent_confirmed,
+                opt_type: c.opt_type,
+                consent_locale: c.consent_locale
+            };
+        });
+
+        response.data = partner;
+        res.json(response);
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
@@ -1243,6 +1280,7 @@ exports.createPartner = createPartner;
 exports.updatePartner = updatePartner;
 
 exports.getPartnerVendors = getPartnerVendors;
+exports.getPartnerVendorById = getPartnerVendorById;
 exports.getPartnerWholesalers = getPartnerWholesalers;
 exports.createPartnerVendor = createPartnerVendor;
 exports.updatePartnerVendor = updatePartnerVendor;
@@ -1252,4 +1290,3 @@ exports.registrationLookup = registrationLookup;
 exports.approvePartner = approvePartner;
 exports.exportApprovedPartners = exportApprovedPartners;
 exports.getPartnerInformation = getPartnerInformation;
-exports.getPartnerVendorById = getPartnerVendorById;
