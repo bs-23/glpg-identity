@@ -601,15 +601,15 @@ async function getTrials(req, res) {
             if(least_distance === Number.MAX_SAFE_INTEGER) {
                 return '';
             }else if(least_distance === 0) { // same country
-                return {...x.dataValues,  distance: Math.round(0*10*100) / 100 + ' km', distance_value: Math.round(0*10*100) / 100};
+                return {...x.dataValues,  distance: ''};
             }else if(distance) {
                 if(least_distance <= distance){
-                    return {...x.dataValues,  distance: Math.round(least_distance*10*100) / 100 + ' km', distance_value: Math.round(least_distance*10*100) / 100}
+                    return {...x.dataValues,  distance: Math.round(least_distance*100) / 100 + ' km', distance_value: Math.round(least_distance*100) / 100}
             } else {
                 return '';
         }}
         else{
-            return {...x.dataValues,  distance: Math.round(least_distance*10*100) / 100 + ' km', distance_value: Math.round(least_distance*10*100) / 100}
+            return {...x.dataValues,  distance: Math.round(least_distance*100) / 100 + ' km', distance_value: Math.round(least_distance*100) / 100}
         }
 
     }).filter(x=>x!=='').sort(function(a, b) {return a.distance_value - b.distance_value});
