@@ -45,6 +45,7 @@ module.exports = async function () {
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model.js'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-vendor.model.js'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner.model.js'));
+    require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-consents.model'));
 
 
     const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model"));
