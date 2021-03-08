@@ -7,8 +7,8 @@ import { createUser } from "../user.actions";
 import { registerSchema } from "../user.schema";
 import { useToasts } from "react-toast-notifications";
 import Dropdown from 'react-bootstrap/Dropdown';
-import CountryCodes from 'country-codes-list';
 import PhoneNumber from 'awesome-phonenumber';
+import { desiredCountryList } from './my-profile/country-info';
 export default function UserForm() {
     const dispatch = useDispatch();
     const [selectedCountryCode, setSelectedCountryCode] = useState(0);
@@ -17,8 +17,7 @@ export default function UserForm() {
     const [roles, setRoles] = useState([]);
     const history = useHistory();
     const { addToast } = useToasts();
-    const countryList = CountryCodes.all();
-    const desiredCountryList = countryList.filter(country => country.region === 'Europe' || country.countryCode === 'BD' || country.countryCode === 'AU' );
+
     useEffect(() => {
         async function getProfile() {
             const response = await axios.get('/api/profiles');
