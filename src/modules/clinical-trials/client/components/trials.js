@@ -94,6 +94,7 @@ var syncGeocodes =  function() {
 }
 
 
+
 const ClinicalTrials = (props) => {
     const isFilterEnabled = false;
     const trialItems = useSelector(state => state.clinicalTrialsReducer);
@@ -105,7 +106,7 @@ const ClinicalTrials = (props) => {
     const [sort, setSort] = useState({ type: 'asc', value: null });
     const [show, setShow] = useState(false);
     const [addMode, setAddMode] = useState(false);
-    const [test, setTest] = useState(false);
+    const [selectedTrials, setSelectedTrials] = useState([]);
     const addDataSample = {
         title: 'Sample Title',
         trials : [1,2,3],
@@ -135,7 +136,7 @@ const ClinicalTrials = (props) => {
     const pageLeft = () => {
         if (hcpUsers.page > 1) urlChange(hcpUsers.page - 1, hcpUsers.codBase, params.get('orderBy'), true);
     };
-    const testFunc = ()=>{console.log('just checking')};
+    
     const pageRight = () => {
         if (hcpUsers.end !== hcpUsers.total) urlChange(hcpUsers.page + 1, hcpUsers.codBase, params.get('orderBy'), true);
     };
@@ -145,6 +146,24 @@ const ClinicalTrials = (props) => {
         const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
         return country && country.countryname;
     };
+
+    const selectedTrialsTemp = []
+    const updateSelectedTrials = (gov_identifier)=>{
+        if(!selectedTrials.includes(gov_identifier)) 
+            {
+                //selectedTrialsTemp.push(gov_identifier);
+                const arr = selectedTrials;
+                arr.push(gov_identifier);
+                setSelectedTrials(arr);
+                console.log('after insert: ',selectedTrials);
+            }
+            else
+            {
+                const arr = selectedTrials.filter(item => item !== gov_identifier);
+                setSelectedTrials(arr);
+                console.log('after remove : ',selectedTrials);
+            }
+    }
 
     useEffect(() => {
         dispatch(getTrialItems());
@@ -160,7 +179,6 @@ const ClinicalTrials = (props) => {
     const [story, setStory] = useState('write a story');
     const topic = false;
    
-    const seectedTopics = [];
 
 
     return (
@@ -286,8 +304,8 @@ const ClinicalTrials = (props) => {
                                                 <tr key={'user-' + idx}>
                                                     <td>
                                                         <div className="custom-control custom-checkbox">
-                                                            <input type="checkbox" className="custom-control-input" id="aa" />
-                                                            <label className="custom-control-label" for="aa"></label>
+                                                            <input type="checkbox" className="custom-control-input" id={row.gov_identifier} onClick={()=>{updateSelectedTrials(row.gov_identifier)}}/>
+                                                            <label className="custom-control-label" for={row.gov_identifier}></label>
                                                         </div>
                                                     </td>
                                                     <td className="text-break">{row.gov_identifier || '--'}</td>
@@ -354,7 +372,7 @@ const ClinicalTrials = (props) => {
                                 </div>
                             </div>
                         }
-                        {show ? <StoryForm story={story} seectedTopics ={seectedTopics} trialDetails={trialDetails} addMode={addMode} changeShow={(val) => setShow(val)} show={show} trialIDs={[1,2,3]} addData = {addDataSample} /> : null}
+                        {show ? <StoryForm story={story} selectedTrials ={selectedTrials} trialDetails={trialDetails} addMode={addMode} changeShow={(val) => setShow(val)} show={show} trialIDs={[1,2,3]} addData = {addDataSample} /> : null}
                         <Modal
                             size="lg"
                             show={!!profileDetails}
