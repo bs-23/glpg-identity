@@ -13,14 +13,15 @@ const initialState = {
     trialDetails: null,
     trialConditions: {
         data: []
-    }
+    },
+    multipleTrailDetails: []
 };
 
 export default function reducer(state = initialState, action) {
     switch (action.type) {
        
-        case Types.GET_TRIAL_ITEM_FULFILLED: {
-            return { ...state, clinialTrial_item: action.payload.data };
+        case Types.GET_TRIAL_ITEM: {
+            return { ...state, clinialTrial_item: action.payload };
         }
         case Types.GET_TRIAL_ITEMS_FULFILLED: {
             return { ...state, clinialTrial_items: action.payload.data };
@@ -31,6 +32,9 @@ export default function reducer(state = initialState, action) {
         }
         case Types.GET_TRIAL_CONDITIONS_FULFILLED: {
             return {...state, trialConditions: action.payload.data };
+        }
+        case Types.GET_MULTIPLE_TRIAL_DETAILS: {
+            return {...state, multipleTrailDetails: action.payload };
         }
     }
 

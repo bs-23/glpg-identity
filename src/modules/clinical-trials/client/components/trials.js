@@ -6,7 +6,7 @@ import { useToasts } from 'react-toast-notifications';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
 import StoryForm from './clinical-trials-story-form.component';
-import {getTrialItems, getClinicalTrialDetails, getTrialConditions } from './clinical-trials.actions';
+import {getTrialItems, getClinicalTrialDetails, getTrialConditions,getMultipleClinicalTrialDetails } from './clinical-trials.actions';
 import './trials.scss'
 var dumpData =  function() {
     const url = `/api/clinical-trials`;
@@ -149,6 +149,7 @@ const ClinicalTrials = (props) => {
     useEffect(() => {
         dispatch(getTrialItems());
         dispatch(getTrialConditions());
+        dispatch(getMultipleClinicalTrialDetails(['b1e15d66-4711-405a-a5d6-21fcb57e1410', '8447cb2e-8348-4213-8d11-4ae36dfbfe52','79e12e54-4eca-49d2-a970-2c5907f122f2']));
     },[]);
 
     useEffect(() => {
@@ -213,7 +214,7 @@ const ClinicalTrials = (props) => {
                             <div className="d-flex pt-3 pt-sm-0 mb-2">
                                 <Dropdown className="ml-auto dropdown-customize">
                                         <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
-                                            <i className="icon icon-filter mr-2 mb-n1"></i> <span className="d-none d-sm-inline-block">{!topic ? 'Filter by Condition' : serviceTopics.find(x => x.slug === topic).title}</span>
+                                            <i className="icon icon-filter mr-2 mb-n1"></i> <span className="d-none d-sm-inline-block">{filteredTopic==='All' ? 'Filter by Condition' : filteredTopic}</span>
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
                                             {trialConditions.length > 0 && filteredTopic!=='All' && <Dropdown.Item href={`#`} onClick={()=>{setFilter('All');}}>All</Dropdown.Item>}
@@ -317,10 +318,10 @@ const ClinicalTrials = (props) => {
                                                     <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle"></Dropdown.Toggle>
                                                     <Dropdown.Menu>
-                                                        <Dropdown.Item onClick={() => { setShow(true); setAddMode(true); setStory(row.story_telling); dispatch(getClinicalTrialDetails([row.trial_fixed_id])) }}>
+                                                        <Dropdown.Item onClick={() => { setShow(true); setAddMode(true); setStory(row.story_telling); dispatch(getClinicalTrialDetails([row.trial_fixed_id])); }}>
                                                             Write Story
                                                         </Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => { setShow(true); setEditMode(true); setEditData(row); }}>
+                                                        <Dropdown.Item onClick={() => { setShow(true); setAddMode(false); setStory(row.story_telling); dispatch(getClinicalTrialDetails([row.trial_fixed_id])); }}>
                                                             Edit Story
                                                         </Dropdown.Item>
                                                         <Dropdown.Item className="text-danger bg-white" onClick={() => { setShowDelete(true); setDeleteId(row.id); }}>Delete</Dropdown.Item>

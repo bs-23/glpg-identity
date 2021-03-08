@@ -56,7 +56,7 @@ const StoryForm = (props) => {
     return (
         <Modal size="lg" centered show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title className="modal-title_small">{props.addMode ? 'Add a new Story for clinical trials' : 'Edit Story'}</Modal.Title>
+                <Modal.Title className="modal-title_small">{props.addMode ? 'Write Story' : 'Edit Story'}</Modal.Title>
             </Modal.Header>
 
             {props.trialIDs && props.trialIDs.length > 0 &&
@@ -66,8 +66,8 @@ const StoryForm = (props) => {
                             title: props.addMode ? props.addData.title : '',
                             trials: props.addMode ? props.addData.trials : [],
                             version: props.addMode ? props.addData.version : 'v1',
-                            story: props.addMode ? parse(props.story) : '',
-                            story_plaintext: props.addMode ? parse(props.addData.story) : ''
+                            story: props ? parse(props.story) : '',
+                            story_plaintext: props ? parse(props.addData.story) : ''
                         }}
                         //validationSchema={faqSchema}
                         displayName="StoryForm"
@@ -111,11 +111,11 @@ const StoryForm = (props) => {
                                 <Modal.Body className="p-4">
                                     <div className="row">
                                         <div className="col-12">
-                                            <div className="form-group">
+                                            {/* <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor='title'> Title of the Story <span className="text-danger">*</span></label>
                                                 <Field className="form-control preference" type='text' name='title' id='title' />
                                                 <div className="invalid-feedback"><ErrorMessage name="title" /></div>
-                                            </div>
+                                            </div> */}
 
                                             <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor='topics'>Selected Clinical Trials <span className="text-danger">*</span></label>

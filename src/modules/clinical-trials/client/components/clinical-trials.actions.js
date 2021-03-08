@@ -10,7 +10,23 @@ export function fetchTrialItem(id) {
             age : 20,
             gender: 'male'
         }
-    };
+    }
+}
+
+export function getMultipleClinicalTrialDetails(ids) {
+    let trials = []
+    ids.map(id=>{
+        const url = `/api/clinical-trials-cdp/${id}`;
+        axios({
+            method: 'get',
+            url
+        }).then(res=> trials.push(res))
+    })
+    
+    return {
+        type: Types.GET_MULTIPLE_TRIAL_DETAILS,
+        payload: trials
+    }
 }
 
 export function getClinicalTrialDetails(ids) {
