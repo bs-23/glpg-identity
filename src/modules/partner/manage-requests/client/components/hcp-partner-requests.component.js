@@ -55,11 +55,7 @@ const HcpPartnerRequests = () => {
     };
 
     const getLocales = (country_iso2) => {
-        let countryLanguages = (country_iso2
-            ? localizations.filter(({ country_iso2: c_iso2 }) => country_iso2 === c_iso2)
-            : localizations.filter(({ country_iso2 }) => (userCountries || []).includes(country_iso2)))
-            .map(({ locale, language_variant }) => { return { locale, locale_name: language_variant }});
-
+        let countryLanguages = localizations.filter(({ country_iso2: c_iso2 }) => country_iso2 === c_iso2);
         return countryLanguages;
     }
 
@@ -587,8 +583,8 @@ const HcpPartnerRequests = () => {
                                             <Field className="form-control lang_code" as="select" name="locale" className="form-control" id="language">
                                                 <option key="select-locale" value="" disabled>--Select Localization--</option>
                                                 {getLocales(formikProps.values.country_iso2).map((element, lang_idx) => {
-                                                    const { locale_name, locale } = element;
-                                                    return locale_name && <option key={lang_idx} value={locale}>{locale_name}</option>
+                                                    const { language_variant, locale } = element;
+                                                    return language_variant && <option key={lang_idx} value={locale}>{language_variant}</option>
                                                 })}
                                             </Field>
                                             <div className="invalid-feedback"><ErrorMessage name="locale" /></div>
