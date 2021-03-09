@@ -70,13 +70,13 @@ export default function Dashboard() {
                             </div>
                         </div>
                     </div>
-                   <div className="col-12 col-lg-5 col-xl-4 py-3 app__content-panel-right">
+                    <div className="col-12 col-lg-5 col-xl-4 py-3 app__content-panel-right">
 
                         <div className="d-none d-sm-block" >
                             <Inbox />
                         </div>
                         <Faq topic="general-information" />
-                        <div className="d-sm-block" >
+                        <div className="d-sm-block mt-3" >
                             <HotStatistic />
                         </div>
                     </div>
