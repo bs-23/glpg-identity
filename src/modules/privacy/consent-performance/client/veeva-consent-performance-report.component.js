@@ -169,11 +169,10 @@ const ConsentPerformanceReport = () => {
                     <div className="col-12">
                         <div>
                             <h4 className="cdp-text-primary font-weight-bold my-3">Consent Performance Report</h4>
-                            <div className="d-sm-flex justify-content-between align-items-end mb-0 mt-4">
+                            <div className="d-sm-flex justify-content-between align-items-end mb-0 mt-4 cdp-table__responsive-sticky-panel">
                                 <div>
-                                   
                                     <div>
-                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/consent/consent-performance-report/cdp"><span className="d-block d-lg-none">CDP</span><span className="d-none d-lg-block">Customer Data Platform</span></NavLink>
+                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/consent/consent-performance-report/cdp">Customer Data Platform</NavLink>
                                         <NavLink className="custom-tab px-3 px-lg-4 py-3 cdp-border-primary" to="/consent/consent-performance-report/veeva-crm"><img alt="Veeva CRM LOGO" src="/assets/logo/logo-veevacrm.svg" height="13" /></NavLink>
                                     </div>
                                 </div>
@@ -184,9 +183,12 @@ const ConsentPerformanceReport = () => {
                                         <button className="btn cdp-btn-outline-primary mr-2" onClick={() => exportExcelFile()}><i className="fas fa-download"></i> <span className="d-none d-lg-inline-block pl-1">Export Full Report</span></button>
 
                                         {countries && consents_report['countries'] &&
-                                            <Dropdown className="ml-auto dropdown-customize mr-2">
-                                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
-                                                    <i className="icon icon-filter mr-2 mb-n1"></i> {consents_report.codbase && (countries.find(i => i.codbase === consents_report.codbase)) ? (countries.find(i => i.codbase === consents_report.codbase)).codbase_desc : 'Filter by Country'}
+                                                <Dropdown className="ml-auto dropdown-customize mr-2">
+                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-none d-sm-flex align-items-center">
+                                                        <i className="icon icon-filter mr-2 mb-n1"></i> {consents_report.codbase && (countries.find(i => i.codbase === consents_report.codbase)) ? (countries.find(i => i.codbase === consents_report.codbase)).codbase_desc : 'Filter by Country'}
+                                                </Dropdown.Toggle>
+                                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle  btn d-block d-sm-none align-items-center">
+                                                    {consents_report.codbase && (countries.find(i => i.codbase === consents_report.codbase)) ? (countries.find(i => i.codbase === consents_report.codbase)).codbase_desc : 'Country'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
                                                     <LinkContainer to={`/consent/consent-performance-report/veeva-crm${makeUrl([
@@ -218,8 +220,11 @@ const ConsentPerformanceReport = () => {
                                         }
 
                                         <Dropdown className="ml-auto dropdown-customize">
-                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
-                                                <i className="icon icon-filter mr-2 mb-n1"></i> {consents_report.opt_type && (allOptTypes.includes(consents_report.opt_type)) ? consents_report.opt_type : 'Filter by Opt Type'}
+                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-none d-sm-flex align-items-center">
+                                                <i className="icon icon-filter mr-2 mb-n1 d-none d-sm-inline-block"></i> {consents_report.opt_type && (allOptTypes.includes(consents_report.opt_type)) ? consents_report.opt_type : 'Filter by Opt Type'}
+                                            </Dropdown.Toggle>
+                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle  btn d-block d-sm-none align-items-center">
+                                                {consents_report.opt_type && (allOptTypes.includes(consents_report.opt_type)) ? consents_report.opt_type : 'Opt Type'}
                                             </Dropdown.Toggle>
                                             <Dropdown.Menu>
                                                 <LinkContainer to={`/consent/consent-performance-report/veeva-crm${makeUrl([{ name: 'codbase', value: consents_report.codbase }, { name: 'orderBy', value: consents_report.orderBy }, { name: 'orderType', value: consents_report.orderType }])}`}>

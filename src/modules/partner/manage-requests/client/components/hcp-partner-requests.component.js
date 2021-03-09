@@ -318,7 +318,7 @@ const HcpPartnerRequests = () => {
                                                 <td data-for="UUID">{row.uuid}</td>
                                                 <td data-for="Name">{`${row.first_name} ${row.last_name}`}</td>
                                                 <td data-for="MDR ID">{row.mdr_id}</td>
-                                                <td data-for="Status" class="text-capitalize">{row.status.replaceAll('_', ' ')}</td>
+                                                <td data-for="Status" class="text-capitalize">{row.status.split('_').join(' ')}</td>
                                                 <td data-for="Company Code">
                                                     {
                                                         row.company_codes && row.company_codes.length &&

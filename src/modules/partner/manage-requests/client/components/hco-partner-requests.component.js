@@ -259,7 +259,7 @@ const HcoPartnerRequests = () => {
                                                 <td data-for="UUID">{row.uuid}</td>
                                                 <td data-for="Name">{`${row.first_name} ${row.last_name}`}</td>
                                                 <td data-for="MDR ID">{row.mdr_id}</td>
-                                                <td data-for="Status" class="text-capitalize">{row.status.replaceAll('_', ' ')}</td>
+                                                <td data-for="Status" class="text-capitalize">{row.status.split('_').join(' ')}</td>
                                                 <td data-for="Email Address">{row.email}</td>
                                                 <td data-for="Procurement Contact">{row.procurement_contact}</td>
                                                 <td data-for="Country">{getCountryName(row.country_iso2)}</td>
