@@ -2,6 +2,7 @@ import React from "react";
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
 import Inbox from '../../../../core/client/components/inbox.component';
+import HotStatistic from '../../../../core/client/components/hotStatistics.component';
 export default function Dashboard() {
     return (
         <main className="app__content cdp-light-bg">
@@ -75,6 +76,9 @@ export default function Dashboard() {
                             <Inbox />
                         </div>
                         <Faq topic="general-information" />
+                        <div className="d-sm-block" >
+                            <HotStatistic />
+                        </div>
                     </div>
                 </div>
             </div>
