@@ -94,6 +94,18 @@ var syncGeocodes =  function() {
 }
 
 
+function checkUncheck(trial_fixed_ids, setTo) {
+    var c = document.getElementsByTagName('input');
+
+    for (var i = 0; i < c.length; i++) {
+        if (c[i].type == 'checkbox' && trial_fixed_ids.includes(c[i].id)) {
+            c[i].checked = setTo;
+        }
+    }
+    
+    
+}
+
 
 const ClinicalTrials = (props) => {
     const isFilterEnabled = false;
@@ -147,28 +159,67 @@ const ClinicalTrials = (props) => {
         return country && country.countryname;
     };
 
-    const selectedTrialsTemp = []
-    const updateSelectedTrials = (gov_identifier)=>{
-        if(!selectedTrials.includes(gov_identifier)) 
+    const toggleAllBoxes = ()=>{
+        var elements = document.getElementsByTagName('input');
+        const arr = []
+        let setTo = true;
+        for(var i = 0; i < elements.length; i++){
+            if(elements[i].type == 'checkbox') 
+            { if(elements[i].id =='checkAll'){
+                console.log('main box:',elements[i].checked);
+                !elements[i].checked ? setTo = false : null 
+            }else{arr.push(elements[i].id)}
+            
+            }
+        }
+        checkUncheck(arr,setTo);
+        setTo ? setSelectedTrials(arr) : setSelectedTrials([]);
+        
+    }
+    
+    const selectedUnmarkedTrial = (trial_fixed_id)=>{
+        var elements = document.getElementsByTagName('input');
+        const trial_fixed_ids = []
+    
+        for(var i = 0; i < elements.length; i++){
+            if(elements[i].type == 'checkbox' && elements[i].id !='checkAll' && elements[i].id !=trial_fixed_id ) 
+            { trial_fixed_ids.push(elements[i].id)
+            }
+            
+            }
+        
+
+        if(!selectedTrials.includes(trial_fixed_id)) 
             {
-                //selectedTrialsTemp.push(gov_identifier);
+                const arr = [];
+                arr.push(trial_fixed_id);
+                setSelectedTrials(arr);
+                checkUncheck(trial_fixed_ids,false);
+                checkUncheck([trial_fixed_id], true);
+                console.log('after insert in unmarked region: ',selectedTrials);
+            }
+        }
+
+    const updateSelectedTrials = (trial_fixed_ids)=>{
+        
+        if(!selectedTrials.includes(trial_fixed_ids)) 
+            {
                 const arr = selectedTrials;
-                arr.push(gov_identifier);
+                arr.push(trial_fixed_ids);
                 setSelectedTrials(arr);
                 console.log('after insert: ',selectedTrials);
             }
             else
             {
-                const arr = selectedTrials.filter(item => item !== gov_identifier);
+                const arr = selectedTrials.filter(item => item !== trial_fixed_ids);
                 setSelectedTrials(arr);
-                console.log('after remove : ',selectedTrials);
+                console.log('after remove: ',selectedTrials);
             }
     }
 
     useEffect(() => {
         dispatch(getTrialItems());
         dispatch(getTrialConditions());
-        dispatch(getMultipleClinicalTrialDetails(['b1e15d66-4711-405a-a5d6-21fcb57e1410', '8447cb2e-8348-4213-8d11-4ae36dfbfe52','79e12e54-4eca-49d2-a970-2c5907f122f2']));
     },[]);
 
     useEffect(() => {
@@ -203,25 +254,12 @@ const ClinicalTrials = (props) => {
                                 </Dropdown.Menu>
                             </Dropdown>
                             <span className="ml-auto mr-3"><i onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary cursor-pointer"></i></span>
-                            {/* <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
-                                <Modal.Header closeButton>
-                                    <Modal.Title>Questions You May Have</Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body className="faq__in-modal"><Faq topic="manage-hcp" /></Modal.Body>
-                            </Modal> */}
                         </nav>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-12">
                         <div className="d-flex justify-content-between align-items-center py-3  cdp-table__responsive-sticky-panel">
-                            {/* <div>
-                                <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1 pb-2">Manage Content For Each Clinical Trial</h4>
-                                <div>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/cdp">Customer Data Platform</NavLink>
-                                    <div className="custom-tab px-3 py-3 cdp-border-primary active">CRDLP</div>
-                                </div>
-                            </div> */}
                              <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">
                              Manage Content For Each Clinical Trial
                                 
@@ -274,8 +312,8 @@ const ClinicalTrials = (props) => {
                                             <tr>
                                                  <th width="10%">
                                                     <div className="custom-control custom-checkbox without-bg">
-                                                        <input type="checkbox" className="custom-control-input" id="customControlAutosizingf" />
-                                                        <label className="custom-control-label" for="customControlAutosizingf"></label>
+                                                        <input type="checkbox" className="custom-control-input" id="checkAll" onClick={()=>{toggleAllBoxes()}} />
+                                                        <label className="custom-control-label" for="checkAll"></label>
                                                     </div>
                                                 </th>
                                                 <th width="10%"><span className={sort.value === 'firstname' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'firstname')}>Clinical Gov. ID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -304,8 +342,8 @@ const ClinicalTrials = (props) => {
                                                 <tr key={'user-' + idx}>
                                                     <td>
                                                         <div className="custom-control custom-checkbox">
-                                                            <input type="checkbox" className="custom-control-input" id={row.gov_identifier} onClick={()=>{updateSelectedTrials(row.gov_identifier)}}/>
-                                                            <label className="custom-control-label" for={row.gov_identifier}></label>
+                                                            <input type="checkbox" className="custom-control-input" id={row.trial_fixed_id} onClick={()=>{updateSelectedTrials(row.trial_fixed_id)}}/>
+                                                            <label className="custom-control-label" for={row.trial_fixed_id}></label>
                                                         </div>
                                                     </td>
                                                     <td className="text-break">{row.gov_identifier || '--'}</td>
@@ -336,10 +374,10 @@ const ClinicalTrials = (props) => {
                                                     <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle"></Dropdown.Toggle>
                                                     <Dropdown.Menu>
-                                                        <Dropdown.Item onClick={() => { setShow(true); setAddMode(true); setStory(row.story_telling); dispatch(getClinicalTrialDetails([row.trial_fixed_id])); }}>
+                                                        <Dropdown.Item onClick={() => { setShow(true); setAddMode(true); setStory(row.story_telling); selectedUnmarkedTrial(row.trial_fixed_id)}}>
                                                             Write Story
                                                         </Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => { setShow(true); setAddMode(false); setStory(row.story_telling); dispatch(getClinicalTrialDetails([row.trial_fixed_id])); }}>
+                                                        <Dropdown.Item onClick={() => { setShow(true); setAddMode(false); setStory(row.story_telling);}}>
                                                             Edit Story
                                                         </Dropdown.Item>
                                                         <Dropdown.Item className="text-danger bg-white" onClick={() => { setShowDelete(true); setDeleteId(row.id); }}>Delete</Dropdown.Item>
@@ -511,7 +549,7 @@ const ClinicalTrials = (props) => {
                     <button onClick={showAllClinicalTrials}>Show All Clinical Trials</button>
                     <button onClick={update_clinicalTrials}>Update Clinical Trials</button>
                     <button onClick={getClinicalTrialDetails}>Show trial details</button>
-                    <button onClick={()=>{setShow(true); setAddMode(true);}}>Add Story</button>
+                    <button onClick={()=>{checkUncheck('NCT04578548',true)}}>Check Uncheck</button>
                     
                 </div>
                 <div class="tooltip">Hover over me

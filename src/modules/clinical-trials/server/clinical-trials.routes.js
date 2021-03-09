@@ -16,6 +16,8 @@ module.exports = app => {
     
     app.route('/api/clinical-trials/update')
         .put(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.updateClinicalTrials);
+    app.route('/api/clinical-trials/update-stories')
+        .put(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.updateStories);
 
     app.route('/api/clinical-trials/versions')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.showAllVersions);
@@ -44,6 +46,6 @@ module.exports = app => {
     app.route('/api/clinical-trials/:id')
         .get(auth, controller.getTrialDetails);
 
-    app.route('/api/clinical-trials-cdp/:id')
+    app.route('/api/clinical-trials-cdp/:ids')
         .get(CDPAuthStrategy, controller.getTrialDetails);
 };

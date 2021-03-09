@@ -5,11 +5,12 @@ const initialState = {
         age : 0,
         gender: 'none'
     },
-    clinialTrial_items: {
-        data:{
-            search_result:[]
-        }
-    },
+    clinialTrial_items: null,
+    // clinialTrial_items: {
+    //     data:{
+    //         search_result:[]
+    //     }
+    // },
     trialDetails: null,
     trialConditions: {
         data: []

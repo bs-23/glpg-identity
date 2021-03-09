@@ -2,6 +2,7 @@ const path = require('path');
 const _ = require('lodash');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const History = require('./clinical-trials.history.model');
+const Story = require('./clinical-trials.story.model');
 const https = require('https');
 const Trial = require('./clinical-trials.trial.model');
 const Location = require('./clinical-trials.location.model');
@@ -270,31 +271,6 @@ async function showAllVersions(req, res) {
         res.status(500).send(response);
     }
 }
-
-// async function addStory(req, res) {
-//     const response = new Response({}, []);
-//     try{
-//         let result = await History.create({
-//             trial_fixed_id: req.trial_fixed_id,
-//             version = req.version,
-//             value: req.value,
-
-//         });
-
-//         if (!result) {
-//             response.data = [];
-//             return res.status(204).send(response);
-//         }
-
-//         response.data = result;
-//         res.json(response);
-//     } catch (err) {
-//         logger.error(err);
-//         response.errors.push(new CustomError('Internal server error', 500));
-//         res.status(500).send(response);
-//     }
-
-// }
 
 
 async function updateLatLngCode(location, count, location_facility, location_zip, latLngNotFound){
@@ -668,16 +644,16 @@ async function getTrialDetails(req, res) {
     const response = new Response({}, []);
     res.set({ 'content-type': 'application/json; charset=utf-8' });
     try {
-        if (!req.params.id) {
+        if (!req.params.ids) {
             return res.status(400).send('Invalid request.');
         }
 
-        id = req.params.id;
-        let result = await Trial.findOne({
+        ids = req.params.ids.split(',');
+        let result = await Trial.findAll({
             where: {
                 [Op.or]: [
-                {trial_fixed_id: id},
-                {id: id}
+                {trial_fixed_id: ids},
+                {id: ids}
                 ]
             },
             include: ['locations']
@@ -689,6 +665,55 @@ async function getTrialDetails(req, res) {
         }
 
         response.data = result;
+        res.json(response);
+    } catch (err) {
+        logger.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
+
+async function updateStories(req, res) {
+    const response = new Response({}, []);
+    const reqdata = req.body;
+    res.set({ 'content-type': 'application/json; charset=utf-8' });
+    try {
+        let ids = reqdata.map(x=>x.trial_fixed_ids)[0];
+        let story = reqdata.map(x=>x.story)[0];
+        
+        let trials = await Trial.findAll({
+            where: {
+                trial_fixed_id: ids             
+            }
+        });
+
+        let result = trials.map(trial=>{
+            trial.story_telling = story;
+            trial.save({ fields: ['story_telling'] });
+            return trial; 
+        });
+
+        let story_result = ids.map(id=>{
+            Story.count({
+                where: {
+                    trial_fixed_id: id
+                }
+            }).then(countNo =>{
+                Story.create({
+                    trial_fixed_id: id,
+                    version: countNo+1,
+                    value: story
+                })
+            })
+        });
+
+        if (!result) {
+            response.data = [];
+            return res.status(204).send(response);
+        }
+
+        response.data = story_result;
         res.json(response);
     } catch (err) {
         logger.error(err);
@@ -936,3 +961,4 @@ exports.getConditionsWithDetails = getConditionsWithDetails;
 exports.validateAddress = validateAddress;
 exports.syncGeoCodes = syncGeoCodes;
 exports.updateClinicalTrials = updateClinicalTrials;
+exports.updateStories = updateStories ;
