@@ -161,7 +161,7 @@ export const partnerRequestSchemaForWholesalers = object().shape({
     country_iso2: string()
         .min(1, 'This field must be selected')
         .required('This field must be selected'),
-    language: string()
+    locale: string()
         .min(1, 'This field must be selected')
         .required('This field must be selected'),
     partner_type: string()
