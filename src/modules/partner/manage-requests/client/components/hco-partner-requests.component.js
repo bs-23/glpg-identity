@@ -10,6 +10,7 @@ import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchemaForHcos } from '../manage-requests.schema'
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
 import SearchHcoModal from './search-hco-modal.component';
+import { getLocalizations } from '../../../../core/client/localizations/localizations.actions';
 
 const HcoPartnerRequests = () => {
     const dispatch = useDispatch();
@@ -47,6 +48,9 @@ const HcoPartnerRequests = () => {
     const countries = useSelector(state => state.countryReducer.countries);
     const allCountries = useSelector(state => state.countryReducer.allCountries);
 
+    const userCountries = useSelector(state => state.userReducer.loggedInUser.countries);
+
+    const localizations = useSelector(state => state.localizationsReducer.localizations);
 
     const [showSearch, setShowSearch] = useState(false);
     const [searchInput, setSearchInput] = useState(false);
@@ -92,6 +96,11 @@ const HcoPartnerRequests = () => {
         const country = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
         return country && country.countryname;
     };
+
+    const getLocales = (country_iso2) => {
+        let countryLanguages = localizations.filter(({ country_iso2: c_iso2 }) => country_iso2 === c_iso2);
+        return countryLanguages;
+    }
 
     const deleteRequest = (id) => {
         dispatch(deletePartnerRequest(id)).then(() => {
@@ -183,6 +192,10 @@ const HcoPartnerRequests = () => {
             });
         }
     }, [formData]);
+
+    useEffect(() => {
+        dispatch(getLocalizations());
+    }, [])
 
     return (
         <main className="app__content cdp-light-bg h-100">
@@ -325,7 +338,7 @@ const HcoPartnerRequests = () => {
                             workplace_type: partnerRequestId && Object.keys(request).length ? request.workplace_type : '',
                             specialty: partnerRequestId && Object.keys(request).length ? request.specialty : '',
                             country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
-                            language: partnerRequestId && Object.keys(request).length ? request.locale.split('_')[0] : 'en',
+                            locale: partnerRequestId && Object.keys(request).length ? request.locale : '',
                             uuid: partnerRequestId && Object.keys(request).length ? request.uuid : '',
                             onekey_id: partnerRequestId && Object.keys(request).length ? request.onekey_id : '',
                         }}
@@ -462,28 +475,29 @@ const HcoPartnerRequests = () => {
                                                 as="select"
                                                 name="country_iso2"
                                                 className="form-control"
-                                                onChange={(e) => {
-                                                    formikProps.setFieldValue('country_iso2', e.target.value);
+                                                onChange={e => {
+                                                    formikProps.setFieldValue('locale', '');
+                                                    formikProps.handleChange(e);
                                                     setSelectedCountry(e.target.value);
-                                                }}
+                                                }}>
                                             >
                                                 <option key="select-country" value="" disabled>--Select Country--</option>
-                                                {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
+                                                {countries.filter(c => userCountries.includes(c.country_iso2)).map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
                                             </Field>
                                             <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
-                                            <label className="font-weight-bold" htmlFor="language">Language<span className="text-danger">*</span></label>
-                                            <Field className="form-control lang_code" as="select" name="language" className="form-control" id="language">
-
-                                                {countryLanguages.map((element, lang_idx) => {
-                                                    const { language_name, language_code } = element;
-                                                    return language_name && <option key={lang_idx} value={language_code}>{language_name}</option>
+                                            <label className="font-weight-bold" htmlFor="locale">Localization<span className="text-danger">*</span></label>
+                                            <Field className="form-control lang_code" as="select" name="locale" className="form-control" id="locale">
+                                                <option key="select-locale" value="" disabled>--Select Localization--</option>
+                                                {getLocales(formikProps.values.country_iso2).map((element, lang_idx) => {
+                                                    const { language_variant, locale } = element;
+                                                    return language_variant && <option key={lang_idx} value={locale}>{language_variant}</option>
                                                 })}
                                             </Field>
-                                            <div className="invalid-feedback"><ErrorMessage name="language" /></div>
+                                            <div className="invalid-feedback"><ErrorMessage name="locale" /></div>
                                         </div>
                                     </div>
                                 </div>
