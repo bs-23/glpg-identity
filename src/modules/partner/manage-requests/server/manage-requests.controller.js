@@ -53,7 +53,7 @@ async function createPartnerRequest(req, res) {
             email,
             mdr_id,
             country_iso2,
-            language,
+            locale,
             uuid,
             is_supplier,
             is_customer,
@@ -77,7 +77,7 @@ async function createPartnerRequest(req, res) {
             email,
             mdr_id,
             country_iso2,
-            locale: language.toLowerCase() + "_" + country_iso2.toUpperCase(),
+            locale,
             created_by: req.user.id,
             updated_by: req.user.id,
         };
