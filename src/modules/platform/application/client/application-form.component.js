@@ -78,7 +78,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                 }}
                             />
                         </div>
-                        <div className="col-12 col-md-5">
+                        <div className="col-12 col-md-2">
                             <span
                                 onClick={() => {
                                     const updatedMetadata = formikProps.values.metadata.filter((item, index) => ind !== index);
