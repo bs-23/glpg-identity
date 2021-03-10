@@ -56,6 +56,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                             <Field  // input field for key
                                 type="text"
                                 value={item.key}
+                                className="form-control"
                                 onChange={(e) => {
                                     const updatedMetadataKey = e.target.value;
                                     const updatedMetadata = [...formikProps.values.metadata];
@@ -67,6 +68,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                         <div className="col-5">
                             <Field  // input field for value
                                 type="text"
+                                className="form-control"
                                 value={item.value}
                                 onChange={(e) => {
                                     const updatedMetadataValue = e.target.value;
@@ -81,7 +83,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                 const updatedMetadata = formikProps.values.metadata.filter((item, index) => ind !== index);
                                 formikProps.setFieldValue('metadata', updatedMetadata);
                             }}
-                            className="col-3"
+                            className="col-2"
                         >
                             X
                         </span>
