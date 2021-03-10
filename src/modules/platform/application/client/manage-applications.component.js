@@ -161,6 +161,7 @@ export default function ManageApplications() {
                             onHide={handleApplicationModalHide}
                             dialogClassName="modal-90w modal-customize"
                             aria-labelledby="example-custom-modal-styling-title"
+                            size="lg"
                             centered
                         >
                             <Modal.Header closeButton>

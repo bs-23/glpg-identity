@@ -185,9 +185,10 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                     <div className="col-12">
                                         <div className="row col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="last_name">Type</label>
+                                                <label className="font-weight-bold" htmlFor="last_name">Type <span className="text-danger">*</span></label>
                                                 <Field className="form-control" name="type" as="select">
                                                     <option value="">--Select a type--</option>
+                                                    <option value="standard">Standard</option>
                                                     <option value="hcp-portal">HCP Portal</option>
                                                 </Field>
                                                 <div className="invalid-feedback"><ErrorMessage name="type"/></div>
