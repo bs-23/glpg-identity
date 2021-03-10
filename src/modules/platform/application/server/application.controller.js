@@ -100,7 +100,7 @@ async function getApplication(req, res) {
     try {
         const application = await Application.findOne({
             where: { id: req.params.id },
-            attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description']
+            attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description', 'metadata']
         });
 
         res.json(application);

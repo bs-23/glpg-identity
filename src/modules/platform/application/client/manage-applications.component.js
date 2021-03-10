@@ -3,11 +3,13 @@ import { Link, NavLink } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { useToasts } from "react-toast-notifications";
 import Dropdown from 'react-bootstrap/Dropdown';
+import { LinkContainer } from 'react-router-bootstrap';
 // import Faq from '../../../platform/faq/client/faq.component';
 import Modal from 'react-bootstrap/Modal';
 import { getApplications } from './application.actions';
 import { useDispatch, useSelector } from "react-redux";
 import ApplicationForm from './application-form.component';
+import ApplicationDetailsModal from "./application-details.component";
 
 export default function ManageApplications() {
     const [modalShow, setModalShow] = useState({
@@ -15,7 +17,7 @@ export default function ManageApplications() {
         applicationDetails: false
     });
     const [isEditing, setIsEditing] = useState(false);
-    const [permissionSetDetailID, setPermissionSetDetailID] = useState(null);
+    // const [permissionSetDetailID, setPermissionSetDetailID] = useState(null);
     const [applicationId, setApplicationId] = useState(null);
     const [showFaq, setShowFaq] = useState(false);
     const dispatch = useDispatch();
@@ -36,12 +38,12 @@ export default function ManageApplications() {
         setIsEditing(false);
     }
 
-    const handlePermissionSetDetailHide = () => {
+    const handleApplicationDetailHide = () => {
         setModalShow({ ...modalShow, applicationDetails: false });
-        setPermissionSetDetailID(null);
+        setApplicationId(null);
     }
 
-    const handlepProfileEditClick = (data) => {
+    const handlepEditClick = (data) => {
         setIsEditing(true);
         setApplicationId(data.id);
         setModalShow({ ...modalShow, createApplication: true });
@@ -112,7 +114,32 @@ export default function ManageApplications() {
                                                 <td data-for="Description">{row.type}</td>
                                                 <td data-for="Is Active">{row.is_active ? 'Active' : 'Inactive'}</td>
                                                 <td data-for="Is Active">{row.description || '--'}</td>
-                                                <td data-for="Action"><button className="btn cdp-btn-outline-primary btn-xs-block btn-sm" onClick={() => handlepProfileEditClick(row)}> <i className="icon icon-edit-pencil pr-2"></i>Edit</button></td>
+                                                <td data-for="Action">
+                                                    <button className="btn cdp-btn-outline-primary btn-xs-block btn-sm" onClick={() => handlepEditClick(row)}>
+                                                    <i className="icon icon-edit-pencil pr-2"></i>Edit</button>
+                                                    <Dropdown className="dropdown-customize">
+                                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu>
+                                                            <LinkContainer to="#">
+                                                                <Dropdown.Item onClick={() => handlepEditClick(row)}>Edit</Dropdown.Item>
+                                                            </LinkContainer>
+                                                            <LinkContainer to="#">
+                                                                <Dropdown.Item
+                                                                    onClick={() => {
+                                                                        setApplicationId(row.id);
+                                                                        setModalShow({
+                                                                            ...modalShow,
+                                                                            applicationDetails: true
+                                                                        })}
+                                                                    }
+                                                                >
+                                                                    Details
+                                                                </Dropdown.Item>
+                                                            </LinkContainer>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -149,11 +176,11 @@ export default function ManageApplications() {
                                 />
                             </Modal.Body>
                         </Modal>
-                        {/* <PermissionSetDetailsModal
-                            permissionSetId={permissionSetDetailID}
+                        <ApplicationDetailsModal
+                            applicationId={applicationId}
                             show={modalShow.applicationDetails}
-                            onHide={handlePermissionSetDetailHide}
-                        /> */}
+                            onHide={handleApplicationDetailHide}
+                        />
                     </div>
                 </div>
             </div>
