@@ -172,7 +172,7 @@ async function sendForm(req, res) {
             attributes: ['metadata']
         });
 
-        const sendFormLink = JSON.parse(metaData[0].dataValues.metadata).request_notification_link;
+        const sendFormLink = metaData[0].dataValues.metadata.request_notification_link;
 
         await axios.post(sendFormLink, payload);
         res.json('Form sent successfully.');

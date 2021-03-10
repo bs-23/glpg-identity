@@ -269,22 +269,22 @@ async function getData(req, res) {
 
 async function clearApplicationCache() {
     try {
-        const applications = await Application.findAll({ where: { metadata: { [Op.like]: '%cache_clearing_url%' } } });
+        const applications = await Application.findAll();
         const maximumConcurrentCalls = 15;
         const tasks = [];
 
         const generatePostCaller = (url, requestBody) => async.reflect(async () => axios.post(url, requestBody));
 
         applications.forEach(app => {
+            const url = (app.metadata || {}).cache_clearing_url;
+
+            if(!url) return;
+
             const token = jwt.sign({
                 id: app.id
             }, app.auth_secret, {
                 expiresIn: '1h'
             });
-
-            const url = JSON.parse(app.metadata).cache_clearing_url;
-
-            if(!url) return;
 
             const requestBody = { jwt_token: token };
 

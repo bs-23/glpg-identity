@@ -52,12 +52,6 @@ const Application = sequelize.cdpConnector.define('applications', {
         allowNull: false,
         type: DataTypes.UUID
     },
-    approve_user_path: {
-        type: DataTypes.STRING,
-    },
-    logo_link: {
-        type: DataTypes.STRING
-    },
     is_active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true
@@ -69,7 +63,7 @@ const Application = sequelize.cdpConnector.define('applications', {
         type: DataTypes.UUID
     },
     metadata: {
-        type: DataTypes.STRING
+        type: DataTypes.JSON
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
