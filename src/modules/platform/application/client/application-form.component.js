@@ -16,10 +16,89 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
     const { addToast } = useToasts();
     const [application, setApplication] = useState({});
 
+    const convertMetadataToArray = (metadata) => {
+        if (!metadata) return [];
+
+        return Object
+            .keys(metadata)
+            .map(key => { return { key: key, value: metadata[key] } } );
+    }
+
+    const convertMetadataArrayToObject = (metadata) => {
+        if (!metadata) return {};
+
+        const metadataObject = {};
+
+        metadata.forEach((item) => {
+            metadataObject[item.key] = item.value;
+        })
+
+        return metadataObject;
+    }
+
+    const renderMetadata = (formikProps) => {
+        const { metadata } = formikProps.values;
+
+        if (!metadata) return null;
+
+        return <div>
+            <span onClick={() => {
+                const metadata = [...formikProps.values.metadata];
+                metadata.push({ key:'', value:'' });
+                formikProps.setFieldValue('metadata', metadata);
+            }}>
+                + Add Property
+            </span>
+            {
+                metadata.map((item, ind) => {
+                    return <div key={ind} className="row">
+                        <div className="col-5">
+                            <Field  // input field for key
+                                type="text"
+                                value={item.key}
+                                onChange={(e) => {
+                                    const updatedMetadataKey = e.target.value;
+                                    const updatedMetadata = [...formikProps.values.metadata];
+                                    updatedMetadata[ind]["key"] = updatedMetadataKey;
+                                    formikProps.setFieldValue('metadata', updatedMetadata);
+                                }}
+                            />
+                        </div>
+                        <div className="col-5">
+                            <Field  // input field for value
+                                type="text"
+                                value={item.value}
+                                onChange={(e) => {
+                                    const updatedMetadataValue = e.target.value;
+                                    const updatedMetadata = [...formikProps.values.metadata];
+                                    updatedMetadata[ind]["value"] = updatedMetadataValue;
+                                    formikProps.setFieldValue('metadata', updatedMetadata);
+                                }}
+                            />
+                        </div>
+                        <span
+                            onClick={() => {
+                                const updatedMetadata = formikProps.values.metadata.filter((item, index) => ind !== index);
+                                formikProps.setFieldValue('metadata', updatedMetadata);
+                            }}
+                            className="col-3"
+                        >
+                            X
+                        </span>
+                    </div>
+                })
+            }
+        </div>
+    }
+
     const handleSubmit = (values, actions) => {
+        const payload = { ...values };
+
+        payload.metadata = convertMetadataArrayToObject(values.metadata);
+
         const promise = isEditing
-            ? axios.put(`/api/applications/${applicationId}`, values)
-            : axios.post('/api/applications', values);
+            ? axios.put(`/api/applications/${applicationId}`, payload)
+            : axios.post('/api/applications', payload);
 
         promise.then(() => {
             const successMessage = isEditing
@@ -71,7 +150,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                             password: '',
                             confirm_password: '',
                             is_active: application.hasOwnProperty('is_active') ? application.is_active : true,
-                            metadata: application.metadata || ''
+                            metadata: convertMetadataToArray(application.metadata)
                         }}
                         displayName="ApplicationForm"
                         // validationSchema={applicationFormSchema}
@@ -123,6 +202,15 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                             <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor="last_name">Is Active</label>
                                                 <Field className="ml-2" checked={formikProps.values.is_active} name="is_active" type="checkbox" />
+                                                <div className="invalid-feedback"><ErrorMessage name="is_active"/></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12">
+                                        <div className="row col-12">
+                                            <div className="form-group">
+                                                <label className="font-weight-bold" htmlFor="last_name">Metadata</label>
+                                                {renderMetadata(formikProps)}
                                                 <div className="invalid-feedback"><ErrorMessage name="is_active"/></div>
                                             </div>
                                         </div>
