@@ -25,13 +25,13 @@ const ApplicationDetails = ({ applicationId }) => {
             </div>
             <div className="profile-detail__col pb-3">
                 <span className="mr-2 d-block profile-detail__label">Type</span>
-                <span className="profile-detail__value text-capitalize">{applicationDetails && applicationDetails.type ? applicationDetails.type : nullValueToken}</span>
+                <span className="profile-detail__value">{applicationDetails && applicationDetails.type ? applicationDetails.type : nullValueToken}</span>
             </div>
         </div>
         <div className="profile-detail__row pb-0 pb-sm-2 d-block d-sm-flex">
             <div className="profile-detail__col pb-3">
                 <span className="mr-2 d-block profile-detail__label">Is Active</span>
-                <span className="profile-detail__value">{applicationDetails && applicationDetails.is_active ? applicationDetails.is_active : false}</span>
+                <span className="profile-detail__value">{applicationDetails && applicationDetails.is_active ? 'Active' : 'Inactive'}</span>
             </div>
             <div className="profile-detail__col pb-3">
                 <span className="mr-2 d-block profile-detail__label">Metadata</span>
@@ -59,7 +59,7 @@ const ApplicationDetailsModal = ({ applicationId, show, onHide, ...rest }) => {
     >
         <Modal.Header closeButton>
             <Modal.Title id="example-custom-modal-styling-title">
-                Rights of this Permission Set
+                Application Details
             </Modal.Title>
         </Modal.Header>
         <Modal.Body>

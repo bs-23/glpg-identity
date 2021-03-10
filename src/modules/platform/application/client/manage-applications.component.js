@@ -115,8 +115,6 @@ export default function ManageApplications() {
                                                 <td data-for="Is Active">{row.is_active ? 'Active' : 'Inactive'}</td>
                                                 <td data-for="Is Active">{row.description || '--'}</td>
                                                 <td data-for="Action">
-                                                    <button className="btn cdp-btn-outline-primary btn-xs-block btn-sm" onClick={() => handlepEditClick(row)}>
-                                                    <i className="icon icon-edit-pencil pr-2"></i>Edit</button>
                                                     <Dropdown className="dropdown-customize">
                                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                                                         </Dropdown.Toggle>
@@ -151,7 +149,7 @@ export default function ManageApplications() {
                             <><div className="row justify-content-center mt-5 pt-5 mb-3">
                                 <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
                                     <i class="icon icon-team icon-6x cdp-text-secondary"></i>
-                                    <h3 className="font-weight-bold cdp-text-primary pt-4">No Profile Found!</h3>
+                                    <h3 className="font-weight-bold cdp-text-primary pt-4">No Application Found!</h3>
                                 </div>
                             </div></>
                         }
