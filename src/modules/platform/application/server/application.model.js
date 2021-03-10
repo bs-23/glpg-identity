@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const Sequelize = require('sequelize');
 
 const Application = sequelize.cdpConnector.define('applications', {
     id: {
@@ -50,7 +51,8 @@ const Application = sequelize.cdpConnector.define('applications', {
     },
     auth_secret: {
         allowNull: false,
-        type: DataTypes.UUID
+        type: DataTypes.UUID,
+        defaultValue: Sequelize.UUIDV4
     },
     is_active: {
         type: DataTypes.BOOLEAN,

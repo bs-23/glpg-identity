@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
 const async = require('async');
 const axios = require('axios');
-const crypto = require('crypto');
 
 const Application = require('./application.model');
 const Data = require('./data.model');
@@ -149,7 +148,6 @@ async function createApplication(req, res) {
             is_active,
             description,
             password,
-            auth_secret: 'e2a7f0f0-6915-4e58-996e-0388ded704f3',
             metadata
         });
 
