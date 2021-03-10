@@ -160,6 +160,7 @@ export default function ManageApplications() {
                             dialogClassName="modal-90w modal-customize"
                             aria-labelledby="example-custom-modal-styling-title"
                             centered
+                            size="xl"
                         >
                             <Modal.Header closeButton>
                                 <Modal.Title id="example-custom-modal-styling-title">
