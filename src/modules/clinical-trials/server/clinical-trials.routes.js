@@ -48,4 +48,6 @@ module.exports = app => {
 
     app.route('/api/clinical-trials-cdp/:ids')
         .get(CDPAuthStrategy, controller.getTrialDetails);
+    app.route('/api/clinical-trials-cdp/all-story-versions/:trial_fixed_id')
+        .get(CDPAuthStrategy, controller.getAllStoryVersions);
 };

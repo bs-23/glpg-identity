@@ -29,7 +29,8 @@ var update_stories =  function(trial_fixed_ids,story) {
 
 const StoryForm = (props) => {
     const [, setShow] = useState(false);
-    const detailsOfAllTrials = useSelector(state => state.clinicalTrialsReducer.clinialTrial_items.data.search_result)
+    const [storyVersions, setStoryVersions] = useState([]);
+    const [currentStory, setCurrentStory] = useState('');
     const { addToast } = useToasts();
     const dispatch = useDispatch();
     const [refresh, setRefresh] = useState(false);
@@ -37,6 +38,12 @@ const StoryForm = (props) => {
         setShow(false);
         props.changeShow(false);
     };
+    const [versionNo, setVersionNo] = useState(storyVersions.length);
+
+  const handleCategoryChange = (versionNo) => {
+     setVersionNo(versionNo);
+     setCurrentStory(storyVersions[versionNo-1].value);
+ }
 
     const showToast = (msg, type) => {
         addToast(msg, {
@@ -57,11 +64,24 @@ const StoryForm = (props) => {
             })
         };
     }
+
+    var getSelectedTrialStoryVersions =  function(trial_fixed_id) {
+        const url = `/api/clinical-trials-cdp/all-story-versions/${trial_fixed_id}`;
+    
+        return {
+            payload: axios({
+                method: 'get',
+                url
+            }).then(out=>{setStoryVersions(out.data.data)})
+        };
+    }
+    
     const [selectedTrialDetails, setSelectedTrialDetails] = useState({data:{data:[]}});
     useEffect(()=>{
         getSelectedTrialDetails();
+        if(props.selectedTrials.length == 1) getSelectedTrialStoryVersions(props.selectedTrials[0]);
     },[]);
-
+   
     return (
         <Modal size="lg" centered show={props.show} onHide={handleClose}>
             <Modal.Header closeButton>
@@ -73,9 +93,8 @@ const StoryForm = (props) => {
                     <Formik
                         initialValues={{
                             trials: props.addMode ? props.addData.trials : [],
-                            version: props.addMode ? props.addData.version : 'v1',
-                            story: props ? parse(props.story) : '',
-                            story_plaintext: props ? parse(props.addData.story) : ''
+                             story: props.selectedTrials.length == 1 ? parse(props.story) : '',
+                             story_plaintext: props.selectedTrials.length == 1 ? parse(props.story) : ''
                         }}
                         //validationSchema={faqSchema}
                         displayName="StoryForm"
@@ -119,12 +138,6 @@ const StoryForm = (props) => {
                                 <Modal.Body className="p-4">
                                     <div className="row">
                                         <div className="col-12">
-                                            {/* <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor='title'> Title of the Story <span className="text-danger">*</span></label>
-                                                <Field className="form-control preference" type='text' name='title' id='title' />
-                                                <div className="invalid-feedback"><ErrorMessage name="title" /></div>
-                                            </div> */}
-
                                             <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor='topics'>Selected Clinical Trials <span className="text-danger">*</span></label>
                                                 <div className= "border rounded tree-view-main">
@@ -132,7 +145,13 @@ const StoryForm = (props) => {
                                                     {/* {selectedTrialDetails.data}   {detailsOfAllTrials.filter(item=> props.selectedTrials.includes(item.trial_fixed_id))}/> */}
                                                 </div>
                                             </div>
-                                            
+                                            {props.selectedTrials.length==1 && <select name="version" value={versionNo} onChange={event => handleCategoryChange(event.target.value)}>
+                                                {Array.from(Array(storyVersions.length).keys()).reverse().map(key=>{
+                                                    return (<option id={key} >{key+1}</option>)
+                                                })
+                                                }
+                                            </select>}
+                                            <span>{currentStory}</span>
 
                                             <div className="form-group pt-3">
                                                 <label className="font-weight-bold" htmlFor='story'>Write a Story <span className="text-danger">*</span></label>

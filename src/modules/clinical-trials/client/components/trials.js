@@ -23,6 +23,17 @@ var dumpData =  function() {
     };
 }
 
+var getbSelectedTrialsStoryVersions =  function(trial_fixed_id) {
+    const url = `/api/clinical-trials-cdp/all-story-versions/${trial_fixed_id}`;
+
+    return {
+        payload: axios({
+            method: 'get',
+            url
+        }).then(out=>console.log(out))
+    };
+}
+
 var showAllVersions =  function() {
     const url = `/api/clinical-trials/versions`;
 
@@ -196,7 +207,7 @@ const ClinicalTrials = (props) => {
                 setSelectedTrials(arr);
                 checkUncheck(trial_fixed_ids,false);
                 checkUncheck([trial_fixed_id], true);
-                console.log('after insert in unmarked region: ',selectedTrials);
+               // console.log('after insert in unmarked region: ',selectedTrials);
             }
         }
 
@@ -207,13 +218,11 @@ const ClinicalTrials = (props) => {
                 const arr = selectedTrials;
                 arr.push(trial_fixed_ids);
                 setSelectedTrials(arr);
-                console.log('after insert: ',selectedTrials);
             }
             else
             {
                 const arr = selectedTrials.filter(item => item !== trial_fixed_ids);
                 setSelectedTrials(arr);
-                console.log('after remove: ',selectedTrials);
             }
     }
 
@@ -227,6 +236,7 @@ const ClinicalTrials = (props) => {
     },[show]);
 
     const [filteredTopic, setFilter] = useState('All');
+    const [filteredPhase, setPhaseFilter] = useState('All');
     const [story, setStory] = useState('write a story');
     const topic = false;
    
@@ -282,14 +292,26 @@ const ClinicalTrials = (props) => {
                                             }
                                         </Dropdown.Menu>
                                 </Dropdown>
+                                <Dropdown className="ml-auto dropdown-customize">
+                                        <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
+                                            <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i> <span className="d-none d-sm-inline-block">{filteredPhase==='All' ? 'Filter' : filteredPhase}</span>
+                                        </Dropdown.Toggle>
+                                        <Dropdown.Menu>
+                                            {filteredPhase!=='All' && <Dropdown.Item href={`#`} onClick={()=>{setPhaseFilter('All');}}>All</Dropdown.Item>}
+                                            {filteredPhase!=='Phase 2' && <Dropdown.Item href={`#`} onClick={()=>{setPhaseFilter('Phase 2')}}>Phase 2</Dropdown.Item>}
+                                            {filteredPhase!=='Phase 3' && <Dropdown.Item href={`#`} onClick={()=>{setPhaseFilter('Phase 3')}}>Phase 3</Dropdown.Item>}
+                                            {filteredPhase!=='Phase 4' && <Dropdown.Item href={`#`} onClick={()=>{setPhaseFilter('Phase 4')}}>Phase 4</Dropdown.Item>}
+                
+                                        </Dropdown.Menu>
+                                </Dropdown>
 
                                 
-                                <button className={`btn  ${isFilterEnabled ? 'multifilter_enabled cdp-btn-primary text-white' : 'cdp-btn-outline-primary'}`} onClick={() => setShowFilterSidebar(true)} >
+                                {/* <button className={`btn  ${isFilterEnabled ? 'multifilter_enabled cdp-btn-primary text-white' : 'cdp-btn-outline-primary'}`} onClick={() => setShowFilterSidebar(true)} >
                                     <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
                                     <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
                                     Filter
-                                </button>
-                                {
+                                </button> */}
+                                {/* {
                                     isFilterEnabled &&
                                     <button
                                         className={`btn cdp-btn-outline-secondary ml-2 ${isFilterEnabled ? 'multifilter_enabled' : ''}`}
@@ -299,7 +321,7 @@ const ClinicalTrials = (props) => {
                                         <i className={`fas fa-times ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
                                         Reset
                                     </button>
-                                }
+                                } */}
                             </div>
                         </div>
 
@@ -338,7 +360,7 @@ const ClinicalTrials = (props) => {
                                             </tr>
                                         </thead>
                                         <tbody className="cdp-table__body bg-white">
-                                            {trialItems.clinialTrial_items.data.search_result.map((row, idx) =>{return (row.indication_group ===filteredTopic || filteredTopic ==='All' ) ? (   
+                                            {trialItems.clinialTrial_items.data.search_result.map((row, idx) =>{return ((row.indication_group ===filteredTopic || filteredTopic ==='All') && (row.phase ===filteredPhase || filteredPhase ==='All') ) ? (   
                                                 <tr key={'user-' + idx}>
                                                     <td>
                                                         <div className="custom-control custom-checkbox">
@@ -375,12 +397,12 @@ const ClinicalTrials = (props) => {
                                                     <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle"></Dropdown.Toggle>
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item onClick={() => { setShow(true); setAddMode(true); setStory(row.story_telling); selectedUnmarkedTrial(row.trial_fixed_id)}}>
-                                                            Write Story
-                                                        </Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => { setShow(true); setAddMode(false); setStory(row.story_telling);}}>
                                                             Edit Story
                                                         </Dropdown.Item>
-                                                        <Dropdown.Item className="text-danger bg-white" onClick={() => { setShowDelete(true); setDeleteId(row.id); }}>Delete</Dropdown.Item>
+                                                        {/* <Dropdown.Item onClick={() => { setShow(true); setAddMode(false); setStory(row.story_telling);}}>
+                                                            Write Story
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item className="text-danger bg-white" onClick={() => { setShowDelete(true); setDeleteId(row.id); }}>Delete</Dropdown.Item> */}
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
 
@@ -549,7 +571,7 @@ const ClinicalTrials = (props) => {
                     <button onClick={showAllClinicalTrials}>Show All Clinical Trials</button>
                     <button onClick={update_clinicalTrials}>Update Clinical Trials</button>
                     <button onClick={getClinicalTrialDetails}>Show trial details</button>
-                    <button onClick={()=>{checkUncheck('NCT04578548',true)}}>Check Uncheck</button>
+                    <button onClick={()=>{getbSelectedTrialsStoryVersions('bf3fcdd9-2c14-4a1e-b02c-787c379c0aa9')}}>Story Versions</button>
                     
                 </div>
                 <div class="tooltip">Hover over me

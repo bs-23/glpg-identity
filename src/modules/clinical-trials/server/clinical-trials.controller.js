@@ -448,6 +448,13 @@ async function mergeProcessData(req, res) {
                     ignoreDuplicates: false, 
                     include: { model: Location, as: 'locations' }
                 });
+        let filterdArray = data.reduce((dataItem,{trial_fixed_id,story_telling}) => [...dataItem,{trial_fixed_id,value:story_telling,version:1}],[]);
+        await Story.bulkCreate(filterdArray,
+            {
+                returning: true,
+                ignoreDuplicates: false
+            });
+        
         }
 
         if (!result) {
@@ -632,6 +639,34 @@ async function getTrials(req, res) {
            search_result: freetext_search_result,
            total_count: freetext_search_result.length
         }
+        res.json(response);
+    } catch (err) {
+        logger.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
+async function getAllStoryVersions(req, res) {
+    const response = new Response({}, []);
+    res.set({ 'content-type': 'application/json; charset=utf-8' });
+    try {
+        if (!req.params.trial_fixed_id) {
+            return res.status(400).send('Invalid request.');
+        }
+
+        let result = await Story.findAll({
+            where: {
+                trial_fixed_id: req.params.trial_fixed_id
+            }
+        });
+
+        if (!result) {
+            response.data = [];
+            return res.status(204).send(response);
+        }
+
+        response.data = result;
         res.json(response);
     } catch (err) {
         logger.error(err);
@@ -962,3 +997,4 @@ exports.validateAddress = validateAddress;
 exports.syncGeoCodes = syncGeoCodes;
 exports.updateClinicalTrials = updateClinicalTrials;
 exports.updateStories = updateStories ;
+exports.getAllStoryVersions = getAllStoryVersions ;
