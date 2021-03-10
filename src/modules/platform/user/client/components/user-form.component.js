@@ -1,14 +1,14 @@
-import axios from "axios";
-import { useDispatch } from "react-redux";
-import { NavLink, useHistory } from 'react-router-dom';
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { Form, Formik, Field, ErrorMessage } from "formik";
-import { createUser } from "../user.actions";
-import { registerSchema } from "../user.schema";
-import { useToasts } from "react-toast-notifications";
-import Dropdown from 'react-bootstrap/Dropdown';
+import { useDispatch, useSelector } from 'react-redux';
+import { NavLink, useHistory } from 'react-router-dom';
 import PhoneNumber from 'awesome-phonenumber';
-import { desiredCountryList } from './my-profile/country-info';
+import Dropdown from 'react-bootstrap/Dropdown';
+import { useToasts } from 'react-toast-notifications';
+import { Form, Formik, Field, ErrorMessage } from 'formik';
+import { createUser } from '../user.actions';
+import { registerSchema } from '../user.schema';
+
 export default function UserForm() {
     const dispatch = useDispatch();
     const [selectedCountryCode, setSelectedCountryCode] = useState(0);
@@ -18,16 +18,19 @@ export default function UserForm() {
     const history = useHistory();
     const { addToast } = useToasts();
 
+    const desiredCountryList = useSelector(state => state.phoneExtensionReducer.phone_extensions);
+
     useEffect(() => {
         async function getProfile() {
             const response = await axios.get('/api/profiles');
             setProfiles(response.data.filter(item => item.slug !== 'system_admin'));
         }
+
         async function getRole() {
             const response = await axios.get('/api/roles');
             setRoles(response.data);
-
         }
+
         getProfile();
         getRole();
     }, []);
@@ -36,7 +39,7 @@ export default function UserForm() {
         const phoneNumberCountryISO = new PhoneNumber(phoneNumber).getRegionCode();
         let selectedCountry = desiredCountryList.find(country => country.countryCode === phoneNumberCountryISO);
         return selectedCountry === undefined ? null : selectedCountry;
-    }
+    };
 
     return (
         <main className="app__content">
@@ -110,33 +113,31 @@ export default function UserForm() {
                                                                         <div className="input-group phone-input">
                                                                             <span className="input-group-btn">
                                                                                 <Dropdown>
-                                                                                    {
-                                                                                    desiredCountryList.map((country, index) => {
+                                                                                    { desiredCountryList.map((country, index) => {
                                                                                         return (index === selectedCountryCode ?
                                                                                             <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
-                                                                                                <span height="20" width="25">{
-                                                                                                        editFlag(formikProps.values.phone) === null ? 'Select' : editFlag(formikProps.values.phone).flag } </span>
-                                                                                                <span className="country-phone-code pl-1">{editFlag(formikProps.values.phone) === null ? "" : editFlag(formikProps.values.phone).countryCode }</span>
-                                                                                            </Dropdown.Toggle> : null)
-                                                                                    })
-                                                                                    }
+                                                                                                <span height="20" width="25"> {
+                                                                                                    editFlag(formikProps.values.phone) === null ? 'Select' : editFlag(formikProps.values.phone).flag } </span>
+                                                                                                <span className="country-phone-code pl-1">
+                                                                                                    {editFlag(formikProps.values.phone) === null ? "" : editFlag(formikProps.values.phone).countryCode }
+                                                                                                </span>
+                                                                                            </Dropdown.Toggle> : null);
+                                                                                    })}
                                                                                     <Dropdown.Menu>
-                                                                                        {
-                                                                                        desiredCountryList.map((country, index) => {
+                                                                                        { desiredCountryList.map((country, index) => {
                                                                                             return index === selectedCountryCode ? null :
-                                                                                                    (<Dropdown.Item onClick={() => {
-                                                                                                        setSelectedCountryCode(index);
-                                                                                                        const countryCode = country.countryCallingCode;
-                                                                                                        formikProps.setFieldValue('country_code', countryCode);
-                                                                                                        formikProps.setFieldValue('phone', `+${countryCode}`);
-                                                                                                        phoneFieldRef.focus();
-                                                                                                    }} key={index} className="px-2 d-flex align-items-center">
-                                                                                                        <span height="20" width="20">{country.flag} </span>
-                                                                                                        <span className="country-name pl-2">{country.countryNameEn}</span>
-                                                                                                        <span className="country-phone-code pl-1">{`+${country.countryCallingCode}`}</span>
-                                                                                                    </Dropdown.Item>)
-                                                                                            })
-                                                                                        }
+                                                                                                (<Dropdown.Item onClick={() => {
+                                                                                                    setSelectedCountryCode(index);
+                                                                                                    const countryCode = country.countryCallingCode;
+                                                                                                    formikProps.setFieldValue('country_code', countryCode);
+                                                                                                    formikProps.setFieldValue('phone', `+${countryCode}`);
+                                                                                                    phoneFieldRef.focus();
+                                                                                                }} key={index} className="px-2 d-flex align-items-center">
+                                                                                                    <span height="20" width="20">{country.flag} </span>
+                                                                                                    <span className="country-name pl-2">{country.countryNameEn}</span>
+                                                                                                    <span className="country-phone-code pl-1">{`+${country.countryCallingCode}`}</span>
+                                                                                                </Dropdown.Item>)
+                                                                                        })}
                                                                                     </Dropdown.Menu>
                                                                                 </Dropdown>
                                                                             </span>
@@ -147,7 +148,6 @@ export default function UserForm() {
                                                                         <ErrorMessage name="phone" data-testid="phoneError" />
                                                                     </div>
                                                                 </div>
-
                                                             </div>
                                                             <div className="col-12 col-sm-6">
                                                                 <div className="form-group">
