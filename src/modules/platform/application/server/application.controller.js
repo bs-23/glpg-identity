@@ -94,7 +94,7 @@ async function getToken(req, res) {
 async function getApplications(req, res) {
     try {
         const applications = await Application.findAll({
-            attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description']
+            attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description', 'created_at']
         });
 
         res.json(applications);

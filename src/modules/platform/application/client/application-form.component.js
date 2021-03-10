@@ -195,11 +195,6 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                         </div>
                                     </div>
                                     <div className="col-12">
-                                        <div className="row">
-                                            <FormField label="Description" type="text" name="description" component="textarea" required={false} />
-                                        </div>
-                                    </div>
-                                    <div className="col-12">
                                         <div className="row col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor="last_name">Is Active</label>
@@ -215,6 +210,11 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                                 {renderMetadata(formikProps)}
                                                 <div className="invalid-feedback"><ErrorMessage name="is_active"/></div>
                                             </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12">
+                                        <div className="row">
+                                            <FormField label="Description" type="text" name="description" component="textarea" required={false} />
                                         </div>
                                     </div>
                                     <div className="col-12">
