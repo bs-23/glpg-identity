@@ -62,7 +62,7 @@ export default function ManageApplications() {
                             <ol className="rounded-0 m-0 p-0 d-none d-sm-flex">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/platform">Management of Customer Data Platform</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Manage Applications</span></li>
+                                <li className="breadcrumb-item active"><span>Manage Service Accounts</span></li>
                             </ol>
                             <Dropdown className="dropdown-customize breadcrumb__dropdown d-block d-sm-none ml-2">
                                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center border-0">
@@ -87,9 +87,9 @@ export default function ManageApplications() {
                 <div className="row">
                     <div className="col-12 col-sm-12">
                         <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel">
-                            <h4 className="cdp-text-primary font-weight-bold mb-0">Manage Applications</h4>
+                            <h4 className="cdp-text-primary font-weight-bold mb-0">Manage Service Accounts</h4>
                             <button className="btn cdp-btn-secondary text-white ml-auto " onClick={() => setModalShow({ ...modalShow, createApplication: true })}>
-                                <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Add New Application</span>
+                                <i className="icon icon-plus pr-1"></i> Add New Service Account
                             </button>
                         </div>
 
@@ -98,22 +98,22 @@ export default function ManageApplications() {
                             <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
-                                            <th width="20%" className="py-2">Title</th>
+                                            <th width="20%" className="py-2">Name</th>
                                             <th width="20%" className="py-2">Email</th>
                                             <th width="10%" className="py-2">Type</th>
                                             <th width="10%" className="py-2">Is Active</th>
                                             <th width="30%" className="py-2">Description</th>
-                                            <th width="20%" className="py-2">Action</th>
+                                            <th width="20%" className="py-2">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
                                         {applications.map(row => (
                                             <tr key={row.id}>
                                                 <td data-for="Title">{row.name}</td>
-                                                <td data-for="Email">{row.email}</td>
-                                                <td data-for="Type">{row.type}</td>
+                                                <td data-for="Type">{row.email}</td>
+                                                <td data-for="Description">{row.type}</td>
                                                 <td data-for="Is Active">{row.is_active ? 'Active' : 'Inactive'}</td>
-                                                <td data-for="Description">{row.description || '--'}</td>
+                                                <td data-for="Is Active">{row.description || '--'}</td>
                                                 <td data-for="Action">
                                                     <Dropdown className="dropdown-customize">
                                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
@@ -163,7 +163,7 @@ export default function ManageApplications() {
                         >
                             <Modal.Header closeButton>
                                 <Modal.Title id="example-custom-modal-styling-title">
-                                    {isEditing ? "Update Profile" : "Create New Profile"}
+                                    {isEditing ? "Update Profile" : "Create New Application"}
                                 </Modal.Title>
                             </Modal.Header>
                             <Modal.Body>

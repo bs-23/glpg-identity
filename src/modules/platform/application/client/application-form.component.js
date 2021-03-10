@@ -169,19 +169,19 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                     </div>
                                     <div className="col-12">
                                         <div className="row">
-                                            <FormField label="email" type="email" name="email" />
+                                            <FormField label="Email" type="email" name="email" />
                                         </div>
                                     </div>
-                                    <div className="col-12">
+                                    {!isEditing && <div className="col-12">
                                         <div className="row">
                                             <FormField label="Password" type="password" name="password" />
                                         </div>
-                                    </div>
-                                    <div className="col-12">
+                                    </div>}
+                                    {!isEditing && <div className="col-12">
                                         <div className="row">
                                             <FormField label="Confirm Password" type="password" name="confirm_password" />
                                         </div>
-                                    </div>
+                                    </div>}
                                     <div className="col-12">
                                         <div className="row col-12">
                                             <div className="form-group">
