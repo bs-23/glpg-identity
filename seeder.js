@@ -360,6 +360,7 @@ async function init() {
                     type: 'hcp-portal',
                     email: 'hcp-portal@glpg.com',
                     password: 'P@ssword123',
+                    is_active: true,
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
                     metadata: {
                         approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
@@ -376,6 +377,7 @@ async function init() {
                     type: 'hcp-portal',
                     email: 'jyseleca@glpg.com',
                     password: 'P@ssword123',
+                    is_active: true,
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
                     metadata: {
                         cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-brandx/clear/author-publish-cache",
@@ -391,6 +393,8 @@ async function init() {
                     slug: convertToSlug('Clinical Trials'),
                     email: 'clinical-trial-portal@glpg.com',
                     password: 'P@ssword123',
+                    type: 'standard',
+                    is_active: true,
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
                     metadata: {
                         approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
@@ -405,6 +409,8 @@ async function init() {
                     slug: convertToSlug('Patients Organization'),
                     email: 'patients-organization@glpg.com',
                     password: 'P@ssword123',
+                    type: 'standard',
+                    is_active: true,
                     auth_secret: 'b248eaa4-583f-4ecd-9e9c-be8f58ab3c3e',
                     created_by: admin.id,
                     updated_by: admin.id,

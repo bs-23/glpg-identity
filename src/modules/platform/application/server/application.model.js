@@ -24,7 +24,7 @@ const Application = sequelize.cdpConnector.define('applications', {
     },
     type: {
         type: DataTypes.ENUM,
-        values: ['hcp-portal']
+        values: ['standard', 'hcp-portal']
     },
     // scope: {
     //     type: DataTypes.ARRAY(DataTypes.STRING)
@@ -56,7 +56,7 @@ const Application = sequelize.cdpConnector.define('applications', {
     },
     is_active: {
         type: DataTypes.BOOLEAN,
-        defaultValue: true
+        defaultValue: false
     },
     created_by: {
         type: DataTypes.UUID

@@ -40,6 +40,11 @@ async function getToken(req, res) {
         if(grant_type === 'password') {
             application = await Application.findOne({ where: { email: username } });
 
+            if (!application.is_active) {
+                response.errors.push(new CustomError('Request denied.', 400));
+                return res.status(400).send(response);
+            }
+
             if (!application || !application.validPassword(password)) {
                 response.errors.push(new CustomError('Invalid username or password.', 401));
             } else {
@@ -54,6 +59,11 @@ async function getToken(req, res) {
             try {
                 const decoded = jwt.verify(refresh_token, nodecache.getValue('APPLICATION_REFRESH_SECRET'));
                 application = await Application.findOne({ where: { id: decoded.id } });
+
+                if (!application.is_active) {
+                    response.errors.push(new CustomError('Request denied.', 400));
+                    return res.status(400).send(response);
+                }
 
                 if(application.refresh_token !== refresh_token) {
                     response.errors.push(new CustomError('The refresh_token is invalid.', 4401));
@@ -166,14 +176,11 @@ async function updateApplication(req, res) {
             email,
             is_active,
             description,
-            password,
-            confirm_password,
             metadata
         } = req.body;
 
         const application_id = req.params.id;
 
-        if (password !== confirm_password) return res.status(400).send('Password and confirm password not found.');
 
         const application = await Application.findOne({
             where: { id: application_id }
@@ -197,7 +204,6 @@ async function updateApplication(req, res) {
             email,
             is_active,
             description,
-            password,
             metadata
         });
 
