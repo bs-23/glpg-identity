@@ -115,7 +115,7 @@ export default function UserForm() {
                                                                                         return (index === selectedCountryCode ?
                                                                                             <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
                                                                                                 <span height="20" width="25">{
-                                                                                                        editFlag(formikProps.values.phone) === null ? 'Select' : editFlag(formikProps.values.phone).flag } </span>
+                                                                                                editFlag(formikProps.values.phone) === null ? 'Select' : editFlag(formikProps.values.phone).flag } </span>
                                                                                                 <span className="country-phone-code pl-1">{editFlag(formikProps.values.phone) === null ? "" : editFlag(formikProps.values.phone).countryCode }</span>
                                                                                             </Dropdown.Toggle> : null)
                                                                                     })

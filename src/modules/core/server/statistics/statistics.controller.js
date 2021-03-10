@@ -7,11 +7,13 @@ const HCPS = require(path.join(process.cwd(), 'src/modules/information/hcp/serve
 
 async function getStatistics(req, res){
     try{
-        const total_consents = await HcpConsents.count({});
-        const hot_statistics = {
-            consents: 0
+        const total_consents = await HcpConsents.count();
+        const total_hcps = await HCPS.count();
+        const statistics = {
+            consents: total_consents,
+            hcps: total_hcps
         }
-        res.json(hot_statistics);
+        res.json(statistics);
     }
     catch (err) {
         logger.error(err);

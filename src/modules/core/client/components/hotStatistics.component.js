@@ -1,15 +1,14 @@
 import { countBy } from 'lodash-es';
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { getStatistics } from '../../client/statistics/statistics.actions';
+import { getHotStatistics } from '../../client/statistics/statistics.actions';
 export default function HotStatistic() {
     const dispatch = useDispatch();
     const [show, setShow] = React.useState();
-    let hcps = useSelector(state => state.hcpReducer.hcps);
-    console.log("hcps: ", )
+    let statistics = useSelector(state => state.statisticsReducer.statistics);
 
     useEffect(() => {
-        dispatch(getStatistics());
+        dispatch(getHotStatistics());
     }, []);
     return (
         <div className={`faq shadow-sm bg-white ${show ? "cdp-inbox__expand" : ""}`}>
@@ -23,7 +22,7 @@ export default function HotStatistic() {
                 <div className="row">
                     <div className="col-4 hot-statistics__box">
                         <div className="hot-statistics__title">Total HCP User</div>
-                        <div className="hot-statistics__amount">{hcps.total}</div>
+                        <div className="hot-statistics__amount">{statistics.hcps}</div>
                         </div>
                     <div className="col-4 hot-statistics__box">
                         <div className="hot-statistics__title">Total Personal Tag</div>
@@ -39,7 +38,7 @@ export default function HotStatistic() {
                        </div>
                     <div className="col-4 hot-statistics__box">
                         <div className="hot-statistics__title"> Total Consents</div>
-                        <div className="hot-statistics__amount">0</div>
+                        <div className="hot-statistics__amount">{statistics.consents}</div>
                         </div>
                     <div className="col-4 hot-statistics__box"></div>
                 </div>

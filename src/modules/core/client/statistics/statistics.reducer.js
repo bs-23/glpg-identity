@@ -5,11 +5,13 @@ const initialState = {
 export default function reducer(state = initialState, action) {
     switch (action.type) {
         case Types.GET_STATISTICS_FULFILLED: {
+            console.log(action.payload.data)
             return {
                 ...state,
                 statistics: action.payload.data
             };
         }
+
     }
     return state;
 }
