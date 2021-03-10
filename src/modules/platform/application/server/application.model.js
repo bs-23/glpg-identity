@@ -25,6 +25,9 @@ const Application = sequelize.cdpConnector.define('applications', {
         type: DataTypes.ENUM,
         values: ['hcp-portal']
     },
+    // scope: {
+    //     type: DataTypes.ARRAY(DataTypes.STRING)
+    // },
     email: {
         unique: true,
         allowNull: false,
@@ -32,6 +35,9 @@ const Application = sequelize.cdpConnector.define('applications', {
         validate: {
             isEmail: true
         }
+    },
+    description: {
+        type: DataTypes.STRING
     },
     password: {
         type: DataTypes.STRING,

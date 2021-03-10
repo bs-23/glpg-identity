@@ -3,12 +3,15 @@ const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
 const async = require('async');
 const axios = require('axios');
+const crypto = require('crypto');
 
 const Application = require('./application.model');
 const Data = require('./data.model');
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
+
+const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -82,11 +85,125 @@ async function getToken(req, res) {
 async function getApplications(req, res) {
     try {
         const applications = await Application.findAll({
-            attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug']
+            attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description']
         });
 
         res.json(applications);
 
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getApplication(req, res) {
+    try {
+        const application = await Application.findOne({
+            where: { id: req.params.id },
+            attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description']
+        });
+
+        res.json(application);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function createApplication(req, res) {
+    try {
+        const {
+            name,
+            type,
+            email,
+            is_active,
+            description,
+            password,
+            confirm_password,
+            metadata
+        } = req.body;
+
+        if (!email) return res.status(400).send('Must provide email.');
+
+        if (!password || !confirm_password) return res.status(400).send('Must provide password and confirm password.');
+
+        if (password !== confirm_password) return res.status(400).send('Password and confirm password do not match.');
+
+        const hasApplicationWithSameName = await Application.findOne({
+            where: { name: { [Op.iLike]: name } }
+        });
+
+        if (hasApplicationWithSameName) return res.status(400).send('Application with the same name already exists.');
+
+        const hasApplicationWithSameEmail = application = await Application.findOne({
+            where: { email: { [Op.iLike]: email } }
+        });
+
+        if (hasApplicationWithSameEmail) return res.status(400).send('Application with the same email already exists.');
+
+        await Application.create({
+            name,
+            slug: convertToSlug(name),
+            type: type || null,
+            email,
+            is_active,
+            description,
+            password,
+            auth_secret: 'e2a7f0f0-6915-4e58-996e-0388ded704f3',
+            metadata
+        });
+
+        res.json(application);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function updateApplication(req, res) {
+    try {
+        const {
+            name,
+            type,
+            email,
+            is_active,
+            description,
+            password,
+            confirm_password,
+            metadata
+        } = req.body;
+
+        const application_id = req.params.id;
+
+        if (password !== confirm_password) return res.status(400).send('Password and confirm password not found.');
+
+        const application = await Application.findOne({
+            where: { id: application_id }
+        });
+
+        if (!application) return res.status(400).send('Application not found.');
+
+        const hasSameName = await Application.findOne({
+            where: {
+                id: { [Op.ne]: application_id },
+                name: { [Op.iLike]: name }
+            }
+        })
+
+        if (hasSameName) return res.status(400).send('Application with the same name already exists.');
+
+        await application.update({
+            name,
+            slug: convertToSlug(name),
+            type: type || null,
+            email,
+            is_active,
+            description,
+            password,
+            metadata
+        });
+
+        res.json(application);
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
@@ -188,3 +305,6 @@ exports.getApplications = getApplications;
 exports.saveData = saveData;
 exports.getData = getData;
 exports.clearApplicationCache = clearApplicationCache;
+exports.createApplication = createApplication;
+exports.getApplication = getApplication;
+exports.updateApplication = updateApplication;
