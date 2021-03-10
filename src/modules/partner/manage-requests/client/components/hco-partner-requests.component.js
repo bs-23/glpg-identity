@@ -10,7 +10,7 @@ import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchemaForHcos } from '../manage-requests.schema'
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
 import SearchHcoModal from './search-hco-modal.component';
-import { getLocalizations } from '../../../../core/client/localizations/localizations.actions';
+import { getLocalizations } from '../../../../core/client/localization/localization.actions';
 
 const HcoPartnerRequests = () => {
     const dispatch = useDispatch();

@@ -10,7 +10,7 @@ import { Faq } from '../../../../platform';
 import { partnerRequestSchemaForHcps } from '../manage-requests.schema'
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
 import SearchHcpModal from './search-hcp-modal.component';
-import { getLocalizations } from '../../../../core/client/localizations/localizations.actions';
+import { getLocalizations } from '../../../../core/client/localization/localization.actions';
 
 const HcpPartnerRequests = () => {
     const dispatch = useDispatch();

@@ -2,7 +2,8 @@ import React from "react";
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../../platform';
 import Inbox from '../../../../core/client/components/inbox.component';
-import HotStatistic from '../../../../core/client/components/hotStatistics.component';
+import HotStatistic from '../../../../core/client/statistics/statistics.component';
+
 export default function Dashboard() {
     return (
         <main className="app__content cdp-light-bg">

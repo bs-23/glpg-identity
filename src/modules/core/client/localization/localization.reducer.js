@@ -1,4 +1,4 @@
-import Types from './localizations.types';
+import Types from './localization.types';
 
 const initialState = {
     localizations: []

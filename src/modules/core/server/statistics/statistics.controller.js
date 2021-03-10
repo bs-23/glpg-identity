@@ -1,25 +1,29 @@
 const path = require('path');
-const { QueryTypes } = require('sequelize');
-const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
-const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
-const HCPS = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-profile.model'));
+const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model'));
+const HCP = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-profile.model'));
+const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
+const HcpConsent = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
 
-async function getStatistics(req, res){
-    try{
-        const total_consents = await HcpConsents.count();
-        const total_hcps = await HCPS.count();
+async function getStatistics(req, res) {
+    try {
+        const users_count = await User.count();
+        const hcps_count = await HCP.count();
+        const consents_count = await Consent.count();
+        const captured_consents_count = await HcpConsent.count();
+
         const statistics = {
-            consents: total_consents,
-            hcps: total_hcps
-        }
+            hcps_count,
+            users_count,
+            consents_count,
+            captured_consents_count
+        };
+
         res.json(statistics);
-    }
-    catch (err) {
+    } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
     }
-
 }
 
 exports.getStatistics = getStatistics;
