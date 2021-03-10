@@ -35,7 +35,7 @@ const VendorPartnerRequests = () => {
     }
 
     const userCountries = useSelector(state => state.userReducer.loggedInUser.countries);
-    const localizations = useSelector(state => state.localizationsReducer.localizations);
+    const localizations = useSelector(state => state.localizationReducer.localizations);
 
     const partnerTypes = ['SUPL', 'CUST', 'HCP', 'HCO', 'POR', 'ZVST'];
     const [requestToDelete, setRequestToDelete] = useState(null);
