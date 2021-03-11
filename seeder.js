@@ -362,9 +362,9 @@ async function init() {
                     password: 'P@ssword123',
                     is_active: true,
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
+                    logo_url: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                     metadata: {
                         approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
-                        logo_url: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                         cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-hcpportal/clear/author-publish-cache"
                     },
                     created_by: admin.id,
@@ -379,9 +379,9 @@ async function init() {
                     password: 'P@ssword123',
                     is_active: true,
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
+                    logo_url: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
                     metadata: {
                         cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-brandx/clear/author-publish-cache",
-                        logo_url: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
                         approve_user_path: '/bin/public/glpg-brandx/mail/approve-user'
                     },
                     created_by: admin.id,
