@@ -186,6 +186,10 @@ function uuid() {
     });
 }
 
+function properDrugTypeName(drugName) {
+    return drugName === 'GLPG0634' ? 'Filgotinib' : drugName.capitalize();
+}
+
 function groupIndications(indication) {
     switch(indication){
         case 'Ankylosing Spondylitis':
@@ -326,8 +330,8 @@ function genderInputTextMapping(gender) {
                 return '';
                 break;
         }
-    })[0] : null;
-    return gender;
+    }) : null;
+    return gender && gender.length? gender.reduce((a,b)=> [...a,...b] ): gender;
 }
 
 async function dumpAllData(req, res) {
@@ -531,7 +535,7 @@ async function mergeProcessData(req, res) {
                             return '';
                         }
                     })(),
-                    'type_of_drug': element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList && element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.length ? element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention[0].InterventionName: null,
+                    'type_of_drug': element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList && element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.length ? properDrugTypeName(element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention[0].InterventionName): null,
                     'story_telling': 'In this trial, doctors hope to find out how the study drug works together with your current standard treatment in terms of its effects on your lung function and IPF in general. People with IPF have increased levels of something called autotaxin, which is thought to have a role in the progression of IPF. The trial is investigating whether decreasing the activity of autotaxin can have a positive effect. It will also look at how well the study drug is tolerated.',
                     'trial_start_date': new Date(element.Study.ProtocolSection.StatusModule.StartDateStruct.StartDate),
                     'trial_end_date': element.Study.ProtocolSection.StatusModule.CompletionDateStruct.CompletionDate ? new Date(element.Study.ProtocolSection.StatusModule.CompletionDateStruct.CompletionDate) : null,
@@ -707,12 +711,12 @@ async function getTrials(req, res) {
                 return {...x.dataValues,  distance: ''};
             }else if(distance) {
                 if(least_distance <= distance){
-                    return {...x.dataValues,  distance: calculated_distance(least_distance) + ' km', distance_value: calculated_distance(least_distance)}
+                    return {...x.dataValues,  distance: calculateDistanceToInteger(least_distance) + ' km', distance_value: calculateDistanceToInteger(least_distance)}
             } else {
                 return '';
         }}
         else{
-            return {...x.dataValues,  distance: calculated_distance(least_distance) + ' km', distance_value: calculated_distance(least_distance)}
+            return {...x.dataValues,  distance: calculateDistanceToInteger(least_distance) + ' km', distance_value: calculateDistanceToInteger(least_distance)}
         }
 
     }).filter(x=>x!=='').sort(function(a, b) {return a.distance_value - b.distance_value});
