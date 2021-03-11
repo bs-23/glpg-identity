@@ -71,7 +71,7 @@ export const registerSchema = object().shape({
     email: cdpUserSchema.email,
     phone: string()
         .matches(/^[0-9\+]*$/, 'This field only contains digits')
-        .min(4, 'This field must be at least 4 characters long')
+        .min(8, 'This field must be at least 8 characters long')
         .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`,
             function () {
                 return isPhoneMaxLengthValid(this.parent);
@@ -125,8 +125,8 @@ export const updateMyProfileSchema = object().shape({
     email: cdpUserSchema.email,
     phone: string().when('isCountryFlagActive', {
         is: true,
-        then: string().matches(/^[0-9]*$/, 'This field only contains digits')
-            .min(4, 'This field must be at least 4 characters long')
+        then: string().matches(/^[0-9\+]*$/, 'This field only contains digits')
+            .min(8, 'This field must be at least 8s characters long')
             .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`,
             function() {
                 return isPhoneMaxLengthValid(this.parent);
