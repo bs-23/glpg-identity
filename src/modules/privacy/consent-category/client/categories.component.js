@@ -84,6 +84,7 @@ const ConsentCategories = () => {
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th>Title</th>
+                                            <th>Legal Title</th>
                                             <th>Slug</th>
                                             <th>Created By</th>
                                             <th>Created Date</th>
@@ -94,6 +95,7 @@ const ConsentCategories = () => {
                                         {consent_categories.map((row, index) => (
                                             <tr key={index}>
                                                 <td data-for="Title">{row.title}</td>
+                                                <td data-for="legal_title">{row.legal_title || '--'}</td>
                                                 <td data-for="Slug">{row.slug}</td>
                                                 <td data-for="Created By">{row.createdBy || '--'}</td>
                                                 <td data-for="Created Date">{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
@@ -130,7 +132,8 @@ const ConsentCategories = () => {
                 <Modal.Body>
                     <Formik
                         initialValues={{
-                            title: consentCategoryId && consent_category ? consent_category.title : ""
+                            title: consentCategoryId && consent_category ? consent_category.title : "",
+                            legal_title: consentCategoryId && consent_category ? consent_category.legal_title : ""
                         }}
                         displayName="ConsentCategoryForm"
                         enableReinitialize={true}
@@ -176,6 +179,15 @@ const ConsentCategories = () => {
                                             <label className="font-weight-bold" htmlFor="title">Title <span className="text-danger">*</span></label>
                                             <Field data-testid="title" className="form-control" type="text" name="title" />
                                             <div className="invalid-feedback" data-testid="titleError"><ErrorMessage name="title" /></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="row">
+                                    <div className="col-12 col-sm-12">
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="legal_title">Legal Title</label>
+                                            <Field data-testid="legal_title" className="form-control" type="text" name="legal_title" />
+                                            <div className="invalid-feedback"><ErrorMessage name="legal_title" /></div>
                                         </div>
                                     </div>
                                 </div>
