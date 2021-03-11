@@ -473,10 +473,11 @@ async function mergeProcessData(req, res) {
                 var paragraph = element.Study.ProtocolSection.EligibilityModule.EligibilityCriteria;
                 var paragraph_lowercase = paragraph.toLowerCase();
                 var last_line = paragraph.split(/\r?\n/).pop();
+                var first_line = paragraph_lowercase.split('.').pop();
                 var note_label_text = last_line.toLowerCase().indexOf('note:')!==-1?  'note:' : '';
-                var inclusion_label_text = paragraph_lowercase.indexOf('key inclusion criteria')!==-1? 'key inclusion criteria' : 'inclusion criteria';
-                var exclusion_label_text = paragraph_lowercase.lastIndexOf('key exclusion criteria')!==-1? 'key exclusion criteria' : 
-                                            paragraph_lowercase.lastIndexOf('exclusion criteria')!==-1? 'exclusion criteria':
+                var inclusion_label_text = first_line.indexOf('key inclusion criteria:')!==-1? 'key inclusion criteria:' : 'inclusion criteria:';
+                var exclusion_label_text = paragraph_lowercase.lastIndexOf('key exclusion criteria:')!==-1? 'key exclusion criteria:' : 
+                                            paragraph_lowercase.lastIndexOf('exclusion criteria:')!==-1? 'exclusion criteria:':
                                             paragraph_lowercase.lastIndexOf(note_label_text)!==-1? note_label_text : '';
                 var sponsor = element.Study.ProtocolSection.IdentificationModule.Organization.OrgFullName;
                  return { 
