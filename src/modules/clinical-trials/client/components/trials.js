@@ -6,7 +6,7 @@ import { useToasts } from 'react-toast-notifications';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
 import StoryForm from './clinical-trials-story-form.component';
-import {getTrialItems, getClinicalTrialDetails, getTrialConditions } from './clinical-trials.actions';
+import {getTrialItems, getClinicalTrialDetails, getTrialConditions,getMultipleClinicalTrialDetails } from './clinical-trials.actions';
 import './trials.scss'
 var dumpData =  function() {
     const url = `/api/clinical-trials`;
@@ -19,6 +19,17 @@ var dumpData =  function() {
                 "urlToGetData": urlToGetData,
                 "description": "all data from glpg nv"
               }
+        }).then(out=>console.log(out))
+    };
+}
+
+var getbSelectedTrialsStoryVersions =  function(trial_fixed_id) {
+    const url = `/api/clinical-trials-cdp/all-story-versions/${trial_fixed_id}`;
+
+    return {
+        payload: axios({
+            method: 'get',
+            url
         }).then(out=>console.log(out))
     };
 }
@@ -94,6 +105,19 @@ var syncGeocodes =  function() {
 }
 
 
+function checkUncheck(trial_fixed_ids, setTo) {
+    var c = document.getElementsByTagName('input');
+
+    for (var i = 0; i < c.length; i++) {
+        if (c[i].type == 'checkbox' && trial_fixed_ids.includes(c[i].id)) {
+            c[i].checked = setTo;
+        }
+    }
+    
+    
+}
+
+
 const ClinicalTrials = (props) => {
     const isFilterEnabled = false;
     const trialItems = useSelector(state => state.clinicalTrialsReducer);
@@ -105,7 +129,7 @@ const ClinicalTrials = (props) => {
     const [sort, setSort] = useState({ type: 'asc', value: null });
     const [show, setShow] = useState(false);
     const [addMode, setAddMode] = useState(false);
-    const [test, setTest] = useState(false);
+    const [selectedTrials, setSelectedTrials] = useState([]);
     const addDataSample = {
         title: 'Sample Title',
         trials : [1,2,3],
@@ -135,7 +159,7 @@ const ClinicalTrials = (props) => {
     const pageLeft = () => {
         if (hcpUsers.page > 1) urlChange(hcpUsers.page - 1, hcpUsers.codBase, params.get('orderBy'), true);
     };
-    const testFunc = ()=>{console.log('just checking')};
+    
     const pageRight = () => {
         if (hcpUsers.end !== hcpUsers.total) urlChange(hcpUsers.page + 1, hcpUsers.codBase, params.get('orderBy'), true);
     };
@@ -145,6 +169,62 @@ const ClinicalTrials = (props) => {
         const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
         return country && country.countryname;
     };
+
+    const toggleAllBoxes = ()=>{
+        var elements = document.getElementsByTagName('input');
+        const arr = []
+        let setTo = true;
+        for(var i = 0; i < elements.length; i++){
+            if(elements[i].type == 'checkbox') 
+            { if(elements[i].id =='checkAll'){
+                console.log('main box:',elements[i].checked);
+                !elements[i].checked ? setTo = false : null 
+            }else{arr.push(elements[i].id)}
+            
+            }
+        }
+        checkUncheck(arr,setTo);
+        setTo ? setSelectedTrials(arr) : setSelectedTrials([]);
+        
+    }
+    
+    const selectedUnmarkedTrial = (trial_fixed_id)=>{
+        var elements = document.getElementsByTagName('input');
+        const trial_fixed_ids = []
+    
+        for(var i = 0; i < elements.length; i++){
+            if(elements[i].type == 'checkbox' && elements[i].id !='checkAll' && elements[i].id !=trial_fixed_id ) 
+            { trial_fixed_ids.push(elements[i].id)
+            }
+            
+            }
+        
+
+        if(!selectedTrials.includes(trial_fixed_id)) 
+            {
+                const arr = [];
+                arr.push(trial_fixed_id);
+                setSelectedTrials(arr);
+                checkUncheck(trial_fixed_ids,false);
+                checkUncheck([trial_fixed_id], true);
+               // console.log('after insert in unmarked region: ',selectedTrials);
+            }
+        }
+
+    const updateSelectedTrials = (trial_fixed_ids)=>{
+        
+        if(!selectedTrials.includes(trial_fixed_ids)) 
+            {
+                const arr = selectedTrials;
+                arr.push(trial_fixed_ids);
+                setSelectedTrials(arr);
+            }
+            else
+            {
+                const arr = selectedTrials.filter(item => item !== trial_fixed_ids);
+                setSelectedTrials(arr);
+            }
+    }
 
     useEffect(() => {
         dispatch(getTrialItems());
@@ -156,10 +236,10 @@ const ClinicalTrials = (props) => {
     },[show]);
 
     const [filteredTopic, setFilter] = useState('All');
+    const [filteredPhase, setPhaseFilter] = useState('All');
     const [story, setStory] = useState('write a story');
     const topic = false;
    
-    const seectedTopics = [];
 
 
     return (
@@ -170,7 +250,7 @@ const ClinicalTrials = (props) => {
                         <nav className="breadcrumb justify-content-between align-items-center" aria-label="breadcrumb">
                             <ol className="rounded-0 m-0 p-0 d-none d-sm-flex">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
-                                <li className="breadcrumb-item"><NavLink to="/information">Clinical Trials</NavLink></li>
+                                <li className="breadcrumb-item"><NavLink to="/clinical-trials">Clinical Trials</NavLink></li>
                                 <li className="breadcrumb-item active"><span>Trials</span></li>
                             </ol>
                             <Dropdown className="dropdown-customize breadcrumb__dropdown d-block d-sm-none ml-2">
@@ -179,30 +259,17 @@ const ClinicalTrials = (props) => {
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     <Dropdown.Item className="px-2" href="/"><i className="fas fa-link mr-2"></i> Dashboard</Dropdown.Item>
-                                    <Dropdown.Item className="px-2" href="/information"><i className="fas fa-link mr-2"></i> Information Management</Dropdown.Item>
+                                    <Dropdown.Item className="px-2" href="/clinical-trials"><i className="fas fa-link mr-2"></i> Information Management</Dropdown.Item>
                                     <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> HCP Profile List</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                             <span className="ml-auto mr-3"><i onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary cursor-pointer"></i></span>
-                            {/* <Modal show={showFaq} onHide={handleCloseFaq} size="lg" centered>
-                                <Modal.Header closeButton>
-                                    <Modal.Title>Questions You May Have</Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body className="faq__in-modal"><Faq topic="manage-hcp" /></Modal.Body>
-                            </Modal> */}
                         </nav>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-12">
                         <div className="d-flex justify-content-between align-items-center py-3  cdp-table__responsive-sticky-panel">
-                            {/* <div>
-                                <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1 pb-2">Manage Content For Each Clinical Trial</h4>
-                                <div>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/cdp">Customer Data Platform</NavLink>
-                                    <div className="custom-tab px-3 py-3 cdp-border-primary active">CRDLP</div>
-                                </div>
-                            </div> */}
                              <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">
                              Manage Content For Each Clinical Trial
                                 
@@ -213,7 +280,7 @@ const ClinicalTrials = (props) => {
                             <div className="d-flex pt-3 pt-sm-0 mb-2">
                                 <Dropdown className="ml-auto dropdown-customize">
                                         <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
-                                            <i className="icon icon-filter mr-2 mb-n1"></i> <span className="d-none d-sm-inline-block">{!topic ? 'Filter by Condition' : serviceTopics.find(x => x.slug === topic).title}</span>
+                                            <i className="icon icon-filter mr-2 mb-n1"></i> <span className="d-none d-sm-inline-block">{filteredTopic==='All' ? 'Filter by Condition' : filteredTopic}</span>
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
                                             {trialConditions.length > 0 && filteredTopic!=='All' && <Dropdown.Item href={`#`} onClick={()=>{setFilter('All');}}>All</Dropdown.Item>}
@@ -225,14 +292,26 @@ const ClinicalTrials = (props) => {
                                             }
                                         </Dropdown.Menu>
                                 </Dropdown>
+                                <Dropdown className="ml-auto dropdown-customize">
+                                        <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center">
+                                            <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i> <span className="d-none d-sm-inline-block">{filteredPhase==='All' ? 'Filter' : filteredPhase}</span>
+                                        </Dropdown.Toggle>
+                                        <Dropdown.Menu>
+                                            {filteredPhase!=='All' && <Dropdown.Item href={`#`} onClick={()=>{setPhaseFilter('All');}}>All</Dropdown.Item>}
+                                            {filteredPhase!=='Phase 2' && <Dropdown.Item href={`#`} onClick={()=>{setPhaseFilter('Phase 2')}}>Phase 2</Dropdown.Item>}
+                                            {filteredPhase!=='Phase 3' && <Dropdown.Item href={`#`} onClick={()=>{setPhaseFilter('Phase 3')}}>Phase 3</Dropdown.Item>}
+                                            {filteredPhase!=='Phase 4' && <Dropdown.Item href={`#`} onClick={()=>{setPhaseFilter('Phase 4')}}>Phase 4</Dropdown.Item>}
+                
+                                        </Dropdown.Menu>
+                                </Dropdown>
 
                                 
-                                <button className={`btn  ${isFilterEnabled ? 'multifilter_enabled cdp-btn-primary text-white' : 'cdp-btn-outline-primary'}`} onClick={() => setShowFilterSidebar(true)} >
+                                {/* <button className={`btn  ${isFilterEnabled ? 'multifilter_enabled cdp-btn-primary text-white' : 'cdp-btn-outline-primary'}`} onClick={() => setShowFilterSidebar(true)} >
                                     <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
                                     <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
                                     Filter
-                                </button>
-                                {
+                                </button> */}
+                                {/* {
                                     isFilterEnabled &&
                                     <button
                                         className={`btn cdp-btn-outline-secondary ml-2 ${isFilterEnabled ? 'multifilter_enabled' : ''}`}
@@ -242,7 +321,7 @@ const ClinicalTrials = (props) => {
                                         <i className={`fas fa-times ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
                                         Reset
                                     </button>
-                                }
+                                } */}
                             </div>
                         </div>
 
@@ -253,12 +332,12 @@ const ClinicalTrials = (props) => {
                                     <table className="table table-hover table-sm mb-0 cdp-table">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
-                                                 {/* <th width="10%">
+                                                 <th width="10%">
                                                     <div className="custom-control custom-checkbox without-bg">
-                                                        <input type="checkbox" className="custom-control-input" id="customControlAutosizingf" />
-                                                        <label className="custom-control-label" for="customControlAutosizingf"></label>
+                                                        <input type="checkbox" className="custom-control-input" id="checkAll" onClick={()=>{toggleAllBoxes()}} />
+                                                        <label className="custom-control-label" for="checkAll"></label>
                                                     </div>
-                                                </th> */}
+                                                </th>
                                                 <th width="10%"><span className={sort.value === 'firstname' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'firstname')}>Clinical Gov. ID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
                                                 <th width="25%"><span className={sort.value === 'lastname' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'lastname')}>Study Title<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -281,14 +360,14 @@ const ClinicalTrials = (props) => {
                                             </tr>
                                         </thead>
                                         <tbody className="cdp-table__body bg-white">
-                                            {trialItems.clinialTrial_items.data.search_result.map((row, idx) =>{return (row.indication_group ===filteredTopic || filteredTopic ==='All' ) ? (   
+                                            {trialItems.clinialTrial_items.data.search_result.map((row, idx) =>{return ((row.indication_group ===filteredTopic || filteredTopic ==='All') && (row.phase ===filteredPhase || filteredPhase ==='All') ) ? (   
                                                 <tr key={'user-' + idx}>
-                                                    {/* <td>
+                                                    <td>
                                                         <div className="custom-control custom-checkbox">
-                                                            <input type="checkbox" className="custom-control-input" id="aa" />
-                                                            <label className="custom-control-label" for="aa"></label>
+                                                            <input type="checkbox" className="custom-control-input" id={row.trial_fixed_id} onClick={()=>{updateSelectedTrials(row.trial_fixed_id)}}/>
+                                                            <label className="custom-control-label" for={row.trial_fixed_id}></label>
                                                         </div>
-                                                    </td> */}
+                                                    </td>
                                                     <td className="text-break">{row.gov_identifier || '--'}</td>
                                                     <td className="text-break">{row.clinical_trial_brief_title || '--'}
                     
@@ -317,13 +396,13 @@ const ClinicalTrials = (props) => {
                                                     <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle"></Dropdown.Toggle>
                                                     <Dropdown.Menu>
-                                                        <Dropdown.Item onClick={() => { setShow(true); setAddMode(true); setStory(row.story_telling); dispatch(getClinicalTrialDetails([row.trial_fixed_id])) }}>
-                                                            Write Story
-                                                        </Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => { setShow(true); setEditMode(true); setEditData(row); }}>
+                                                        <Dropdown.Item onClick={() => { setShow(true); setAddMode(true); setStory(row.story_telling); selectedUnmarkedTrial(row.trial_fixed_id)}}>
                                                             Edit Story
                                                         </Dropdown.Item>
-                                                        <Dropdown.Item className="text-danger bg-white" onClick={() => { setShowDelete(true); setDeleteId(row.id); }}>Delete</Dropdown.Item>
+                                                        {/* <Dropdown.Item onClick={() => { setShow(true); setAddMode(false); setStory(row.story_telling);}}>
+                                                            Write Story
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item className="text-danger bg-white" onClick={() => { setShowDelete(true); setDeleteId(row.id); }}>Delete</Dropdown.Item> */}
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
 
@@ -353,7 +432,7 @@ const ClinicalTrials = (props) => {
                                 </div>
                             </div>
                         }
-                        {show ? <StoryForm story={story} seectedTopics ={seectedTopics} trialDetails={trialDetails} addMode={addMode} changeShow={(val) => setShow(val)} show={show} trialIDs={[1,2,3]} addData = {addDataSample} /> : null}
+                        {show ? <StoryForm story={story} selectedTrials ={selectedTrials} trialDetails={trialDetails} addMode={addMode} changeShow={(val) => setShow(val)} show={show} trialIDs={[1,2,3]} addData = {addDataSample} /> : null}
                         <Modal
                             size="lg"
                             show={!!profileDetails}
@@ -492,7 +571,7 @@ const ClinicalTrials = (props) => {
                     <button onClick={showAllClinicalTrials}>Show All Clinical Trials</button>
                     <button onClick={update_clinicalTrials}>Update Clinical Trials</button>
                     <button onClick={getClinicalTrialDetails}>Show trial details</button>
-                    <button onClick={()=>{setShow(true); setAddMode(true);}}>Add Story</button>
+                    <button onClick={()=>{getbSelectedTrialsStoryVersions('bf3fcdd9-2c14-4a1e-b02c-787c379c0aa9')}}>Story Versions</button>
                     
                 </div>
                 <div class="tooltip">Hover over me

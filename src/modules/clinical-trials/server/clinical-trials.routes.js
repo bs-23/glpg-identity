@@ -12,10 +12,12 @@ module.exports = app => {
 
     app.route('/api/clinical-trials')
         .get(auth, controller.getTrials)
-        .post(CDPAuthStrategy, controller.dumpAllData);
+        .post(CDPAuthStrategy,  controller.dumpAllData);
     
     app.route('/api/clinical-trials/update')
-        .put(CDPAuthStrategy, controller.updateClinicalTrials);
+        .put(CDPAuthStrategy,  controller.updateClinicalTrials);
+    app.route('/api/clinical-trials/update-stories')
+        .put(CDPAuthStrategy, controller.updateStories);
 
     app.route('/api/clinical-trials/versions')
         .get(CDPAuthStrategy, controller.showAllVersions);
@@ -44,6 +46,8 @@ module.exports = app => {
     app.route('/api/clinical-trials/:id')
         .get(auth, controller.getTrialDetails);
 
-    app.route('/api/clinical-trials-cdp/:id')
+    app.route('/api/clinical-trials-cdp/:ids')
         .get(CDPAuthStrategy, controller.getTrialDetails);
+    app.route('/api/clinical-trials-cdp/all-story-versions/:trial_fixed_id')
+        .get(CDPAuthStrategy, controller.getAllStoryVersions);
 };
