@@ -16,11 +16,14 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
     const { addToast } = useToasts();
     const [application, setApplication] = useState({});
 
-    const metadataOptions = [
-        "cache_clearing_url",
-        "approve_user_path",
-        "request_notification_link"
-    ];
+    const metadataOptions = {
+        standard: [],
+        "hcp-portal": [
+            "cache_clearing_url",
+            "approve_user_path",
+            "request_notification_link"
+        ]
+    }
 
     const convertMetadataToArray = (metadata) => {
         if (!metadata) return [];
@@ -73,7 +76,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                 <>
                                     <option disabled value="">Select an option</option>
                                     {
-                                        metadataOptions.map(option =>
+                                        (metadataOptions[formikProps.values.type] || []).map(option =>
                                             <option disabled={formikProps.values.metadata.some(item => item.key === option)} key={option} value={option}>{option}</option>
                                         )
                                     }
@@ -204,7 +207,15 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                         <div className="row col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold" htmlFor="last_name">Type <span className="text-danger">*</span></label>
-                                                <Field className="form-control" name="type" as="select">
+                                                <Field
+                                                    className="form-control"
+                                                    name="type"
+                                                    as="select"
+                                                    onChange={e => {
+                                                        formikProps.setFieldValue('metadata', []);
+                                                        formikProps.handleChange(e);
+                                                    }}
+                                                >
                                                     <option value="">--Select a type--</option>
                                                     <option value="standard">Standard</option>
                                                     <option value="hcp-portal">HCP Portal</option>
