@@ -360,12 +360,13 @@ async function init() {
                     type: 'hcp-portal',
                     email: 'hcp-portal@glpg.com',
                     password: 'P@ssword123',
-                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                    is_active: true,
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
-                    logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
-                    metadata: JSON.stringify({
+                    metadata: {
+                        approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                        logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                         cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-hcpportal/clear/author-publish-cache"
-                    }),
+                    },
                     created_by: admin.id,
                     updated_by: admin.id
                 },
@@ -376,12 +377,13 @@ async function init() {
                     type: 'hcp-portal',
                     email: 'jyseleca@glpg.com',
                     password: 'P@ssword123',
-                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                    is_active: true,
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
-                    logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
-                    metadata: JSON.stringify({
-                        cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-brandx/clear/author-publish-cache"
-                    }),
+                    metadata: {
+                        cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-brandx/clear/author-publish-cache",
+                        logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
+                        approve_user_path: '/bin/public/glpg-brandx/mail/approve-user'
+                    },
                     created_by: admin.id,
                     updated_by: admin.id
                 },
@@ -391,9 +393,13 @@ async function init() {
                     slug: convertToSlug('Clinical Trials'),
                     email: 'clinical-trial-portal@glpg.com',
                     password: 'P@ssword123',
-                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                    type: 'standard',
+                    is_active: true,
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
-                    logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
+                    metadata: {
+                        approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                        logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`
+                    },
                     created_by: admin.id,
                     updated_by: admin.id
                 },
@@ -403,14 +409,16 @@ async function init() {
                     slug: convertToSlug('Patients Organization'),
                     email: 'patients-organization@glpg.com',
                     password: 'P@ssword123',
-                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                    type: 'standard',
+                    is_active: true,
                     auth_secret: 'b248eaa4-583f-4ecd-9e9c-be8f58ab3c3e',
-                    logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id,
-                    metadata: JSON.stringify({
+                    metadata: {
+                        approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                        logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                         request_notification_link: 'https://onboarding-business-partner-dev.glpg.com/bin/public/glpg-forms/sendForm.invitation.html'
-                    })
+                    }
                 }
             ];
 
