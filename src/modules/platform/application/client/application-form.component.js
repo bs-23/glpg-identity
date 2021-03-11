@@ -33,7 +33,8 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
         ],
         "hcp-portal": [
             "cache_clearing_url",
-            "approve_user_path"
+            "approve_user_path",
+            "logo_url"
         ]
     }
 
