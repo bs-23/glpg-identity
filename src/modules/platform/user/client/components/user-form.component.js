@@ -13,7 +13,6 @@ export default function UserForm() {
     const dispatch = useDispatch();
     const [selectedCountryCode, setSelectedCountryCode] = useState(0);
     const [phoneFieldRef, setPhoneFieldRef] = useState(null);
-    const [phoneFieldDisabled, setPhoneFieldDisabled] = useState(false);
     const [profiles, setProfiles] = useState([]);
     const [roles, setRoles] = useState([]);
     const history = useHistory();
@@ -44,11 +43,12 @@ export default function UserForm() {
     const onChangePhonefield = (phoneNumber) => {
         const phoneNumberCountryISO = new PhoneNumber(phoneNumber).getRegionCode();
         let selectedCountry = desiredCountryList.find(country => country.countryCode === phoneNumberCountryISO);
-        if (selectedCountry === undefined){ setPhoneFieldDisabled(true); }
+        if (selectedCountry === undefined) { phoneFieldRef !== null ? phoneFieldRef.disabled = true : ''}
         else{
             selectedCountry.flag = generateCountryIconPath(selectedCountry.countryNameEn);
-            setPhoneFieldDisabled(false);
-            phoneFieldRef.focus();
+            if(phoneFieldRef !== null){
+                phoneFieldRef.disabled = false ;
+            }
         }
         return selectedCountry === undefined ? null : selectedCountry;
     };
@@ -130,11 +130,11 @@ export default function UserForm() {
                                                                                         return (index === selectedCountryCode ?
                                                                                             <Dropdown.Toggle key={index} variant className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
                                                                                             {
-                                                                                                    onChangePhonefield(formikProps.values.phone) === null ? <span height="20" width="20">Select</span> :
-                                                                                                        <img height="20" width="20" src={onChangePhonefield(formikProps.values.phone) === null ? '' : onChangePhonefield(formikProps.values.phone).flag} />
+                                                                                                    onChangePhonefield(formikProps.values.phone) === null || onChangePhonefield(formikProps.values.phone) === undefined ? <span height="20" width="20">Select</span> :
+                                                                                                        <img height="20" width="20" src={onChangePhonefield(formikProps.values.phone) === null || onChangePhonefield(formikProps.values.phone) === undefined ? '' : onChangePhonefield(formikProps.values.phone).flag} />
                                                                                             }
                                                                                                 <span className="country-phone-code pl-1">
-                                                                                                    {onChangePhonefield(formikProps.values.phone) === null ? "" : onChangePhonefield(formikProps.values.phone).countryCode}
+                                                                                                    {onChangePhonefield(formikProps.values.phone) === null || onChangePhonefield(formikProps.values.phone) === undefined ? "" : onChangePhonefield(formikProps.values.phone).countryCode}
                                                                                                 </span>
                                                                                             </Dropdown.Toggle> : null);
                                                                                     })}
@@ -156,7 +156,7 @@ export default function UserForm() {
                                                                                     </Dropdown.Menu>
                                                                                 </Dropdown>
                                                                             </span>
-                                                                        <Field disabled={phoneFieldDisabled} innerRef={(ele) => setPhoneFieldRef(ele)} data-testid="phone" className="form-control rounded" type="text" name="phone"/>
+                                                                        <Field innerRef={(ele) => setPhoneFieldRef(ele)} data-testid="phone" className="form-control rounded" type="text" name="phone"/>
                                                                         </div>
                                                                     </div>
                                                                     <div className="invalid-feedback">
