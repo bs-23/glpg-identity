@@ -134,9 +134,9 @@ async function getPermissionsFromPermissionSet(permissionSet) {
 
     if (permissionSet.ps_app) {
         for (const ps_app of permissionSet.ps_app) {
-            const { id, name, slug, logo_link} = ps_app.application;
+            const { id, name, slug, metadata} = ps_app.application;
 
-            const userApplication = { id, name, slug, logo_link };
+            const userApplication = { id, name, slug, logo_link: metadata.logo_link };
 
             applications.push(userApplication);
         }

@@ -69,7 +69,7 @@ async function notifyHcpUserApproval(hcpUser) {
 
     payload.jwt_token = token;
 
-    await axios.post(`${hcpUser.origin_url}${userApplication.approve_user_path}`, payload, {
+    await axios.post(`${hcpUser.origin_url}${userApplication.metadata.approve_user_path}`, payload, {
         headers: {
             jwt_token: token
         }

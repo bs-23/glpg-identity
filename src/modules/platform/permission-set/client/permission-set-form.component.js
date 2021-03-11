@@ -282,7 +282,7 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
                                                             labelExtractor={item => item.codbase_desc}
                                                         />
                                                     </FormField>
-                                                    <FormField label="Select Applications" name="applications" required={false} >
+                                                    <FormField label="Select HCP Portal" name="applications" required={false} >
                                                         <CheckList
                                                             name="applications"
                                                             options={applications}
