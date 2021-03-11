@@ -60,6 +60,7 @@ const StoryForm = (props) => {
                 method: 'get',
                 url
             }).then(out=>{
+                out.data.data = Array.isArray(out.data.data) ? out.data.data : [out.data.data];
                 setSelectedTrialDetails(out);
             })
         };

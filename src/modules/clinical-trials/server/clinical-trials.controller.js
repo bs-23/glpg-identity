@@ -451,6 +451,7 @@ async function mergeProcessData(req, res) {
     const response = new Response({}, []);
     const { ids } = req.body;
     res.set({ 'content-type': 'application/json; charset=utf-8' });
+    seed = 1;
 
     try {
         let result = await History.findAll({
@@ -727,7 +728,10 @@ async function getTrials(req, res) {
             return {...x.dataValues,  distance: calculateDistanceToInteger(least_distance) + ' km', distance_value: calculateDistanceToInteger(least_distance)}
         }
 
-    }).filter(x=>x!=='').sort(function(a, b) {return a.distance_value - b.distance_value});
+    }).filter(x=>x!=='');
+    
+    search_result = search_result.filter(x=>x.distance_value).length ? search_result.sort(function(a, b) {return a.distance_value - b.distance_value}) 
+                    : search_result.sort((a,b)=>['Recruiting'].includes(b.trial_status)? 1:-1);
 
     let freetext_search_result = search_result.filter(x=>{
         try{
@@ -835,7 +839,7 @@ async function getTrialDetails(req, res) {
             return res.status(204).send(response);
         }
 
-        response.data = result;
+        response.data = result.length > 1? result : result[0];
         res.json(response);
     } catch (err) {
         logger.error(err);
