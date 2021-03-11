@@ -27,7 +27,7 @@ const HcpPartnerRequests = () => {
     const [isSupplier, setIsSupplier] = useState(false);
     const [isCustomer, setIsCustomer] = useState(false);
     const [formData, setFormData] = useState(undefined);
-    const localizations = useSelector(state => state.localizationsReducer.localizations);
+    const localizations = useSelector(state => state.localizationReducer.localizations);
 
     // const countryLanguages = [
     //     { locale_name: 'English', language_code: 'en' },

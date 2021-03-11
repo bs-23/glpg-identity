@@ -42,7 +42,7 @@ const WholesalerPartnerRequests = () => {
     const countries = useSelector(state => state.countryReducer.countries);
 
     const userCountries = useSelector(state => state.userReducer.loggedInUser.countries);
-    const localizations = useSelector(state => state.localizationsReducer.localizations);
+    const localizations = useSelector(state => state.localizationReducer.localizations);
 
     const getCountryName = (country_iso2) => {
         if (!countries || !country_iso2) return null;

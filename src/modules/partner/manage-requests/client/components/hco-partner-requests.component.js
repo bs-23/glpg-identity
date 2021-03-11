@@ -50,7 +50,7 @@ const HcoPartnerRequests = () => {
 
     const userCountries = useSelector(state => state.userReducer.loggedInUser.countries);
 
-    const localizations = useSelector(state => state.localizationsReducer.localizations);
+    const localizations = useSelector(state => state.localizationReducer.localizations);
 
     const [showSearch, setShowSearch] = useState(false);
     const [searchInput, setSearchInput] = useState(false);

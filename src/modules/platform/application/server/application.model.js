@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const Sequelize = require('sequelize');
 
 const Application = sequelize.cdpConnector.define('applications', {
     id: {
@@ -23,7 +24,7 @@ const Application = sequelize.cdpConnector.define('applications', {
     },
     type: {
         type: DataTypes.ENUM,
-        values: ['hcp-portal']
+        values: ['standard', 'hcp-portal']
     },
     email: {
         unique: true,
@@ -33,28 +34,33 @@ const Application = sequelize.cdpConnector.define('applications', {
             isEmail: true
         }
     },
+    description: {
+        type: DataTypes.STRING
+    },
     password: {
         type: DataTypes.STRING,
         set(value) {
             this.setDataValue('password', bcrypt.hashSync(value, 8));
         }
     },
+    failed_auth_attempt: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
+    password_expiry_date: {
+        type: DataTypes.DATE
+    },
     refresh_token: {
         type: DataTypes.STRING
     },
     auth_secret: {
         allowNull: false,
-        type: DataTypes.UUID
-    },
-    approve_user_path: {
-        type: DataTypes.STRING,
-    },
-    logo_link: {
-        type: DataTypes.STRING
+        type: DataTypes.UUID,
+        defaultValue: Sequelize.UUIDV4
     },
     is_active: {
         type: DataTypes.BOOLEAN,
-        defaultValue: true
+        defaultValue: false
     },
     created_by: {
         type: DataTypes.UUID
@@ -63,7 +69,7 @@ const Application = sequelize.cdpConnector.define('applications', {
         type: DataTypes.UUID
     },
     metadata: {
-        type: DataTypes.STRING
+        type: DataTypes.JSON
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,

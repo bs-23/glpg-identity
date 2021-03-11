@@ -13,6 +13,7 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/clinical-trials/server/clinical-trials.trial.model.js'));
     const ClinicalTrialTrialModel = require(path.join(process.cwd(), 'src/modules/clinical-trials/server/clinical-trials.trial.model.js'));
     const ClinicalTrialLocationModel = require(path.join(process.cwd(), 'src/modules/clinical-trials/server/clinical-trials.location.model.js'));
+    const ClinicalTrialStoryModel = require(path.join(process.cwd(), 'src/modules/clinical-trials/server/clinical-trials.story.model.js'));
 
     async function clinicalTrilalsDbStructureSeeder() {
         await sequelize.clinitalTrialsConnector.query(`CREATE SCHEMA IF NOT EXISTS "${nodecache.getValue('POSTGRES_CLINICAL_TRIALS_SCHEMA')}"`);
@@ -26,6 +27,19 @@ async function init() {
                     description: 'initial history entry',
                     value: ''
                 }
+            ], {
+                returning: true,
+                ignoreDuplicates: false
+            });
+        });
+        ClinicalTrialStoryModel.destroy({ truncate: { cascade: true } }).then(() => {
+            ClinicalTrialStoryModel.bulkCreate([
+                {
+                    trial_fixed_id: '1234',
+                    version: 1,
+                    value: 'sample value'
+                }
+        
             ], {
                 returning: true,
                 ignoreDuplicates: false

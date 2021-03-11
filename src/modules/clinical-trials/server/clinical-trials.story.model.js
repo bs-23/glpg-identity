@@ -18,7 +18,7 @@ let storyModel = {
             type: DataTypes.STRING(60)
         },
         version: {
-            unique: true,
+            unique: false,
             allowNull: false,
             type: DataTypes.INTEGER()
         },

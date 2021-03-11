@@ -139,7 +139,6 @@ describe('Veeva consent performance report component', () => {
             expect(screen.getByText('Name')).toBeTruthy();
             expect(screen.getByText('Email')).toBeTruthy();
             expect(screen.getByText('Content Type')).toBeTruthy();
-            expect(screen.getByText('Opt Type')).toBeTruthy();
             expect(screen.getByText('Legal Basis')).toBeTruthy();
             expect(screen.getByText('Date')).toBeTruthy();
         });
