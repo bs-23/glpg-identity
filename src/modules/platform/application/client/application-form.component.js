@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useState, useEffect } from 'react';
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import { useToasts } from "react-toast-notifications";
-import { applicationFormSchema } from './applications.schema';
+import { createApplicationSchema, updateApplicationSchema } from './applications.schema';
 
 const FormField = ({ label, name, type, children, required = true, ...rest }) => <div className="col-12">
     <div className="form-group">
@@ -173,7 +173,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                             metadata: convertMetadataToArray(application.metadata)
                         }}
                         displayName="ApplicationForm"
-                        // validationSchema={applicationFormSchema}
+                        validationSchema={isEditing ? updateApplicationSchema : createApplicationSchema}
                         onSubmit={handleSubmit}
                         enableReinitialize
                     >
