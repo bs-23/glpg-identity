@@ -48,17 +48,17 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
         if (!metadata) return null;
 
         return <div>
-            <span onClick={() => {
+            <span className="cursor-pointer btn cdp-btn-secondary text-white btn-sm my-2" onClick={() => {
                 const metadata = [...formikProps.values.metadata];
                 metadata.push({ key:'', value:'' });
                 formikProps.setFieldValue('metadata', metadata);
             }}>
-                + Add Property
+                <i className="icon icon-plus"></i> <span className="pl-1">Add Property</span>
             </span>
             {
                 metadata.map((item, ind) => {
-                    return <div key={ind} className="row">
-                        <div className="col-5">
+                    return <div key={ind} className="row mb-3">
+                        <div className="col-12 col-md-5">
                             <Field  // input field for key
                                 as="select"
                                 value={item.key}
@@ -80,7 +80,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                 </>
                             </Field>
                         </div>
-                        <div className="col-5">
+                        <div className="col-12 col-md-5">
                             <Field  // input field for value
                                 type="text"
                                 className="form-control"
@@ -93,15 +93,18 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                 }}
                             />
                         </div>
-                        <span
-                            onClick={() => {
-                                const updatedMetadata = formikProps.values.metadata.filter((item, index) => ind !== index);
-                                formikProps.setFieldValue('metadata', updatedMetadata);
-                            }}
-                            className="col-2"
-                        >
-                            X
-                        </span>
+                        <div className="col-12 col-md-2">
+                            <span
+                                onClick={() => {
+                                    const updatedMetadata = formikProps.values.metadata.filter((item, index) => ind !== index);
+                                    formikProps.setFieldValue('metadata', updatedMetadata);
+                                }}
+                                className="btn cdp-btn-outline-secondary px-3"
+                            >
+                                <i class="fas fa-times"></i>
+                            </span>
+                        </div>
+                        
                     </div>
                 })
             }
@@ -177,22 +180,22 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                         {formikProps => (
                             <Form onSubmit={formikProps.handleSubmit}>
                                 <div className="row">
-                                    <div className="col-12">
+                                    <div className="col-12 col-md-6">
                                         <div className="row">
                                             <FormField label="Name" type="text" name="name" />
                                         </div>
                                     </div>
-                                    <div className="col-12">
+                                    <div className="col-12 col-md-6">
                                         <div className="row">
                                             <FormField label="Email" type="email" name="email" />
                                         </div>
                                     </div>
-                                    {!isEditing && <div className="col-12">
+                                    {!isEditing && <div className="col-12 col-md-6">
                                         <div className="row">
                                             <FormField label="Password" type="password" name="password" />
                                         </div>
                                     </div>}
-                                    {!isEditing && <div className="col-12">
+                                    {!isEditing && <div className="col-12 col-md-6">
                                         <div className="row">
                                             <FormField label="Confirm Password" type="password" name="confirm_password" />
                                         </div>
@@ -213,19 +216,19 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                     <div className="col-12">
                                         <div className="row col-12">
                                             <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="last_name">Is Active</label>
-                                                <Field className="ml-2" checked={formikProps.values.is_active} name="is_active" type="checkbox" />
+                                                <div className="custom-control custom-checkbox mr-sm-2">
+                                                    <input type="checkbox" className="custom-control-input" checked={formikProps.values.is_active} name="is_active" id="isactive" />
+                                                    <label className="custom-control-label" for="isactive">Is Active</label>
+                                                </div>
                                                 <div className="invalid-feedback"><ErrorMessage name="is_active"/></div>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="col-12">
-                                        <div className="row col-12">
-                                            <div className="form-group">
-                                                <label className="font-weight-bold" htmlFor="last_name">Metadata</label>
-                                                {renderMetadata(formikProps)}
-                                                <div className="invalid-feedback"><ErrorMessage name="is_active"/></div>
-                                            </div>
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="last_name">Metadata</label>
+                                            {renderMetadata(formikProps)}
+                                            <div className="invalid-feedback"><ErrorMessage name="is_active" /></div>
                                         </div>
                                     </div>
                                     <div className="col-12">
