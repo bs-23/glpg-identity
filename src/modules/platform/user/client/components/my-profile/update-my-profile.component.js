@@ -18,7 +18,6 @@ const UpdateMyProfile = () => {
     const desiredCountryList = useSelector(state => state.phoneExtensionReducer.phone_extensions);
     const getMyCountryISO2 = useSelector(state => state.userReducer.loggedInUser.countries);
     const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}');
-    const [phoneFieldDisabled, setPhoneFieldDisabled] = useState(false);
     const getMyApplicationNames = () => {
         if(!myProfileInfo) return [];
 

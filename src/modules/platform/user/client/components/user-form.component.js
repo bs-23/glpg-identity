@@ -13,7 +13,6 @@ export default function UserForm() {
     const dispatch = useDispatch();
     const [selectedCountryCode, setSelectedCountryCode] = useState(0);
     const [phoneFieldRef, setPhoneFieldRef] = useState(null);
-    const [phoneFieldDisabled, setPhoneFieldDisabled] = useState(false);
     const [profiles, setProfiles] = useState([]);
     const [roles, setRoles] = useState([]);
     const history = useHistory();
@@ -157,7 +156,7 @@ export default function UserForm() {
                                                                                     </Dropdown.Menu>
                                                                                 </Dropdown>
                                                                             </span>
-                                                                        <Field disabled={phoneFieldDisabled} innerRef={(ele) => setPhoneFieldRef(ele)} data-testid="phone" className="form-control rounded" type="text" name="phone"/>
+                                                                        <Field innerRef={(ele) => setPhoneFieldRef(ele)} data-testid="phone" className="form-control rounded" type="text" name="phone"/>
                                                                         </div>
                                                                     </div>
                                                                     <div className="invalid-feedback">
