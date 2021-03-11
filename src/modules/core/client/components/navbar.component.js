@@ -39,8 +39,8 @@ export default function Navigationbar() {
     const renderApplicationIcon = () => {
         if(userApplications) {
             return userApplications.map(app => {
-                const { name, logo_link, slug } = app;
-                return <img className="ml-2" key={slug} src={logo_link} title={name} alt={`${name} Logo`} width="122" />
+                const { name, logo_url, slug } = app;
+                return <img className="ml-2" key={slug} src={logo_url} title={name} alt={`${name} Logo`} width="122" />
             })
         }
     };

@@ -32,6 +32,7 @@ export default function reducer(state = initialState, action) {
             const consent_categories = state.consent_categories.map(function(x) {
                 if(x.id === action.payload.data.id) {
                     x.title = action.payload.data.title;
+                    x.legal_title = action.payload.data.legal_title;
                     x.slug = action.payload.data.slug;
                     x.is_active = action.payload.data.is_active;
                 }

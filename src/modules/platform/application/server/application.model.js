@@ -54,7 +54,6 @@ const Application = sequelize.cdpConnector.define('applications', {
         type: DataTypes.STRING
     },
     auth_secret: {
-        allowNull: false,
         type: DataTypes.UUID,
         defaultValue: Sequelize.UUIDV4
     },
