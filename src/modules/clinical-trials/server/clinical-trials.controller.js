@@ -2,6 +2,7 @@ const path = require('path');
 const _ = require('lodash');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const History = require('./clinical-trials.history.model');
+const Story = require('./clinical-trials.story.model');
 const https = require('https');
 const Trial = require('./clinical-trials.trial.model');
 const Location = require('./clinical-trials.location.model');
@@ -131,6 +132,10 @@ var countriesWithISO = [
     {'code':'US','name':'United States'
     }
 ];
+
+function calculateDistanceToInteger(distance){
+    return parseInt(Math.round(distance*100) / 100);
+}
 
 async function getCoordinates(facility, zip, city, state, country, index)
 {
@@ -309,19 +314,19 @@ function genderInputTextMapping(gender) {
     gender = gender? gender.split(',').map(x=>{
         switch(x){
             case 'GENDER_ALL':
-                return 'All';
+                return ['All', 'Male', 'Female'];
                 break;
             case 'GENDER_MALE':
-                return 'Male'
+                return ['All', 'Male']  
                 break;
             case 'GENDER_FEMALE':
-                return 'Female'
+                return ['All', 'Female']
                 break;
             default:
                 return '';
                 break;
         }
-    }) : null;
+    })[0] : null;
     return gender;
 }
 
@@ -386,32 +391,6 @@ async function showAllVersions(req, res) {
         res.status(500).send(response);
     }
 }
-
-// async function addStory(req, res) {
-//     const response = new Response({}, []);
-//     try{
-//         let result = await History.create({
-//             trial_fixed_id: req.trial_fixed_id,
-//             version = req.version,
-//             value: req.value,
-
-//         });
-
-//         if (!result) {
-//             response.data = [];
-//             return res.status(204).send(response);
-//         }
-
-//         response.data = result;
-//         res.json(response);
-//     } catch (err) {
-//         logger.error(err);
-//         response.errors.push(new CustomError('Internal server error', 500));
-//         res.status(500).send(response);
-//     }
-
-// }
-
 
 async function updateLatLngCode(location, count, location_facility, location_zip, latLngNotFound){
     var {lat,lng} = await getCoordinates(location_facility, location_zip, location.location_city, location.location_state, location.location_country, count.to_update);
@@ -588,6 +567,13 @@ async function mergeProcessData(req, res) {
                     ignoreDuplicates: false, 
                     include: { model: Location, as: 'locations' }
                 });
+        let filterdArray = data.reduce((dataItem,{trial_fixed_id,story_telling}) => [...dataItem,{trial_fixed_id,value:story_telling,version:1}],[]);
+        await Story.bulkCreate(filterdArray,
+            {
+                returning: true,
+                ignoreDuplicates: false
+            });
+        
         }
 
         if (!result) {
@@ -721,12 +707,12 @@ async function getTrials(req, res) {
                 return {...x.dataValues,  distance: ''};
             }else if(distance) {
                 if(least_distance <= distance){
-                    return {...x.dataValues,  distance: Math.round(least_distance*100) / 100 + ' km', distance_value: Math.round(least_distance*100) / 100}
+                    return {...x.dataValues,  distance: calculated_distance(least_distance) + ' km', distance_value: calculated_distance(least_distance)}
             } else {
                 return '';
         }}
         else{
-            return {...x.dataValues,  distance: Math.round(least_distance*100) / 100 + ' km', distance_value: Math.round(least_distance*100) / 100}
+            return {...x.dataValues,  distance: calculated_distance(least_distance) + ' km', distance_value: calculated_distance(least_distance)}
         }
 
     }).filter(x=>x!=='').sort(function(a, b) {return a.distance_value - b.distance_value});
@@ -781,20 +767,48 @@ async function getTrials(req, res) {
     }
 }
 
+async function getAllStoryVersions(req, res) {
+    const response = new Response({}, []);
+    res.set({ 'content-type': 'application/json; charset=utf-8' });
+    try {
+        if (!req.params.trial_fixed_id) {
+            return res.status(400).send('Invalid request.');
+        }
+
+        let result = await Story.findAll({
+            where: {
+                trial_fixed_id: req.params.trial_fixed_id
+            }
+        });
+
+        if (!result) {
+            response.data = [];
+            return res.status(204).send(response);
+        }
+
+        response.data = result;
+        res.json(response);
+    } catch (err) {
+        logger.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
 async function getTrialDetails(req, res) {
     const response = new Response({}, []);
     res.set({ 'content-type': 'application/json; charset=utf-8' });
     try {
-        if (!req.params.id) {
+        if (!req.params.ids) {
             return res.status(400).send('Invalid request.');
         }
 
-        id = req.params.id;
-        let result = await Trial.findOne({
+        ids = req.params.ids.split(',');
+        let result = await Trial.findAll({
             where: {
                 [Op.or]: [
-                {trial_fixed_id: id},
-                {id: id}
+                {trial_fixed_id: ids},
+                {id: ids}
                 ]
             },
             include: ['locations']
@@ -806,6 +820,55 @@ async function getTrialDetails(req, res) {
         }
 
         response.data = result;
+        res.json(response);
+    } catch (err) {
+        logger.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
+
+async function updateStories(req, res) {
+    const response = new Response({}, []);
+    const reqdata = req.body;
+    res.set({ 'content-type': 'application/json; charset=utf-8' });
+    try {
+        let ids = reqdata.map(x=>x.trial_fixed_ids)[0];
+        let story = reqdata.map(x=>x.story)[0];
+        
+        let trials = await Trial.findAll({
+            where: {
+                trial_fixed_id: ids             
+            }
+        });
+
+        let result = trials.map(trial=>{
+            trial.story_telling = story;
+            trial.save({ fields: ['story_telling'] });
+            return trial; 
+        });
+
+        let story_result = ids.map(id=>{
+            Story.count({
+                where: {
+                    trial_fixed_id: id
+                }
+            }).then(countNo =>{
+                Story.create({
+                    trial_fixed_id: id,
+                    version: countNo+1,
+                    value: story
+                })
+            })
+        });
+
+        if (!result) {
+            response.data = [];
+            return res.status(204).send(response);
+        }
+
+        response.data = story_result;
         res.json(response);
     } catch (err) {
         logger.error(err);
@@ -890,19 +953,19 @@ async function getConditions(req, res) {
 async function getConditionsWithDetails(req, res) {
     const response = new Response({}, []);
     let conditions = [
-        {indication: 'Ankylosing Spondylitis', description: 'Ankylosing spondylitis (AS) is a type of arthritis in which there is a long-term inflammation of the joints of the spine. Typically the joints where the spine joins the pelvis are also affected. Occasionally other joints such as the shoulders or hips are involved. Eye and bowel problems may also occur.'},
-        {indication: 'Atopic Dermatitis', description: 'Atopic dermatitis (eczema) is a condition that makes your skin red and itchy. It\'s common in children but can occur at any age. Atopic dermatitis is long lasting (chronic) and tends to flare periodically. It may be accompanied by asthma or hay fever.'},
-        {indication: 'Autosomal Dominant Polycystic Kidney Disease', description:  'Autosomal dominant polycystic kidney disease (ADPKD) is a genetic disorder characterized by the growth of numerous cysts in the kidneys. Symptoms vary in severity and age of onset, but usually develop between the ages of 30 and 40. ADPKD is a progressive disease and symptoms tend to get worse over time. The most common symptoms are kidney cysts, pain in the back and the sides and headaches. Other symptoms include liver and pancreatic cysts, urinary tract infections, abnormal heart valves, high blood pressure, kidney stones, and brain aneurysms. ADPKD is most often caused by changes in the PKD1 and PKD2 genes, and less often by changes in the GANAB and DNAJB11 genes.[1] It is inherited in a dominant pattern. Treatment for ADPKD involves managing the symptoms and slowing disease progression. The most serious complication of ADPKD is kidney disease and kidney failure. ADPKD is the most common inherited disorder of the kidneys.'},
-        {indication: 'Crohn\'s Disease', description:  'Crohn\'s disease is a type of inflammatory bowel disease (IBD). It causes inflammation of your digestive tract, which can lead to abdominal pain, severe diarrhea, fatigue, weight loss and malnutrition.'},
-        {indication: 'Idiopathic Pulmonary Fibrosis', description:  'Idiopathic pulmonary fibrosis (IPF) is a rare, progressive illness of the respiratory system, characterized by the thickening and stiffening of lung tissue, associated with the formation of scar tissue. It is a type of chronic scarring lung disease characterized by a progressive and irreversible decline in lung function.[3][4] The tissue in the lungs becomes thick and stiff, which affects the tissue that surrounds the air sacs in the lungs.'},
-        {indication: 'Lupus Erythematosus', description:  'Lupus, technically known as systemic lupus erythematosus (SLE), is an autoimmune disease in which the body\'s immune system mistakenly attacks healthy tissue in many parts of the body.[1] Symptoms vary between people and may be mild to severe.[1] Common symptoms include painful and swollen joints, fever, chest pain, hair loss, mouth ulcers, swollen lymph nodes, feeling tired, and a red rash which is most commonly on the face.[1] Often there are periods of illness, called flares, and periods of remission during which there are few symptoms.'},
-        {indication: 'Psoriatic Arthritis', description:  'Psoriatic arthritis is a form of arthritis that affects some people who have psoriasis — a condition that features red patches of skin topped with silvery scales. Most people develop psoriasis first and are later diagnosed with psoriatic arthritis, but the joint problems can sometimes begin before skin patches appear.'},
-        {indication: 'Osteoarthritis', description:'OsteoarthritisOsteoarthritis (OA) is a type of joint disease that results from breakdown of joint cartilage and underlying bone. The most common symptoms are joint pain and stiffness. Usually the symptoms progress slowly over years. Initially they may occur only after exercise but can become constant over time.'},
-        {indication: 'Rheumatoid Arthritis', description:  'Rheumatoid arthritis is a chronic inflammatory disorder that can affect more than just your joints. In some people, the condition can damage a wide variety of body systems, including the skin, eyes, lungs, heart and blood vessels.'},
-        {indication: 'Sjogren\'s Syndrome', description:  'Sjogren\'s syndrome is an autoimmune disease. This means that your immune system attacks parts of your own body by mistake. In Sjogren\'s syndrome, it attacks the glands that make tears and saliva. This causes a dry mouth and dry eyes. You may have dryness in other places that need moisture, such as your nose, throat, and skin. Sjogren\'s can also affect other parts of the body, including your joints, lungs, kidneys, blood vessels, digestive organs, and nerves.'},
-        {indication: 'Systemic Sclerosis', description:'Systemic scleroderma, or systemic sclerosis, is an autoimmune rheumatic disease characterised by excessive production and accumulation of collagen, called fibrosis, in the skin and internal organs and by injuries to small arteries. There are two major subgroups of systemic sclerosis based on the extent of skin involvement: limited and diffuse. The limited form affects areas below, but not above, the elbows and knees with or without involvement of the face. The diffuse form also affects the skin above the elbows and knees and can also spread to the torso. Visceral organs, including the kidneys, heart, lungs, and gastrointestinal tract can also be affected by the fibrotic process. Prognosis is determined by the form of the disease and the extent of visceral involvement. Patients with limited systemic sclerosis have a better prognosis than those with the diffuse form. Death is most often caused by lung, heart, and kidney involvement. There is also a slight increase in the risk of cancer.'},
-        {indication: 'Ulcerative Colitis', description: 'Ulcerative colitis (UC) is a long-term condition that results in inflammation and ulcers of the colon and rectum. The primary symptoms of active disease are abdominal pain and diarrhea mixed with blood. Weight loss, fever, and anemia may also occur.'},
-        {indication: 'Uveitis', description:  'Uveitis is a form of eye inflammation. It affects the middle layer of tissue in the eye wall (uvea). Uveitis (u-vee-I-tis) warning signs often come on suddenly and get worse quickly. They include eye redness, pain and blurred vision.'}
+        {indication: 'Ankylosing Spondylitis', description: 'Ankylosing spondylitis is an inflammatory condition that affects the joints of the spine. Pain and stiffness is often experienced, which can lead to loss of flexibility, and can have a significant effect on day-to-day life. There is currently no cure for ankylosing spondylitis; however, there are ways to help manage the symptoms, including improving flexibility through exercise.Although this is a rare disease, which can sometimes feel isolating, it’s thought to affect 1% of US adults (1.7 million people), with global levels varying. Along with support from your doctor, there are also specific patient association websites that can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of others who have the same condition. Galapagos is committed to developing treatments for rare medical conditions with an unmet need, such as ankylosing spondylitis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
+        {indication: 'Atopic Dermatitis', description: 'Atopic dermatitis is common a skin disorder that occurs when the immune system becomes overactive, and results in symptoms including itchy and red skin. It can have a significant impact on day-to-day life, and as symptoms can come and go over time it can be difficult to manage. While the exact cause is unknown and there is currently no cure, symptoms can be reduced or controlled through a range of treatments.  Along with support from your doctor, there are also specific patient association websites that can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition. Galapagos is committed to developing treatments for rare medical conditions with an unmet need, such as atopic dermatitis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
+        {indication: 'Autosomal Dominant Polycystic Kidney Disease', description:  'Autosomal dominant polycystic kidney disease is mainly an inherited condition caused by cells in the kidney not developing properly, which results in the kidney not working properly. It is thought that 1 in 500 to 1 in 2,500 have this medical condition. While the impact of the disease can vary widely from person to person, it can result in difficult-to-manage symptoms, such as back pain, high blood pressure, headaches and kidney stones. There is no cure for autosomal dominant polycystic kidney disease; however, most associated symptoms can be managed with treatments. For some patients, additional treatment, such as dialysis – where a machine replaces kidney function – or a transplant, may be required.  Along with support from your doctor, there are also specific patient association websites that can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition. Galapagos is committed to developing treatments for rare medical conditions with an unmet need, such as autosomal dominant polycystic kidney disease. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
+        {indication: 'Crohn\'s Disease', description:  'Crohn’s disease is a chronic medical condition that affects the bowel and causes inflammation to occur in the digestive tract. It results in a wide range of symptoms including diarrhea, stomach pain, blood in stools, and weight loss. Symptoms can come and go over time, which can have a significant impact on day-to-day life and make it difficult to manage. While the exact cause is unknown and there is currently no cure, symptoms can be reduced or effectively controlled through a range of treatments. Along with support from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as Crohn’s disease. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
+        {indication: 'Idiopathic Pulmonary Fibrosis', description:  'Idiopathic pulmonary fibrosis (IPF) is a rare medical condition in which scar tissue forms on the lungs, resulting in symptoms of breathlessness,chronic dry cough and fatigue that can have a significant impact on day-to-day activities. Although there are currently some treatments available for IPF, there is no cure for this disease; however, understanding the symptoms and how they can be managed can help minimize their impact. Managing life with a rare disease can sometimes feel isolating; however, approximately 5 million people are currently living with IPF worldwide. Along with support from your doctor, there are also specific patient association websites that can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition. The exact cause of IPF is still unknown (“idiopathic” means no known cause), which can make it harder to develop specific treatments. Galapagos is committed to developing treatments for rare medical conditions with a high unmet need, such as IPF. We now have more than 10 years of experience within IPF and are currently enrolling patients onto our clinical trials. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
+        {indication: 'Lupus Erythematosus', description:  'Lupus erythematosus is a chronic medical condition that occurs as a result of the immune system not working as it should and the body attacking healthy cells by mistake, affecting multiple organs. The symptoms can come and go, which can make getting on with day-to-day life difficult; however, individualised management can help with controlling these symptoms. Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of patients and caregivers who have the same condition. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as lupus erythematosus. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
+        {indication: 'Psoriatic Arthritis', description:  'Psoriatic arthritis is a chronic, inflammatory type of arthritis that affects some people with the skin condition psoriasis. It can cause symptoms in the skin, joints and nails. The symptoms can directly impact day-to-day life, which can be made more difficult to manage as symptoms can go away and then come back in a period known as a flare-up; these flare-ups can last for days or months. While there is no cure for psoriatic arthritis, symptoms can be controlled with appropriate management.  Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as psoriatic arthritis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
+        {indication: 'Osteoarthritis', description:'Osteoarthritis is the most common type of arthritis and is caused by wear and tear to your joints. While joints are exposed to low-level impact in everyone, in people with osteoarthritis, joints become particularly stiff and painful. The severity of symptoms experienced varies from person to person, with some people experiencing mild symptoms that come and go and others experiencing much more severe symptoms that can considerably affect day-to-day life. Although there is no cure for osteoarthritis, symptoms don’t necessarily get worse and can often be reduced with appropriate management.  Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patient and caregivers who have the same condition. The exact cause of osteoarthritis is still unknown, which can make it harder to develop specific treatments. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as osteoarthritis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
+        {indication: 'Rheumatoid Arthritis', description:  'Rheumatoid arthritis is a chronic medical condition that occurs as a result of the immune system not working as it should and the body attacking healthy cells by mistake; this causes swelling and pain in the joints. The symptoms can come and go and not knowing when symptoms might appear can be difficult. However, appropriate treatment can result in months or years between flare-ups, which helps in being able to get on with day-to-day life. Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of others who have the same condition. There is currently no cure for rheumatoid arthritis. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as rheumatoid arthritis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
+        {indication: 'Sjogren\'s Syndrome', description:  'Sjogren\'s syndrome is a chronic autoimmune condition in which the immune system becomes overactive and attacks the healthy tissue, in particular the tear and salivary glands. It’s not clear why this happens, meaning it has been difficult to develop specific treatments; however, there are ways in which the symptoms can be controlled. Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as Sjogren\'s Syndrome. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
+        {indication: 'Systemic Sclerosis', description:'Systemic sclerosis is a chronic autoimmune condition in which the immune system becomes overactive and attacks the connective tissue that sits under the skin, which leads to hardened areas forming. The exact symptoms can differ from person to person, with some people experiencing symptoms affecting the internal organs and blood vessels. It’s not clear why this happens to the immune system, meaning it has been difficult to develop specific treatments; however, your doctor can support you on how to best manage the disease.Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of patients and caregivers who have the same condition. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as systemic sclerosis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
+        {indication: 'Ulcerative Colitis', description: 'Ulcerative colitis is a chronic condition that causes inflammation in the digestive tract. Common symptoms include diarrhea, rectal bleeding and weight loss. The exact cause of ulcerative colitis is unknown, but eating healthily and keeping on top of stress has been shown to be beneficial. While there is currently no cure for ulcerative colitis, doctors have lots of experience managing this condition and will develop a management approach to help with symptoms. Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patient and caregivers who have the same condition. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as ulcerative colitis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
+        {indication: 'Uveitis', description:  'Uveitis is a medical condition that occurs due to inflammation in part of the eye, resulting in a wide range of symptoms including blurry vision, a red eye or headaches. It can be caused by infection or immune response, and some instances it’s difficult to find the exact cause. Usually the treatment will be similar no matter the cause, apart from in uveitis caused by infection, where treatment that fights the bacteria or virus will be used. Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition. Galapagos is committed to developing treatments for medical conditions such as uveitis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'}
     ].sort();
     try {
         response.data = conditions;
@@ -937,3 +1000,5 @@ exports.getConditionsWithDetails = getConditionsWithDetails;
 exports.validateAddress = validateAddress;
 exports.syncGeoCodes = syncGeoCodes;
 exports.updateClinicalTrials = updateClinicalTrials;
+exports.updateStories = updateStories ;
+exports.getAllStoryVersions = getAllStoryVersions ;
