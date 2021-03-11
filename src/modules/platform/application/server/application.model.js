@@ -26,9 +26,6 @@ const Application = sequelize.cdpConnector.define('applications', {
         type: DataTypes.ENUM,
         values: ['standard', 'hcp-portal']
     },
-    // scope: {
-    //     type: DataTypes.ARRAY(DataTypes.STRING)
-    // },
     email: {
         unique: true,
         allowNull: false,
@@ -45,6 +42,13 @@ const Application = sequelize.cdpConnector.define('applications', {
         set(value) {
             this.setDataValue('password', bcrypt.hashSync(value, 8));
         }
+    },
+    failed_auth_attempt: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
+    password_expiry_date: {
+        type: DataTypes.DATE
     },
     refresh_token: {
         type: DataTypes.STRING

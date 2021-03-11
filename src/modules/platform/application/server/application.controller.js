@@ -32,6 +32,7 @@ function generateRefreshToken(doc) {
 
 async function getToken(req, res) {
     const response = new Response({}, []);
+    const maximumFailedAttempts = 5;
 
     try {
         let application;
@@ -40,12 +41,22 @@ async function getToken(req, res) {
         if(grant_type === 'password') {
             application = await Application.findOne({ where: { email: username } });
 
-            if (!application.is_active) {
+            if (application && !application.is_active) {
                 response.errors.push(new CustomError('Request denied.', 400));
                 return res.status(400).send(response);
             }
 
             if (!application || !application.validPassword(password)) {
+                console.log(application)
+                if (application) {
+                    await application.update({
+                        failed_auth_attempt: application.failed_auth_attempt + 1,
+                        is_active: application.failed_auth_attempt + 1 >= maximumFailedAttempts
+                            ? false
+                            : application.is_active
+                    });
+                }
+
                 response.errors.push(new CustomError('Invalid username or password.', 401));
             } else {
                 const new_refresh_token = generateRefreshToken(application);
@@ -60,12 +71,19 @@ async function getToken(req, res) {
                 const decoded = jwt.verify(refresh_token, nodecache.getValue('APPLICATION_REFRESH_SECRET'));
                 application = await Application.findOne({ where: { id: decoded.id } });
 
-                if (!application.is_active) {
+                if (application && !application.is_active) {
                     response.errors.push(new CustomError('Request denied.', 400));
                     return res.status(400).send(response);
                 }
 
                 if(application.refresh_token !== refresh_token) {
+                    await application.update({
+                        failed_auth_attempt: application.failed_auth_attempt + 1,
+                        is_active: application.failed_auth_attempt + 1 >= maximumFailedAttempts
+                            ? false
+                            : application.is_active
+                    });
+
                     response.errors.push(new CustomError('The refresh_token is invalid.', 4401));
                 }
             } catch(err) {
