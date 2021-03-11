@@ -478,6 +478,7 @@ async function mergeProcessData(req, res) {
                 var exclusion_label_text = paragraph_lowercase.lastIndexOf('key exclusion criteria')!==-1? 'key exclusion criteria' : 
                                             paragraph_lowercase.lastIndexOf('exclusion criteria')!==-1? 'exclusion criteria':
                                             paragraph_lowercase.lastIndexOf(note_label_text)!==-1? note_label_text : '';
+                var sponsor = element.Study.ProtocolSection.IdentificationModule.Organization.OrgFullName;
                  return { 
                     'trial_fixed_id': uuid(),
                     'indication': element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0].capitalize().split('|').join(','),
@@ -494,6 +495,7 @@ async function mergeProcessData(req, res) {
                     'std_age': element.Study.ProtocolSection.EligibilityModule.StdAgeList.StdAge.join(','),
                     'phase': element.Study.ProtocolSection.DesignModule.PhaseList.Phase[0],
                     'trial_status': element.Study.ProtocolSection.StatusModule.OverallStatus,
+                    'sponsor': sponsor,
                     'inclusion_criteria': (()=>{
                         try{
                             var inclusion_boundary = [paragraph_lowercase.indexOf(inclusion_label_text)+inclusion_label_text.length, paragraph_lowercase.indexOf(exclusion_label_text)];
@@ -541,7 +543,7 @@ async function mergeProcessData(req, res) {
                         }
                     })(),
                     'type_of_drug': element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList && element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.length ? properDrugTypeName(element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention[0].InterventionName): null,
-                    'story_telling': 'In this trial, doctors hope to find out how the study drug works together with your current standard treatment in terms of its effects on your lung function and IPF in general. People with IPF have increased levels of something called autotaxin, which is thought to have a role in the progression of IPF. The trial is investigating whether decreasing the activity of autotaxin can have a positive effect. It will also look at how well the study drug is tolerated.',
+                    'story_telling': sponsor.toLowerCase().includes('gilead')? 'This clinical trial is run by Gilead Sciences Inc., a Galapagos partner. The information displayed on this page is strictly based on the information provided by Gilead Sciences Inc. on clinicaltrials.gov, as automatically extracted.' : 'The content displayed below is based on information provided by clinicaltrials.gov. On this page you can review the main details of the clinical trial, including the purpose and main eligibility criteria. You can also identify the closest clinical trial location to you.',
                     'trial_start_date': new Date(element.Study.ProtocolSection.StatusModule.StartDateStruct.StartDate),
                     'trial_end_date': element.Study.ProtocolSection.StatusModule.CompletionDateStruct.CompletionDate ? new Date(element.Study.ProtocolSection.StatusModule.CompletionDateStruct.CompletionDate) : null,
                     'locations': locationList? await Promise.all(locationList.Location.map(async (location,index)=> {
@@ -808,8 +810,12 @@ async function getTrialDetails(req, res) {
     const response = new Response({}, []);
     res.set({ 'content-type': 'application/json; charset=utf-8' });
     try {
-        if (!req.params.ids) {
+        
+        if (!req.params.ids && !req.params.id) {
             return res.status(400).send('Invalid request.');
+        }
+        else if(!req.params.ids){
+            req.params.ids = req.params.id;
         }
 
         ids = req.params.ids.split(',');
