@@ -17,11 +17,12 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
     const [application, setApplication] = useState({});
 
     const metadataOptions = {
-        standard: [],
+        standard: [
+            "request_notification_link"
+        ],
         "hcp-portal": [
             "cache_clearing_url",
-            "approve_user_path",
-            "request_notification_link"
+            "approve_user_path"
         ]
     }
 
