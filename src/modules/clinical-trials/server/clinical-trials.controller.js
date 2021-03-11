@@ -186,6 +186,10 @@ function uuid() {
     });
 }
 
+function properDrugTypeName(drugName) {
+    return drugName === 'GLPG0634' ? 'Filgotinib' : drugName.capitalize();
+}
+
 function groupIndications(indication) {
     switch(indication){
         case 'Ankylosing Spondylitis':
@@ -326,8 +330,8 @@ function genderInputTextMapping(gender) {
                 return '';
                 break;
         }
-    })[0] : null;
-    return gender;
+    }) : null;
+    return gender && gender.length? gender.reduce((a,b)=> [...a,...b] ): gender;
 }
 
 async function dumpAllData(req, res) {
@@ -468,11 +472,13 @@ async function mergeProcessData(req, res) {
 
                 var paragraph = element.Study.ProtocolSection.EligibilityModule.EligibilityCriteria;
                 var paragraph_lowercase = paragraph.toLowerCase();
-                var note_label_text = paragraph_lowercase.lastIndexOf('note:')!==-1?  'note:' : '';
+                var last_line = paragraph.split(/\r?\n/).pop();
+                var note_label_text = last_line.toLowerCase().indexOf('note:')!==-1?  'note:' : '';
                 var inclusion_label_text = paragraph_lowercase.indexOf('key inclusion criteria')!==-1? 'key inclusion criteria' : 'inclusion criteria';
                 var exclusion_label_text = paragraph_lowercase.lastIndexOf('key exclusion criteria')!==-1? 'key exclusion criteria' : 
                                             paragraph_lowercase.lastIndexOf('exclusion criteria')!==-1? 'exclusion criteria':
                                             paragraph_lowercase.lastIndexOf(note_label_text)!==-1? note_label_text : '';
+                var sponsor = element.Study.ProtocolSection.IdentificationModule.Organization.OrgFullName;
                  return { 
                     'trial_fixed_id': uuid(),
                     'indication': element.Study.ProtocolSection.ConditionsModule.ConditionList.Condition[0].capitalize().split('|').join(','),
@@ -489,6 +495,7 @@ async function mergeProcessData(req, res) {
                     'std_age': element.Study.ProtocolSection.EligibilityModule.StdAgeList.StdAge.join(','),
                     'phase': element.Study.ProtocolSection.DesignModule.PhaseList.Phase[0],
                     'trial_status': element.Study.ProtocolSection.StatusModule.OverallStatus,
+                    'sponsor': sponsor,
                     'inclusion_criteria': (()=>{
                         try{
                             var inclusion_boundary = [paragraph_lowercase.indexOf(inclusion_label_text)+inclusion_label_text.length, paragraph_lowercase.indexOf(exclusion_label_text)];
@@ -524,15 +531,19 @@ async function mergeProcessData(req, res) {
                     'note_criteria':(()=>{
                         try{
                             if(note_label_text == '') return  '';
-                            var note_boundary = [paragraph_lowercase.indexOf(note_label_text)+note_label_text.length, paragraph_lowercase.length];
-                            var note_text = paragraph.substring(note_boundary[0],note_boundary[1]).replace(/^[ :]+/g,'').replace('note:', '');
+                            
+                            // var note_boundary = [paragraph_lowercase.indexOf(note_label_text)+note_label_text.length, paragraph_lowercase.length];
+                            // var note_text = paragraph.substring(note_boundary[0],note_boundary[1]).replace(/^[ :]+/g,'').replace('note:', '');
+                            
+                            var note_boundary = [last_line.toLowerCase().indexOf(note_label_text)+note_label_text.length, last_line.length];
+                            var note_text = last_line.substring(note_boundary[0],note_boundary[1]).replace(/^[ :]+/g,'').replace('note:', '');
                             return note_text;
                         }catch(ex){
                             return '';
                         }
                     })(),
-                    'type_of_drug': element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList && element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.length ? element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention[0].InterventionName: null,
-                    'story_telling': 'In this trial, doctors hope to find out how the study drug works together with your current standard treatment in terms of its effects on your lung function and IPF in general. People with IPF have increased levels of something called autotaxin, which is thought to have a role in the progression of IPF. The trial is investigating whether decreasing the activity of autotaxin can have a positive effect. It will also look at how well the study drug is tolerated.',
+                    'type_of_drug': element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList && element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.length ? properDrugTypeName(element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention[0].InterventionName): null,
+                    'story_telling': sponsor.toLowerCase().includes('gilead')? 'This clinical trial is run by Gilead Sciences Inc., a Galapagos partner. The information displayed on this page is strictly based on the information provided by Gilead Sciences Inc. on clinicaltrials.gov, as automatically extracted.' : 'The content displayed below is based on information provided by clinicaltrials.gov. On this page you can review the main details of the clinical trial, including the purpose and main eligibility criteria. You can also identify the closest clinical trial location to you.',
                     'trial_start_date': new Date(element.Study.ProtocolSection.StatusModule.StartDateStruct.StartDate),
                     'trial_end_date': element.Study.ProtocolSection.StatusModule.CompletionDateStruct.CompletionDate ? new Date(element.Study.ProtocolSection.StatusModule.CompletionDateStruct.CompletionDate) : null,
                     'locations': locationList? await Promise.all(locationList.Location.map(async (location,index)=> {
@@ -707,12 +718,12 @@ async function getTrials(req, res) {
                 return {...x.dataValues,  distance: ''};
             }else if(distance) {
                 if(least_distance <= distance){
-                    return {...x.dataValues,  distance: calculated_distance(least_distance) + ' km', distance_value: calculated_distance(least_distance)}
+                    return {...x.dataValues,  distance: calculateDistanceToInteger(least_distance) + ' km', distance_value: calculateDistanceToInteger(least_distance)}
             } else {
                 return '';
         }}
         else{
-            return {...x.dataValues,  distance: calculated_distance(least_distance) + ' km', distance_value: calculated_distance(least_distance)}
+            return {...x.dataValues,  distance: calculateDistanceToInteger(least_distance) + ' km', distance_value: calculateDistanceToInteger(least_distance)}
         }
 
     }).filter(x=>x!=='').sort(function(a, b) {return a.distance_value - b.distance_value});
@@ -799,8 +810,12 @@ async function getTrialDetails(req, res) {
     const response = new Response({}, []);
     res.set({ 'content-type': 'application/json; charset=utf-8' });
     try {
-        if (!req.params.ids) {
+        
+        if (!req.params.ids && !req.params.id) {
             return res.status(400).send('Invalid request.');
+        }
+        else if(!req.params.ids){
+            req.params.ids = req.params.id;
         }
 
         ids = req.params.ids.split(',');
