@@ -10,13 +10,28 @@ export function fetchTrialItem(id) {
             age : 20,
             gender: 'male'
         }
-    };
+    }
+}
+
+export function getMultipleClinicalTrialDetails(ids) {
+    let trials = []
+    ids.map(id=>{
+        const url = `/api/clinical-trials-cdp/${id}`;
+        axios({
+            method: 'get',
+            url
+        }).then(res=> trials.push(res))
+    })
+    
+    return {
+        type: Types.GET_MULTIPLE_TRIAL_DETAILS,
+        payload: trials
+    }
 }
 
 export function getClinicalTrialDetails(ids) {
-    //let id = prompt("set your id:", 'bf3fcdd9-2c14-4a1e-b02c-787c379c0aa9');
-    let id = ids[0];
-    const url = `/api/clinical-trials-cdp/${id}`;
+    
+    const url = `/api/clinical-trials-cdp/${ids}`;
     return {
         type: Types.GET_TRIAL_DETAILS,
         payload: axios({
