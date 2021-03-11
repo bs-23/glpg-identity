@@ -16,6 +16,12 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
     const { addToast } = useToasts();
     const [application, setApplication] = useState({});
 
+    const metadataOptions = [
+        "cache_clearing_url",
+        "approve_user_path",
+        "request_notification_link"
+    ];
+
     const convertMetadataToArray = (metadata) => {
         if (!metadata) return [];
 
@@ -54,7 +60,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                     return <div key={ind} className="row">
                         <div className="col-5">
                             <Field  // input field for key
-                                type="text"
+                                as="select"
                                 value={item.key}
                                 className="form-control"
                                 onChange={(e) => {
@@ -63,7 +69,16 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                     updatedMetadata[ind]["key"] = updatedMetadataKey;
                                     formikProps.setFieldValue('metadata', updatedMetadata);
                                 }}
-                            />
+                            >
+                                <>
+                                    <option disabled value="">Select an option</option>
+                                    {
+                                        metadataOptions.map(option =>
+                                            <option disabled={formikProps.values.metadata.some(item => item.key === option)} key={option} value={option}>{option}</option>
+                                        )
+                                    }
+                                </>
+                            </Field>
                         </div>
                         <div className="col-5">
                             <Field  // input field for value
