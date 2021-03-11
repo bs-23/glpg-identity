@@ -1,8 +1,19 @@
 import axios from "axios";
 import React, { useState, useEffect } from 'react';
-import { Form, Formik, Field, ErrorMessage } from "formik";
+import { Form, Formik, Field, ErrorMessage, getIn } from "formik";
 import { useToasts } from "react-toast-notifications";
 import { createApplicationSchema, updateApplicationSchema } from './applications.schema';
+
+const ErrorMessageForArray = ({ name }) => (
+    <Field
+      name={name}
+      render={({ form }) => {
+        const error = getIn(form.errors, name);
+        const touch = getIn(form.touched, name);
+        return touch && error ? error : null;
+      }}
+    />
+  );
 
 const FormField = ({ label, name, type, children, required = true, ...rest }) => <div className="col-12">
     <div className="form-group">
@@ -83,6 +94,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                     }
                                 </>
                             </Field>
+                            <div className="invalid-feedback"><ErrorMessageForArray name={`metadata[${ind}].key`} /></div>
                         </div>
                         <div className="col-12 col-md-5">
                             <Field  // input field for value
@@ -96,6 +108,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                     formikProps.setFieldValue('metadata', updatedMetadata);
                                 }}
                             />
+                            <div className="invalid-feedback"><ErrorMessageForArray name={`metadata[${ind}].value`} /></div>
                         </div>
                         <div className="col-12 col-md-2">
                             <span
@@ -108,7 +121,6 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                 <i class="fas fa-times"></i>
                             </span>
                         </div>
-
                     </div>
                 })
             }
@@ -247,7 +259,6 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="metadata">Metadata</label>
                                             {renderMetadata(formikProps)}
-                                            <div className="invalid-feedback"><ErrorMessage name="metadata" /></div>
                                         </div>
                                     </div>
                                     <div className="col-12">
