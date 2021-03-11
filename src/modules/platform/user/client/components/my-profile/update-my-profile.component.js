@@ -74,10 +74,12 @@ const UpdateMyProfile = () => {
     const onChangePhonefield = (phoneNumber) => {
             const phoneNumberCountryISO = new PhoneNumber(phoneNumber).getRegionCode();
             let selectedCountry = desiredCountryList.find(country => country.countryCode === phoneNumberCountryISO);
-            if (selectedCountry === undefined) { setPhoneFieldDisabled(true); }
+        if (selectedCountry === undefined) { phoneFieldRef !== null ? phoneFieldRef.disabled = true : ''}
             else {
             selectedCountry.flag = generateCountryIconPath(selectedCountry.countryNameEn);
-            setPhoneFieldDisabled(false);
+            if (phoneFieldRef !== null) {
+                phoneFieldRef.disabled = false;
+            }
         }
             selectedCountry === undefined ? null : selectedCountry.flag = generateCountryIconPath(selectedCountry.countryNameEn);
             return selectedCountry === undefined ? null : selectedCountry;
@@ -230,7 +232,7 @@ const UpdateMyProfile = () => {
                                                         </Dropdown.Menu>
                                                     </Dropdown>
                                                         </span>
-                                                <Field disabled={phoneFieldDisabled} data-testid="phone" innerRef={(ele) => setPhoneFieldRef(ele)} className="form-control rounded" type="text" name="phone" onChange={(e) => handlePhoneFieldChange(e, formikProps)} />
+                                                <Field data-testid="phone" innerRef={(ele) => setPhoneFieldRef(ele)} className="form-control rounded" type="text" name="phone" onChange={(e) => handlePhoneFieldChange(e, formikProps)} />
                                                     </div>
                                                 </div>
                                             </div>
