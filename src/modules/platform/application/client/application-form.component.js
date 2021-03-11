@@ -122,8 +122,8 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
 
         promise.then(() => {
             const successMessage = isEditing
-                ? 'Successfully updated new profile.'
-                : 'Successfully created new profile.';
+                ? 'Successfully updated the service account.'
+                : 'Successfully created a service account.';
 
             addToast(successMessage, {
                 appearance: 'success',
