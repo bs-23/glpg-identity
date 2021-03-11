@@ -55,7 +55,13 @@ const applicationSchema = {
         .required('This field must not be empty')
         .oneOf([ref('password'), null], 'Passwords must match'),
     type: string()
-        .required('This field must not be empty')
+        .required('This field must not be empty'),
+    metadata: array().of(
+        object().shape({
+            key: string().required('This field must not be empty'),
+            value: string().required('This field must not be empty')
+        })
+    )
 }
 
 export const createApplicationSchema = object().shape({ ...applicationSchema });
