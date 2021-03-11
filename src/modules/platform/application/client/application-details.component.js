@@ -50,7 +50,7 @@ const ApplicationDetailsModal = ({ applicationId, show, onHide, ...rest }) => {
         dialogClassName="modal-90w modal-customize"
         aria-labelledby="example-custom-modal-styling-title"
         centered
-        size="lg"
+        size="xl"
         {...rest}
     >
         <Modal.Header closeButton>
