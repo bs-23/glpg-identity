@@ -405,8 +405,13 @@ async function mergeProcessData(req, res) {
                     'note_criteria':(()=>{
                         try{
                             if(note_label_text == '') return  '';
-                            var note_boundary = [paragraph_lowercase.indexOf(note_label_text)+note_label_text.length, paragraph_lowercase.length];
-                            var note_text = paragraph.substring(note_boundary[0],note_boundary[1]).replace(/^[ :]+/g,'').replace('note:', '');
+                            var last_line = paragraph.split(/\r?\n/).pop();
+                            if(last_line.toLowerCase().indexOf(note_label_text) === -1) return '';
+                            // var note_boundary = [paragraph_lowercase.indexOf(note_label_text)+note_label_text.length, paragraph_lowercase.length];
+                            // var note_text = paragraph.substring(note_boundary[0],note_boundary[1]).replace(/^[ :]+/g,'').replace('note:', '');
+                            
+                            var note_boundary = [last_line.toLowerCase().indexOf(note_label_text)+note_label_text.length, last_line.length];
+                            var note_text = last_line.substring(note_boundary[0],note_boundary[1]).replace(/^[ :]+/g,'').replace('note:', '');
                             return note_text;
                         }catch(ex){
                             return '';
