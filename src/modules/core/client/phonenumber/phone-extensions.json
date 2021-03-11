@@ -3,84 +3,72 @@
         "countryCallingCode": "376",
         "countryCode": "AD",
         "countryNameEn": "Andorra",
-        "flag": "🇦🇩",
         "region": "Europe"
     },
     {
         "countryCallingCode": "880",
         "countryCode": "BD",
         "countryNameEn": "Bangladesh",
-        "flag": "🇧🇩",
         "region": "Asia & Pacific"
     },
     {
         "countryCallingCode": "32",
         "countryCode": "BE",
         "countryNameEn": "Belgium",
-        "flag": "🇧🇪",
         "region": "Europe"
     },
     {
         "countryCallingCode": "49",
         "countryCode": "DE",
         "countryNameEn": "Germany",
-        "flag": "🇩🇪",
         "region": "Europe"
     },
     {
         "countryCallingCode": "34",
         "countryCode": "ES",
         "countryNameEn": "Spain",
-        "flag": "🇪🇸",
         "region": "Europe"
     },
     {
         "countryCallingCode": "33",
         "countryCode": "FR",
         "countryNameEn": "France",
-        "flag": "🇫🇷",
         "region": "Europe"
     },
     {
         "countryCallingCode": "353",
         "countryCode": "IE",
         "countryNameEn": "Ireland",
-        "flag": "🇮🇪",
         "region": "Europe"
     },
     {
         "countryCallingCode": "39",
         "countryCode": "IT",
         "countryNameEn": "Italy",
-        "flag": "🇮🇹",
         "region": "Europe"
     },
     {
         "countryCallingCode": "352",
         "countryCode": "LU",
         "countryNameEn": "Luxembourg",
-        "flag": "🇱🇺",
         "region": "Europe"
     },
     {
         "countryCallingCode": "377",
         "countryCode": "MC",
         "countryNameEn": "Monaco",
-        "flag": "🇲🇨",
         "region": "Europe"
     },
     {
         "countryCallingCode": "31",
         "countryCode": "NL",
         "countryNameEn": "Netherlands",
-        "flag": "🇳🇱",
         "region": "Europe"
     },
     {
         "countryCallingCode": "44",
         "countryCode": "GB",
         "countryNameEn": "United Kingdom",
-        "flag": "🇬🇧",
         "region": "Europe"
     }
 ]

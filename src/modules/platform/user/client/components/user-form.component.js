@@ -13,6 +13,7 @@ export default function UserForm() {
     const dispatch = useDispatch();
     const [selectedCountryCode, setSelectedCountryCode] = useState(0);
     const [phoneFieldRef, setPhoneFieldRef] = useState(null);
+    const [phoneFieldDisabled, setPhoneFieldDisabled] = useState(false);
     const [profiles, setProfiles] = useState([]);
     const [roles, setRoles] = useState([]);
     const history = useHistory();
@@ -35,11 +36,23 @@ export default function UserForm() {
         getRole();
     }, []);
 
-    const editFlag = (phoneNumber) => {
+    const generateCountryIconPath = (country) => {
+        if (country) return `/assets/flag/flag-${country.toLowerCase().replace(/ /g, "-")}.svg`;
+        return `/assets/flag/flag-placeholder.svg`;
+    };
+
+    const onChangePhonefield = (phoneNumber) => {
         const phoneNumberCountryISO = new PhoneNumber(phoneNumber).getRegionCode();
         let selectedCountry = desiredCountryList.find(country => country.countryCode === phoneNumberCountryISO);
+        if (selectedCountry === undefined){ setPhoneFieldDisabled(true); }
+        else{
+            selectedCountry.flag = generateCountryIconPath(selectedCountry.countryNameEn);
+            setPhoneFieldDisabled(false);
+            phoneFieldRef.focus();
+        }
         return selectedCountry === undefined ? null : selectedCountry;
     };
+
 
     return (
         <main className="app__content">
@@ -115,11 +128,13 @@ export default function UserForm() {
                                                                                 <Dropdown>
                                                                                     {desiredCountryList.map((country, index) => {
                                                                                         return (index === selectedCountryCode ?
-                                                                                            <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
-                                                                                                <span height="20" width="25"> {
-                                                                                                    editFlag(formikProps.values.phone) === null ? 'Select' : editFlag(formikProps.values.phone).flag} </span>
+                                                                                            <Dropdown.Toggle key={index} variant className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
+                                                                                            {
+                                                                                                    onChangePhonefield(formikProps.values.phone) === null ? <span height="20" width="20">Select</span> :
+                                                                                                        <img height="20" width="20" src={onChangePhonefield(formikProps.values.phone) === null ? '' : onChangePhonefield(formikProps.values.phone).flag} />
+                                                                                            }
                                                                                                 <span className="country-phone-code pl-1">
-                                                                                                    {editFlag(formikProps.values.phone) === null ? "" : editFlag(formikProps.values.phone).countryCode}
+                                                                                                    {onChangePhonefield(formikProps.values.phone) === null ? "" : onChangePhonefield(formikProps.values.phone).countryCode}
                                                                                                 </span>
                                                                                             </Dropdown.Toggle> : null);
                                                                                     })}
@@ -133,7 +148,7 @@ export default function UserForm() {
                                                                                                     formikProps.setFieldValue('phone', `+${countryCode}`);
                                                                                                     phoneFieldRef.focus();
                                                                                                 }} key={index} className="px-2 d-flex align-items-center">
-                                                                                                    <span height="20" width="20">{country.flag} </span>
+                                                                                                    <img height="20" width="20" src={generateCountryIconPath(country.countryNameEn)} />
                                                                                                     <span className="country-name pl-2">{country.countryNameEn}</span>
                                                                                                     <span className="country-phone-code pl-1">{`+${country.countryCallingCode}`}</span>
                                                                                                 </Dropdown.Item>)
@@ -141,7 +156,7 @@ export default function UserForm() {
                                                                                     </Dropdown.Menu>
                                                                                 </Dropdown>
                                                                             </span>
-                                                                            <Field innerRef={(ele) => setPhoneFieldRef(ele)} data-testid="phone" className="form-control rounded" type="text" name="phone" />
+                                                                        <Field disabled={phoneFieldDisabled} innerRef={(ele) => setPhoneFieldRef(ele)} data-testid="phone" className="form-control rounded" type="text" name="phone"/>
                                                                         </div>
                                                                     </div>
                                                                     <div className="invalid-feedback">
