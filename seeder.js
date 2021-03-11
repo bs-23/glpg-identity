@@ -364,7 +364,7 @@ async function init() {
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
                     metadata: {
                         approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
-                        logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
+                        logo_url: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                         cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-hcpportal/clear/author-publish-cache"
                     },
                     created_by: admin.id,
@@ -381,7 +381,7 @@ async function init() {
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
                     metadata: {
                         cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-brandx/clear/author-publish-cache",
-                        logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
+                        logo_url: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
                         approve_user_path: '/bin/public/glpg-brandx/mail/approve-user'
                     },
                     created_by: admin.id,
@@ -391,15 +391,10 @@ async function init() {
                     id: '0da54f98-6ec0-4055-8ce7-4ab2aa1fe921',
                     name: 'Clinical Trials',
                     slug: convertToSlug('Clinical Trials'),
-                    email: 'clinical-trial-portal@glpg.com',
+                    email: 'clinicaltrials-portal@glpg.com',
                     password: 'P@ssword123',
                     type: 'standard',
                     is_active: true,
-                    auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
-                    metadata: {
-                        approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
-                        logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`
-                    },
                     created_by: admin.id,
                     updated_by: admin.id
                 },
@@ -415,8 +410,6 @@ async function init() {
                     created_by: admin.id,
                     updated_by: admin.id,
                     metadata: {
-                        approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
-                        logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                         request_notification_link: 'https://onboarding-business-partner-dev.glpg.com/bin/public/glpg-forms/sendForm.invitation.html'
                     }
                 }
