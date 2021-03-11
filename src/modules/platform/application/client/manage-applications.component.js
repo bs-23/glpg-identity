@@ -167,7 +167,7 @@ export default function ManageApplications() {
                         >
                             <Modal.Header closeButton>
                                 <Modal.Title id="example-custom-modal-styling-title">
-                                    {isEditing ? "Update Profile" : "Create New Application"}
+                                    {isEditing ? "Update Service Account" : "Create New Service Account"}
                                 </Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
