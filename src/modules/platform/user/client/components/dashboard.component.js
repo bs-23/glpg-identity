@@ -77,9 +77,8 @@ export default function Dashboard() {
                             <Inbox />
                         </div>
                         <Faq topic="general-information" />
-                        <div className="d-sm-block mt-3" >
-                            <HotStatistic />
-                        </div>
+                        <HotStatistic />
+                       
                     </div>
                 </div>
             </div>
