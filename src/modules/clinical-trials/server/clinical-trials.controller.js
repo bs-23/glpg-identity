@@ -472,7 +472,8 @@ async function mergeProcessData(req, res) {
 
                 var paragraph = element.Study.ProtocolSection.EligibilityModule.EligibilityCriteria;
                 var paragraph_lowercase = paragraph.toLowerCase();
-                var note_label_text = paragraph_lowercase.lastIndexOf('note:')!==-1?  'note:' : '';
+                var last_line = paragraph.split(/\r?\n/).pop();
+                var note_label_text = last_line.toLowerCase().indexOf('note:')!==-1?  'note:' : '';
                 var inclusion_label_text = paragraph_lowercase.indexOf('key inclusion criteria')!==-1? 'key inclusion criteria' : 'inclusion criteria';
                 var exclusion_label_text = paragraph_lowercase.lastIndexOf('key exclusion criteria')!==-1? 'key exclusion criteria' : 
                                             paragraph_lowercase.lastIndexOf('exclusion criteria')!==-1? 'exclusion criteria':
@@ -528,8 +529,12 @@ async function mergeProcessData(req, res) {
                     'note_criteria':(()=>{
                         try{
                             if(note_label_text == '') return  '';
-                            var note_boundary = [paragraph_lowercase.indexOf(note_label_text)+note_label_text.length, paragraph_lowercase.length];
-                            var note_text = paragraph.substring(note_boundary[0],note_boundary[1]).replace(/^[ :]+/g,'').replace('note:', '');
+                            
+                            // var note_boundary = [paragraph_lowercase.indexOf(note_label_text)+note_label_text.length, paragraph_lowercase.length];
+                            // var note_text = paragraph.substring(note_boundary[0],note_boundary[1]).replace(/^[ :]+/g,'').replace('note:', '');
+                            
+                            var note_boundary = [last_line.toLowerCase().indexOf(note_label_text)+note_label_text.length, last_line.length];
+                            var note_text = last_line.substring(note_boundary[0],note_boundary[1]).replace(/^[ :]+/g,'').replace('note:', '');
                             return note_text;
                         }catch(ex){
                             return '';
