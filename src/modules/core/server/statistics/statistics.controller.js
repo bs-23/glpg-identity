@@ -10,7 +10,10 @@ async function getStatistics(req, res) {
         const users_count = await User.count();
         const hcps_count = await HCP.count();
         const consents_count = await Consent.count();
-        const captured_consents_count = await HcpConsent.count();
+        const captured_consents_count = await HcpConsent.count({
+            where: {
+                consent_confirmed: true
+            }});
 
         const statistics = {
             hcps_count,

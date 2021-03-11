@@ -18,7 +18,7 @@ const UpdateMyProfile = () => {
     const desiredCountryList = useSelector(state => state.phoneExtensionReducer.phone_extensions);
     const getMyCountryISO2 = useSelector(state => state.userReducer.loggedInUser.countries);
     const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}');
-
+    const [phoneFieldDisabled, setPhoneFieldDisabled] = useState(false);
     const getMyApplicationNames = () => {
         if(!myProfileInfo) return [];
 
@@ -71,11 +71,16 @@ const UpdateMyProfile = () => {
         return `/assets/flag/flag-placeholder.svg`;
     }
 
-    const editPhonefield = (phoneNumber) => {
-        const phoneNumberCountryISO = new PhoneNumber(phoneNumber).getRegionCode();
-        let selectedCountry = desiredCountryList.find(country => country.countryCode === phoneNumberCountryISO);
-        selectedCountry === undefined ? null : selectedCountry.flag = generateCountryIconPath(selectedCountry.countryNameEn);
-        return selectedCountry === undefined ? null : selectedCountry;
+    const onChangePhonefield = (phoneNumber) => {
+            const phoneNumberCountryISO = new PhoneNumber(phoneNumber).getRegionCode();
+            let selectedCountry = desiredCountryList.find(country => country.countryCode === phoneNumberCountryISO);
+            if (selectedCountry === undefined) { setPhoneFieldDisabled(true); }
+            else {
+            selectedCountry.flag = generateCountryIconPath(selectedCountry.countryNameEn);
+            setPhoneFieldDisabled(false);
+        }
+            selectedCountry === undefined ? null : selectedCountry.flag = generateCountryIconPath(selectedCountry.countryNameEn);
+            return selectedCountry === undefined ? null : selectedCountry;
     };
     const formSubmitHandler = async (values, actions) => {
         try{
@@ -199,11 +204,11 @@ const UpdateMyProfile = () => {
                                                             return (index === selectedCountryCode ?
                                                                 <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
                                                                     {
-                                                                        editPhonefield(formikProps.values.phone) === null ? <span height="20" width="20">Select</span> :
-                                                                            <img height="20" width="20" src={editPhonefield(formikProps.values.phone) === null ? '' : editPhonefield(formikProps.values.phone).flag} />
+                                                                        onChangePhonefield(formikProps.values.phone) === null || onChangePhonefield(formikProps.values.phone) === undefined ? <span height="20" width="20">Select</span> :
+                                                                            <img height="20" width="20" src={onChangePhonefield(formikProps.values.phone) === null || onChangePhonefield(formikProps.values.phone) === undefined ? '' : onChangePhonefield(formikProps.values.phone).flag} />
                                                                     }
                                                                     <span className="country-phone-code pl-1">
-                                                                        {editPhonefield(formikProps.values.phone) === null ? "" : editPhonefield(formikProps.values.phone).countryCode}
+                                                                        {onChangePhonefield(formikProps.values.phone) === null || onChangePhonefield(formikProps.values.phone) === undefined ? "" : onChangePhonefield(formikProps.values.phone).countryCode}
                                                                     </span>
                                                                 </Dropdown.Toggle> : null);
                                                         })}
@@ -225,7 +230,7 @@ const UpdateMyProfile = () => {
                                                         </Dropdown.Menu>
                                                     </Dropdown>
                                                         </span>
-                                                <Field data-testid="phone" innerRef={(ele) => setPhoneFieldRef(ele)} className="form-control rounded" type="text" name="phone" onChange={(e) => handlePhoneFieldChange(e, formikProps)} />
+                                                <Field disabled={phoneFieldDisabled} data-testid="phone" innerRef={(ele) => setPhoneFieldRef(ele)} className="form-control rounded" type="text" name="phone" onChange={(e) => handlePhoneFieldChange(e, formikProps)} />
                                                     </div>
                                                 </div>
                                             </div>
