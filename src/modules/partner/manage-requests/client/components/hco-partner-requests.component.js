@@ -10,7 +10,7 @@ import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerRequestSchemaForHcos } from '../manage-requests.schema'
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
 import SearchHcoModal from './search-hco-modal.component';
-import { getLocalizations } from '../../../../core/client/localizations/localizations.actions';
+import { getLocalizations } from '../../../../core/client/localization/localization.actions';
 
 const HcoPartnerRequests = () => {
     const dispatch = useDispatch();
@@ -50,7 +50,7 @@ const HcoPartnerRequests = () => {
 
     const userCountries = useSelector(state => state.userReducer.loggedInUser.countries);
 
-    const localizations = useSelector(state => state.localizationsReducer.localizations);
+    const localizations = useSelector(state => state.localizationReducer.localizations);
 
     const [showSearch, setShowSearch] = useState(false);
     const [searchInput, setSearchInput] = useState(false);

@@ -8,7 +8,7 @@ import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import { Faq } from '../../../../platform';
 import { partnerRequestSchemaForWholesalers } from './../manage-requests.schema';
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
-import { getLocalizations } from '../../../../core/client/localizations/localizations.actions';
+import { getLocalizations } from '../../../../core/client/localization/localization.actions';
 
 const WholesalerPartnerRequests = () => {
     const dispatch = useDispatch();
@@ -42,7 +42,7 @@ const WholesalerPartnerRequests = () => {
     const countries = useSelector(state => state.countryReducer.countries);
 
     const userCountries = useSelector(state => state.userReducer.loggedInUser.countries);
-    const localizations = useSelector(state => state.localizationsReducer.localizations);
+    const localizations = useSelector(state => state.localizationReducer.localizations);
 
     const getCountryName = (country_iso2) => {
         if (!countries || !country_iso2) return null;
