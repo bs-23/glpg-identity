@@ -104,7 +104,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                 <i class="fas fa-times"></i>
                             </span>
                         </div>
-                        
+
                     </div>
                 })
             }
@@ -217,7 +217,14 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                         <div className="row col-12">
                                             <div className="form-group">
                                                 <div className="custom-control custom-checkbox mr-sm-2">
-                                                    <input type="checkbox" className="custom-control-input" checked={formikProps.values.is_active} name="is_active" id="isactive" />
+                                                    <input
+                                                        id="isactive"
+                                                        name="is_active"
+                                                        type="checkbox"
+                                                        className="custom-control-input"
+                                                        checked={formikProps.values.is_active}
+                                                        onChange={e => formikProps.setFieldValue('is_active', e.target.checked)}
+                                                    />
                                                     <label className="custom-control-label" for="isactive">Is Active</label>
                                                 </div>
                                                 <div className="invalid-feedback"><ErrorMessage name="is_active"/></div>
@@ -226,9 +233,9 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                     </div>
                                     <div className="col-12">
                                         <div className="form-group">
-                                            <label className="font-weight-bold" htmlFor="last_name">Metadata</label>
+                                            <label className="font-weight-bold" htmlFor="metadata">Metadata</label>
                                             {renderMetadata(formikProps)}
-                                            <div className="invalid-feedback"><ErrorMessage name="is_active" /></div>
+                                            <div className="invalid-feedback"><ErrorMessage name="metadata" /></div>
                                         </div>
                                     </div>
                                     <div className="col-12">
