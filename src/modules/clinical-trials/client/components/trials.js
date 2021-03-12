@@ -250,7 +250,7 @@ const ClinicalTrials = (props) => {
                         <nav className="breadcrumb justify-content-between align-items-center" aria-label="breadcrumb">
                             <ol className="rounded-0 m-0 p-0 d-none d-sm-flex">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
-                                <li className="breadcrumb-item"><NavLink to="/information">Clinical Trials</NavLink></li>
+                                <li className="breadcrumb-item"><NavLink to="/clinical-trials">Clinical Trials</NavLink></li>
                                 <li className="breadcrumb-item active"><span>Trials</span></li>
                             </ol>
                             <Dropdown className="dropdown-customize breadcrumb__dropdown d-block d-sm-none ml-2">
@@ -259,7 +259,7 @@ const ClinicalTrials = (props) => {
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     <Dropdown.Item className="px-2" href="/"><i className="fas fa-link mr-2"></i> Dashboard</Dropdown.Item>
-                                    <Dropdown.Item className="px-2" href="/information"><i className="fas fa-link mr-2"></i> Information Management</Dropdown.Item>
+                                    <Dropdown.Item className="px-2" href="/clinical-trials"><i className="fas fa-link mr-2"></i> Information Management</Dropdown.Item>
                                     <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> HCP Profile List</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
