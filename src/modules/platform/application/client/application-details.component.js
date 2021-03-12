@@ -31,6 +31,18 @@ const ApplicationDetails = ({ applicationId }) => {
                 <span className="mr-2 d-block profile-detail__label">Is Active</span>
                 <span className="profile-detail__value">{applicationDetails && applicationDetails.is_active ? 'Active' : 'Inactive'}</span>
             </div>
+            <div className="col-6 col-md-4 pb-3">
+                <span className="mr-2 d-block profile-detail__label">Created By</span>
+                <span className="profile-detail__value">
+                    {applicationDetails && applicationDetails.createdByUser ? `${applicationDetails.createdByUser.first_name} ${applicationDetails.createdByUser.last_name}` : '--'}
+                </span>
+            </div>
+            <div className="col-6 col-md-4 pb-3">
+                <span className="mr-2 d-block profile-detail__label">Updated By</span>
+                <span className="profile-detail__value">
+                    {applicationDetails && applicationDetails.updatedByUser ? `${applicationDetails.updatedByUser.first_name} ${applicationDetails.updatedByUser.last_name}` : '--'}
+                </span>
+            </div>
             <div className="col-12 pb-3">
                 <span className="mr-2 d-block profile-detail__label">Metadata</span>
                 <span className="profile-detail__value">{applicationDetails && applicationDetails.metadata ? JSON.stringify(applicationDetails.metadata) : nullValueToken}</span>
