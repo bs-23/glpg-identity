@@ -41,6 +41,7 @@ export default function UserForm() {
     };
 
     const onChangePhonefield = (phoneNumber) => {
+        if (!phoneNumber) return;
         const phoneNumberCountryISO = new PhoneNumber(phoneNumber).getRegionCode();
         let selectedCountry = desiredCountryList.find(country => country.countryCode === phoneNumberCountryISO);
         if (selectedCountry === undefined) { phoneFieldRef !== null ? phoneFieldRef.disabled = true : ''}
@@ -144,7 +145,8 @@ export default function UserForm() {
                                                                                                 (<Dropdown.Item onClick={() => {
                                                                                                     setSelectedCountryCode(index);
                                                                                                     const countryCode = country.countryCallingCode;
-                                                                                                    formikProps.setFieldValue('country_code', countryCode);
+                                                                                                    formikProps.setFieldValue('country_callingCode', countryCode);
+                                                                                                    formikProps.setFieldValue('country_Code', country.countryCode);
                                                                                                     formikProps.setFieldValue('phone', `+${countryCode}`);
                                                                                                     phoneFieldRef.focus();
                                                                                                 }} key={index} className="px-2 d-flex align-items-center">

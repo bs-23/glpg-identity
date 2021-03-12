@@ -71,6 +71,7 @@ const UpdateMyProfile = () => {
     }
 
     const onChangePhonefield = (phoneNumber) => {
+        if (!phoneNumber) return;
             const phoneNumberCountryISO = new PhoneNumber(phoneNumber).getRegionCode();
             let selectedCountry = desiredCountryList.find(country => country.countryCode === phoneNumberCountryISO);
         if (selectedCountry === undefined) { phoneFieldRef !== null ? phoneFieldRef.disabled = true : ''}
