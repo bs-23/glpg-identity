@@ -4,8 +4,9 @@ const { DataTypes } = require('sequelize');
 const Sequelize = require('sequelize');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const UserProfile = require(path.join(process.cwd(), 'src/modules/platform/profile/server/user-profile.model.js'));
-const Role = require(path.join(process.cwd(), 'src/modules/platform/role/server/role.model.js'));
+const UserProfile = require(path.join(process.cwd(), 'src/modules/platform/profile/server/user-profile.model'));
+const Role = require(path.join(process.cwd(), 'src/modules/platform/role/server/role.model'));
+const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const User = sequelize.cdpConnector.define('users', {
@@ -96,5 +97,7 @@ User.prototype.validPassword = function(password) {
 User.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
 User.belongsTo(UserProfile, { as: 'userProfile', foreignKey: 'profile_id' });
 User.belongsTo(Role, { as: 'userRole', foreignKey: 'role_id' });
+Application.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
+Application.belongsTo(User, { as: 'updatedByUser', foreignKey: 'updated_by' });
 
 module.exports = User;

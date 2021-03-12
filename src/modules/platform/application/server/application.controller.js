@@ -5,6 +5,7 @@ const async = require('async');
 const axios = require('axios');
 
 const Application = require('./application.model');
+const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model'));
 const Data = require('./data.model');
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
@@ -127,6 +128,10 @@ async function getApplication(req, res) {
     try {
         const application = await Application.findOne({
             where: { id: req.params.id },
+            include: [
+                { model: User, as: 'createdByUser', attributes: ['id', 'first_name', 'last_name'] },
+                { model: User, as: 'updatedByUser', attributes: ['id', 'first_name', 'last_name'] }
+            ],
             attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description', 'metadata']
         });
 
@@ -176,7 +181,9 @@ async function createApplication(req, res) {
             is_active,
             description: (description || '').trim(),
             password,
-            metadata
+            metadata,
+            created_by: req.user.id,
+            updated_by: req.user.id
         });
 
         res.json(application);
@@ -229,7 +236,8 @@ async function updateApplication(req, res) {
             email: email && email.toLowerCase(),
             is_active,
             description: description && description.trim(),
-            metadata
+            metadata,
+            updated_by: req.user.id
         });
 
         res.json(application);
