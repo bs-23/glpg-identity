@@ -172,9 +172,9 @@ async function createApplication(req, res) {
             name,
             slug: convertToSlug(name),
             type: type || null,
-            email,
+            email: email.toLowerCase(),
             is_active,
-            description,
+            description: (description || '').trim(),
             password,
             metadata
         });
@@ -196,9 +196,7 @@ async function updateApplication(req, res) {
             description,
             metadata
         } = req.body;
-
         const application_id = req.params.id;
-
 
         const application = await Application.findOne({
             where: { id: application_id }
@@ -215,13 +213,22 @@ async function updateApplication(req, res) {
 
         if (hasSameName) return res.status(400).send('Application with the same name already exists.');
 
+        const hasSameEmail = await Application.findOne({
+            where: {
+                id: { [Op.ne]: application_id },
+                email: { [Op.iLike]: email }
+            }
+        });
+
+        if (hasSameEmail) return res.status(400).send('Application with the same email already exists.');
+
         await application.update({
             name,
             slug: convertToSlug(name),
             type: type || null,
-            email,
+            email: email && email.toLowerCase(),
             is_active,
-            description,
+            description: description && description.trim(),
             metadata
         });
 
