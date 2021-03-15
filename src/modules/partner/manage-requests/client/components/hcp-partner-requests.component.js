@@ -226,7 +226,7 @@ const HcpPartnerRequests = () => {
 
     useEffect(() => {
         if (formData) {
-            dispatch(sendForm(formData)).then(() => {
+            dispatch(sendForm(formData.id)).then(() => {
                 dispatch(updatePartnerRequest(formData.id, { ...formData, status: 'email_sent' })).then(() => {
                     addToast('Form sent successfully.', {
                         appearance: 'success',

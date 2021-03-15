@@ -139,8 +139,13 @@ async function getPartnerRequest(req, res) {
 
 async function sendForm(req, res) {
     try {
+        const { id } = req.params;
+
+        const partnerRequest = await PartnerRequest.findOne({ where: { id } })
+
+        if (!partnerRequest) return res.status(400).send('Partner Request not found.');
+
         const {
-            id,
             application_id,
             first_name,
             last_name,
@@ -148,7 +153,7 @@ async function sendForm(req, res) {
             partner_type,
             country_iso2,
             locale
-        } = req.body;
+        } = partnerRequest.dataValues;
 
         const userApplication = await Application.findOne({ where: { id: application_id } });
         const jwt_token = jwt.sign({
