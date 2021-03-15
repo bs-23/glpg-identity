@@ -282,7 +282,7 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
                                                             labelExtractor={item => item.codbase_desc}
                                                         />
                                                     </FormField>
-                                                    <FormField label="Select Applications" name="applications" required={false} >
+                                                    <FormField label="Select HCP Portal" name="applications" required={false} >
                                                         <CheckList
                                                             name="applications"
                                                             options={applications}
@@ -332,7 +332,7 @@ export default function PermissionSetForm({ onSuccess, onError, permissionSetId 
                                                     }
                                                     <FormFieldFluid label="Description" type="text" name="description" required={false} component="textarea" />
                                                     </div>
-                                                    <ErrorMessage name="app_country_service" >{(message) => <div className="invalid-feedback alert alert-warning" >{message}</div>}</ErrorMessage>
+                                                    <ErrorMessage name="app_country_service" >{(message) => <div className="invalid-feedback alert alert-danger" >{message}</div>}</ErrorMessage>
                                                     <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" disabled={formikProps.isSubmitting} > Submit </button>
                                                 </div>
                                             </div>

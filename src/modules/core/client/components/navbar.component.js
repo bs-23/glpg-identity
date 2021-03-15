@@ -39,8 +39,8 @@ export default function Navigationbar() {
     const renderApplicationIcon = () => {
         if(userApplications) {
             return userApplications.map(app => {
-                const { name, logo_link, slug } = app;
-                return <img className="ml-2" key={slug} src={logo_link} title={name} alt={`${name} Logo`} width="122" />
+                const { name, logo_url, slug } = app;
+                return <img className="ml-2" key={slug} src={logo_url} title={name} alt={`${name} Logo`} width="122" />
             })
         }
     };
@@ -62,7 +62,7 @@ export default function Navigationbar() {
                     </div>
                     <div className="col-9 text-right">
                         <div className="d-block d-sm-flex justify-content-end align-items-center">
-                            {loggedInUser.type !== 'admin' && <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">
+                            {loggedInUser.profile.slug !== 'system_admin' && <div className="mb-2 mb-sm-0 d-flex justify-content-end align-items-center">
                                 <div className="mr-3">
                                     {renderApplicationIcon()}
                                 </div>
@@ -90,7 +90,7 @@ export default function Navigationbar() {
                                 <i className="fas fa-times cdp-text-secondary fa-2x"></i>
                             </Navbar.Toggle>
                         </div>
-                        { loggedInUser.type !== 'admin' && <div>
+                        { loggedInUser.profile.slug !== 'system_admin' && <div>
                             {userApplications.length > 0 && <div className="px-3 border-bottom pb-2 mb-2">
                                 <label className="d-block">Application</label>
                                 {renderApplicationIcon()}

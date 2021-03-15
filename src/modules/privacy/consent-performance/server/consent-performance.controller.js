@@ -55,8 +55,6 @@ async function getCdpConsentsReport(req, res) {
         const userPermittedCountries = countries.filter(i => userPermittedCodbases.includes(i.codbase)).map(i => i.country_iso2);
         const userPermittedApplications = userCountriesApplication[0].map(app => app.id);
 
-        const application_list = (await HCPS.findAll()).map(i => i.get("application_id"));
-
         const country_iso2_list_for_codbase = countries.filter(i => i.codbase === codbase).map(i => i.country_iso2);
         const countries_with_ignorecase = [].concat.apply([], country_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
 
@@ -69,7 +67,7 @@ async function getCdpConsentsReport(req, res) {
         const consent_filter = {
             'opt_type': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types },
             [Op.or]: [{ 'consent_confirmed': true }, { 'opt_type': 'opt-out' }],
-            '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : userPermittedApplications,
+            '$hcp_profile.application_id$': userPermittedApplications,
             '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_with_ignorecase] } : { [Op.any]: [country_iso2_list_with_ignorecase] },
         };
 
@@ -299,15 +297,13 @@ async function exportCdpConsentsReport(req, res) {
         const userPermittedCountries = countries.filter(i => userPermittedCodbases.includes(i.codbase)).map(i => i.country_iso2);
         const userPermittedApplications = userCountriesApplication[0].map(app => app.id);
 
-        const application_list = (await HCPS.findAll()).map(i => i.get("application_id"));
-
         const codbase_list = countries.filter(i => userPermittedCountries.includes(i.country_iso2)).map(i => i.codbase);
         const country_iso2_list = countries.filter(i => codbase_list.includes(i.codbase)).map(i => i.country_iso2);
         const country_iso2_list_with_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
 
         const consent_filter = {
             [Op.or]: [{ 'consent_confirmed': true }, { 'opt_type': 'opt-out' }],
-            '$hcp_profile.application_id$': req.user.type === 'admin' ? { [Op.or]: application_list } : userPermittedApplications,
+            '$hcp_profile.application_id$': userPermittedApplications,
             '$hcp_profile.country_iso2$': { [Op.any]: [country_iso2_list_with_ignorecase] },
         };
 

@@ -53,7 +53,7 @@ async function createPartnerRequest(req, res) {
             email,
             mdr_id,
             country_iso2,
-            language,
+            locale,
             uuid,
             is_supplier,
             is_customer,
@@ -77,7 +77,7 @@ async function createPartnerRequest(req, res) {
             email,
             mdr_id,
             country_iso2,
-            locale: language.toLowerCase() + "_" + country_iso2.toUpperCase(),
+            locale,
             created_by: req.user.id,
             updated_by: req.user.id,
         };
@@ -162,7 +162,7 @@ async function sendForm(req, res) {
             first_name,
             last_name,
             email,
-            partner_type: partner_type.toLowerCase(),
+            partner_type: partner_type ? partner_type.toLowerCase() : undefined,
             country_iso2: country_iso2.toLowerCase(),
             locale: locale
         };
@@ -172,7 +172,7 @@ async function sendForm(req, res) {
             attributes: ['metadata']
         });
 
-        const sendFormLink = JSON.parse(metaData[0].dataValues.metadata).request_notification_link;
+        const sendFormLink = metaData[0].dataValues.metadata.request_notification_link;
 
         await axios.post(sendFormLink, payload);
         res.json('Form sent successfully.');

@@ -127,11 +127,17 @@ const PartnerVendors = sequelize.cdpConnector.define('partner_vendors', {
     currency: {
         type: DataTypes.STRING
     },
+    swift_code: {
+        type: DataTypes.STRING
+    },
+    routing: {
+        type: DataTypes.STRING
+    },
     status: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['pending', 'approved', 'rejected'],
-        defaultValue: 'pending'
+        values: ['not_approved', 'approved'],
+        defaultValue: 'not_approved'
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,

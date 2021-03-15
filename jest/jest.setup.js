@@ -32,6 +32,9 @@ module.exports = async function () {
     const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model.js'));
     const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model.js'));
     const Localization = require(path.join(process.cwd(), 'src/modules/core/server/localization/localization.model.js'));
+    const PartnerRequest = require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model.js'));
+    const Partner = require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner.model.js'));
+
 
     require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model.js'));
     require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model.js'));
@@ -41,6 +44,10 @@ module.exports = async function () {
     require(path.join(process.cwd(), 'src/modules/platform/application/server/data.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/archive/archive.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model.js'));
+    require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-vendor.model.js'));
+    require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-consents.model'));
+    require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
+
 
     const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model"));
     const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service.model"));
@@ -56,6 +63,7 @@ module.exports = async function () {
     await PermissionSetService.bulkCreate(specHelper.permissionSet_service, { returning: true, ignoreDuplicates: false });
     await UserProfilePermissionSet.bulkCreate(specHelper.userProfile_permissionSet, { returning: true, ignoreDuplicates: false });
     await Application.create(specHelper.defaultApplication);
+    await Application.create(specHelper.partnerRequestApplication);
     await User.create(specHelper.users.defaultAdmin);
     await User.create(specHelper.users.defaultUser);
     await Hcp_profile.create(specHelper.hcp.defaultUser);
@@ -65,4 +73,6 @@ module.exports = async function () {
     await ConsentCountry.bulkCreate(specHelper.consent.demoConsentCountry, { returning: true, ignoreDuplicates: false });
     await Faq.create(specHelper.faq.demoFaq);
     await Localization.bulkCreate(specHelper.localizations, { returning: true, ignoreDuplicates: false });
+    await PartnerRequest.create(specHelper.partner_request);
+    // await Partner.create(specHelper.partner);
 };

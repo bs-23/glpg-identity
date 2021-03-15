@@ -17,6 +17,12 @@ paths:
                   description: Case insensitive value in language_country format (e.g. nl_NL or nl_BE)
                   schema:
                     type: string
+                - name: category
+                  in: query
+                  required: false
+                  description: Cateogry Slug for consent
+                  schema:
+                    type: string
             responses:
                 200:
                     description: The request has succeeded.

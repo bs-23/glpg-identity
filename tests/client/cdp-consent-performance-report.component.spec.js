@@ -15,6 +15,8 @@ import { login } from '../../src/modules/platform/user/client/user.actions';
 
 configure({ adapter: new Adapter() });
 
+jest.setTimeout(20000);
+
 describe('Cdp consent performance report component', () => {
     let mockAxios;
     let savedUser;
@@ -29,7 +31,8 @@ describe('Cdp consent performance report component', () => {
             "countries": [],
             "email": "test@gmail.com",
             "name": "a",
-            "serviceCategories": []
+            "serviceCategories": [],
+            "services": []
         };
         mockAxios.onPost('/api/login').reply(200, savedUser);
 
@@ -162,8 +165,7 @@ describe('Cdp consent performance report component', () => {
             expect(screen.getByText('First Name')).toBeTruthy();
             expect(screen.getByText('Last Name')).toBeTruthy();
             expect(screen.getByText('Email')).toBeTruthy();
-            expect(screen.getByText('Consent Type')).toBeTruthy();
-            expect(screen.getByText('Opt Type')).toBeTruthy();
+            expect(screen.getByText('Consent Category')).toBeTruthy();
             expect(screen.getByText('Legal Basis')).toBeTruthy();
             expect(screen.getByText('Preferences')).toBeTruthy();
             expect(screen.getByText('Date')).toBeTruthy();

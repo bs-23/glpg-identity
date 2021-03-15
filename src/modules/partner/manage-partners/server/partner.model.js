@@ -68,7 +68,6 @@ const Partner = sequelize.cdpConnector.define('partners', {
         type: DataTypes.STRING
     },
     uuid: {
-        allowNull: false,
         type: DataTypes.STRING(20)
     },
     onekey_id: {
@@ -96,11 +95,17 @@ const Partner = sequelize.cdpConnector.define('partners', {
     currency: {
         type: DataTypes.STRING
     },
+    swift_code: {
+        type: DataTypes.STRING
+    },
+    routing: {
+        type: DataTypes.STRING
+    },
     status: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['pending', 'approved', 'rejected'],
-        defaultValue: 'pending'
+        values: ['not_approved', 'approved'],
+        defaultValue: 'not_approved'
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,

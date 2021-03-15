@@ -1,0 +1,20 @@
+.hot-statistics {
+    &__box {
+
+        &-wrap {
+            background-color: $light-bg-color;
+        }
+    }
+
+    &__title {
+        font-size: 14px;
+        font-weight: 600;
+        color: $primary-color;
+    }
+
+    &__amount {
+        font-size: 18px;
+        font-weight: bold;
+        color: $primary-color;
+    }
+}

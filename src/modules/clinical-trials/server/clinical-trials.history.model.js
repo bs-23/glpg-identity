@@ -26,7 +26,7 @@ let historyModel = {
             unique: false,
             allowNull: true,
             type: DataTypes.STRING(1024)
-        },
+        }
     },
     db_schema: {
         schema: `${nodecache.getValue('POSTGRES_CLINICAL_TRIALS_SCHEMA')}`,

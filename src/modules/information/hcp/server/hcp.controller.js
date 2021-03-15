@@ -70,7 +70,7 @@ async function notifyHcpUserApproval(hcpUser) {
 
     payload.jwt_token = token;
 
-    await axios.post(`${hcpUser.origin_url}${userApplication.approve_user_path}`, payload, {
+    await axios.post(`${hcpUser.origin_url}${userApplication.metadata.approve_user_path}`, payload, {
         headers: {
             jwt_token: token
         }
@@ -135,9 +135,9 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
 
     if (table === 'datasync_hcp_profiles') {
         const getUserPermittedCodbases = async () => {
-            const allCountries = await getAllCountries();
+            const allCountryList = await getAllCountries();
 
-            const userCodBases = allCountries.filter(c => userPermittedCountries.includes(c.country_iso2)).map(c => c.codbase.toLowerCase());
+            const userCodBases = allCountryList.filter(c => userPermittedCountries.includes(c.country_iso2)).map(c => c.codbase.toLowerCase());
             return userCodBases;
         };
 
@@ -152,13 +152,6 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
 
     if (!currentFilterSettings || !currentFilterSettings.filters || currentFilterSettings.filter === 0)
         return defaultFilter;
-
-    // if (currentFilter.option.filters.length === 1 || !currentFilter.option.logic) {
-    //     const filter = currentFilter.option.filters[0];
-    //     defaultFilter[filter.fieldName] = filterService.getQueryValue(filter);
-
-    //     return defaultFilter;
-    // }
 
     let customFilter = { ...defaultFilter };
 
@@ -182,9 +175,6 @@ async function generateFilterOptions(currentFilterSettings, userPermittedApplica
 
             const selected_iso2_list_for_codbase = country_iso2_list_for_codbase.filter(i => user_country_iso2_list.includes(i));
             const ignorecase_of_selected_iso2_list_for_codbase = [].concat.apply([], selected_iso2_list_for_codbase.map(i => ignoreCaseArray(i)));
-            queryValue = ignorecase_of_selected_iso2_list_for_codbase.length
-                ? ignorecase_of_selected_iso2_list_for_codbase
-                : null;
 
             delete customFilter.country_iso2;
             return {
@@ -416,6 +406,7 @@ async function updateHcps(req, res) {
 
         await Promise.all(Hcps.map(async hcp => {
             const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, telephone, _rowIndex } = trimRequestBody(hcp);
+            let individual_id_onekey;
 
             if (!id) {
                 response.errors.push(new Error(_rowIndex, 'id', 'ID is missing.'));
@@ -485,6 +476,12 @@ async function updateHcps(req, res) {
                     response.errors.push(new Error(_rowIndex, 'uuid', 'UUID already exists.'));
                 }
 
+                if (Object.keys(master_data).length) {
+                    individual_id_onekey = master_data.individual_id_onekey || null;
+                } else {
+                    individual_id_onekey = null;
+                }
+
                 if (uuidsToUpdate.has(uuid_from_master_data || uuid)) {
                     uuidsToUpdate.get(uuid_from_master_data || uuid).push(_rowIndex);
                 } else {
@@ -499,7 +496,8 @@ async function updateHcps(req, res) {
                 last_name,
                 specialty_onekey,
                 country_iso2,
-                telephone
+                telephone,
+                individual_id_onekey
             });
 
             HcpUser.dataValues._rowIndex = _rowIndex;
@@ -526,7 +524,7 @@ async function updateHcps(req, res) {
             const updatedPropertiesLog = [];
 
             Object.keys(hcpsToUpdate[index]).forEach(key => {
-                if (hcpsToUpdate[index][key]) {
+                if (hcpsToUpdate[index][key] || hcpsToUpdate[index][key] === null) {
                     const updatedPropertyLogObject = {
                         field: key,
                         old_value: hcp.dataValues[key],
@@ -554,7 +552,7 @@ async function updateHcps(req, res) {
         hcpModelInstances.map((hcpModelIns, idx) => {
             const { _rowIndex } = hcpModelIns.dataValues;
             Object.keys(hcpsToUpdate[idx]).forEach(key => {
-                if (hcpsToUpdate[idx][key]) response.data.push(new Data(_rowIndex, key, hcpModelIns.dataValues[key]));
+                if (hcpsToUpdate[idx][key] || hcpsToUpdate[idx][key] === null) response.data.push(new Data(_rowIndex, key, hcpModelIns.dataValues[key]));
             })
         });
 
@@ -781,7 +779,7 @@ async function createHcpProfile(req, res) {
                 if (!consentDetails) {
                     response.errors.push(new CustomError('Invalid consents.', 400));
                     return;
-                };
+                }
 
                 const currentCountry = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
 
@@ -852,7 +850,7 @@ async function createHcpProfile(req, res) {
             }));
         }
 
-        if(response.errors.length) {
+        if (response.errors.length) {
             return res.status(400).send(response);
         }
 
@@ -1737,29 +1735,6 @@ async function getHcpsFromDatasync(req, res) {
         });
 
         const totalUsers = await DatasyncHcp.count({ where: filterOptions });
-
-        // const individualIdOnekeyList = hcps.map(h => h.individual_id_onekey);
-        // const hcpSpecialties = await sequelize.datasyncConnector.query(`
-        //     SELECT h.*, s.cod_description, s.cod_locale
-        //     FROM ciam.vwmaphcpspecialty AS h
-        //     INNER JOIN ciam.vwspecialtymaster AS s
-        //     ON (h.specialty_code = s.cod_id_onekey)
-        //     WHERE individual_id_onekey = ANY($individualIdOnekeyList) AND cod_locale='en'`, {
-        //     bind: {
-        //         individualIdOnekeyList: individualIdOnekeyList,
-        //     },
-        //     type: QueryTypes.SELECT
-        // });
-
-        // if (hcpSpecialties) {
-        //     hcps.forEach(hcp => {
-        //         const specialties = hcpSpecialties.filter(s => s.individual_id_onekey === hcp.individual_id_onekey);
-        //         hcp.dataValues.specialties = specialties.map(s => ({
-        //             description: s.cod_description,
-        //             code: s.specialty_code
-        //         }));
-        //     });
-        // }
 
         hcps.forEach(hcp => {
             const specialties = [

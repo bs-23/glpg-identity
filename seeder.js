@@ -58,6 +58,7 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-vendor.model'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner.model'));
+    require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-consents.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 
     await sequelize.cdpConnector.sync();
@@ -69,8 +70,7 @@ async function init() {
             where: { email: 'glpg@brainstation-23.com' }, defaults: {
                 first_name: 'System',
                 last_name: 'Admin',
-                password: 'P@ssword123',
-                type: 'admin'
+                password: 'P@ssword123'
             }
         }).then(function () {
             callback();
@@ -360,12 +360,13 @@ async function init() {
                     type: 'hcp-portal',
                     email: 'hcp-portal@glpg.com',
                     password: 'P@ssword123',
-                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                    is_active: true,
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
-                    logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
-                    metadata: JSON.stringify({
+                    logo_url: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
+                    metadata: {
+                        approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
                         cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-hcpportal/clear/author-publish-cache"
-                    }),
+                    },
                     created_by: admin.id,
                     updated_by: admin.id
                 },
@@ -376,12 +377,13 @@ async function init() {
                     type: 'hcp-portal',
                     email: 'jyseleca@glpg.com',
                     password: 'P@ssword123',
-                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                    is_active: true,
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
-                    logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
-                    metadata: JSON.stringify({
-                        cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-brandx/clear/author-publish-cache"
-                    }),
+                    logo_url: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
+                    metadata: {
+                        cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-brandx/clear/author-publish-cache",
+                        approve_user_path: '/bin/public/glpg-brandx/mail/approve-user'
+                    },
                     created_by: admin.id,
                     updated_by: admin.id
                 },
@@ -389,11 +391,10 @@ async function init() {
                     id: '0da54f98-6ec0-4055-8ce7-4ab2aa1fe921',
                     name: 'Clinical Trials',
                     slug: convertToSlug('Clinical Trials'),
-                    email: 'clinical-trial-portal@glpg.com',
+                    email: 'clinicaltrials-portal@glpg.com',
                     password: 'P@ssword123',
-                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
-                    auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
-                    logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
+                    type: 'standard',
+                    is_active: true,
                     created_by: admin.id,
                     updated_by: admin.id
                 },
@@ -403,14 +404,14 @@ async function init() {
                     slug: convertToSlug('Patients Organization'),
                     email: 'patients-organization@glpg.com',
                     password: 'P@ssword123',
-                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                    type: 'standard',
+                    is_active: true,
                     auth_secret: 'b248eaa4-583f-4ecd-9e9c-be8f58ab3c3e',
-                    logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id,
-                    metadata: JSON.stringify({
+                    metadata: {
                         request_notification_link: 'https://onboarding-business-partner-dev.glpg.com/bin/public/glpg-forms/sendForm.invitation.html'
-                    })
+                    }
                 }
             ];
 
@@ -454,7 +455,8 @@ async function init() {
             const consent_categories = [
                 { id: 'fe037405-c676-4d98-bd05-85008900c838', title: 'Direct Marketing', type: 'dm', slug: convertToSlug('Direct Marketing'), created_by: admin.id },
                 { id: '29374bce-7c3f-4408-a138-c062143d2247', title: 'Medical Consent', type: 'mc', slug: convertToSlug('Medical Consent'), created_by: admin.id },
-                { id: '59953d51-2449-4b65-950f-9f88654019bb', title: 'General Consent', type: 'general', slug: convertToSlug('General Consent'), created_by: admin.id }
+                { id: '59953d51-2449-4b65-950f-9f88654019bb', title: 'General Consent', type: 'general', slug: convertToSlug('General Consent'), created_by: admin.id },
+                { id: '3e1dff97-cea9-48cb-a37a-e3210269783b', title: 'Business Partner', type: 'bp', slug: convertToSlug('Business Partner'), created_by: admin.id }
             ];
 
             const consents = [

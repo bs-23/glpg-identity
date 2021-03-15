@@ -8,6 +8,8 @@ import { Provider } from 'react-redux';
 import store from '../../src/modules/core/client/store';
 import { ManagePermissionSets } from '../../src/modules/platform';
 
+jest.setTimeout(20000);
+
 describe('Permission sets component', () => {
     let fakeAxios;
 
@@ -16,13 +18,24 @@ describe('Permission sets component', () => {
 
         const permissionSets = [
             {
-                "id":"e6ac08ec-337b-4fde-9ae4-b155b906b7ad",
-                "slug":"system_admin",
-                "title":"System Admin Permission Set",
-                "type":"standard",
-                "countries":["BE","FR","DE","IT","NL","ES","GB"],
-                "description":"This is the default permission set for System Admin",
-                "application_id":null
+                "id": "e6ac08ec-337b-4fde-9ae4-b155b906b7ad",
+                "slug": "system_admin",
+                "title": "System Admin Permission Set",
+                "type": "standard",
+                "countries": ["BE","FR","DE","IT","NL","ES","GB"],
+                "description": "This is the default permission set for System Admin",
+                "ps_sc": [
+                    {
+                        "id": "5fc2a8be-1bbb-4d34-ac17-60ed73ffd23c",
+                        "service": {
+                            "id": "20ded958-9c42-40ea-b777-06d9a8d9088c",
+                            "title": "Information Management",
+                            "slug": "information",
+                            "parent_id": null
+                        }
+                    }
+                ],
+                "ps_app":[]
             }
         ];
 
@@ -39,7 +52,13 @@ describe('Permission sets component', () => {
         fakeAxios.onGet('/api/services').reply(200, [{
             "id": "6ae61e07-c7b2-4c95-addb-e985eeab2202",
             "title": "Management of Customer Data Platform",
-            "slug": "platform"
+            "slug": "platform",
+            "childServices": [{
+                "id": "dbe38c21-376d-4a46-ac7d-84448da0fd4c",
+                "title": "Manage Vendor Request",
+                "slug": "manage-vendor-request",
+                "parent_id": "942503fe-ec22-47f0-a50c-ea3d19f10ba1",
+            }]
         }]);
     });
 

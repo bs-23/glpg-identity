@@ -9,6 +9,7 @@ module.exports = {
             "src/modules/partner/manage-requests/server/manage-requests.routes.js",
             "src/modules/!(core)/server/**/*.routes.js",
             "src/modules/core/server/country/country.routes.js",
+            "src/modules/core/server/statistics/statistics.route.js",
             "src/modules/core/server/filter/filter.routes.js",
             "src/modules/core/server/localization/localization.routes.js",
             "src/modules/information/hcp/server/**/*.routes.js",

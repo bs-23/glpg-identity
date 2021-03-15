@@ -15,11 +15,14 @@ import { login } from '../../src/modules/platform/user/client/user.actions';
 
 configure({ adapter: new Adapter() });
 
+jest.setTimeout(20000);
+
 describe('Consent form component', () => {
     let mockAxios;
     let savedUser;
     let consent_categories;
     let consent;
+    let localizations;
     jest.useFakeTimers();
 
     beforeEach( async () => {
@@ -30,7 +33,8 @@ describe('Consent form component', () => {
             "countries": [],
             "email": "test@gmail.com",
             "name": "a",
-            "serviceCategories": []
+            "serviceCategories": [],
+            "services": []
         };
         mockAxios.onPost('/api/login').reply(200, savedUser);
 
@@ -113,6 +117,17 @@ describe('Consent form component', () => {
             "translations": []
         }
         mockAxios.onGet('/api/cdp-consents/1').reply(200, consent);
+
+        localizations = [
+            {
+                "id": "321cb02f-886f-4ff2-aaa6-67dd51d34a9a",
+                "language_family": "English",
+                "language_variant": "British English",
+                "country_iso2": "GB",
+                "locale": "en_GB",
+            }
+        ];
+        mockAxios.onGet('/api/localizations').reply(200, localizations);
     });
 
     const userSlice = () => store.getState().userReducer;

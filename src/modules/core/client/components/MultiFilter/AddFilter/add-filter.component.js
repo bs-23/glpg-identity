@@ -6,7 +6,8 @@ import { Button } from '../common';
 import { Filter } from './components';
 import { buildLogicAfterAddition, buildLogicAfterRemoval } from '../utils';
 
-const generateRandomKey = () => `${Math.random()}_${Math.random()}`;
+const random = window.crypto ? window.crypto.getRandomValues(new Uint32Array(2))[0] / 0x100000000 : null;
+const generateRandomKey = () => `${random}_${random}`;
 
 const AddFilter = (props) => {
     const {
@@ -38,7 +39,7 @@ const AddFilter = (props) => {
     const handleAddMoreFilter = () => {
         const emptyFilter = createEmptyFilter();
         emptyFilter.name = String(filters.length + 1);
-        const updateLogic = buildLogicAfterAddition([String(filters.length+1)], logic);
+        const updateLogic = buildLogicAfterAddition([String(filters.length + 1)], logic);
 
         setFilters([...filters, emptyFilter]);
         setValidationErrors([...validationErrors, {}]);
@@ -66,16 +67,16 @@ const AddFilter = (props) => {
             return areValuesSame;
         });
 
-        if(isIdenticalFilter) validationError.value = 'This filter is identical to another filter in the list.';
+        if (isIdenticalFilter) validationError.value = 'This filter is identical to another filter in the list.';
 
         if (!filter.fieldName.length) validationError.fieldName = 'Field can not be empty.';
         if (!filter.operator.length) validationError.operator = 'Field can not be empty.';
         if (!filter.value.length) validationError.value = 'Field can not be empty.';
 
         if (valueSchema) {
-            try{
+            try {
                 await valueSchema.validate(filter.value);
-            }catch(err) {
+            } catch (err) {
                 validationError.value = err.errors[0];
             }
         }
@@ -85,10 +86,10 @@ const AddFilter = (props) => {
 
     const handleDone = (e) => {
         setIsTouched(true);
-        if(!isFormValid) return;
+        if (!isFormValid) return;
 
         const filtersWithUpdatedNames = filters.map((filter, ind) => {
-            filter.name = String(ind+1);
+            filter.name = String(ind + 1);
             return filter;
         });
 
@@ -103,7 +104,7 @@ const AddFilter = (props) => {
         if (propertyName === 'fieldName') {
             updatedFilters[index]['operator'] = '';
             updatedFilters[index]['value'] = [];
-        };
+        }
 
         setFilters(updatedFilters);
     }
@@ -117,7 +118,7 @@ const AddFilter = (props) => {
         setFilters(filtersAfterRemoval);
         setValidationErrors(validationErrorsAfterRemoval);
 
-        if(scrollRef) {
+        if (scrollRef) {
             const scrollPosition = scrollRef.current.state.topPosition;
             const filterComponentHeight = 230;
             scrollRef.current.scrollArea.scrollYTo(scrollPosition - filterComponentHeight);
@@ -139,7 +140,7 @@ const AddFilter = (props) => {
         await Promise.all(filters.map(async (filter, index) => {
             const validationErrorMessage = await getFilterValidationError(filter, index);
             updatedValidationErrors[index] = validationErrorMessage;
-            if(Object.keys(validationErrorMessage).length) isValid = false;
+            if (Object.keys(validationErrorMessage).length) isValid = false;
         }))
 
         setValidationErrors(updatedValidationErrors);
@@ -151,7 +152,7 @@ const AddFilter = (props) => {
     }, [filters])
 
     useEffect(() => {
-        if(!alreadyAddedFilters.length) {
+        if (!alreadyAddedFilters.length) {
             const updatedFilters = [createEmptyFilter()].map(filter => ({ ...filter, key: generateRandomKey() }));
             setFilters(updatedFilters);
 
@@ -179,7 +180,7 @@ const AddFilter = (props) => {
                         if (CustomFilterComponent) {
                             return <CustomFilterComponent
                                 key={filter.key || index}
-                                title={index+1}
+                                title={index + 1}
                                 index={index}
                                 filter={filter}
                                 filterOptions={filterOptions}
@@ -192,17 +193,17 @@ const AddFilter = (props) => {
                         }
 
                         return <Filter
-                                key={filter.key || index}
-                                title={index+1}
-                                index={index}
-                                filter={filter}
-                                filterOptions={filterOptions}
-                                isTouched={isTouched}
-                                validationError={validationErrors[index]}
-                                maxNumberOfValues={maxNumberOfValues}
-                                onChange={handleChange}
-                                onRemove={handleRemove}
-                            />
+                            key={filter.key || index}
+                            title={index + 1}
+                            index={index}
+                            filter={filter}
+                            filterOptions={filterOptions}
+                            isTouched={isTouched}
+                            validationError={validationErrors[index]}
+                            maxNumberOfValues={maxNumberOfValues}
+                            onChange={handleChange}
+                            onRemove={handleRemove}
+                        />
                     })
                 }
                 {filters.length < maxNumberOfFilters && <Button className="btn cdp-btn-outline-primary mt-4 btn-block" label="+ add more filter" onClick={handleAddMoreFilter} />}

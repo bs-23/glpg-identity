@@ -17,7 +17,7 @@ export default function Faq(props) {
 
     return (
         <React.Fragment>
-            <div className={`faq shadow-sm bg-white ${show ? "faq-expand" : ""}`}>
+            <div className={`faq shadow-sm bg-white mb-3 ${show ? "faq-expand" : ""}`}>
                 <h5 className="faq__header p-3 font-weight-bold mb-0 d-flex justify-content-between">
                     Questions You May Have
                     <i onClick={() => setShow(true)} class="icon icon-expand faq-icon-expand faq__icon-toggle d-none d-lg-block cursor-pointer"></i>
@@ -37,8 +37,7 @@ export default function Faq(props) {
                             </Accordion.Toggle>
                         </Card>
                     ))}
-
-                    {faqData.metadata && faqData.metadata.total > 5 &&
+                    {faqData.metadata && faqData.metadata.total_items > 5 &&
                         <Card className="border-0">
                             <NavLink to="/help" className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-text-secondary">
                                 Visit CDP help center for more

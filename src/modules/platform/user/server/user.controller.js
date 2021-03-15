@@ -63,6 +63,7 @@ async function getProfilePermissions(user) {
 
         const profile = {
             title: userProfile.title,
+            slug: userProfile.slug,
             permissionSets: permissionSets
         }
 
@@ -165,7 +166,7 @@ async function formatProfile(user) {
         last_name: user.last_name,
         email: user.email,
         phone: user.phone,
-        type: user.type,
+        // type: user.type,
         profile: await getProfilePermissions(user),
         role: await getRolePermissions(user),
         status: user.status,
@@ -182,12 +183,12 @@ async function formatProfileDetail(user) {
         first_name: user.first_name,
         last_name: user.last_name,
         email: user.email,
-        type: user.type,
+        // type: user.type,
         status: user.status,
         phone: user.phone,
         last_login: user.last_login,
         expiry_date: user.expiry_date,
-        profiles: user.userProfile.title,
+        profiles: { title: user.userProfile.title, slug: user.userProfile.slug },
         application: appCounPermissionFormatted[0],
         countries: appCounPermissionFormatted[1],
         role: user.userRole && { id: user.userRole.id, title: user.userRole.title },
@@ -320,7 +321,7 @@ async function createUser(req, res) {
         role
     } = req.body;
 
-    const phone_number = phone ? country_code + phone : '';
+    const phone_number = phone ? phone : '';
     const validForMonths = 6
     const currentDate = new Date()
 
@@ -539,9 +540,11 @@ async function getUsers(req, res) {
             order.splice(1, 0, [{ model: User, as: 'createdByUser' }, 'last_name', orderType]);
         }
 
+        const systemAdminProfile = await UserProfile.findOne({ where: { slug: 'system_admin' }});
+
         const defaultFilter = {
             id: { [Op.ne]: signedInId },
-            type: 'basic'
+            profile_id: { [Op.ne]: systemAdminProfile.id }
         };
 
         const currentFilter = req.body;

@@ -4,9 +4,9 @@ const { DataTypes } = require('sequelize');
 const Sequelize = require('sequelize');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const UserProfile = require(path.join(process.cwd(), 'src/modules/platform/profile/server/user-profile.model.js'));
-// const User_Role = require(path.join(process.cwd(), 'src/modules/platform/role/server/user-role.model.js'));
-const Role = require(path.join(process.cwd(), 'src/modules/platform/role/server/role.model.js'));
+const UserProfile = require(path.join(process.cwd(), 'src/modules/platform/profile/server/user-profile.model'));
+const Role = require(path.join(process.cwd(), 'src/modules/platform/role/server/role.model'));
+const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const User = sequelize.cdpConnector.define('users', {
@@ -52,11 +52,6 @@ const User = sequelize.cdpConnector.define('users', {
     phone: {
         type: DataTypes.STRING(25)
     },
-    type: {
-        type: DataTypes.ENUM,
-        values: ['admin', 'basic'],
-        defaultValue: 'basic'
-    },
     status: {
         type: DataTypes.ENUM,
         values: ['active', 'inactive'],
@@ -82,24 +77,10 @@ const User = sequelize.cdpConnector.define('users', {
         type: DataTypes.STRING
     },
     created_by: {
-        type: DataTypes.UUID,
-        validate: {
-            customValidator(value) {
-                if (value === null && this.type !== 'admin') {
-                    throw new Error("created_by is required for basic user");
-                }
-            }
-        }
+        type: DataTypes.UUID
     },
     updated_by: {
-        type: DataTypes.UUID,
-        validate: {
-            customValidator(value) {
-                if (value === null && this.type !== 'admin') {
-                    throw new Error("updated_by is required for basic user");
-                }
-            }
-        }
+        type: DataTypes.UUID
     },
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
@@ -116,6 +97,7 @@ User.prototype.validPassword = function(password) {
 User.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
 User.belongsTo(UserProfile, { as: 'userProfile', foreignKey: 'profile_id' });
 User.belongsTo(Role, { as: 'userRole', foreignKey: 'role_id' });
-// User.hasMany(User_Role, {as: 'userRoles', foreignKey: 'userId', sourceKey: 'id'});
+Application.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
+Application.belongsTo(User, { as: 'updatedByUser', foreignKey: 'updated_by' });
 
 module.exports = User;

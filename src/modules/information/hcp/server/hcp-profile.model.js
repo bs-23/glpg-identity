@@ -6,6 +6,7 @@ const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequel
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const HcpConsents = require('./hcp-consents.model');
 
+
 const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
     id: {
         allowNull: false,

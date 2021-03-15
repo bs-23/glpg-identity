@@ -7,15 +7,26 @@ const { Services } = require(path.join(process.cwd(), 'src/modules/core/server/a
 const { ServiceGuard } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.middleware.js'));
 
 module.exports = app => {
+    app.route('/api/clinical-trials-cdp')
+        .get(CDPAuthStrategy, controller.getTrials);
+
     app.route('/api/clinical-trials')
         .get(auth, controller.getTrials)
         .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.dumpAllData);
+    
+    app.route('/api/clinical-trials/update')
+        .put(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.updateClinicalTrials);
+    app.route('/api/clinical-trials/update-stories')
+        .put(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.updateStories);
 
     app.route('/api/clinical-trials/versions')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.showAllVersions);
 
     app.route('/api/clinical-trials/merge-versions')
         .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.mergeProcessData);
+
+    app.route('/api/clinical-trials/sync-geocodes')
+        .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_CLINICAL_TRIALS]), controller.syncGeoCodes);
 
     app.route('/api/clinical-trials/countries')
         .get(auth, controller.getCountryList);
@@ -29,6 +40,14 @@ module.exports = app => {
     app.route('/api/clinical-trials/conditions')
         .get(auth, controller.getConditions);
 
+    app.route('/api/clinical-trials/conditions-cdp')
+        .get(CDPAuthStrategy, controller.getConditions);
+
     app.route('/api/clinical-trials/:id')
         .get(auth, controller.getTrialDetails);
+
+    app.route('/api/clinical-trials-cdp/:ids')
+        .get(CDPAuthStrategy, controller.getTrialDetails);
+    app.route('/api/clinical-trials-cdp/all-story-versions/:trial_fixed_id')
+        .get(CDPAuthStrategy, controller.getAllStoryVersions);
 };

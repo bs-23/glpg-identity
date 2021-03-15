@@ -2,13 +2,15 @@ import React, { useEffect, useState, useRef } from 'react';
 import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
-import { Faq } from '../../../../platform';
 import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
+
+import { Faq } from '../../../../platform';
 import { partnerRequestSchemaForHcps } from '../manage-requests.schema'
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
 import SearchHcpModal from './search-hcp-modal.component';
+import { getLocalizations } from '../../../../core/client/localization/localization.actions';
 
 const HcpPartnerRequests = () => {
     const dispatch = useDispatch();
@@ -25,12 +27,15 @@ const HcpPartnerRequests = () => {
     const [isSupplier, setIsSupplier] = useState(false);
     const [isCustomer, setIsCustomer] = useState(false);
     const [formData, setFormData] = useState(undefined);
-    const countryLanguages = [
-        { language_name: 'English', language_code: 'en' },
-        { language_name: 'French', language_code: 'fr' },
-        { language_name: 'German', language_code: 'de' },
-        { language_name: 'Dutch', language_code: 'nl' }
-    ];
+    const localizations = useSelector(state => state.localizationReducer.localizations);
+
+    // const countryLanguages = [
+    //     { locale_name: 'English', language_code: 'en' },
+    //     { locale_name: 'French', language_code: 'fr' },
+    //     { locale_name: 'German', language_code: 'de' },
+    //     { locale_name: 'Dutch', language_code: 'nl' }
+    // ];
+
     const partnerTypes = ['SUPL', 'CUST', 'HCP', 'HCO', 'POR', 'ZVST'];
     const [requestToDelete, setRequestToDelete] = useState(null);
 
@@ -40,7 +45,7 @@ const HcpPartnerRequests = () => {
 
     const requestData = useSelector(state => state.manageRequestsReducer.partnerRequests);
     const request = useSelector(state => state.manageRequestsReducer.partnerRequest);
-
+    const userCountries = useSelector(state => state.userReducer.loggedInUser.countries);
     const countries = useSelector(state => state.countryReducer.countries);
 
     const getCountryName = (country_iso2) => {
@@ -48,6 +53,11 @@ const HcpPartnerRequests = () => {
         const country = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
         return country && country.countryname;
     };
+
+    const getLocales = (country_iso2) => {
+        let countryLanguages = localizations.filter(({ country_iso2: c_iso2 }) => country_iso2 === c_iso2);
+        return countryLanguages;
+    }
 
     const [showSearch, setShowSearch] = useState(false);
     const [searchInput, setSearchInput] = useState(false);
@@ -189,6 +199,10 @@ const HcpPartnerRequests = () => {
     };
 
     useEffect(() => {
+        dispatch(getLocalizations());
+    }, []);
+
+    useEffect(() => {
         loadRequests();
     }, [location]);
 
@@ -213,7 +227,7 @@ const HcpPartnerRequests = () => {
     useEffect(() => {
         if (formData) {
             dispatch(sendForm(formData)).then(() => {
-                dispatch(updatePartnerRequest(formData.id, { ...formData, status: 'pending' })).then(() => {
+                dispatch(updatePartnerRequest(formData.id, { ...formData, status: 'email_sent' })).then(() => {
                     addToast('Form sent successfully.', {
                         appearance: 'success',
                         autoDismiss: true
@@ -300,7 +314,7 @@ const HcpPartnerRequests = () => {
                                                 <td data-for="UUID">{row.uuid}</td>
                                                 <td data-for="Name">{`${row.first_name} ${row.last_name}`}</td>
                                                 <td data-for="MDR ID">{row.mdr_id}</td>
-                                                <td data-for="Status">{row.status}</td>
+                                                <td data-for="Status" class="text-capitalize">{row.status.split('_').join(' ')}</td>
                                                 <td data-for="Company Code">
                                                     {
                                                         row.company_codes && row.company_codes.length &&
@@ -313,15 +327,20 @@ const HcpPartnerRequests = () => {
                                                 <td data-for="Email Address">{row.email}</td>
                                                 <td data-for="Procurement Contact">{row.procurement_contact}</td>
                                                 <td data-for="Country">{getCountryName(row.country_iso2)}</td>
-                                                <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
-                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
-                                                    </Dropdown.Toggle>
-                                                    <Dropdown.Menu>
-                                                        <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                        <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
-                                                    </Dropdown.Menu>
-                                                </Dropdown></td>
+                                                <td data-for="Action">
+                                                    {row.status === 'new_request' ?
+                                                        <Dropdown className="ml-auto dropdown-customize">
+                                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
+                                                            </Dropdown.Toggle>
+                                                            <Dropdown.Menu>
+                                                                <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
+                                                                <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
+                                                                <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
+                                                            </Dropdown.Menu>
+                                                        </Dropdown>
+                                                        : '--'
+                                                    }
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -370,7 +389,7 @@ const HcpPartnerRequests = () => {
                             procurement_contact: partnerRequestId && Object.keys(request).length ? request.procurement_contact : '',
                             company_codes: [],
                             country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
-                            language: partnerRequestId && Object.keys(request).length ? request.locale.split('_')[0] : 'en',
+                            locale: partnerRequestId && Object.keys(request).length ? request.locale : '',
                             uuid: partnerRequestId && Object.keys(request).length ? request.uuid : '',
                             onekey_id: partnerRequestId && Object.keys(request).length ? request.onekey_id : '',
                             partner_type: partnerRequestId && Object.keys(request).length ? request.partner_type : '',
@@ -543,24 +562,32 @@ const HcpPartnerRequests = () => {
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="country_iso2">Country <span className="text-danger">*</span></label>
-                                            <Field data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
+                                            <Field
+                                                data-testid="country_iso2"
+                                                as="select"
+                                                name="country_iso2"
+                                                className="form-control"
+                                                onChange={e => {
+                                                    formikProps.setFieldValue('locale', '');
+                                                    formikProps.handleChange(e);
+                                                }}>
                                                 <option key="select-country" value="" disabled>--Select Country--</option>
-                                                {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
+                                                {countries.filter(c => userCountries.includes(c.country_iso2)).map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
                                             </Field>
                                             <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
-                                            <label className="font-weight-bold" htmlFor="language">Language<span className="text-danger">*</span></label>
-                                            <Field className="form-control lang_code" as="select" name="language" className="form-control" id="language">
-                                                <option key="select-language" value="" disabled>--Select Language--</option>
-                                                {countryLanguages.map((element, lang_idx) => {
-                                                    const { language_name, language_code } = element;
-                                                    return language_name && <option key={lang_idx} value={language_code}>{language_name}</option>
+                                            <label className="font-weight-bold" htmlFor="localization">Localization<span className="text-danger">*</span></label>
+                                            <Field className="form-control lang_code" as="select" name="locale" className="form-control" id="language">
+                                                <option key="select-locale" value="" disabled>--Select Localization--</option>
+                                                {getLocales(formikProps.values.country_iso2).map((element, lang_idx) => {
+                                                    const { language_variant, locale } = element;
+                                                    return language_variant && <option key={lang_idx} value={locale}>{language_variant}</option>
                                                 })}
                                             </Field>
-                                            <div className="invalid-feedback"><ErrorMessage name="language" /></div>
+                                            <div className="invalid-feedback"><ErrorMessage name="locale" /></div>
                                         </div>
                                     </div>
                                 </div>

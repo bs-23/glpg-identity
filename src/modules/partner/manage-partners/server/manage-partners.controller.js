@@ -1,17 +1,22 @@
 const path = require('path');
-const url = require('url');
+const { Op, QueryTypes } = require('sequelize');
+const validator = require('validator');
+
+const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const Partner = require('./partner.model');
 const PartnerVendors = require('./partner-vendor.model');
-const { Op } = require('sequelize');
-const { string } = require('yup');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const PartnerRequest = require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model'));
+const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
+const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model'));
+const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model'));
+const PartnerConsent = require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-consents.model'));
 const storageService = require(path.join(process.cwd(), 'src/modules/core/server/storage/storage.service'));
 const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
-async function uploadDucuments(owner, type, files) {
+async function uploadDucuments(owner, type, files = []) {
     const bucketName = 'cdp-development';
     for (const file of files) {
         const uploadOptions = {
@@ -158,11 +163,9 @@ async function createPartner(req, res) {
     try {
         const files = req.files;
 
-        const { type, request_id, first_name, last_name, organization_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, individual_type, organization_type, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency } = req.body;
+        const { type, request_id, first_name, last_name, organization_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, individual_type, organization_type, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency, swift_code, routing } = req.body;
 
         const entityType = type;
-
-        if (response.errors.length) return res.status(400).send(response);
 
         const partnerRequest = await PartnerRequest.findOne({
             where: {
@@ -176,18 +179,19 @@ async function createPartner(req, res) {
             return res.status(404).send(response);
         }
 
-        if (partnerRequest && partnerRequest.status !== 'pending') {
+        if (partnerRequest && partnerRequest.status !== 'email_sent') {
             response.errors.push(new CustomError('Invalid partner request status.', 400));
             return res.status(400).send(response);
         }
 
         const data = {
-            request_id, first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency
+            request_id, first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, iban, bank_name, bank_account_no, currency, swift_code, routing
         };
 
         data.entity_type = entityType;
         if (entityType === 'hcp') {
             data.individual_type = individual_type;
+            data.beneficiary_category = beneficiary_category;
         }
 
         if (entityType === 'hco') {
@@ -195,6 +199,90 @@ async function createPartner(req, res) {
             data.organization_name = organization_name;
         }
         data.onekey_id = partnerRequest.onekey_id;
+
+        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+
+        let hasDoubleOptIn = false;
+        let consentArr = [];
+
+        const consents = JSON.parse('[' + (req.body.consents || '') + ']');
+
+        if (consents && consents.length) {
+            await Promise.all(consents.map(async consent => {
+                const consentId = Object.keys(consent)[0];
+                const consentResponse = Object.values(consent)[0];
+                const language_code = locale.split('_')[0];
+                let richTextLocale = `${language_code}_${country_iso2.toUpperCase()}`;
+
+                if (!consentResponse) return;
+
+                const consentDetails = await Consent.findOne({ where: { id: consentId } });
+
+                if (!consentDetails) {
+                    response.errors.push(new CustomError('Invalid consents.', 400));
+                    return;
+                };
+
+                const currentCountry = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                const baseCountry = countries.find(c => c.countryname === currentCountry.codbase_desc);
+
+                const consentCountry = await ConsentCountry.findOne({
+                    where: {
+                        country_iso2: {
+                            [Op.iLike]: baseCountry.country_iso2
+                        },
+                        consent_id: consentDetails.id
+                    }
+                });
+
+                if (!consentCountry) {
+                    response.errors.push(new CustomError('Invalid consent country.', 400));
+                    return;
+                }
+
+                let consentLocale = await ConsentLocale.findOne({
+                    where: {
+                        consent_id: consentId,
+                        locale: { [Op.iLike]: `${language_code}_${country_iso2}` }
+                    }
+                });
+
+                if (!consentLocale) {
+                    const codbaseCountry = countries.filter(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                    const localeUsingParentCountryISO = `${language_code}_${(codbaseCountry[0].country_iso2 || '').toUpperCase()}`;
+
+                    consentLocale = await ConsentLocale.findOne({
+                        where: {
+                            consent_id: consentId,
+                            locale: { [Op.iLike]: localeUsingParentCountryISO }
+                        }
+                    });
+
+                    richTextLocale = localeUsingParentCountryISO;
+                }
+
+                if (!consentLocale) {
+                    response.errors.push(new CustomError('Invalid consent locale.', 400));
+                    return;
+                }
+
+                if (consentCountry.opt_type === 'double-opt-in') {
+                    hasDoubleOptIn = true;
+                }
+
+                consentArr.push({
+                    consent_id: consentDetails.id,
+                    consent_confirmed: hasDoubleOptIn ? false : true,
+                    opt_type: consentCountry.opt_type,
+                    rich_text: validator.unescape(consentLocale.rich_text),
+                    consent_locale: richTextLocale,
+                    created_by: req.user.id,
+                    updated_by: req.user.id
+                });
+            }));
+        }
 
         const [partnerHcx, created] = await Partner.findOrCreate({
             where: { request_id: request_id },
@@ -206,9 +294,20 @@ async function createPartner(req, res) {
             return res.status(400).send(response);
         }
 
-        await partnerRequest.update({ status: 'submitted' });
+        await partnerRequest.update({ status: 'request_processed' });
 
         await uploadDucuments(partnerHcx, entityType, files);
+
+        if (consentArr.length) {
+            consentArr = consentArr.map(c => {
+                c.user_id = partnerHcx.id
+                return c;
+            });
+            await PartnerConsent.bulkCreate(consentArr, {
+                returning: true,
+                ignoreDuplicates: false
+            });
+        }
 
         partnerHcx.dataValues.type = partnerHcx.dataValues.individual_type;
 
@@ -245,7 +344,7 @@ async function updatePartner(req, res) {
     try {
         const files = req.files;
 
-        const { type, first_name, last_name, organization_name, address, city, post_code, email, telephone, individual_type, organization_type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency, remove_files } = req.body;
+        const { type, first_name, last_name, organization_name, address, city, post_code, email, telephone, individual_type, organization_type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency, swift_code, routing, remove_files } = req.body;
 
         const partner = await Partner.findOne({
             where: {
@@ -259,8 +358,95 @@ async function updatePartner(req, res) {
             return res.status(400).send(response);
         }
 
+        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+        let consentArr = [];
+        const consents = JSON.parse('[' + (req.body.consents || '') + ']');
+
+        if (consents && consents.length) {
+            await Promise.all(consents.map(async x => {
+                const consentId = Object.keys(x)[0];
+                const consentResponse = Object.values(x)[0];
+
+                const partnerConsent = await PartnerConsent.findOne({ where: { user_id: partner.id, consent_id: consentId } });
+
+                if (partnerConsent) {
+                    await partnerConsent.update({
+                        opt_type: consentResponse ? 'single-opt-in' : 'opt-out',
+                        consent_confirmed: consentResponse
+                    });
+                } else {
+                    const language_code = locale.split('_')[0];
+                    let richTextLocale = `${language_code}_${country_iso2.toUpperCase()}`;
+
+                    if (!consentResponse) return;
+
+                    const consentDetails = await Consent.findOne({ where: { id: consentId } });
+
+                    if (!consentDetails) {
+                        response.errors.push(new CustomError('Invalid consents.', 400));
+                        return;
+                    };
+
+                    const currentCountry = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                    const baseCountry = countries.find(c => c.countryname === currentCountry.codbase_desc);
+
+                    const consentCountry = await ConsentCountry.findOne({
+                        where: {
+                            country_iso2: {
+                                [Op.iLike]: baseCountry.country_iso2
+                            },
+                            consent_id: consentDetails.id
+                        }
+                    });
+
+                    if (!consentCountry) {
+                        response.errors.push(new CustomError('Invalid consent country.', 400));
+                        return;
+                    }
+
+                    let consentLocale = await ConsentLocale.findOne({
+                        where: {
+                            consent_id: consentId,
+                            locale: { [Op.iLike]: `${language_code}_${country_iso2}` }
+                        }
+                    });
+
+                    if (!consentLocale) {
+                        const codbaseCountry = countries.filter(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                        const localeUsingParentCountryISO = `${language_code}_${(codbaseCountry[0].country_iso2 || '').toUpperCase()}`;
+
+                        consentLocale = await ConsentLocale.findOne({
+                            where: {
+                                consent_id: consentId,
+                                locale: { [Op.iLike]: localeUsingParentCountryISO }
+                            }
+                        });
+
+                        richTextLocale = localeUsingParentCountryISO;
+                    }
+
+                    if (!consentLocale) {
+                        response.errors.push(new CustomError('Invalid consent locale.', 400));
+                        return;
+                    }
+
+                    consentArr.push({
+                        consent_id: consentDetails.id,
+                        consent_confirmed: true,
+                        opt_type: consentCountry.opt_type,
+                        rich_text: validator.unescape(consentLocale.rich_text),
+                        consent_locale: richTextLocale,
+                        created_by: req.user.id,
+                        updated_by: req.user.id
+                    });
+                }
+            }));
+        }
+
         const data = {
-            first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, iban, bank_name, bank_account_no, currency
+            first_name, last_name, address, city, post_code, email, telephone, country_iso2, locale, registration_number, uuid, iban, bank_name, bank_account_no, currency, swift_code, routing
         };
 
         if (partner.dataValues.entity_type === 'hcp') {
@@ -307,6 +493,17 @@ async function updatePartner(req, res) {
         const updated_data = await partner.update(data);
 
         await uploadDucuments(partner, updated_data.dataValues.entity_type, files);
+
+        if (consentArr.length) {
+            consentArr = consentArr.map(c => {
+                c.user_id = updated_data.id
+                return c;
+            });
+            await PartnerConsent.bulkCreate(consentArr, {
+                returning: true,
+                ignoreDuplicates: false
+            });
+        }
 
         delete updated_data.dataValues.created_at;
         delete updated_data.dataValues.updated_at;
@@ -444,7 +641,7 @@ async function createPartnerVendor(req, res) {
     try {
         const files = req.files;
 
-        const { request_id, type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency } = req.body;
+        const { request_id, type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, swift_code, routing } = req.body;
 
         if (response.errors.length) return res.status(400).send(response);
 
@@ -460,16 +657,100 @@ async function createPartnerVendor(req, res) {
             return res.status(404).send(response);
         }
 
-        if (partnerRequest && partnerRequest.status !== 'pending') {
+        if (partnerRequest && partnerRequest.status !== 'email_sent') {
             response.errors.push(new CustomError('Invalid partner request status.', 400));
             return res.status(404).send(response);
         }
 
         const data = {
-            request_id, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency
+            request_id, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, swift_code, routing
         };
 
         data.entity_type = type;
+
+        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+
+        let hasDoubleOptIn = false;
+        let consentArr = [];
+
+        const consents = JSON.parse('[' + (req.body.consents || '') + ']');
+
+        if (consents && consents.length) {
+            await Promise.all(consents.map(async consent => {
+                const consentId = Object.keys(consent)[0];
+                const consentResponse = Object.values(consent)[0];
+                const language_code = locale.split('_')[0];
+                let richTextLocale = `${language_code}_${country_iso2.toUpperCase()}`;
+
+                if (!consentResponse) return;
+
+                const consentDetails = await Consent.findOne({ where: { id: consentId } });
+
+                if (!consentDetails) {
+                    response.errors.push(new CustomError('Invalid consents.', 400));
+                    return;
+                };
+
+                const currentCountry = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                const baseCountry = countries.find(c => c.countryname === currentCountry.codbase_desc);
+
+                const consentCountry = await ConsentCountry.findOne({
+                    where: {
+                        country_iso2: {
+                            [Op.iLike]: baseCountry.country_iso2
+                        },
+                        consent_id: consentDetails.id
+                    }
+                });
+
+                if (!consentCountry) {
+                    response.errors.push(new CustomError('Invalid consent country.', 400));
+                    return;
+                }
+
+                let consentLocale = await ConsentLocale.findOne({
+                    where: {
+                        consent_id: consentId,
+                        locale: { [Op.iLike]: `${language_code}_${country_iso2}` }
+                    }
+                });
+
+                if (!consentLocale) {
+                    const codbaseCountry = countries.filter(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                    const localeUsingParentCountryISO = `${language_code}_${(codbaseCountry[0].country_iso2 || '').toUpperCase()}`;
+
+                    consentLocale = await ConsentLocale.findOne({
+                        where: {
+                            consent_id: consentId,
+                            locale: { [Op.iLike]: localeUsingParentCountryISO }
+                        }
+                    });
+
+                    richTextLocale = localeUsingParentCountryISO;
+                }
+
+                if (!consentLocale) {
+                    response.errors.push(new CustomError('Invalid consent locale.', 400));
+                    return;
+                }
+
+                if (consentCountry.opt_type === 'double-opt-in') {
+                    hasDoubleOptIn = true;
+                }
+
+                consentArr.push({
+                    consent_id: consentDetails.id,
+                    consent_confirmed: hasDoubleOptIn ? false : true,
+                    opt_type: consentCountry.opt_type,
+                    rich_text: validator.unescape(consentLocale.rich_text),
+                    consent_locale: richTextLocale,
+                    created_by: req.user.id,
+                    updated_by: req.user.id
+                });
+            }));
+        }
 
         const [partnerVendor, created] = await PartnerVendors.findOrCreate({
             where: {
@@ -491,9 +772,20 @@ async function createPartnerVendor(req, res) {
             return res.status(400).send(response);
         }
 
-        await partnerRequest.update({ status: 'submitted' });
+        await partnerRequest.update({ status: 'request_processed' });
 
         await uploadDucuments(partnerVendor, type, files);
+
+        if (consentArr.length) {
+            consentArr = consentArr.map(c => {
+                c.user_id = partnerVendor.id
+                return c;
+            });
+            await PartnerConsent.bulkCreate(consentArr, {
+                returning: true,
+                ignoreDuplicates: false
+            });
+        }
 
         delete partnerVendor.dataValues.created_at;
         delete partnerVendor.dataValues.updated_at;
@@ -513,11 +805,12 @@ async function updatePartnerVendor(req, res) {
     try {
         const files = req.files;
 
-        const { type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, remove_files } = req.body;
+        const { type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, swift_code, routing, remove_files } = req.body;
 
         const partner = await PartnerVendors.findOne({
             where: {
-                id: req.params.id
+                id: req.params.id,
+                entity_type: type
             }
         });
 
@@ -526,8 +819,95 @@ async function updatePartnerVendor(req, res) {
             return res.status(400).send(response);
         }
 
+        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+        let consentArr = [];
+        const consents = JSON.parse('[' + (req.body.consents || '') + ']');
+
+        if (consents && consents.length) {
+            await Promise.all(consents.map(async x => {
+                const consentId = Object.keys(x)[0];
+                const consentResponse = Object.values(x)[0];
+
+                const partnerConsent = await PartnerConsent.findOne({ where: { user_id: partner.id, consent_id: consentId } });
+
+                if (partnerConsent) {
+                    await partnerConsent.update({
+                        opt_type: consentResponse ? 'single-opt-in' : 'opt-out',
+                        consent_confirmed: consentResponse
+                    });
+                } else {
+                    const language_code = locale.split('_')[0];
+                    let richTextLocale = `${language_code}_${country_iso2.toUpperCase()}`;
+
+                    if (!consentResponse) return;
+
+                    const consentDetails = await Consent.findOne({ where: { id: consentId } });
+
+                    if (!consentDetails) {
+                        response.errors.push(new CustomError('Invalid consents.', 400));
+                        return;
+                    };
+
+                    const currentCountry = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                    const baseCountry = countries.find(c => c.countryname === currentCountry.codbase_desc);
+
+                    const consentCountry = await ConsentCountry.findOne({
+                        where: {
+                            country_iso2: {
+                                [Op.iLike]: baseCountry.country_iso2
+                            },
+                            consent_id: consentDetails.id
+                        }
+                    });
+
+                    if (!consentCountry) {
+                        response.errors.push(new CustomError('Invalid consent country.', 400));
+                        return;
+                    }
+
+                    let consentLocale = await ConsentLocale.findOne({
+                        where: {
+                            consent_id: consentId,
+                            locale: { [Op.iLike]: `${language_code}_${country_iso2}` }
+                        }
+                    });
+
+                    if (!consentLocale) {
+                        const codbaseCountry = countries.filter(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                        const localeUsingParentCountryISO = `${language_code}_${(codbaseCountry[0].country_iso2 || '').toUpperCase()}`;
+
+                        consentLocale = await ConsentLocale.findOne({
+                            where: {
+                                consent_id: consentId,
+                                locale: { [Op.iLike]: localeUsingParentCountryISO }
+                            }
+                        });
+
+                        richTextLocale = localeUsingParentCountryISO;
+                    }
+
+                    if (!consentLocale) {
+                        response.errors.push(new CustomError('Invalid consent locale.', 400));
+                        return;
+                    }
+
+                    consentArr.push({
+                        consent_id: consentDetails.id,
+                        consent_confirmed: true,
+                        opt_type: consentCountry.opt_type,
+                        rich_text: validator.unescape(consentLocale.rich_text),
+                        consent_locale: richTextLocale,
+                        created_by: req.user.id,
+                        updated_by: req.user.id
+                    });
+                }
+            }));
+        }
+
         const data = {
-            type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency,
+            type, country_iso2, locale, requestor_first_name, requestor_last_name, purchasing_org, company_code, requestor_email, procurement_contact, name, registration_number, address, city, post_code, telephone, invoice_contact_name, invoice_address, invoice_city, invoice_post_code, invoice_email, invoice_telephone, commercial_contact_name, commercial_address, commercial_city, commercial_post_code, commercial_email, commercial_telephone, ordering_contact_name, ordering_email, ordering_telephone, iban, bank_name, bank_account_no, currency, swift_code, routing,
             entity_type: type
         };
 
@@ -560,11 +940,20 @@ async function updatePartnerVendor(req, res) {
 
         }
 
-
-
         const updated_data = await partner.update(data);
 
         await uploadDucuments(partner, updated_data.dataValues.entity_type, files);
+
+        if (consentArr.length) {
+            consentArr = consentArr.map(c => {
+                c.user_id = updated_data.id
+                return c;
+            });
+            await PartnerConsent.bulkCreate(consentArr, {
+                returning: true,
+                ignoreDuplicates: false
+            });
+        }
 
         delete updated_data.dataValues.created_at;
         delete updated_data.dataValues.updated_at;
@@ -620,7 +1009,7 @@ async function approvePartner(req, res) {
 
         if (!partner) return res.status(404).send(`The ${entityType} partner does not exist`);
 
-        if (partner.status !== 'pending') return res.status(400).send(`The ${entityType} partner has already been approved/rejected`);
+        if (partner.status !== 'not_approved') return res.status(400).send(`The ${entityType} partner has already been approved`);
 
         await partner.update({ status: 'approved' });
 
@@ -772,13 +1161,17 @@ async function exportApprovedPartners(req, res) {
 
 
 async function getPartnerVendorById(req, res) {
+    const response = new Response({}, []);
     try {
         const partnerVendor = await PartnerVendors.findOne({
             where: { id: req.params.id },
             attributes: { exclude: ['entity_type', 'created_at', 'updated_at'] }
         });
 
-        if (!partnerVendor) return res.status(404).send('The partner vendor does not exist');
+        if (!partnerVendor) {
+            response.errors.push(new CustomError('The partner does not exist.', 404));
+            return res.status(404).send(response);
+        }
 
         partnerVendor.dataValues.type = partnerVendor.dataValues.individual_type;
         delete partnerVendor.dataValues.individual_type;
@@ -790,7 +1183,22 @@ async function getPartnerVendorById(req, res) {
             id: d.dataValues.id
         }));
 
-        res.json(partnerVendor);
+        const consents = await PartnerConsent.findAll({ where: { user_id: partnerVendor.id } });
+
+        partnerVendor.dataValues.consents = consents.map(c => {
+            return {
+                rich_text: c.rich_text,
+                id: c.id,
+                consent_id: c.consnet_id,
+                consent_confirmed: c.consent_confirmed,
+                opt_type: c.opt_type,
+                consent_locale: c.consent_locale
+            };
+        });
+
+        response.data = partnerVendor;
+
+        res.json(response);
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
@@ -798,13 +1206,17 @@ async function getPartnerVendorById(req, res) {
 }
 
 async function getPartnerById(req, res) {
+    const response = new Response({}, []);
     try {
         const partner = await Partner.findOne({
             where: { id: req.params.id },
             attributes: { exclude: ['created_at', 'updated_at'] }
         });
 
-        if (!partner) return res.status(404).send('The partner does not exist');
+        if (!partner) {
+            response.errors.push(new CustomError('The partner does not exist.', 404));
+            return res.status(404).send(response);
+        }
 
         if (partner.dataValues.entity_type === 'hcp') {
             delete partner.dataValues.organization_name;
@@ -828,7 +1240,21 @@ async function getPartnerById(req, res) {
             id: d.dataValues.id
         }));
 
-        res.json(partner);
+        const consents = await PartnerConsent.findAll({ where: { user_id: partner.id } });
+
+        partner.dataValues.consents = consents.map(c => {
+            return {
+                rich_text: c.rich_text,
+                id: c.id,
+                consent_id: c.consnet_id,
+                consent_confirmed: c.consent_confirmed,
+                opt_type: c.opt_type,
+                consent_locale: c.consent_locale
+            };
+        });
+
+        response.data = partner;
+        res.json(response);
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
@@ -854,6 +1280,7 @@ exports.createPartner = createPartner;
 exports.updatePartner = updatePartner;
 
 exports.getPartnerVendors = getPartnerVendors;
+exports.getPartnerVendorById = getPartnerVendorById;
 exports.getPartnerWholesalers = getPartnerWholesalers;
 exports.createPartnerVendor = createPartnerVendor;
 exports.updatePartnerVendor = updatePartnerVendor;
@@ -863,4 +1290,3 @@ exports.registrationLookup = registrationLookup;
 exports.approvePartner = approvePartner;
 exports.exportApprovedPartners = exportApprovedPartners;
 exports.getPartnerInformation = getPartnerInformation;
-exports.getPartnerVendorById = getPartnerVendorById;

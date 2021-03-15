@@ -18,6 +18,11 @@ let trialModel = {
             allowNull: true,
             type: DataTypes.STRING(60)
         },
+        sponsor: {
+            unique: false,
+            allowNull: true,
+            type: DataTypes.STRING(256)
+        },
         gov_identifier: {
             unique: false,
             allowNull: true,

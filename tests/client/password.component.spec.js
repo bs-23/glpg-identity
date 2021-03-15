@@ -13,6 +13,8 @@ import { ToastProvider } from 'react-toast-notifications';
 
 configure({ adapter: new Adapter() });
 
+jest.setTimeout(20000);
+
 describe('PasswordForm component', () => {
     let fakeAxios;
     let savedUser;
@@ -26,6 +28,7 @@ describe('PasswordForm component', () => {
             "email": "test@gmail.com",
             "name": "a",
             "serviceCategories": [],
+            "services": []
         };
         fakeAxios.onPost('/api/login').reply(200, savedUser);
 
