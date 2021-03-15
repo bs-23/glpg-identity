@@ -639,7 +639,7 @@ async function syncConsentInVeevaCRM(hcpUser) {
             where: {
                 user_id: hcpUser.id,
                 consent_confirmed: true,
-                '$consent.consent_category.title$': { [Op.iLike]: 'direct marketing' }
+                '$consent.consent_category.slug$': { [Op.iLike]: 'direct-marketing' }
             },
             include: [{
                 model: Consent,
