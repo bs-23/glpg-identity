@@ -135,7 +135,7 @@ const ConsentForm = (props) => {
                                 <label className="font-weight-bold" htmlFor={localeId}>Localization <span className="text-danger">*</span></label>
                                 <Field className="form-control locale" value={item.locale} onChange={(e) => handleTranslationChange(e.target.value, idx, 'locale', formikProps)} data-id={idx} as="select" name={localeId} id={localeId}>
                                     <option key={'country-' + item.id} value="" disabled>--Select Localization--</option>
-                                    {localizations.filter(l => l.country_iso2).map(localization => {
+                                    {localizations.map(localization => {
                                         return <option key={localization.locale} value={localization.locale}>
                                             {localization.language_variant} ({localization.locale})
                                         </option>

@@ -61,7 +61,7 @@ export default function UserForm() {
                     <div className="row">
                         <div className="col-12">
                             <div className="bg-white">
-                                <div className="add-user p-3">
+                                <div className="add-user p-sm-3">
                                     <Formik
                                         initialValues={{
                                             first_name: "",
@@ -131,9 +131,9 @@ export default function UserForm() {
                                                                                             <Dropdown.Toggle key={index} variant className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
                                                                                             {
                                                                                                     onChangePhonefield(formikProps.values.phone) === null || onChangePhonefield(formikProps.values.phone) === undefined ? <span height="20" width="20">Select</span> :
-                                                                                                        <img height="20" width="20" src={onChangePhonefield(formikProps.values.phone) === null || onChangePhonefield(formikProps.values.phone) === undefined ? '' : onChangePhonefield(formikProps.values.phone).flag} />
+                                                                                                        <img className="mr-2" height="20" width="20" src={onChangePhonefield(formikProps.values.phone) === null || onChangePhonefield(formikProps.values.phone) === undefined ? '' : onChangePhonefield(formikProps.values.phone).flag} />
                                                                                             }
-                                                                                                <span className="country-phone-code pl-1">
+                                                                                                <span className="country-phone-code">
                                                                                                     {onChangePhonefield(formikProps.values.phone) === null || onChangePhonefield(formikProps.values.phone) === undefined ? "" : onChangePhonefield(formikProps.values.phone).countryCode}
                                                                                                 </span>
                                                                                             </Dropdown.Toggle> : null);

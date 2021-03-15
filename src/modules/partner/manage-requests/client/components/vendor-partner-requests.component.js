@@ -169,7 +169,7 @@ const VendorPartnerRequests = () => {
 
     useEffect(() => {
         if (formData) {
-            dispatch(sendForm(formData)).then(() => {
+            dispatch(sendForm(formData.id)).then(() => {
                 dispatch(updatePartnerRequest(formData.id, { ...formData, status: "email_sent" }));
             }).catch(() => {
                 addToast('An error occured. Please try again.', {
