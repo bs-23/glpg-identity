@@ -605,7 +605,6 @@ async function init() {
     function localizationSeeder(callback) {
         const localizations = [
             { language_family: 'English', language_variant: 'British English', country_iso2: 'GB', locale: 'en_GB' },
-            { language_family: 'English', language_variant: 'English', locale: 'en' },
             { language_family: 'Dutch', language_variant: 'Belgian Dutch', country_iso2: 'BE', locale: 'nl_BE' },
             { language_family: 'Dutch', language_variant: 'Standard Dutch', country_iso2: 'NL', locale: 'nl_NL' },
             { language_family: 'French', language_variant: 'Belgian French', country_iso2: 'BE', locale: 'fr_BE' },
