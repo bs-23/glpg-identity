@@ -13,8 +13,10 @@ const isPhoneMaxLengthValid = (parent) => {
 
 const isPhoneNumberValid = (parent) => {
     const { country_code, phone} = parent;
+    if(!phone) return true;
     const pn = PhoneNumber(phone, country_code);
     return pn.isValid();
+
 }
 
 function validatePassword(password) {
@@ -78,7 +80,6 @@ export const registerSchema = object().shape({
     email: cdpUserSchema.email,
     phone: string()
         .matches(/^[0-9\+]*$/, 'This field only contains digits')
-        .min(8, 'This field must be at least 8 characters long')
         .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`,
             function () {
                 return isPhoneMaxLengthValid(this.parent);
@@ -136,7 +137,6 @@ export const updateMyProfileSchema = object().shape({
     email: cdpUserSchema.email,
     phone: string()
         .matches(/^[0-9\+]*$/, 'This field only contains digits')
-        .min(8, 'This field must be at least 8 characters long')
         .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`,
             function () {
                 return isPhoneMaxLengthValid(this.parent);
