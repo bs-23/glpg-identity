@@ -30,6 +30,16 @@ export function sendForm(request_id) {
     };
 };
 
+export function resendForm(request_id) {
+    return {
+        type: Types.RESEND_FORM,
+        payload: axios({
+            method: 'get',
+            url: `/api/partner-requests/${request_id}/resend-form`
+        })
+    };
+};
+
 export function createPartnerRequest(data) {
     return {
         type: Types.POST_PARTNER_REQUEST,

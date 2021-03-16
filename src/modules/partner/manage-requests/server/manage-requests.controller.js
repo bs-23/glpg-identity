@@ -152,12 +152,14 @@ async function sendForm(req, res) {
             email,
             partner_type,
             country_iso2,
-            locale
+            locale,
+            status
         } = partnerRequest.dataValues;
 
         const userApplication = await Application.findOne({ where: { id: application_id } });
         const jwt_token = jwt.sign({
-            request_id: id
+            request_id: id,
+            status: status
         }, userApplication.auth_secret, {
             expiresIn: '1h'
         });
@@ -181,6 +183,61 @@ async function sendForm(req, res) {
 
         await axios.post(sendFormLink, payload);
         res.json('Form sent successfully.');
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function resendForm(req, res){
+   try {
+        const { id } = req.params;
+        const partner = await PartnerRequest.findOne({ where: { id } })
+        if (!partner) return res.status(400).send('Partner not found.');
+
+        const { request_id } = partner.dataValues;
+        const partnerRequest = await PartnerRequest.findOne({ where: { request_id } })
+
+        if (!partnerRequest) return res.status(400).send('Partner Request not found.');
+
+        const {
+            application_id,
+            first_name,
+            last_name,
+            email,
+            partner_type,
+            country_iso2,
+            locale,
+            status
+        } = partnerRequest.dataValues;
+
+        const userApplication = await Application.findOne({ where: { id: application_id } });
+        const jwt_token = jwt.sign({
+            partner_id: id,
+            status: status
+        }, userApplication.auth_secret, {
+            expiresIn: '1h'
+        });
+
+        const payload = {
+            jwt_token,
+            first_name,
+            last_name,
+            email,
+            partner_type: partner_type ? partner_type.toLowerCase() : undefined,
+            country_iso2: country_iso2.toLowerCase(),
+            locale: locale
+        };
+
+        const metaData = await Application.findAll({
+            where: { id: application_id },
+            attributes: ['metadata']
+        });
+
+        const resendFormLink = metaData[0].dataValues.metadata.request_notification_link;
+
+        await axios.post(resendFormLink, payload);
+        res.json('Form resent successfully.');
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
@@ -315,3 +372,4 @@ exports.getPartnerRequest = getPartnerRequest;
 exports.updatePartnerRequest = updatePartnerRequest;
 exports.deletePartnerRequest = deletePartnerRequest;
 exports.sendForm = sendForm;
+exports.resendForm = resendForm;
