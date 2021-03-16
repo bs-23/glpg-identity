@@ -224,6 +224,23 @@ const SearchProfessionalHcp = (props) => {
         );
     };
 
+    const hcpListInfo = (
+        <Popover id="hcpListInfo" className="shadow-lg">
+            <Popover.Content className="px-3">
+                <ul className="list-unstyled mb-0">
+                    <li className="pl-0 pb-0 font-weight-bold cdp-text-primary">Name</li>
+                    <li className="pl-0 pb-0"><i className="fas fa-circle mr-1 cdp-text-primary"></i> In my contract</li>
+                    <li className="pl-0 pb-0"><i className="fas fa-circle mr-1 cdp-text-secondary"></i> Not In my contract</li>
+                    <li className="pl-0 pt-3 font-weight-bold cdp-text-primary">Workplace</li>
+                    <li className="pl-0 pb-0"><i className="fas fa-check mr-1 cdp-text-primary"></i> Valid</li>
+                    <li className="pl-0 pb-0"><i className="fas fa-times mr-1 cdp-text-secondary"></i> Invalid </li>
+                    <li className="pl-0 pt-3 font-weight-bold cdp-text-primary">Activity Onekey ID</li>
+                    <li className="pl-0 pb-0">HCP Professional Engagement</li>
+                </ul>
+            </Popover.Content>
+        </Popover>
+    );
+
     const nameHintPopup = (
         <Popover id="popover-basic" className="shadow-lg">
             <Popover.Content className="px-3">
@@ -570,8 +587,13 @@ const SearchProfessionalHcp = (props) => {
                     <div className="row" id="search-result">
                         <div className="col-12">
                             <div className="my-3">
-                                <div className="d-sm-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel-title cdp-light-bg">
+                                <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel-title cdp-light-bg">
                                     <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0">Search Result</h4>
+                                    <div className="d-block d-sm-none">
+                                        <OverlayTrigger trigger="click" rootClose placement="left" overlay={hcpListInfo}>
+                                            <i className="fas fa-info-circle ml-1 " role="button"></i>
+                                        </OverlayTrigger>
+                                    </div>
                                 </div>
                                 <div className="table-responsive shadow-sm bg-white cdp-table__responsive-wrapper">
                                     <table className="table table-hover table-sm mb-0 cdp-table cdp-table cdp-table__responsive">
