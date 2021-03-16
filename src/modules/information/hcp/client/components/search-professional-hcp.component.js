@@ -309,7 +309,7 @@ const SearchProfessionalHcp = (props) => {
                 <div className="row">
                     <div className="col-12 px-0 px-sm-3">
                         <div className="shadow-sm bg-light pb-3">
-                            <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel">
+                            <div className="d-flex justify-content-between align-items-center p-3 mx-0 cdp-table__responsive-sticky-panel bg-light">
                                 <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1">OKLA Search</h4>
                                 <div className="d-flex align-items-center pl-3">
                                     <div>
