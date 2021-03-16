@@ -633,8 +633,6 @@ async function syncConsentInVeevaCRM(hcpUser) {
     if(!hcpUser.individual_id_onekey) return;
 
     try {
-        const searchUrl = nodecache.getValue('SALESFORCE_SERVICE_URL');
-
         const hcp_consent = await HcpConsents.findOne({
             where: {
                 user_id: hcpUser.id,
@@ -646,11 +644,17 @@ async function syncConsentInVeevaCRM(hcpUser) {
                 attributes: ['id'],
                 include: [{
                     model: ConsentCategory,
-                    attributes: ['title']
+                    attributes: ['title', 'veeva_content_type_id']
+                }],
+                include: [{
+                    model: ConsentLocale,
+                    attributes: ['veeva_consent_type_id']
                 }]
             }],
-            attributes: ['updated_at']
+            attributes: ['consent_id', 'updated_at']
         });
+
+        const searchUrl = nodecache.getValue('SALESFORCE_SERVICE_URL');
 
         const auth = async function() {
             const grant_type = 'password';
@@ -684,20 +688,19 @@ async function syncConsentInVeevaCRM(hcpUser) {
         }
 
         if(hcp_consent) {
-            const galapagos_news_content_type = await axios.get(`${searchUrl}/data/v48.0/query?q=SELECT + id + from + Content_Type_vod__c + WHERE + name = 'Galapagos news'`, { headers });
-            const galapagos_news_content_type_id = galapagos_news_content_type.data.records[0]?.Id;
-
             const account_consents = account.Multichannel_Consent_vod__r?.records;
 
             if(!(account_consents?.length)) {
                 await axios.post(`${searchUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
-                    "Account_vod__c": account.Id,
-                    "RecordTypeId": "0124J000000ouUlQAI",
-                    "Capture_Datetime_vod__c": hcp_consent.updated_at,
-                    "Channel_Value_vod__c": hcpUser.email,
-                    "Opt_Type_vod__c": "Opt_In_vod",
-                    "Content_Type_vod__c": galapagos_news_content_type_id,
-                    "GLPG_Consent_Source__c": "Website"
+                    Account_vod__c: account.Id,
+                    RecordTypeId: '0124J000000ouUlQAI',
+                    Capture_Datetime_vod__c: hcp_consent.updated_at,
+                    Channel_Value_vod__c: hcpUser.email,
+                    Opt_Type_vod__c: 'Opt_In_vod',
+                    Content_Type_vod__c: hcp_consent.consent.consent_category.veeva_content_type_id,
+                    GLPG_Consent_Source__c: 'Website',
+                    CDP_Consent_ID__c: hcp_consent.consent_id,
+                    Consent_Type_vod__c: hcp_consent.consent.consent_locale.veeva_consent_type_id
                 }, { headers });
             }
         }

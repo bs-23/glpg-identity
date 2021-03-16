@@ -31,6 +31,9 @@ const ConsentCategory = sequelize.cdpConnector.define('consent_categories', {
     },
     updated_by: {
         type: DataTypes.UUID
+    },
+    veeva_content_type_id: {
+        type: DataTypes.STRING(18)
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,

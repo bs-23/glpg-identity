@@ -25,6 +25,9 @@ const ConsentLanguage = sequelize.cdpConnector.define('consent_locales', {
     },
     locale: {
         type: DataTypes.STRING
+    },
+    veeva_consent_type_id: {
+        type: DataTypes.STRING(18)
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
