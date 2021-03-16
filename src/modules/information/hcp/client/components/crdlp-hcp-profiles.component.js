@@ -190,7 +190,7 @@ export default function CrdlpHcpProfiles() {
                     <div className="col-12">
                         <div className="d-sm-flex justify-content-between align-items-end mt-1">
                             <div>
-                                <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1 pb-2">List of HCP User</h4>
+                                <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1 pb-2">List of CRDLP HCP User</h4>
                                 <div>
                                     <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/cdp">Customer Data Platform</NavLink>
                                     <div className="custom-tab px-3 py-3 cdp-border-primary active">CRDLP</div>
@@ -218,8 +218,8 @@ export default function CrdlpHcpProfiles() {
 
                         {hcpUsers['users'] && hcpUsers['users'].length > 0 &&
                             <React.Fragment>
-                                <div className="table-responsive shadow-sm bg-white">
-                                    <table className="table table-hover table-sm mb-0 cdp-table">
+                            <div className="table-responsive shadow-sm bg-white cdp-table__responsive-wrapper">
+                                <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
                                                 <th width="10%"><span className={sort.value === 'firstname' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'firstname')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -244,9 +244,9 @@ export default function CrdlpHcpProfiles() {
                                         <tbody className="cdp-table__body bg-white">
                                             {hcpUsers.users.map((row, idx) => (
                                                 <tr key={'user-' + idx}>
-                                                    <td className="text-break">{row.firstname || '--'}</td>
-                                                    <td className="text-break">{row.lastname || '--'}</td>
-                                                    <td>
+                                                    <td data-for="First Name" className="text-break">{row.firstname || '--'}</td>
+                                                    <td data-for="Last Name" className="text-break">{row.lastname || '--'}</td>
+                                                    <td data-for="Status">
                                                         {row.ind_status_desc ?
                                                             <span>
                                                                 <i className={`fa fa-xs fa-circle ${(row.ind_status_desc || '').toLowerCase() === 'valid' ? 'text-success' : 'text-danger'} pr-2 hcp-status-icon`}></i>
@@ -255,17 +255,17 @@ export default function CrdlpHcpProfiles() {
                                                             : '--'
                                                         }
                                                     </td>
-                                                    <td className="text-break">{row.uuid_1 || '--'}</td>
-                                                    <td className="text-break">{row.individual_id_onekey || '--'}</td>
-                                                    <td>{getCountryName(row.country_iso2) || '--'}</td>
-                                                    <td>
+                                                    <td data-for="UUID" className="text-break">{row.uuid_1 || '--'}</td>
+                                                    <td data-for="Individual Onekey ID" className="text-break">{row.individual_id_onekey || '--'}</td>
+                                                    <td data-for="Country">{getCountryName(row.country_iso2) || '--'}</td>
+                                                    <td data-for="Specialty">
                                                         {row.specialties && row.specialties.length ?
                                                             (row.specialties || []).map(s => s.description).join(', ')
                                                             : '--'
                                                         }
                                                     </td>
-                                                    <td className="text-break">{row.telephone || '--'}</td>
-                                                    <td>
+                                                    <td data-for="Phone" className="text-break">{row.telephone || '--'}</td>
+                                                    <td data-for="Action">
                                                         <button className="btn cdp-btn-outline-primary btn-sm" onClick={() => setProfileDetails(row)}><i class="icon icon-user mr-2" ></i>Profile</button>
                                                     </td>
                                                 </tr>
@@ -311,7 +311,7 @@ export default function CrdlpHcpProfiles() {
                             <Modal.Body>
                                 {
                                     profileDetails &&
-                                    <div className="px-4 py-3">
+                                    <div className="p-3">
                                         <div className="row">
                                             <div className="col">
                                                 <h4 className="mt-1 font-weight-bold">{`${profileDetails.ind_prefixname_desc || ''} ${profileDetails.firstname || ''} ${profileDetails.lastname || ''}`}</h4>
