@@ -44,8 +44,8 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
     }, [hcpDetails, selectedTab]);
 
     return <Modal
-        dialogClassName='custom-modal-size'
         centered
+        size="xl"
         show={!!hcpDetails}
         onHide={() => hideHcpDetails()}>
         <Modal.Header closeButton>
@@ -127,6 +127,7 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                                 <Dropdown.Menu>
                                     {hcpDetails.workplaces.map((workplace, idx) => (
                                         <Dropdown.Item
+                                            className="okla-search__details-workplace-dropdown-item"
                                             key={'wp-' + idx}
                                             onClick={() => { setSelectedWorkplace(workplace); }}>
                                             {workplace.name || workplace.alternateName}
@@ -136,41 +137,41 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                             </Dropdown>
 
                             {selectedWorkplace &&
-                                <div className="py-5">
+                                <div className="py-3 py-sm-5">
                                     <div className="row">
                                         <div className="col-12 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Name</div>
                                             <div>{selectedWorkplace.name || '--'}</div>
                                         </div>
-                                        <div className="col-12 col-sm-6 pb-3">
+                                        <div className="col-6 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Type</div>
                                             <div>{selectedWorkplace.type}</div>
                                         </div>
-                                        <div className="col-12 col-sm-6 pb-3">
+                                        <div className="col-6 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Main activity?</div>
                                             <div>{selectedWorkplace.isMainActivity ? 'Yes' : 'No'}</div>
                                         </div>
-                                        <div className="col-12 col-sm-6 pb-3">
+                                        <div className="col-6 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Status</div>
                                             <div>{selectedWorkplace.isValid ? 'Valid' : 'Invalid'}</div>
                                         </div>
-                                        <div className="col-12 col-sm-6 pb-3">
+                                        <div className="col-6 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Contract status</div>
                                             <div>{selectedWorkplace.isInContract ? 'In my contract' : 'Not in my contract'}</div>
                                         </div>
-                                        <div className="col-12 col-sm-6 pb-3">
+                                        <div className="col-6 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Address</div>
                                             <div>{selectedWorkplace.address}</div>
                                         </div>
-                                        <div className="col-12 col-sm-6 pb-3">
+                                        <div className="col-6 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">City</div>
                                             <div>{selectedWorkplace.city}</div>
                                         </div>
-                                        <div className="col-12 col-sm-6 pb-3">
+                                        <div className="col-6 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Post Code</div>
                                             <div>{selectedWorkplace.postCode}</div>
                                         </div>
-                                        <div className="col-12 col-sm-6 pb-3">
+                                        <div className="col-6 col-sm-6 pb-3">
                                             <div className="mt-1 font-weight-bold">Country</div>
                                             <div className="text-capitalize">{selectedWorkplace.country.toLowerCase()}</div>
                                         </div>

@@ -212,7 +212,7 @@ const SearchOrganizationHcp = () => {
                 <div className="row">
                     <div className="col-12 px-0 px-sm-3">
                         <div className="shadow-sm bg-light pb-3">
-                            <div className="d-flex justify-content-between align-items-center p-3">
+                            <div className="d-flex justify-content-between align-items-center p-3 mx-0 cdp-table__responsive-sticky-panel bg-light">
                                 <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1">OKLA Search</h4>
                                 <div className="d-flex align-items-center pl-3">
                                     <div>
@@ -295,7 +295,7 @@ const SearchOrganizationHcp = () => {
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="col-12 col-sm-6 col-lg-4 pt-3">
+                                                <div className="col-12 col-sm-6 col-lg-4 pb-3 pb-sm-0 pt-sm-3">
                                                     <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
                                                         <Field type="checkbox" className="custom-control-input" name="isInContract" id="customControlInline" />
                                                         <label className="custom-control-label" for="customControlInline">In My Contract</label>
@@ -316,7 +316,7 @@ const SearchOrganizationHcp = () => {
                                                 </div>
                                             </div>
 
-                                            <h5 className="border-bottom pt-4 pb-2 "><i className="far fa-building cdp-text-secondary mr-2"></i>Workplace</h5>
+                                            <h5 className="border-bottom pt-sm-4 pb-2 "><i className="far fa-building cdp-text-secondary mr-2"></i>Workplace</h5>
                                             <div className="row">
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
@@ -403,15 +403,16 @@ const SearchOrganizationHcp = () => {
                     <div className="row" id="search-result">
                         <div className="col-12">
                             <div className="my-3">
-                                <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                                    <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Search Result</h4>
-                                    <div className="d-flex justify-content-between align-items-center">
+                                <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel-title cdp-light-bg">
+                                    <h4 className="cdp-text-primary font-weight-bold mb-0">Search Result</h4>
+                                    <div className="d-block d-sm-none">
+                                        <OverlayTrigger trigger="click" rootClose placement="left" overlay={namehintpopup}>
+                                            <i className="fas fa-info-circle ml-1 " role="button"></i>
+                                        </OverlayTrigger>
                                     </div>
                                 </div>
-
-
-                                <div className="table-responsive shadow-sm bg-white">
-                                    <table className="table table-hover table-sm mb-0 cdp-table">
+                                <div className="table-responsive shadow-sm bg-white cdp-table__responsive-wrapper">
+                                <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
                                                 <th>Name <OverlayTrigger trigger="click" rootClose placement="right" overlay={namehintpopup}>
@@ -428,12 +429,12 @@ const SearchOrganizationHcp = () => {
                                             {
                                                 hcos.results.map((hco, idx) => (
                                                     <tr key={idx}>
-                                                        <td>{hco.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not In my contract"></i>} {`${hco.name}`}</td>
-                                                        <td>{(hco.specialties || ['--']).join(', ')}</td>
-                                                        <td>{hco.address}</td>
-                                                        <td>{hco.city}</td>
-                                                        <td>{getCountryName(hco.countryIso2)}</td>
-                                                        <td>
+                                                        <td data-for="Name">{hco.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not In my contract"></i>} {`${hco.name}`}</td>
+                                                        <td data-for="Specialty">{(hco.specialties || ['--']).join(', ')}</td>
+                                                        <td data-for="Address">{hco.address}</td>
+                                                        <td data-for="City">{hco.city}</td>
+                                                        <td data-for="Country">{getCountryName(hco.countryIso2)}</td>
+                                                        <td data-for="Action">
                                                             <Dropdown>
                                                                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle btn">
                                                                 </Dropdown.Toggle>
