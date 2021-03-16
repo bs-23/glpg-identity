@@ -295,7 +295,7 @@ const SearchOrganizationHcp = () => {
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="col-12 col-sm-6 col-lg-4 pt-3">
+                                                <div className="col-12 col-sm-6 col-lg-4 pb-3 pb-sm-0 pt-sm-3">
                                                     <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
                                                         <Field type="checkbox" className="custom-control-input" name="isInContract" id="customControlInline" />
                                                         <label className="custom-control-label" for="customControlInline">In My Contract</label>
@@ -316,7 +316,7 @@ const SearchOrganizationHcp = () => {
                                                 </div>
                                             </div>
 
-                                            <h5 className="border-bottom pt-4 pb-2 "><i className="far fa-building cdp-text-secondary mr-2"></i>Workplace</h5>
+                                            <h5 className="border-bottom pt-sm-4 pb-2 "><i className="far fa-building cdp-text-secondary mr-2"></i>Workplace</h5>
                                             <div className="row">
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
