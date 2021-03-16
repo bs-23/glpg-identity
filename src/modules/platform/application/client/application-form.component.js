@@ -57,6 +57,10 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
         return metadataObject;
     }
 
+    const handleFileChange = (e, formikProps) => {
+        formikProps.setFieldValue('logo', e.target.files[0]);
+    }
+
     const renderMetadata = (formikProps) => {
         const { metadata } = formikProps.values;
 
@@ -128,13 +132,19 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
     }
 
     const handleSubmit = (values, actions) => {
-        const payload = { ...values };
+        let payload = { ...values };
 
         payload.metadata = convertMetadataArrayToObject(values.metadata);
 
+        var form_data = new FormData();
+
+        for (const key in payload) {
+            form_data.append(key, payload[key]);
+        }
+
         const promise = isEditing
-            ? axios.put(`/api/applications/${applicationId}`, payload)
-            : axios.post('/api/applications', payload);
+            ? axios.put(`/api/applications/${applicationId}`, form_data)
+            : axios.post('/api/applications', form_data);
 
         promise.then(() => {
             const successMessage = isEditing
@@ -264,6 +274,17 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                     <div className="col-12">
                                         <div className="row">
                                             <FormField label="Description" type="text" name="description" component="textarea" required={false} />
+                                        </div>
+                                    </div>
+                                    <div className="col-12">
+                                        <div className="row">
+                                            <div className="col-12">
+                                                <div className="form-group">
+                                                    <label className="font-weight-bold" htmlFor="logo">Logo</label>
+                                                    <input className="form-control" type="file" name="logo" onChange={e => handleFileChange(e, formikProps)} />
+                                                    <div className="invalid-feedback"><ErrorMessage name="logo" /></div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="col-12">

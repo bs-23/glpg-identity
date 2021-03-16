@@ -28,7 +28,7 @@ const File = sequelize.cdpConnector.define('files', {
     table_name: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['partners', 'partner_vendors'],
+        values: ['partners', 'partner_vendors', 'applications'],
         defaultValue: 'partners'
     }
 }, {

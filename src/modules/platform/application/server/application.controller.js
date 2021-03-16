@@ -10,6 +10,8 @@ const Data = require('./data.model');
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
+const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
+const storageService = require(path.join(process.cwd(), 'src/modules/core/server/storage/storage.service'));
 
 const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 
@@ -155,6 +157,8 @@ async function createApplication(req, res) {
             metadata
         } = req.body;
 
+        const logo = req.files[0];
+
         if (!email) return res.status(400).send('Must provide email.');
 
         if (!password || !confirm_password) return res.status(400).send('Must provide password and confirm password.');
@@ -167,13 +171,13 @@ async function createApplication(req, res) {
 
         if (hasApplicationWithSameName) return res.status(400).send('Application with the same name already exists.');
 
-        const hasApplicationWithSameEmail = application = await Application.findOne({
+        const hasApplicationWithSameEmail = await Application.findOne({
             where: { email: { [Op.iLike]: email } }
         });
 
         if (hasApplicationWithSameEmail) return res.status(400).send('Application with the same email already exists.');
 
-        await Application.create({
+        const application = await Application.create({
             name,
             slug: convertToSlug(name),
             type: type || null,
@@ -186,6 +190,23 @@ async function createApplication(req, res) {
             updated_by: req.user.id
         });
 
+        const uploadOptions = {
+            bucket: 'cdp-development',
+            folder: `${application.name.replace(/\s/g, '-')}/`,
+            fileName: `logo${path.extname(logo.originalname)}`,
+            fileContent: logo.buffer
+        };
+
+        const storageServiceResponse = await storageService.upload(uploadOptions);
+
+        await File.create({
+            name: logo.originalname,
+            bucket_name: 'cdp-development',
+            key: storageServiceResponse.key,
+            owner_id: application.id,
+            table_name: 'applications'
+        });
+        console.log(storageServiceResponse)
         res.json(application);
     } catch (err) {
         logger.error(err);
