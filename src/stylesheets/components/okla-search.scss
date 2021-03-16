@@ -45,14 +45,14 @@
         }
 
         .nav-link {
-            background: #F2F2F2;
+            background: $gray-F2F2F2;
             margin-bottom: 5px;
             border: none;
             padding: 20px;
             font-size: 26px;
             font-weight: 600;
             color: #222020;
-            border-left: 9px solid #F2F2F2;
+            border-left: 9px solid $gray-F2F2F2;
             border-radius: 0px;
 
             &.active {
@@ -87,6 +87,15 @@
             &-value {
                 font-size: 16px;
             }
+
+            &-workplace-dropdown-item {
+                white-space: normal;
+                border-bottom: 1px solid $gray-F2F2F2;
+
+                &:last-child {
+                    border-bottom: none;
+                }
+            }
         }
 
         &__tabs {
@@ -98,9 +107,13 @@
             .nav-link {
                 margin-bottom: 0px;
                 border-left: 0px;
-                border-bottom: 5px solid #F2F2F2;
-                padding: 10px;
+                border-bottom: 5px solid $gray-F2F2F2;
+                padding: 10px 15px;
                 font-size: 16px;
+
+                @media (max-width: 392px) {
+                    padding: 10px 12px;
+                }
 
                 &.active {
                     border-bottom: 5px solid $secondary-color;
@@ -108,28 +121,5 @@
                 }
             }
         }
-    }
-}
-
-.modal-okla-width {
-    width: 90vw; /* Occupy the 90% of the screen width */
-    max-width: 90vw;
-
-    @media (max-width: $screen-phone) {
-        width: 96vw; /* Occupy the 90% of the screen width */
-        max-width: 96vw;
-    }
-}
-
-.custom-modal-size {
-    max-width: 1050px;
-
-    @media (max-width: $screen-lg-desktop) {
-        max-width: 950px;
-    }
-
-    @media (max-width: $screen-desktop) {
-        max-width: 100%;
-        margin: 0.5rem;
     }
 }
