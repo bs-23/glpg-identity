@@ -44,6 +44,7 @@ async function init() {
     const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model"));
     const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model"));
     const Localization = require(path.join(process.cwd(), 'src/modules/core/server/localization/localization.model'));
+    const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
     require(path.join(process.cwd(), "src/modules/platform/role/server/role.model"));
     require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
     const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model'));
@@ -158,13 +159,13 @@ async function init() {
 
                         const clinicalTrialsServices = [
                             { title: "Manage Content Clinical Trail", slug: "manage-clinical-trials", parent_id: clinicalTrials.id, created_by: admin.id, updated_by: admin.id },
-                        ]
+                        ];
 
                         const businessPartnerServices = [
                             { title: "Manage Vendor Request", slug: "manage-vendor-request", parent_id: businessPartner.id, created_by: admin.id, updated_by: admin.id },
                             { title: "Manage Healthcare Entity Request", slug: "manage-entity-request", parent_id: businessPartner.id, created_by: admin.id, updated_by: admin.id },
                             { title: "Business Partner Management to Submit to ERP Systems", slug: "manage-business-partners", parent_id: businessPartner.id, created_by: admin.id, updated_by: admin.id },
-                        ]
+                        ];
 
                         const allServices = [
                             ...platformServices,
@@ -172,7 +173,7 @@ async function init() {
                             ...privacyServices,
                             ...clinicalTrialsServices,
                             ...businessPartnerServices
-                        ]
+                        ];
 
                         Service.bulkCreate(allServices, { returning: true, ignoreDuplicates: false }).then(res => { callback() });
                     })
@@ -225,13 +226,12 @@ async function init() {
     function permissionSetServiceCategorySeeder(callback) {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
             Promise.all([
-                // Service Categories
                 Service.findOne({ where: { slug: 'information' }, include: { model: Service, as: 'childServices' } }),
                 Service.findOne({ where: { slug: 'platform' }, include: { model: Service, as: 'childServices' } }),
                 Service.findOne({ where: { slug: 'privacy' }, include: { model: Service, as: 'childServices' } }),
                 Service.findOne({ where: { slug: 'business-partner' }, include: { model: Service, as: 'childServices' } }),
                 Service.findOne({ where: { slug: 'clinical-trials' }, include: { model: Service, as: 'childServices' } }),
-                // Permission Sets
+
                 PermissionSet.findOne({ where: { slug: 'system_admin' } }),
                 PermissionSet.findOne({ where: { slug: 'site_admin' } }),
                 PermissionSet.findOne({ where: { slug: 'data_privacy_officer' } }),
@@ -252,21 +252,20 @@ async function init() {
                 ] = values;
 
                 const permissionSet_serviceCategory = [
-                    // Setup System Admin PermissionSet Service Category
                     { permissionset_id: systemAdmin_permissionSet.id, service_id: informationServiceCategory.id },
                     { permissionset_id: systemAdmin_permissionSet.id, service_id: platformServiceCategory.id },
                     { permissionset_id: systemAdmin_permissionSet.id, service_id: privacyServiceCategory.id },
                     { permissionset_id: systemAdmin_permissionSet.id, service_id: businessPartnerServiceCategory.id },
                     { permissionset_id: systemAdmin_permissionSet.id, service_id: clinicalTrialServiceCategory.id },
-                    // Setup Site Admin PermissionSet Service Category
+
                     { permissionset_id: siteAdmin_permissionSet.id, service_id: informationServiceCategory.id },
                     { permissionset_id: siteAdmin_permissionSet.id, service_id: platformServiceCategory.id },
                     { permissionset_id: siteAdmin_permissionSet.id, service_id: privacyServiceCategory.id },
-                    // Setup DPO Admin PermissionSet Service Category
+
                     { permissionset_id: dpo_permissionSet.id, service_id: privacyServiceCategory.id },
-                    // Setup GDS PermissionSet
+
                     { permissionset_id: gds_permissionSet.id, service_id: informationServiceCategory.id },
-                    // Setup LDS PermissionSet Service Category
+
                     { permissionset_id: lds_permissionSet.id, service_id: informationServiceCategory.id }
                 ];
 
@@ -612,10 +611,35 @@ async function init() {
             { language_family: 'French', language_variant: 'Luxembourgish French', country_iso2: 'LU', locale: 'fr_LU' },
             { language_family: 'German', language_variant: 'Standard German', country_iso2: 'DE', locale: 'de_DE' },
             { language_family: 'Spanish', language_variant: 'Castilian Spanish', country_iso2: 'ES', locale: 'es_ES' },
-        ]
+        ];
 
         Localization.destroy({ truncate: { cascade: true } }).then(() => {
             Localization.bulkCreate(localizations, {
+                returning: true,
+                ignoreDuplicates: false
+            }).then(function () {
+                callback();
+            });
+        });
+    }
+
+    function countriesSeeder(callback) {
+        const countries = [
+            { country_iso2: 'BE', country_iso3: 'BEL', codbase: 'WBE', countryname: 'Belgium', codbase_desc: 'Belgium', codbase_desc_okws: 'OneKey Belgium' },
+            { country_iso2: 'DE', country_iso3: 'DEU', codbase: 'WDE', countryname: 'Germany', codbase_desc: 'Germany', codbase_desc_okws: 'OneKey Germany' },
+            { country_iso2: 'ES', country_iso3: 'ESP', codbase: 'WES', countryname: 'Spain', codbase_desc: 'Spain', codbase_desc_okws: 'OneKey Spain' },
+            { country_iso2: 'FR', country_iso3: 'FRA', codbase: 'WFR', countryname: 'France', codbase_desc: 'France', codbase_desc_okws: 'OneKey France' },
+            { country_iso2: 'GB', country_iso3: 'GBR', codbase: 'WUK', countryname: 'United Kingdom', codbase_desc: 'United Kingdom', codbase_desc_okws: 'OneKey United Kingdom' },
+            { country_iso2: 'IE', country_iso3: 'IRL', codbase: 'WUK', countryname: 'Ireland', codbase_desc: 'United Kingdom', codbase_desc_okws: 'OneKey United Kingdom' },
+            { country_iso2: 'IT', country_iso3: 'ITA', codbase: 'WIT', countryname: 'Italy', codbase_desc: 'Italy', codbase_desc_okws: 'OneKey Italy' },
+            { country_iso2: 'LU', country_iso3: 'LUX', codbase: 'WBE', countryname: 'Luxembourg', codbase_desc: 'Belgium', codbase_desc_okws: 'OneKey Belgium' },
+            { country_iso2: 'MC', country_iso3: 'MCO', codbase: 'WFR', countryname: 'Monaco', codbase_desc: 'France', codbase_desc_okws: 'OneKey France' },
+            { country_iso2: 'NL', country_iso3: 'NLD', codbase: 'WNL', countryname: 'Netherlands', codbase_desc: 'Netherlands', codbase_desc_okws: 'OneKey Netherlands' },
+            { country_iso2: 'AD', country_iso3: 'AND', codbase: 'WFR', countryname: 'Andorra', codbase_desc: 'France', codbase_desc_okws: 'OneKey France' }
+        ];
+
+        Country.destroy({ truncate: { cascade: true } }).then(() => {
+            Country.bulkCreate(countries, {
                 returning: true,
                 ignoreDuplicates: false
             }).then(function () {
@@ -636,12 +660,13 @@ async function init() {
         applicationSeeder,
         permissionSetApplicationsSeeder,
         consentSeeder,
-        localizationSeeder
+        localizationSeeder,
+        countriesSeeder
     ], function (err) {
-            if (err) console.error(err);
-            else console.info('DB seed completed!');
-            process.exit();
-        });
+        if (err) console.error(err);
+        else console.info('DB seed completed!');
+        process.exit();
+    });
 }
 
 init();
