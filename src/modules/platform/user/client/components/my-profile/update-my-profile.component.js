@@ -123,7 +123,7 @@ const UpdateMyProfile = () => {
     const handlePhoneFieldChange = (e, formikProps) => {
         const currentPhoneValue = e.target.value;
         const { setFieldValue } = formikProps;
-            setFieldValue('phone', currentPhoneValue);
+            currentPhoneValue === null ? setFieldValue('phone', ''): setFieldValue('phone', currentPhoneValue);
             setFieldValue('isCountryFlagActive', true);
     }
 
@@ -206,7 +206,8 @@ const UpdateMyProfile = () => {
                                                             return (index === selectedCountryCode ?
                                                                 <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
                                                                     {
-                                                                        onChangePhonefield(formikProps.values.phone) === null || onChangePhonefield(formikProps.values.phone) === undefined ? <span height="20" width="20">Select</span> :
+                                                                        onChangePhonefield(formikProps.values.phone) === null || onChangePhonefield(formikProps.values.phone) === undefined ?
+                                                                            <span height="20" width="20">Select</span> :
                                                                             <img className="mr-2" height="20" width="20" src={onChangePhonefield(formikProps.values.phone) === null || onChangePhonefield(formikProps.values.phone) === undefined ? '' : onChangePhonefield(formikProps.values.phone).flag} />
                                                                     }
                                                                     <span className="country-phone-code">
