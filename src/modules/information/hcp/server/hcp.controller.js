@@ -633,23 +633,24 @@ async function syncConsentInVeevaCRM(hcpUser) {
     if(!hcpUser.individual_id_onekey) return;
 
     try {
-        const hcp_consent = await HcpConsents.findOne({
+        const hcp_consents = await HcpConsents.findAll({
             where: {
                 user_id: hcpUser.id,
                 consent_confirmed: true,
-                '$consent.consent_category.slug$': { [Op.iLike]: 'direct-marketing' }
             },
             include: [{
                 model: Consent,
                 attributes: ['id'],
-                include: [{
-                    model: ConsentCategory,
-                    attributes: ['title', 'veeva_content_type_id']
-                }],
-                include: [{
-                    model: ConsentLocale,
-                    attributes: ['veeva_consent_type_id']
-                }]
+                include: [
+                    {
+                        model: ConsentCategory,
+                        attributes: ['title', 'veeva_content_type_id']
+                    },
+                    {
+                        model: ConsentLocale,
+                        attributes: ['veeva_consent_type_id']
+                    }
+                ]
             }],
             attributes: ['consent_id', 'updated_at']
         });
@@ -687,21 +688,26 @@ async function syncConsentInVeevaCRM(hcpUser) {
             await axios.patch(`${searchUrl}/data/v48.0/sobjects/Account/${account.Id}`, { Secondary_Email__c: hcpUser.email }, { headers });
         }
 
-        if(hcp_consent) {
+        if(hcp_consents && hcp_consents.length) {
             const account_consents = account.Multichannel_Consent_vod__r?.records;
 
             if(!(account_consents?.length)) {
-                await axios.post(`${searchUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
-                    Account_vod__c: account.Id,
-                    RecordTypeId: '0124J000000ouUlQAI',
-                    Capture_Datetime_vod__c: hcp_consent.updated_at,
-                    Channel_Value_vod__c: hcpUser.email,
-                    Opt_Type_vod__c: 'Opt_In_vod',
-                    Content_Type_vod__c: hcp_consent.consent.consent_category.veeva_content_type_id,
-                    GLPG_Consent_Source__c: 'Website',
-                    CDP_Consent_ID__c: hcp_consent.consent_id,
-                    Consent_Type_vod__c: hcp_consent.consent.consent_locale.veeva_consent_type_id
-                }, { headers });
+                await Promise.all(hcp_consents.map(async hcp_consent => {
+                    const created_mcc = await axios.post(`${searchUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
+                        Account_vod__c: account.Id,
+                        RecordTypeId: '0124J000000ouUlQAI',
+                        Capture_Datetime_vod__c: hcp_consent.updated_at,
+                        Channel_Value_vod__c: hcpUser.email,
+                        Opt_Type_vod__c: 'Opt_In_vod',
+                        Content_Type_vod__c: hcp_consent.consent.consent_category.veeva_content_type_id,
+                        GLPG_Consent_Source__c: 'Website',
+                        CDP_Consent_ID__c: hcp_consent.consent_id,
+                        Consent_Type_vod__c: hcp_consent.consent.consent_locales.veeva_consent_type_id
+                    }, { headers });
+
+                    const a = created_mcc;
+                }));
+
             }
         }
     } catch(err) {
