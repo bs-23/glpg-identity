@@ -670,7 +670,7 @@ export default function hcpUsers() {
                                     </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    <div className="px-4 py-3">
+                                    <div className="p-3">
                                         <div className="row">
                                             <div className="col">
                                                 <h4 className="mt-1 font-weight-bold">{`${currentUser.first_name || ''} ${currentUser.last_name || ''}`}</h4>
