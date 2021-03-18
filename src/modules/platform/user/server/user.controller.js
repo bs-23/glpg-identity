@@ -503,7 +503,12 @@ async function getUsers(req, res) {
 
         const [, userCountries,] = await getRequestingUserPermissions(req.user);
 
-        const countries = await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT });
+        const countries = await Country.findAll({
+            order: [
+                ['codbase_desc', 'ASC'],
+                ['countryname', 'ASC']
+            ]
+        });
 
         const country_iso2_list_for_codbase = countries.filter(c => c.codbase === codbase).map(c => c.country_iso2);
 

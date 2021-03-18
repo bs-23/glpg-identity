@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const axios = require('axios');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
 const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
 const Partners = require('./partner.model');
 const PartnerVendors = require('./partner-vendor.model');
@@ -203,7 +204,12 @@ async function createPartner(req, res) {
         }
         data.onekey_id = partnerRequest.onekey_id;
 
-        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+        const countries = await Country.findAll({
+            order: [
+                ['codbase_desc', 'ASC'],
+                ['countryname', 'ASC']
+            ]
+        });
 
         let hasDoubleOptIn = false;
         let consentArr = [];
@@ -361,7 +367,12 @@ async function updatePartner(req, res) {
             return res.status(400).send(response);
         }
 
-        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+        const countries = await Country.findAll({
+            order: [
+                ['codbase_desc', 'ASC'],
+                ['countryname', 'ASC']
+            ]
+        });
         let consentArr = [];
         const consents = JSON.parse('[' + (req.body.consents || '') + ']');
 
@@ -670,7 +681,12 @@ async function createPartnerVendor(req, res) {
 
         data.entity_type = type;
 
-        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+        const countries = await Country.findAll({
+            order: [
+                ['codbase_desc', 'ASC'],
+                ['countryname', 'ASC']
+            ]
+        });
 
         let hasDoubleOptIn = false;
         let consentArr = [];
@@ -821,7 +837,12 @@ async function updatePartnerVendor(req, res) {
             return res.status(400).send(response);
         }
 
-        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+        const countries = await Country.findAll({
+            order: [
+                ['codbase_desc', 'ASC'],
+                ['countryname', 'ASC']
+            ]
+        });
         let consentArr = [];
         const consents = JSON.parse('[' + (req.body.consents || '') + ']');
 
