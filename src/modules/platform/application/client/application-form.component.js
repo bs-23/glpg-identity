@@ -58,7 +58,19 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
     }
 
     const handleFileChange = (e, formikProps) => {
-        formikProps.setFieldValue('logo', e.target.files[0]);
+        const selectedLogoFile = e.target.files[0];
+        formikProps.setFieldValue('logo', selectedLogoFile);
+
+        const logoImageTag = document.getElementById('logo');
+        const reader = new FileReader();
+
+        reader.addEventListener('load', function() {
+            logoImageTag.src = reader.result;
+        });
+
+        if (selectedLogoFile) {
+            reader.readAsDataURL(selectedLogoFile);
+        }
     }
 
     const renderMetadata = (formikProps) => {
@@ -281,6 +293,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                             <div className="col-12">
                                                 <div className="form-group">
                                                     <label className="font-weight-bold" htmlFor="logo">Logo</label>
+                                                    <img src="" id="logo" width="300"/>
                                                     <input className="form-control" type="file" name="logo" onChange={e => handleFileChange(e, formikProps)} />
                                                     <div className="invalid-feedback"><ErrorMessage name="logo" /></div>
                                                 </div>
