@@ -35,6 +35,12 @@ export default function reducer(state = initialState, action) {
                 sendForm: action.payload.data
             }
         }
+        case Types.RESEND_FORM_FULFILLED: {
+            return {
+                ...state,
+                resendForm: action.payload.data
+            }
+        }
     }
     return state;
 }
