@@ -1,8 +1,11 @@
 const path = require('path');
 const { Op, QueryTypes } = require('sequelize');
 const validator = require('validator');
+const jwt = require('jsonwebtoken');
+const axios = require('axios');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
 const Partners = require('./partner.model');
 const PartnerVendors = require('./partner-vendor.model');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
@@ -1295,7 +1298,7 @@ async function resendForm(req, res) {
         if (!partner) return res.status(400).send('Partner not found.');
 
         const { request_id } = partner.dataValues;
-        const partnerRequest = await PartnerRequest.findOne({ where: { request_id } });
+        const partnerRequest = await PartnerRequest.findOne({ where: { id: request_id } });
 
         if (!partnerRequest) return res.status(400).send('Partner Request not found.');
 

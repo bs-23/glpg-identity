@@ -1,11 +1,12 @@
 const path = require('path');
-const PartnerRequest = require('./partner-request.model');
-const Application = require('./../../../platform/application/server/application.model');
 const { Op } = require('sequelize');
-const ArchiveService = require(path.join(process.cwd(), 'src/modules/core/server/archive/archive.service.js'));
-const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
+
+const PartnerRequest = require('./partner-request.model');
+const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
+const ArchiveService = require(path.join(process.cwd(), 'src/modules/core/server/archive/archive.service.js'));
+const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 async function getPartnerRequests(req, res) {

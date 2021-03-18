@@ -63,3 +63,12 @@ export function approveBusinessPartner(id, type) {
     };
 }
 
+export function resendFormForCorrection(id, type) {
+    return {
+        type: Types.RESEND_FORM,
+        payload: axios({
+            method: 'get',
+            url: `/api/partners/${type}/${id}/resend-form`
+        })
+    };
+}
