@@ -648,7 +648,7 @@ async function syncConsentInVeevaCRM(hcpUser) {
                     },
                     {
                         model: ConsentLocale,
-                        attributes: ['veeva_consent_type_id']
+                        attributes: ['locale', 'veeva_consent_type_id']
                     }
                 ]
             }],
@@ -693,6 +693,9 @@ async function syncConsentInVeevaCRM(hcpUser) {
 
             if(!(account_consents?.length)) {
                 await Promise.all(hcp_consents.map(async hcp_consent => {
+
+                    const locale = hcp_consent.consent.consent_locales.filter(i => i.locale === hcpUser.locale);
+
                     const { data } = await axios.post(`${searchUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
                         Account_vod__c: account.Id,
                         RecordTypeId: '0124J000000ouUlQAI',
@@ -702,7 +705,7 @@ async function syncConsentInVeevaCRM(hcpUser) {
                         Content_Type_vod__c: hcp_consent.consent.consent_category.veeva_content_type_id,
                         GLPG_Consent_Source__c: 'Website',
                         CDP_Consent_ID__c: hcp_consent.consent_id,
-                        Consent_Type_vod__c: hcp_consent.consent.consent_locales.veeva_consent_type_id
+                        Consent_Type_vod__c: locale && locale.length ? locale[0].dataValues.veeva_consent_type_id : null
                     }, { headers });
 
                     const hcpConsent = await HcpConsents.findOne({ where: { id: hcp_consent.id }});
