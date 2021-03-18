@@ -142,7 +142,8 @@ async function init() {
                             { title: "Manage Profiles", slug: "manage-profile", parent_id: platform.id, created_by: admin.id, updated_by: admin.id },
                             { title: "Define Roles", slug: "manage-role", parent_id: platform.id, created_by: admin.id, updated_by: admin.id },
                             { title: "Manage Permission Sets", slug: "manage-permission-sets", parent_id: platform.id, created_by: admin.id, updated_by: admin.id },
-                            { title: "Manage FAQs", slug: "manage-faqs", parent_id: platform.id, created_by: admin.id, updated_by: admin.id }
+                            { title: "Manage FAQs", slug: "manage-faqs", parent_id: platform.id, created_by: admin.id, updated_by: admin.id },
+                            { title: "Manage Service Accounts", slug: "manage-service-accounts", parent_id: platform.id, created_by: admin.id, updated_by: admin.id }
                         ];
 
                         const informationServices = [
