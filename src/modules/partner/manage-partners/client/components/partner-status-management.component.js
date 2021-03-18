@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import { getPartnerById, approveUser } from '../manage-partners.actions';
+import { getPartnerById, approveBusinessPartner } from '../manage-partners.actions';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import { useToasts } from 'react-toast-notifications';
@@ -35,8 +35,8 @@ const PartnerStatusManage = (props) => {
             });
     }
 
-    const userApprove = () => {
-        dispatch(approveUser(props.partnerInfo.id, props.detailType)).then(() => {
+    const approvePartner = () => {
+        dispatch(approveBusinessPartner(props.partnerInfo.id, props.detailType)).then(() => {
             addToast('User approved', {
                 appearance: 'success',
                 autoDismiss: true
@@ -53,7 +53,7 @@ const PartnerStatusManage = (props) => {
 
     const confirmStatus = () => {
         if (statusSelect === 'approve') {
-            userApprove();
+            approvePartner();
         }
     }
 

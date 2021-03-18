@@ -17,7 +17,4 @@ module.exports = app => {
 
     app.route('/api/partner-requests/:id/send-form')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_VENDOR_REQUEST, Services.MANAGE_ENTITY_REQUEST]), controller.sendForm);
-
-    app.route('/api/partner-requests/:id/resend-form')
-        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_VENDOR_REQUEST, Services.MANAGE_ENTITY_REQUEST]), controller.resendForm);
 };

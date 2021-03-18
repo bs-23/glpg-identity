@@ -53,7 +53,7 @@ export function getPartnerById(id, type) {
     };
 }
 
-export function approveUser(id, type) {
+export function approveBusinessPartner(id, type) {
     return {
         type: Types.GET_USER_APPROVE,
         payload: axios({
