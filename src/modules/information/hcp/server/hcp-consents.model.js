@@ -1,12 +1,11 @@
-const path = require("path");
-const { DataTypes } = require("sequelize");
-const sequelize = require(path.join(process.cwd(), "src/config/server/lib/sequelize"));
-const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
-const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const path = require('path');
 const validator = require('validator');
+const { DataTypes } = require('sequelize');
+const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
 
-const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
-
+const HcpConsents = sequelize.cdpConnector.define('hcp_consents', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -49,18 +48,20 @@ const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
     },
     updated_by: {
         type: DataTypes.UUID
+    },
+    veeva_multichannel_consent_id: {
+        type: DataTypes.STRING(18)
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
-    tableName: "hcp_consents",
+    tableName: 'hcp_consents',
     timestamps: true,
-    createdAt: "created_at",
-    updatedAt: "updated_at"
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
 });
 
 HcpConsents.belongsTo(Consent, {
     foreignKey: 'consent_id'
 });
-
 
 module.exports = HcpConsents;
