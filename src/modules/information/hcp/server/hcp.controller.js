@@ -652,7 +652,7 @@ async function syncConsentInVeevaCRM(hcpUser) {
                     }
                 ]
             }],
-            attributes: ['consent_id', 'updated_at']
+            attributes: ['id', 'consent_id', 'updated_at']
         });
 
         const searchUrl = nodecache.getValue('SALESFORCE_SERVICE_URL');
@@ -693,7 +693,7 @@ async function syncConsentInVeevaCRM(hcpUser) {
 
             if(!(account_consents?.length)) {
                 await Promise.all(hcp_consents.map(async hcp_consent => {
-                    const created_mcc = await axios.post(`${searchUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
+                    const { data } = await axios.post(`${searchUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
                         Account_vod__c: account.Id,
                         RecordTypeId: '0124J000000ouUlQAI',
                         Capture_Datetime_vod__c: hcp_consent.updated_at,
@@ -705,7 +705,8 @@ async function syncConsentInVeevaCRM(hcpUser) {
                         Consent_Type_vod__c: hcp_consent.consent.consent_locales.veeva_consent_type_id
                     }, { headers });
 
-                    const a = created_mcc;
+                    const hcpConsent = await HcpConsents.findOne({ where: { id: hcp_consent.id }});
+                    await hcpConsent.update({ veeva_multichannel_consent_id: data.id });
                 }));
 
             }
