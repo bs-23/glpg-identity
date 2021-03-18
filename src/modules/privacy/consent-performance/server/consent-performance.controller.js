@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const { QueryTypes, Op } = require('sequelize');
 
+const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
 const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
 const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model'));
 const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model'));
