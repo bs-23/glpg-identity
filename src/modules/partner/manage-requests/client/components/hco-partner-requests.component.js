@@ -480,7 +480,6 @@ const HcoPartnerRequests = () => {
                                                     formikProps.handleChange(e);
                                                     setSelectedCountry(e.target.value);
                                                 }}>
-                                            >
                                                 <option key="select-country" value="" disabled>--Select Country--</option>
                                                 {countries.filter(c => userCountries.includes(c.country_iso2)).map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
                                             </Field>
