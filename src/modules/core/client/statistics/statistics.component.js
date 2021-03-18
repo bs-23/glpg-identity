@@ -21,6 +21,22 @@ export default function HotStatistic() {
             </h5>
             <div className="p-3 shadow-sm hot-statistics__box-wrap">
                 <div className="row">
+                    {/*<div className="col-12 hot-statistics__box pb-4">
+                        <div className="form-group">
+                            <select className="form-control">
+                                <option><img height="20" width="20" src="/assets/flag/flag-belgium.svg" /><span>Belgium</span></option>
+                                <option><img height="20" width="20" src="/assets/flag/flag-germany.svg" /><span>Germany</span></option>
+                                <option><img height="20" width="20" src="/assets/flag/flag-spain.svg" /><span>Spain</span></option>
+                                <option><img height="20" width="20" src="/assets/flag/flag-france.svg" /><span>France</span></option>
+                                <option><img height="20" width="20" src="/assets/flag/flag-ireland.svg" /><span>Ireland</span></option>
+                                <option><img height="20" width="20" src="/assets/flag/flag-italy.svg" /><span>Italy</span></option>
+                                <option><img height="20" width="20" src="/assets/flag/flag-luxembourg.svg" /><span>Luxembourg</span></option>
+                                <option><img height="20" width="20" src="/assets/flag/flag-monaco.svg" /><span>Monaco</span></option>
+                                <option><img height="20" width="20" src="/assets/flag/flag-netherlands.svg" /><span>Netherlands</span></option>
+                                <option><img height="20" width="20" src="/assets/flag/flag-united-kingdom.svg" /><span>United Kingdom</span></option>
+                            </select>
+                        </div>
+                    </div>*/}
                     <div className="col-6 col-md-4 hot-statistics__box pb-4">
                         <div className="hot-statistics__title pb-3">Total Users</div>
                         <div className="hot-statistics__amount">{statistics.users_count}</div>
