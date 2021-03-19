@@ -351,19 +351,6 @@ export default function hcpUsers() {
                             : <span></span>
     }
 
-    const renderOptInTypes = ({ value }) => {
-        if (!value) return null;
-
-        const allOptTypes = ['single-opt-in', 'double-opt-in', 'opt-out'];
-
-        return <div className="text-center ml-n2">
-            {value.includes('single-opt-in') ? <i title="Single Opt-In" className="fas fa-check cdp-text-primary mr-3"></i> : ''}
-            {value.includes('double-opt-in') ? <i title="Double Opt-In" className="fas fa-check-double cdp-text-primary mr-3"></i> : ''}
-            {value.includes('opt-out') ? <i title="Opt-out" className="far fa-window-close text-danger"></i> : ''}
-            {value.filter(val => allOptTypes.some(ot => ot === val)).length ? '' : <div>N/A</div>}
-        </div>
-    }
-
     const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps: editProps }) => {
         const { dirty, resetForm, initialValues, isValid } = formikProps;
 
@@ -385,24 +372,6 @@ export default function hcpUsers() {
                 </>
             }
         </div>
-    }
-
-    const hintpopup = (
-        <Popover id="popover-basic" className="shadow-lg">
-            <Popover.Content className="px-3">
-                <ul className="list-unstyled mb-0">
-                    <li className="pl-0 pb-2"><i className="fas fa-check mr-1"></i> Single Opt-In</li>
-                    <li className="pl-0 pb-2"><i className="fas fa-check-double mr-1"></i> Double Opt-In</li>
-                    <li className="pl-0 pb-2"><i className="far fa-window-close text-danger mr-1"></i> Opt Out</li>
-                </ul>
-            </Popover.Content>
-        </Popover>
-    );
-
-    const CustomOptInHeader = () => {
-        return <div>Opt Type <OverlayTrigger trigger="click" rootClose placement="left" overlay={hintpopup}>
-            <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
-        </OverlayTrigger></div>
     }
 
     const RegistrationHeader = () => {
@@ -491,13 +460,12 @@ export default function hcpUsers() {
             fieldType: { name: 'text', maxLength: '25' },
         },
         {
-            id: 'opt_types',
-            name: 'Opt-In-Types',
-            editable: false,
-            customCell: renderOptInTypes,
-            CustomHeader: CustomOptInHeader,
+            id: 'individual_id_onekey',
+            name: 'OneKeyID',
+            editable: (row) => ['manually_verified'].includes(row.status),
             class: "text-center",
-            width: "8%"
+            width: "8%",
+            unique: true
         },
         {
             id: 'action',

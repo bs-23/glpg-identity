@@ -1,6 +1,7 @@
 .cdp-table {
 
     &-inline-editing {
+
         .inline-editing {
             &__field-wrap {
                 position: relative;
@@ -62,11 +63,19 @@
             }
         }
 
-
-
         &__save-btn {
             position: sticky;
             bottom: 0px;
+        }
+
+        @media (max-width: $screen-phone) {
+            &__edit-icon {
+                visibility: visible;
+            }
+
+            .search-in-okla {
+
+            }
         }
     }
 
@@ -351,14 +360,14 @@
     }
 }
 
-@media (min-width: $screen-desktop) {
-    .table-responsive {
-        overflow: visible;
+    @media (min-width: $screen-desktop) {
+        .table-responsive {
+            overflow: visible;
+        }
     }
-}
 
 
 
-.search-in-okla {
-    visibility: hidden;
-}
+    .search-in-okla {
+        visibility: hidden;
+    }

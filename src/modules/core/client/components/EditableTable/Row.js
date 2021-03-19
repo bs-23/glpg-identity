@@ -116,6 +116,7 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
             <td
                 style={getCellStyle(inputName)}
                 className="inline-editing__td"
+                data-for={column.name}
             >
                 {editingCell && editingCell.rowIndex === rowIndex && editingCell.columnIndex === colIndex
                     ? <div className="inline-editing__field-wrap">
