@@ -23,6 +23,7 @@ const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/pla
 const Filter = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model"));
 const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
+const parser = require('html-react-parser');
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -648,7 +649,7 @@ async function syncConsentInVeevaCRM(hcpUser) {
                     },
                     {
                         model: ConsentLocale,
-                        attributes: ['locale', 'veeva_consent_type_id']
+                        attributes: ['locale', 'rich_text', 'veeva_consent_type_id']
                     }
                 ]
             }],
@@ -695,6 +696,7 @@ async function syncConsentInVeevaCRM(hcpUser) {
                 await Promise.all(hcp_consents.map(async hcp_consent => {
 
                     const locale = hcp_consent.consent.consent_locales.filter(i => i.locale === hcpUser.locale);
+                    const rich_text = locale && locale.length ? locale[0].dataValues.rich_text : '';
 
                     const { data } = await axios.post(`${searchUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
                         Account_vod__c: account.Id,
@@ -705,7 +707,8 @@ async function syncConsentInVeevaCRM(hcpUser) {
                         Content_Type_vod__c: hcp_consent.consent.consent_category.veeva_content_type_id,
                         GLPG_Consent_Source__c: 'Website',
                         CDP_Consent_ID__c: hcp_consent.consent_id,
-                        Consent_Type_vod__c: locale && locale.length ? locale[0].dataValues.veeva_consent_type_id : null
+                        Consent_Type_vod__c: locale && locale.length ? locale[0].dataValues.veeva_consent_type_id : null,
+                        Default_Consent_Text_vod__c: parser(rich_text).replace(/(<\/?(?:a)[^>]*>)|<[^>]+>/ig, '$1')
                     }, { headers });
 
                     const hcpConsent = await HcpConsents.findOne({ where: { id: hcp_consent.id }});
