@@ -4,6 +4,9 @@ const parser = require('html-react-parser');
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
+const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
+const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model'));
+const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model'));
 
 async function syncHcpConsentsInVeeva(user) {
     if(!user.individual_id_onekey) return;
@@ -48,9 +51,7 @@ async function syncHcpConsentsInVeeva(user) {
         const access_token = await auth();
         const headers = { authorization: `Bearer ${access_token}` };
 
-        const query = `SELECT + Id, Name, PersonEmail, Secondary_Email__c, (SELECT + Id, Capture_Datetime_vod__c, Channel_Value_vod__c, Content_Type_vod__c, GLPG_Consent_Source__c +
-            FROM + Multichannel_Consent_vod__r + WHERE + Content_Type_vod__r.Name = 'Galapagos news' + and + channel_value_vod__c = '${user.email}') +
-            FROM + Account + WHERE + QIDC__OneKeyId_IMS__c = '${user.individual_id_onekey}'`;
+        const query = `SELECT + Id, Name, PersonEmail, Secondary_Email__c + FROM + Account + WHERE + QIDC__OneKeyId_IMS__c = '${user.individual_id_onekey}'`;
         const account_response = await axios.get(`${searchUrl}/data/v48.0/query?q=${query}`, { headers });
         const account = account_response.data.totalSize ? account_response.data.records[0] : null;
 
@@ -65,11 +66,13 @@ async function syncHcpConsentsInVeeva(user) {
         }
 
         if(hcp_consents && hcp_consents.length) {
-            const account_consents = account.Multichannel_Consent_vod__r?.records;
+            await Promise.all(hcp_consents.map(async hcp_consent => {
+                let mcc;
+                if(hcp_consent.veeva_consent_type_id){
+                    mcc = await axios.get(`${searchUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c/${hcp_consent.veeva_consent_type_id}`);
+                }
 
-            if(!(account_consents?.length)) {
-                await Promise.all(hcp_consents.map(async hcp_consent => {
-
+                if(!mcc){
                     const locale = hcp_consent.consent.consent_locales.filter(i => i.locale === user.locale);
                     const rich_text = locale && locale.length ? locale[0].dataValues.rich_text : '';
 
@@ -88,8 +91,8 @@ async function syncHcpConsentsInVeeva(user) {
 
                     const hcpConsent = await HcpConsents.findOne({ where: { id: hcp_consent.id }});
                     await hcpConsent.update({ veeva_multichannel_consent_id: data.id });
-                }));
-            }
+                }
+            }));
         }
     } catch(err) {
         logger.error(err);
