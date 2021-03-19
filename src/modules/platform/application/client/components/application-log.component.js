@@ -55,9 +55,9 @@ const ApplicationLog = (props) => {
             <option value="DELETE">DELETE</option>
             <option value="UPDATE">UPDATE</option>
             <option value="LOGIN">LOGIN</option>
-            <option value="LOGIN">LOGOUT</option>
-            <option value="LOGIN">UNAUTHORIZE</option>
-            <option value="LOGIN">BAD_REQUEST</option>
+            <option value="LOGOUT">LOGOUT</option>
+            <option value="UNAUTHORIZE">UNAUTHORIZE</option>
+            <option value="BAD_REQUEST">BAD_REQUEST</option>
         </select>
         {
             applicationLog.map(log => {
