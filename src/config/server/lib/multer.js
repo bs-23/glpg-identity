@@ -7,7 +7,14 @@ const MAX_FILE_NAME_LENGTH = 224;
 module.exports = multer({
     storage: multer.memoryStorage(),
     fileFilter: (req, file, cb) => {
-        if (path.extname(file.originalname) !== '.jpg' && (path.extname(file.originalname) !== '.pdf' || file.mimetype !== 'application/pdf')) {
+        const fileExtension = path.extname(file.originalname);
+
+        if (
+            fileExtension !== '.jpg'
+            && fileExtension !== '.jpeg'
+            && fileExtension !== '.png'
+            && (fileExtension !== '.pdf' || file.mimetype !== 'application/pdf')
+        ) {
             cb(null, false);
             return cb(new Error('Invalid file type. Only PDF is allowed.'), false);
         }

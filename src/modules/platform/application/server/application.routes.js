@@ -21,5 +21,5 @@ module.exports = app => {
 
     app.route('/api/applications/:id')
         .get(CDPAuthStrategy, controller.getApplication)
-        .put(CDPAuthStrategy, controller.updateApplication);
+        .put(CDPAuthStrategy, multer.array('logo', 1), controller.updateApplication);
 };

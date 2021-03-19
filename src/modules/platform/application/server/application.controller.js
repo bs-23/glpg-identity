@@ -134,10 +134,12 @@ async function getApplication(req, res) {
                 { model: User, as: 'createdByUser', attributes: ['id', 'first_name', 'last_name'] },
                 { model: User, as: 'updatedByUser', attributes: ['id', 'first_name', 'last_name'] }
             ],
-            attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description', 'metadata']
+            attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description', 'metadata', 'logo_url']
         });
 
-        res.json(application);
+        const logo_url = `${nodecache.getValue('S3_BUCKET_URL')}/application/${application.id}/${application.logo_url}`;
+
+        res.json({ ...application.dataValues, logo_url });
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
@@ -185,14 +187,17 @@ async function createApplication(req, res) {
             is_active,
             description: (description || '').trim(),
             password,
-            metadata,
+            metadata: JSON.parse(metadata),
             created_by: req.user.id,
             updated_by: req.user.id
         });
 
+        const bucketURL = nodecache.getValue('S3_BUCKET_URL');
+        const bucketName = bucketURL.split('.')[0].split('//')[1];
+
         const uploadOptions = {
-            bucket: 'cdp-development',
-            folder: `${application.name.replace(/\s/g, '-')}/`,
+            bucket: bucketName,
+            folder: `application/${application.id}/`,
             fileName: `logo${path.extname(logo.originalname)}`,
             fileContent: logo.buffer
         };
@@ -200,13 +205,17 @@ async function createApplication(req, res) {
         const storageServiceResponse = await storageService.upload(uploadOptions);
 
         await File.create({
-            name: logo.originalname,
-            bucket_name: 'cdp-development',
+            name: `logo${path.extname(logo.originalname)}`,
+            bucket_name: bucketName,
             key: storageServiceResponse.key,
             owner_id: application.id,
             table_name: 'applications'
         });
-        console.log(storageServiceResponse)
+
+        await application.update({ logo_url: `logo${path.extname(logo.originalname)}` });
+
+        console.log(storageServiceResponse);
+
         res.json(application);
     } catch (err) {
         logger.error(err);
@@ -224,7 +233,10 @@ async function updateApplication(req, res) {
             description,
             metadata
         } = req.body;
+
         const application_id = req.params.id;
+
+        const logo = req.files[0];
 
         const application = await Application.findOne({
             where: { id: application_id }
@@ -257,9 +269,48 @@ async function updateApplication(req, res) {
             email: email && email.toLowerCase(),
             is_active,
             description: description && description.trim(),
-            metadata,
+            metadata: JSON.parse(metadata),
             updated_by: req.user.id
         });
+
+        if (logo) {
+            const bucketURL = nodecache.getValue('S3_BUCKET_URL');
+            const bucketName = bucketURL.split('.')[0].split('//')[1];
+            const previousKey = `application/${application.id}/${application.logo_url}`;
+
+            const deleteParam = {
+                Bucket: bucketName,
+                Delete: {
+                    Objects: [{ Key: previousKey }]
+                }
+            };
+
+            await storageService.deleteFiles(deleteParam);
+
+            const uploadOptions = {
+                bucket: bucketName,
+                folder: `application/${application.id}/`,
+                fileName: `logo${path.extname(logo.originalname)}`,
+                fileContent: logo.buffer
+            };
+
+            const storageServiceResponse = await storageService.upload(uploadOptions);
+
+            // Update file name extension and key
+            const key = `application/${application.id}/${logo.logo_url}`;
+            const logoFile = await File.findOne({ where: { key }});
+
+            if (logoFile) {
+                await logoFile.update({
+                    name: `logo${path.extname(logo.originalname)}`,
+                    key: storageServiceResponse.key
+                });
+            }
+
+            await application.update({ logo_url: `logo${path.extname(logo.originalname)}` });
+
+            console.log(storageServiceResponse);
+        }
 
         res.json(application);
     } catch (err) {
