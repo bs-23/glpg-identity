@@ -299,7 +299,8 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                             <div className="col-12">
                                                 <div className="form-group">
                                                     <label className="font-weight-bold" htmlFor="logo">Logo</label>
-                                                    <img src={(application || {}).logo_url} id="logo" width="300"/>
+                                                    <br></br>
+                                                    <img src={(application || {}).logo_url} id="logo" width="150"/>
                                                     <input className="form-control" type="file" name="logo" onChange={e => handleFileChange(e, formikProps)} />
                                                     <div className="invalid-feedback"><ErrorMessage name="logo" /></div>
                                                 </div>
