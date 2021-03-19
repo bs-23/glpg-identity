@@ -10,11 +10,13 @@ import { getApplications } from './application.actions';
 import { useDispatch, useSelector } from "react-redux";
 import ApplicationForm from './application-form.component';
 import ApplicationDetailsModal from "./application-details.component";
+import { ApplicationLog } from '../../../platform';
 
 export default function ManageApplications() {
     const [modalShow, setModalShow] = useState({
         createApplication: false,
-        applicationDetails: false
+        applicationDetails: false,
+        applicationLog: false
     });
     const [isEditing, setIsEditing] = useState(false);
     // const [permissionSetDetailID, setPermissionSetDetailID] = useState(null);
@@ -137,6 +139,16 @@ export default function ManageApplications() {
                                                                     Details
                                                                 </Dropdown.Item>
                                                             </LinkContainer>
+                                                            <LinkContainer to="#">
+                                                                <Dropdown.Item
+                                                                    onClick={() => {
+                                                                        setApplicationId(row.id);
+                                                                        setModalShow({ ...modalShow, applicationLog: true })}
+                                                                    }
+                                                                >
+                                                                    Log
+                                                                </Dropdown.Item>
+                                                            </LinkContainer>
                                                         </Dropdown.Menu>
                                                     </Dropdown>
                                                 </td>
@@ -178,6 +190,26 @@ export default function ManageApplications() {
                                 />
                             </Modal.Body>
                         </Modal>
+
+                        <Modal
+                            show={modalShow.applicationLog}
+                            onHide={() => { setModalShow({ ...modalShow, applicationLog: false }) }}
+                            dialogClassName="modal-90w modal-customize"
+                            aria-labelledby="example-custom-modal-styling-title"
+                            size="lg"
+                            centered
+                            size="xl"
+                        >
+                            <Modal.Header closeButton>
+                                <Modal.Title id="example-custom-modal-styling-title">
+                                    Application Log
+                                </Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <ApplicationLog id={applicationId} />
+                            </Modal.Body>
+                        </Modal>
+
                         <ApplicationDetailsModal
                             applicationId={applicationId}
                             show={modalShow.applicationDetails}

@@ -19,6 +19,9 @@ module.exports = app => {
     app.route('/api/applications/data/:id')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getData);
 
+    app.route('/api/applications/:id/log')
+        .get(CDPAuthStrategy, controller.getApplicationLog);
+
     app.route('/api/applications/:id')
         .get(CDPAuthStrategy, controller.getApplication)
         .put(CDPAuthStrategy, multer.array('logo', 1), controller.updateApplication);

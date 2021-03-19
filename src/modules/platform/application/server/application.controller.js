@@ -11,6 +11,7 @@ const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston')
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
+const Audit = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
 const storageService = require(path.join(process.cwd(), 'src/modules/core/server/storage/storage.service'));
 
 const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
@@ -409,6 +410,37 @@ async function clearApplicationCache() {
     }
 }
 
+async function getApplicationLog(req, res) {
+    try {
+        const applicationID = req.params.id;
+        const event_type = req.query.event_type || null;
+        const page = req.query.page ? +req.query.page : 1;
+        const limit = 50;
+        const offset = page ? (+page - 1) * limit : 0;
+
+        const application = await Application.findOne({ where: { id: applicationID } });
+
+        if (!application) return res.status(400).send('Application not found.');
+
+        console.log(offset, limit);
+
+        const applicationLog = await Audit.findAll({
+            where: {
+                actor: applicationID,
+                ...(event_type ? { event_type } : null)
+            },
+            limit,
+            offset,
+            logging: console.log
+        });
+        console.log(applicationLog);
+        res.json(applicationLog);
+    } catch(err) {
+        logger.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getToken = getToken;
 exports.getApplications = getApplications;
 exports.saveData = saveData;
@@ -417,3 +449,4 @@ exports.clearApplicationCache = clearApplicationCache;
 exports.createApplication = createApplication;
 exports.getApplication = getApplication;
 exports.updateApplication = updateApplication;
+exports.getApplicationLog = getApplicationLog;
