@@ -53,7 +53,7 @@ export function getPartnerById(id, type) {
     };
 }
 
-export function approveUser(id, type) {
+export function approveBusinessPartner(id, type) {
     return {
         type: Types.GET_USER_APPROVE,
         payload: axios({
@@ -63,3 +63,12 @@ export function approveUser(id, type) {
     };
 }
 
+export function resendFormForCorrection(id, type) {
+    return {
+        type: Types.RESEND_FORM,
+        payload: axios({
+            method: 'get',
+            url: `/api/partners/${type}/${id}/resend-form`
+        })
+    };
+}

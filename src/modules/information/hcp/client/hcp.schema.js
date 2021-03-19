@@ -27,6 +27,24 @@ export const ApprovalRejectSchema = object().shape({
     })
 });
 
+function invalidEmail(email) {
+    if (email) {
+        const portion = email.split("@");
+        if (portion[1] === 'mail.c' || portion[1] === 'mail#archive.com' || portion[1] === 'mail' || portion[1] === 'mail..com') {
+            return false;
+        }
+        if (portion[0].charAt(portion[0].length - 1) === '-') {
+            return false;
+        }
+        if (portion & portion[0] && portion[0].includes('#')) {
+            return false;
+        }
+
+    }
+
+    return true;
+}
+
 export const HcpInlineEditSchema = object().shape({
     first_name: string()
         .matches(XRegExp('^[\\pL.-]+(?:\\s[\\pL.]+)*$'), 'This field only contains letters')
@@ -42,6 +60,8 @@ export const HcpInlineEditSchema = object().shape({
         .email('This field should be a valid email address.')
         .matches(/^.{1,64}@/, 'The part before @ of the email can be maximum 64 characters.')
         .matches(/^.*[a-z]+.*@/, 'This field should be a valid email address.')
+        .test('invalid-email', 'This field should be a valid email address.)',
+            email => invalidEmail(email))
         .max(100, 'This field must be at most 100 characters long.')
         .required('This field must not be empty.'),
     uuid: string()
@@ -53,6 +73,6 @@ export const HcpInlineEditSchema = object().shape({
         .required('This field must not be empty.'),
     telephone: string()
         .matches(/^(?:[+]?[0-9]*|[0-9]{2,3}[\/]?[0-9]*)$/, 'Must be a valid phone number')
-        .max(25,'This field must be at most 25 characters long')
+        .max(25, 'This field must be at most 25 characters long')
         .nullable()
 });

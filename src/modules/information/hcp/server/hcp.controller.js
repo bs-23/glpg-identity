@@ -24,6 +24,7 @@ const Filter = require(path.join(process.cwd(), "src/modules/core/server/filter/
 const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 const veevaService = require('./services/veeva.service');
+const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -99,10 +100,8 @@ function ignoreCaseArray(str) {
 
 async function generateFilterOptions(currentFilterSettings, userPermittedApplications, userPermittedCountries, status, table) {
     const getAllCountries = async () => {
-        return await sequelize.datasyncConnector.query(
-            `SELECT * FROM ciam.vwcountry`,
-            { type: QueryTypes.SELECT }
-        );
+        const countries = await Country.findAll();
+        return countries.map(c => c.dataValues);
     };
 
     let allCountries = [];
@@ -685,7 +684,12 @@ async function createHcpProfile(req, res) {
             return res.status(400).send(response);
         }
 
-        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+        const countries = await Country.findAll({
+            order: [
+                ['codbase_desc', 'ASC'],
+                ['countryname', 'ASC']
+            ]
+        });
 
         let hasDoubleOptIn = false;
         let consentArr = [];
@@ -731,15 +735,8 @@ async function createHcpProfile(req, res) {
                 });
 
                 if (!consentLocale) {
-                    const codbaseCountry = await sequelize.datasyncConnector.query(`
-                        SELECT * FROM ciam.vwcountry
-                        WHERE countryname = (SELECT codbase_desc FROM ciam.vwcountry
-                        WHERE LOWER(ciam.vwcountry.country_iso2) = $country_iso2);`, {
-                        bind: {
-                            country_iso2: country_iso2.toLowerCase()
-                        },
-                        type: QueryTypes.SELECT
-                    });
+                    const userCountry = countries.filter(c => c.country_iso2.toLowerCase() === country_iso2.toLocaleLowerCase());
+                    const codbaseCountry = countries.filter(c => c.countryname === c.codbase_desc && c.codbase === userCountry[0].codbase);
 
                     const localeUsingParentCountryISO = `${language_code}_${(codbaseCountry[0].country_iso2 || '').toUpperCase()}`;
 
@@ -1328,13 +1325,12 @@ async function getSpecialties(req, res) {
 
         if (response.errors && response.errors.length) return res.status(400).send(response);
 
-        const countries = await sequelize.datasyncConnector.query(`
-            SELECT * FROM ciam.vwcountry
-            WHERE LOWER(ciam.vwcountry.country_iso2) = $country_iso2;`, {
-            bind: {
-                country_iso2: country_iso2.toLowerCase()
-            },
-            type: QueryTypes.SELECT
+        const countries = await Country.findAll({
+            where: {
+                country_iso2: {
+                    [Op.iLike]: country_iso2
+                }
+            }
         });
 
         if (!countries || !countries.length) {
@@ -1397,16 +1393,11 @@ async function getSpecialtiesWithEnglishTranslation(req, res) {
 
         if (response.errors && response.errors.length) return res.status(400).send(response);
 
-        const countries = await sequelize.datasyncConnector.query(`
-            SELECT * FROM ciam.vwcountry
-            WHERE LOWER(ciam.vwcountry.country_iso2) = $country_iso2;`, {
-            bind: {
-                country_iso2: country_iso2.toLowerCase()
-            },
-            type: QueryTypes.SELECT
-        });
+        const countries = await Country.findAll();
 
-        if (!countries || !countries.length) {
+        const currentCountry = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+        if (!currentCountry) {
             response.data = [];
             return res.status(204).send(response);
         }
@@ -1422,20 +1413,13 @@ async function getSpecialtiesWithEnglishTranslation(req, res) {
             `, {
             bind: {
                 locale: locale.toLowerCase(),
-                codbase: countries[0].codbase.toLowerCase()
+                codbase: currentCountry.codbase.toLowerCase()
             },
             type: QueryTypes.SELECT
         });
 
         if (!masterDataSpecialties.length) {
-            const codbaseCountry = await sequelize.datasyncConnector.query(`
-                SELECT * FROM ciam.vwcountry
-                WHERE LOWER(countryname) = $codbase_desc;`, {
-                bind: {
-                    codbase_desc: countries[0].codbase_desc.toLowerCase()
-                },
-                type: QueryTypes.SELECT
-            });
+            const codbaseCountry = countries.filter(c => c.countryname === c.codbase_desc && c.codbase === currentCountry.codbase);
 
             const localeUsingParentCountryISO = `${locale.split('_')[0]}_${codbaseCountry[0].country_iso2}`;
 
@@ -1450,7 +1434,7 @@ async function getSpecialtiesWithEnglishTranslation(req, res) {
                 `, {
                 bind: {
                     locale: localeUsingParentCountryISO.toLowerCase(),
-                    codbase: countries[0].codbase.toLowerCase()
+                    codbase: currentCountry.codbase.toLowerCase()
                 },
                 type: QueryTypes.SELECT
             });
