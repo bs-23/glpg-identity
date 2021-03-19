@@ -28,19 +28,20 @@ export const ApprovalRejectSchema = object().shape({
 });
 
 function invalidEmail(email) {
-    const portion = email.split("@");
-    if (
-        (portion[1] === 'mail.c' || portion[1] === 'mail#archive.com' || portion[1] === 'mail' || portion[1] === 'mail..com')) {
-        return false;
-    }
-    if (portion & portion[0].charAt(portion[0].length - 1) === '-') {
-        return false;
+    if (email) {
+        const portion = email.split("@");
+        if (portion[1] === 'mail.c' || portion[1] === 'mail#archive.com' || portion[1] === 'mail' || portion[1] === 'mail..com') {
+            return false;
+        }
+        if (portion[0].charAt(portion[0].length - 1) === '-') {
+            return false;
+        }
+        if (portion & portion[0] && portion[0].includes('#')) {
+            return false;
+        }
 
     }
 
-    if (portion & portion[0] && portion[0].includes('#')) {
-        return false;
-    }
     return true;
 }
 
