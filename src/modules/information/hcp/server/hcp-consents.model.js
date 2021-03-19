@@ -51,6 +51,9 @@ const HcpConsents = sequelize.cdpConnector.define('hcp_consents', {
     },
     veeva_multichannel_consent_id: {
         type: DataTypes.STRING(18)
+    },
+    expired_at: {
+        type: DataTypes.DATE
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
