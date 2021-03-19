@@ -403,8 +403,9 @@ async function updateHcps(req, res) {
         }
 
         await Promise.all(Hcps.map(async hcp => {
-            const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, telephone, _rowIndex } = trimRequestBody(hcp);
-            let individual_id_onekey;
+            const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, telephone, individual_id_onekey, _rowIndex } = trimRequestBody(hcp);
+            let individual_id_onekey_from_UUID;
+            let UUID_from_individual_id_onekey;
 
             if (!id) {
                 response.errors.push(new Error(_rowIndex, 'id', 'ID is missing.'));
@@ -475,9 +476,9 @@ async function updateHcps(req, res) {
                 }
 
                 if (Object.keys(master_data).length) {
-                    individual_id_onekey = master_data.individual_id_onekey || null;
+                    individual_id_onekey_from_UUID = master_data.individual_id_onekey || null;
                 } else {
-                    individual_id_onekey = null;
+                    individual_id_onekey_from_UUID = null;
                 }
 
                 if (uuidsToUpdate.has(uuid_from_master_data || uuid)) {
@@ -487,15 +488,66 @@ async function updateHcps(req, res) {
                 }
             }
 
+            if (individual_id_onekey) {
+                const doesOnekeyExists = await Hcp.findOne({
+                    where: {
+                        id: { [Op.ne]: id },
+                        individual_id_onekey
+                    }
+                });
+
+                if (doesOnekeyExists) {
+                    response.errors.push(new Error(_rowIndex, 'individual_id_onekey', 'Individual Onekey ID already exists.'));
+                } else {
+                    const master_data = await sequelize.datasyncConnector.query(
+                        `SELECT * from ciam.vwhcpmaster
+                        WHERE individual_id_onekey = $individual_id_onekey`, {
+                        bind: { individual_id_onekey },
+                        type: QueryTypes.SELECT
+                    });
+
+                    if (master_data && master_data.length) {
+                        UUID_from_individual_id_onekey = master_data[0].uuid_1 || master_data[0].uuid_2 || '';
+
+                        if (UUID_from_individual_id_onekey && !uuid) {
+                            const doesUUIDExist = await Hcp.findOne({
+                                where: {
+                                    id: {
+                                        [Op.ne]: id
+                                    },
+                                    uuid: UUID_from_individual_id_onekey
+                                }
+                            });
+
+                            if (doesUUIDExist) {
+                                response.errors.push(new Error(_rowIndex, 'uuid', 'UUID already exists.'));
+                            }
+
+                            if (uuidsToUpdate.has(UUID_from_individual_id_onekey)) {
+                                uuidsToUpdate.get(UUID_from_individual_id_onekey).push(_rowIndex);
+                            } else {
+                                uuidsToUpdate.set(UUID_from_individual_id_onekey, [_rowIndex]);
+                            }
+                        }
+                    } else {
+                        response.errors.push(new Error(_rowIndex, 'individual_id_onekey', 'Individual Onekey ID is not valid or not in the contract.'));
+                    }
+                }
+            }
+
             hcpsToUpdate.push({
-                uuid: uuid_from_master_data || uuid,
+                uuid: individual_id_onekey && uuid
+                    ? uuid_from_master_data || uuid
+                    : UUID_from_individual_id_onekey || uuid_from_master_data || uuid,
                 email,
                 first_name,
                 last_name,
                 specialty_onekey,
                 country_iso2,
                 telephone,
-                individual_id_onekey
+                individual_id_onekey: individual_id_onekey && uuid
+                    ? individual_id_onekey
+                    : individual_id_onekey_from_UUID
             });
 
             HcpUser.dataValues._rowIndex = _rowIndex;
