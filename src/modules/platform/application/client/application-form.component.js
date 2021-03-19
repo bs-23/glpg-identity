@@ -295,14 +295,17 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                         </div>
                                     </div>
                                     <div className="col-12">
-                                        <div className="row">
-                                            <div className="col-12">
+                                        <label className="font-weight-bold" htmlFor="logo">Logo</label>
+                                        <div className="row align-items-center">
+                                            <div className="col-12 col-sm-6">
+                                                <div className="custom-file">
+                                                    <input className="custom-file-input" id="customFile" type="file" name="logo" onChange={e => handleFileChange(e, formikProps)} />
+                                                    <label className="custom-file-label" for="customFile">Choose file</label>
+                                                </div>
+                                            </div>
+                                            <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <label className="font-weight-bold" htmlFor="logo">Logo</label>
-                                                    <br></br>
-                                                    <img src={(application || {}).logo_url} id="logo" width="150"/>
-                                                    <input className="form-control" type="file" name="logo" onChange={e => handleFileChange(e, formikProps)} />
-                                                    <div className="invalid-feedback"><ErrorMessage name="logo" /></div>
+                                                    <img src={(application || {}).logo_url} id="logo" width="300" />
                                                 </div>
                                             </div>
                                         </div>
