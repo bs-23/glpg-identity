@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const { QueryTypes, Op } = require('sequelize');
 
+const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
 const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
 const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model'));
 const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model'));
@@ -48,7 +49,7 @@ async function getCdpConsentsReport(req, res) {
         order.push([HCPS, 'created_at', 'DESC']);
         order.push([HCPS, 'id', 'DESC']);
 
-        const countries = await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT });
+        const countries = await Country.findAll();
 
         const userCountriesApplication = await getUserPermissions(req.user.id);
         const userPermittedCodbases = countries.filter(i => userCountriesApplication[1].includes(i.country_iso2)).map(i => i.codbase);
@@ -159,7 +160,7 @@ async function getVeevaConsentsReport(req, res) {
         const offset = page * limit;
 
         const [, userPermittedCountries] = await getUserPermissions(req.user.id);
-        const countries = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry;", { type: QueryTypes.SELECT });
+        const countries = await Country.findAll();
 
         async function getCountryIso2() {
             const user_codbase_list_for_iso2 = countries.filter(i => userPermittedCountries.includes(i.country_iso2)).map(i => i.codbase);
@@ -291,7 +292,7 @@ async function exportCdpConsentsReport(req, res) {
         order.push([HCPS, 'created_at', 'DESC']);
         order.push([HCPS, 'id', 'DESC']);
 
-        const countries = await sequelize.datasyncConnector.query(`SELECT * FROM ciam.vwcountry`, { type: QueryTypes.SELECT });
+        const countries = await Country.findAll();
         const userCountriesApplication = await getUserPermissions(req.user.id);
         const userPermittedCodbases = countries.filter(i => userCountriesApplication[1].includes(i.country_iso2)).map(i => i.codbase);
         const userPermittedCountries = countries.filter(i => userPermittedCodbases.includes(i.codbase)).map(i => i.country_iso2);
@@ -360,7 +361,7 @@ async function exportCdpConsentsReport(req, res) {
 async function exportVeevaConsentsReport(req, res) {
     try {
         const [, userPermittedCountries] = await getUserPermissions(req.user.id);
-        const countries = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry;", { type: QueryTypes.SELECT });
+        const countries = await Country.findAll();
 
         async function getCountryIso2() {
             const user_codbase_list_for_iso2 = countries.filter(i => userPermittedCountries.includes(i.country_iso2)).map(i => i.codbase);

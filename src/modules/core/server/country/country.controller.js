@@ -1,13 +1,23 @@
 const path = require('path');
-const { QueryTypes } = require('sequelize');
+const { QueryTypes, Op, col } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
+const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
+
 
 async function getCountries(req, res) {
     try {
-        // const countries = await sequelize.datasyncConnector.query("SELECT DISTINCT ON(codbase_desc) * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
-
-        const countries = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry WHERE codbase_desc=countryname ORDER BY codbase_desc, countryname;", { type: QueryTypes.SELECT });
+        const countries = await Country.findAll({
+            where: {
+                codbase_desc: {
+                    [Op.eq]: col('countryname')
+                }
+            },
+            order: [
+                ['codbase_desc', 'ASC'],
+                ['countryname', 'ASC']
+            ]
+        });
 
         res.json(countries);
     } catch (err) {
@@ -18,7 +28,13 @@ async function getCountries(req, res) {
 
 async function getAllCountries(req, res) {
     try {
-        const countries = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwcountry ORDER BY codbase_desc;", { type: QueryTypes.SELECT });
+        const countries = await Country.findAll({
+            order: [
+                ['codbase_desc', 'ASC'],
+                ['countryname', 'ASC']
+            ]
+        });
+
         res.json(countries);
     } catch (err) {
         logger.error(err);
