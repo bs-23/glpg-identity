@@ -55,7 +55,7 @@ module.exports = app => {
 
     app.route('/api/hcp-profiles/:id/consents')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.getHCPUserConsents)
-        .put(passport.authenticate('application-jwt', { session: false }), validate(updateHCPUserConsents), controller.updateHCPUserConsents);
+        .put(passport.authenticate('application-jwt', { session: false }), validate(updateHCPUserConsents), controller.updateHCPConsents);
 
     app.route('/api/hcp-profiles/:id')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile);

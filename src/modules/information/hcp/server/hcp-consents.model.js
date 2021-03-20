@@ -26,7 +26,7 @@ const HcpConsents = sequelize.cdpConnector.define('hcp_consents', {
     opt_type: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['single-opt-in', 'double-opt-in', 'soft-opt-in', 'opt-out'],
+        values: ['single-opt-in', 'double-opt-in', 'soft-opt-in', 'opt-out']
     },
     rich_text: {
         allowNull: false,
@@ -54,6 +54,12 @@ const HcpConsents = sequelize.cdpConnector.define('hcp_consents', {
     },
     expired_at: {
         type: DataTypes.DATE
+    },
+    consent_source: {
+        allowNull: false,
+        type: DataTypes.ENUM,
+        values: ['website'],
+        defaultValue: 'website'
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,

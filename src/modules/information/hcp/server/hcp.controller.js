@@ -22,6 +22,7 @@ const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/pla
 const Filter = require(path.join(process.cwd(), "src/modules/core/server/filter/filter.model"));
 const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
+const hcpService = require('./services/hcp.service');
 const veevaService = require('./services/veeva.service');
 const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
 
@@ -693,9 +694,7 @@ async function createHcpProfile(req, res) {
         response.errors.push(new CustomError('specialty_onekey is invalid.', 400, 'specialty_onekey'));
     }
 
-    if (response.errors.length) {
-        return res.status(400).send(response);
-    }
+    if (response.errors.length) return res.status(400).send(response);
 
     try {
         const isEmailExists = await Hcp.findOne({ where: where(fn('lower', col('email')), fn('lower', email)) });
@@ -731,9 +730,7 @@ async function createHcpProfile(req, res) {
             response.errors.push(new CustomError('UUID already exists.', 4101, 'uuid'));
         }
 
-        if (response.errors.length) {
-            return res.status(400).send(response);
-        }
+        if (response.errors.length) return res.status(400).send(response);
 
         const countries = await Country.findAll({
             order: [
@@ -872,7 +869,7 @@ async function createHcpProfile(req, res) {
             response.data.retention_period = '1 hour';
         }
 
-        veevaService.syncHcpConsentsInVeeva(hcpUser);
+        await veevaService.syncHcpConsentsInVeeva(hcpUser);
 
         await logService.log({
             event_type: 'CREATE',
@@ -932,7 +929,7 @@ async function confirmConsents(req, res) {
             retention_period: '1 hour'
         };
 
-        veevaService.syncHcpConsentsInVeeva(hcpUser);
+        await veevaService.syncHcpConsentsInVeeva(hcpUser);
 
         res.json(response);
     } catch (err) {
@@ -1582,7 +1579,7 @@ async function getAccessToken(req, res) {
     }
 }
 
-async function updateHCPUserConsents(req, res) {
+async function updateHCPConsents(req, res) {
     const response = new Response({}, []);
 
     try {
@@ -1592,21 +1589,10 @@ async function updateHCPUserConsents(req, res) {
             response.errors.push(new CustomError('Invalid HCP User.', 400));
         }
 
-        if (response.errors.length) {
-            return res.status(400).send(response);
-        }
+        if (response.errors.length) return res.status(400).send(response);
 
         if (req.body.consents && req.body.consents.length) {
-            await Promise.all(req.body.consents.map(async x => {
-                const consentId = Object.keys(x)[0];
-                const consentResponse = Object.values(x)[0];
-
-                const hcpConsent = await HcpConsents.findOne({ where: { user_id: hcpUser.id, consent_id: consentId } });
-
-                if (!hcpConsent || consentResponse) return;
-
-                await hcpConsent.update({ opt_type: 'opt-out', consent_confirmed: false });
-            }));
+            await hcpService.updateConsents(hcpUser, req.body.consents, req.user);
         }
 
         response.data = {
@@ -1753,6 +1739,6 @@ exports.rejectHCPUser = rejectHCPUser;
 exports.getHCPUserConsents = getHCPUserConsents;
 exports.updateHcps = updateHcps;
 exports.getSpecialtiesWithEnglishTranslation = getSpecialtiesWithEnglishTranslation;
-exports.updateHCPUserConsents = updateHCPUserConsents;
+exports.updateHCPConsents = updateHCPConsents;
 exports.getSpecialtiesForCdp = getSpecialtiesForCdp;
 exports.getHcpsFromDatasync = getHcpsFromDatasync;
