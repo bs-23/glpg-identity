@@ -64,7 +64,7 @@ async function updateConsents(hcp, consent_response, actor) {
                     updated_by: actor.id
                 });
 
-                await hcpConsent.update({ expired_at: new Date() });
+                await hcpConsent.update({ expired_at: new Date(Date.now()) });
             }));
 
             if(consents.length) {

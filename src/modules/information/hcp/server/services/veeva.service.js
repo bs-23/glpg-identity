@@ -17,7 +17,7 @@ async function syncHcpConsentsInVeeva(user) {
                 user_id: user.id,
                 consent_confirmed: true
             },
-            attributes: ['id', 'consent_id', 'updated_at'],
+            attributes: ['id', 'consent_id', 'updated_at', 'veeva_multichannel_consent_id'],
             include: [{
                 model: Consent,
                 attributes: ['id'],
@@ -96,7 +96,7 @@ async function syncHcpConsentsInVeeva(user) {
                     if(hcpConsent.opt_type === 'opt-out') {
                         const multichannel_consents = account_multichannel_consents && account_multichannel_consents.find(x => x.CDP_Consent_ID__c === hcp_consent.id);
                         await Promise.all(multichannel_consents.map(async multichannel_consent => {
-                            await axios.patch(`${serviceUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c/${multichannel_consent.Id}`, { Opt_Expiration_Date_vod__c: '' }, { headers });
+                            await axios.patch(`${serviceUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c/${multichannel_consent.Id}`, { Opt_Expiration_Date_vod__c: new Date(Date.now()) }, { headers });
                         }));
                     }
                 }
