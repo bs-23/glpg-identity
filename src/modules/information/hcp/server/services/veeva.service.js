@@ -7,6 +7,18 @@ const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hc
 const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
 const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model'));
 const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model'));
+const searchUrl = nodecache.getValue('SALESFORCE_SERVICE_URL');
+
+async function existMultiChannelConsent(id, headers){
+    try{
+        await axios.get(`${searchUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c/${id}`, { headers });
+        return true;
+    }
+    catch(err){
+        logger.error(err);
+        return false;
+    }
+}
 
 async function syncHcpConsentsInVeeva(user) {
     if(!user.individual_id_onekey) return;
@@ -31,10 +43,8 @@ async function syncHcpConsentsInVeeva(user) {
                     }
                 ]
             }],
-            attributes: ['id', 'consent_id', 'updated_at']
+            attributes: ['id', 'consent_id', 'updated_at', 'veeva_multichannel_consent_id']
         });
-
-        const searchUrl = nodecache.getValue('SALESFORCE_SERVICE_URL');
 
         const auth = async function() {
             const grant_type = 'password';
@@ -68,8 +78,8 @@ async function syncHcpConsentsInVeeva(user) {
         if(hcp_consents && hcp_consents.length) {
             await Promise.all(hcp_consents.map(async hcp_consent => {
                 let mcc;
-                if(hcp_consent.veeva_consent_type_id){
-                    mcc = await axios.get(`${searchUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c/${hcp_consent.veeva_consent_type_id}`);
+                if(hcp_consent.veeva_multichannel_consent_id){
+                    mcc = await existMultiChannelConsent(hcp_consent.veeva_multichannel_consent_id, headers);
                 }
 
                 if(!mcc){

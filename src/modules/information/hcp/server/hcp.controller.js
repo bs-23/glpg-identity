@@ -1738,6 +1738,24 @@ async function getHcpsFromDatasync(req, res) {
     }
 }
 
+async function syncHCPUserConsents(req, res) {
+    try{
+        const { id } = req.params;
+        if (!id) res.status(400).send('ID is missing.');
+
+        const HcpUser = await Hcp.findOne({ where: { id: id } });
+        if(!HcpUser) res.status(404).send('Hcp user not found.');
+
+        veevaService.syncHcpConsentsInVeeva(HcpUser);
+
+        res.json('Successfully synced consents.');
+    }
+    catch(err){
+        logger.error(err);
+        res.status(500).send(err);
+    }
+}
+
 exports.getHcps = getHcps;
 exports.registrationLookup = registrationLookup;
 exports.createHcpProfile = createHcpProfile;
@@ -1756,3 +1774,4 @@ exports.getSpecialtiesWithEnglishTranslation = getSpecialtiesWithEnglishTranslat
 exports.updateHCPUserConsents = updateHCPUserConsents;
 exports.getSpecialtiesForCdp = getSpecialtiesForCdp;
 exports.getHcpsFromDatasync = getHcpsFromDatasync;
+exports.syncHCPUserConsents = syncHCPUserConsents;

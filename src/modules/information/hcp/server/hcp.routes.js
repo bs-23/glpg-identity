@@ -57,8 +57,12 @@ module.exports = app => {
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.getHCPUserConsents)
         .put(passport.authenticate('application-jwt', { session: false }), validate(updateHCPUserConsents), controller.updateHCPUserConsents);
 
+    app.route('/api/hcp-profiles/:id/sync-consents')
+        .get(CDPAuthStrategy, controller.syncHCPUserConsents)
+
     app.route('/api/hcp-profiles/:id')
         .get(passport.authenticate('application-jwt', { session: false }), controller.getHcpProfile);
+
 
     app.route('/api/datasync/hcps')
         .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.getHcpsFromDatasync);

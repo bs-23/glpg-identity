@@ -187,6 +187,23 @@ export default function hcpUsers() {
         setCurrentUser(user);
     }
 
+    const syncConsents = async (user) => {
+        try{
+            await axios.get(`/api/hcp-profiles/${user.id}/sync-consents`);
+
+            addToast('Successfully synced consents.', {
+                appearance: 'success',
+                autoDismiss: true
+            });
+        }
+        catch(err){
+            addToast(err, {
+                appearance: 'error',
+                autoDismiss: true
+            });
+        }
+    }
+
     const onTableRowSave = (user, tableProps) => {
         setShow({ ...show, saveConfirmation: true });
         setCurrentUser(user);
@@ -360,6 +377,7 @@ export default function hcpUsers() {
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(initialValues.rows[rowIndex])}>Profile</Dropdown.Item></LinkContainer>
+                    <LinkContainer to="#"><Dropdown.Item onClick={() => syncConsents(initialValues.rows[rowIndex])}>Sync Consents</Dropdown.Item></LinkContainer>
                     {row.status === 'not_verified' && <LinkContainer disabled={dirty} to="#"><Dropdown.Item onClick={() => onUpdateStatus(initialValues.rows[rowIndex])}>Manage Status</Dropdown.Item></LinkContainer>}
                 </Dropdown.Menu>
             </Dropdown>}
