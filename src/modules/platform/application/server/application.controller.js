@@ -116,11 +116,38 @@ async function getToken(req, res) {
 
 async function getApplications(req, res) {
     try {
+        const orderBy = req.query.orderBy
+            ? req.query.orderBy
+            : null;
+
+        const orderType = req.query.orderType === 'ASC' || req.query.orderType === 'DESC'
+            ? req.query.orderType
+            : 'ASC';
+
+        const order = [
+            ['created_at', 'DESC'],
+            ['id', 'DESC']
+        ];
+
+        const sortableColumns = Object.keys(Application.rawAttributes);
+
+        if (orderBy && sortableColumns.includes(orderBy)) {
+            order.splice(0, 0, [orderBy, orderType]);
+        }
+
+        if (orderBy === 'created_by') {
+            order.splice(0, 0, [{ model: User, as: 'createdByUser' }, 'first_name', orderType]);
+            order.splice(1, 0, [{ model: User, as: 'createdByUser' }, 'last_name', orderType]);
+        }
+
+        console.log(order)
+
         const applications = await Application.findAll({
             include: [
                 { model: User, as: 'createdByUser', attributes: ['id', 'first_name', 'last_name'] }
             ],
-            attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description', 'created_at']
+            attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description', 'created_at'],
+            order
         });
 
         res.json(applications);
