@@ -13,6 +13,7 @@ const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/
 const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 const Audit = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
 const storageService = require(path.join(process.cwd(), 'src/modules/core/server/storage/storage.service'));
+const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
 
 const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 
@@ -116,6 +117,9 @@ async function getToken(req, res) {
 async function getApplications(req, res) {
     try {
         const applications = await Application.findAll({
+            include: [
+                { model: User, as: 'createdByUser', attributes: ['id', 'first_name', 'last_name'] }
+            ],
             attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description', 'created_at']
         });
 
@@ -415,16 +419,14 @@ async function getApplicationLog(req, res) {
         const applicationID = req.params.id;
         const event_type = req.query.event_type || null;
         const page = req.query.page ? +req.query.page : 1;
-        const limit = 50;
+        const limit = 1;
         const offset = page ? (+page - 1) * limit : 0;
 
         const application = await Application.findOne({ where: { id: applicationID } });
 
         if (!application) return res.status(400).send('Application not found.');
 
-        console.log(offset, limit);
-
-        const applicationLog = await Audit.findAll({
+        const { count , rows: applicationLog } = await Audit.findAndCountAll({
             where: {
                 actor: applicationID,
                 ...(event_type ? { event_type } : null)
@@ -433,8 +435,39 @@ async function getApplicationLog(req, res) {
             offset,
             logging: console.log
         });
-        console.log(applicationLog);
-        res.json(applicationLog);
+
+        res.json({ data: applicationLog, metadata: { count }});
+    } catch(err) {
+        logger.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function exportApplicationLog(req, res) {
+    try {
+        const applicationID = req.params.id;
+        const event_type = req.query.event_type || null;
+
+        const application = await Application.findOne({ where: { id: applicationID } });
+
+        if (!application) return res.status(400).send('Application not found.');
+
+        const applicationLog = await Audit.findAll({
+            where: {
+                actor: applicationID,
+                ...(event_type ? { event_type } : null)
+            }
+        });
+
+        const sheetName = 'application-log';
+        const fileBuffer = ExportService.exportToExcel(applicationLog.map(app_log => app_log.dataValues), sheetName);
+
+        res.writeHead(200, {
+            'Content-Disposition': `attachment;filename=${sheetName.replace(' ', '_')}.xlsx`,
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+
+        res.end(fileBuffer);
     } catch(err) {
         logger.error(err);
         res.status(500).send('Internal server error');
@@ -450,3 +483,4 @@ exports.createApplication = createApplication;
 exports.getApplication = getApplication;
 exports.updateApplication = updateApplication;
 exports.getApplicationLog = getApplicationLog;
+exports.exportApplicationLog = exportApplicationLog;

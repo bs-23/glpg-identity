@@ -105,7 +105,8 @@ export default function ManageApplications() {
                                             <th width="10%" className="py-2">Type</th>
                                             <th width="5%" className="py-2">Is Active</th>
                                             <th width="30%" className="py-2">Description</th>
-                                            <th width="10%" className="py-2">Creation Date</th>
+                                            <th width="5%" className="py-2">Creation Date</th>
+                                            <th width="5%" className="py-2">Created By</th>
                                             <th width="5%" className="py-2">Action</th>
                                         </tr>
                                     </thead>
@@ -118,6 +119,7 @@ export default function ManageApplications() {
                                                 <td data-for="Is Active">{row.is_active ? 'Active' : 'Inactive'}</td>
                                                 <td data-for="Description">{row.description || '--'}</td>
                                                 <td data-for="Creation Date">{row.created_at ? (new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--'}</td>
+                                                <td data-for="Created By">{row.createdByUser.first_name + ' ' + row.createdByUser.last_name}</td>
                                                 <td data-for="Action">
                                                     <Dropdown className="dropdown-customize">
                                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
