@@ -44,7 +44,8 @@ const DatasyncHcpProfile = sequelize.datasyncConnector.define('vwhcpmaster', {
     specialty_2_long_description: { type: DataTypes.STRING },
     specialty_2_code: { type: DataTypes.STRING },
     specialty_3_long_description: { type: DataTypes.STRING },
-    specialty_3_code: { type: DataTypes.STRING }
+    specialty_3_code: { type: DataTypes.STRING },
+    personemail: { type: DataTypes.STRING }
 }, {
     schema: `ciam`,
     tableName: 'vwhcpmaster',

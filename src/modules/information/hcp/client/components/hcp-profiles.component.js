@@ -383,15 +383,6 @@ export default function hcpUsers() {
 
     const columns = [
         {
-            id: 'email',
-            name: 'Email',
-            unique: true,
-            onSort: generateSortHandler('email'),
-            fieldType: { name: 'email', maxLength: '100' },
-            width: "12%",
-            editable: (row) => ['manually_verified', 'self_verified'].includes(row.status)
-        },
-        {
             id: 'created_at',
             name: 'Date of Registration',
             editable: false,
@@ -400,6 +391,15 @@ export default function hcpUsers() {
             fieldType: { name: 'date' },
             CustomHeader: RegistrationHeader,
             width: "8%"
+        },
+        {
+            id: 'email',
+            name: 'Email',
+            unique: true,
+            onSort: generateSortHandler('email'),
+            fieldType: { name: 'email', maxLength: '100' },
+            width: "12%",
+            editable: (row) => ['manually_verified', 'self_verified'].includes(row.status)
         },
         {
             id: 'first_name',
