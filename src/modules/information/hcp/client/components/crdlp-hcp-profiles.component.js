@@ -238,6 +238,8 @@ export default function CrdlpHcpProfiles() {
 
                                                 <th width="10%">Phone</th>
 
+                                                <th width="10%">OneKeyID</th>
+
                                                 <th width="10%">Action</th>
                                             </tr>
                                         </thead>
@@ -265,6 +267,7 @@ export default function CrdlpHcpProfiles() {
                                                         }
                                                     </td>
                                                     <td data-for="Phone" className="text-break">{row.telephone || '--'}</td>
+                                                    <td data-for="OneKeyID" className="text-break">{row.individual_id_onekey || '--'}</td>
                                                     <td data-for="Action">
                                                         <button className="btn cdp-btn-outline-primary btn-sm" onClick={() => setProfileDetails(row)}><i class="icon icon-user mr-2" ></i>Profile</button>
                                                     </td>
