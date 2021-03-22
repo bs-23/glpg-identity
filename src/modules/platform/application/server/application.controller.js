@@ -117,6 +117,9 @@ async function getToken(req, res) {
 async function getApplications(req, res) {
     try {
         const applications = await Application.findAll({
+            include: [
+                { model: User, as: 'createdByUser', attributes: ['id', 'first_name', 'last_name'] }
+            ],
             attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description', 'created_at']
         });
 
