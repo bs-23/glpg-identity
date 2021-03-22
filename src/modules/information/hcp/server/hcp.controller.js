@@ -869,7 +869,7 @@ async function createHcpProfile(req, res) {
             response.data.retention_period = '1 hour';
         }
 
-        await veevaService.syncHcpConsentsInVeeva(hcpUser);
+        await veevaService.syncHcpConsentsInVeeva(hcpUser, req.user);
 
         await logService.log({
             event_type: 'CREATE',
@@ -929,7 +929,7 @@ async function confirmConsents(req, res) {
             retention_period: '1 hour'
         };
 
-        await veevaService.syncHcpConsentsInVeeva(hcpUser);
+        await veevaService.syncHcpConsentsInVeeva(hcpUser, req.user);
 
         res.json(response);
     } catch (err) {
@@ -1724,19 +1724,16 @@ async function getHcpsFromDatasync(req, res) {
     }
 }
 
-async function syncHCPUserConsents(req, res) {
-    try{
-        const { id } = req.params;
-        if (!id) res.status(400).send('ID is missing.');
+async function syncHCPConsentsInVeeva(req, res) {
+    try {
+        const hcp = await Hcp.findOne({ where: { id: req.params.id } });
 
-        const HcpUser = await Hcp.findOne({ where: { id: id } });
-        if(!HcpUser) res.status(404).send('Hcp user not found.');
+        if(!hcp) res.status(404).send('Hcp not found.');
 
-        veevaService.syncHcpConsentsInVeeva(HcpUser);
+        veevaService.syncHcpConsentsInVeeva(hcp, req.user);
 
-        res.json('Successfully synced consents.');
-    }
-    catch(err){
+        res.sendStatus(200);
+    } catch(err) {
         logger.error(err);
         res.status(500).send(err);
     }
@@ -1760,4 +1757,4 @@ exports.getSpecialtiesWithEnglishTranslation = getSpecialtiesWithEnglishTranslat
 exports.updateHCPConsents = updateHCPConsents;
 exports.getSpecialtiesForCdp = getSpecialtiesForCdp;
 exports.getHcpsFromDatasync = getHcpsFromDatasync;
-exports.syncHCPUserConsents = syncHCPUserConsents;
+exports.syncHCPConsentsInVeeva = syncHCPConsentsInVeeva;

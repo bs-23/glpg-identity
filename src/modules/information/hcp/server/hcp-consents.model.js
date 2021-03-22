@@ -50,6 +50,7 @@ const HcpConsents = sequelize.cdpConnector.define('hcp_consents', {
         type: DataTypes.UUID
     },
     veeva_multichannel_consent_id: {
+        unique: true,
         type: DataTypes.STRING(18)
     },
     expired_at: {

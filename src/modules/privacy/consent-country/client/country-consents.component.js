@@ -181,8 +181,7 @@ const CountryConsents = () => {
                         </div>
 
                         {
-                            getGroupedCountryConsents().map((countryConsent, countryConsentIndex) =>
-                            (
+                            getGroupedCountryConsents().map((countryConsent, countryConsentIndex) => (
                                 <div key={countryConsentIndex}>
                                     <div className="d-flex align-items-center text-white cdp-bg-primary-lighter px-3 py-2 cdp-table__responsive-sticky-panel-title">
                                         <img alt={countryConsent.name} src={countryConsent.flagUrl} height="18" className="mr-2" /> {countryConsent.name}
@@ -199,11 +198,10 @@ const CountryConsents = () => {
                                             </thead>
                                             <tbody className="cdp-table__body bg-white">
                                                 {
-                                                    countryConsent.consents.map((consent, coonsentIndex) =>
-                                                    (
+                                                    countryConsent.consents.map((consent, coonsentIndex) => (
                                                         <tr key={coonsentIndex}>
                                                             <td data-for="Preference/Purpose" className="text-break">
-                                                                    <span className="btn btn-link cdp-text-primary p-0 text-left cursor-pointer" onClick={() => showConsentDetailsModal(consent.id)}>
+                                                                <span className="btn btn-link cdp-text-primary p-0 text-left cursor-pointer" onClick={() => showConsentDetailsModal(consent.id)}>
                                                                     <i className="fas fa-caret-right mr-1"></i>{consent.preference} {consent.is_active ? '' : '(Inactive)'}
                                                                 </span>
                                                             </td>
@@ -219,26 +217,24 @@ const CountryConsents = () => {
                                                                                 </Popover.Content>
                                                                             </Popover>
                                                                         }
-
                                                                     >
                                                                         <span className="badge badge-secondary-light shadow-sm font-weight-bold-light mr-1 text-dark">{translation.locale}</span>
                                                                     </OverlayTrigger>
-                                                                ))}</td>
-                                                                <td data-for="Opt Type">{consent.optType.text}</td>
-                                                                <td data-for="Action">
-                                                                    <button className="btn btn-sm cdp-btn-outline-primary cdp-text-primary font-weight-bold-light mr-2" onClick={() => setEdit(consent)}><i className="fas fa-tasks px-2 px-lg-0"></i> <span className="ml-1 d-none d-lg-inline-block">Manage opt type</span></button>
-                                                                    <button onClick={() => setDeleteModal(consent.country_consent_id, consent.preference, countryConsent.name)} className="btn btn-sm cdp-btn-outline-secondary font-weight-bold-light"><i className="far fa-trash-alt px-2 px-lg-0"></i><span className="ml-1 d-none d-lg-inline-block">Remove</span></button>
+                                                                ))}
+                                                            </td>
+                                                            <td data-for="Opt Type">{consent.optType.text}</td>
+                                                            <td data-for="Action">
+                                                                <button className="btn btn-sm cdp-btn-outline-primary cdp-text-primary font-weight-bold-light mr-2" onClick={() => setEdit(consent)}><i className="fas fa-tasks px-2 px-lg-0"></i> <span className="ml-1 d-none d-lg-inline-block">Manage opt type</span></button>
+                                                                <button onClick={() => setDeleteModal(consent.country_consent_id, consent.preference, countryConsent.name)} className="btn btn-sm cdp-btn-outline-secondary font-weight-bold-light"><i className="far fa-trash-alt px-2 px-lg-0"></i><span className="ml-1 d-none d-lg-inline-block">Remove</span></button>
                                                             </td>
                                                         </tr>
-                                                    )
-                                                    )
+                                                    ))
                                                 }
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
-                            )
-                            )
+                            ))
                         }
 
                         <Modal centered show={showDelete} onHide={() => setShowDelete(false)}>
@@ -265,8 +261,8 @@ const CountryConsents = () => {
                     </div>
                 </div>
             </div>
-        </main >
+        </main>
     );
-}
+};
 
 export default CountryConsents;

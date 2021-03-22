@@ -1,16 +1,15 @@
-import React, { useEffect, useState, useRef } from "react";
-import { NavLink, useLocation, useHistory } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { useToasts } from 'react-toast-notifications';
-import { LinkContainer } from 'react-router-bootstrap';
-import Accordion from 'react-bootstrap/Accordion';
-import Dropdown from 'react-bootstrap/Dropdown';
-import Modal from 'react-bootstrap/Modal';
-import Card from 'react-bootstrap/Card';
-import axios from 'axios';
 import _ from 'lodash';
+import axios from 'axios';
 import parse from 'html-react-parser';
-import { OverlayTrigger, Popover } from 'react-bootstrap';
+import Card from 'react-bootstrap/Card';
+import Modal from 'react-bootstrap/Modal';
+import Dropdown from 'react-bootstrap/Dropdown';
+import Accordion from 'react-bootstrap/Accordion';
+import { useToasts } from 'react-toast-notifications';
+import { useSelector, useDispatch } from 'react-redux';
+import { LinkContainer } from 'react-router-bootstrap';
+import React, { useEffect, useState, useRef } from 'react';
+import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import Faq from '../../../../platform/faq/client/faq.component';
 import StatusupdateModal from '../../../../core/client/components/statusUpdateModal.component';
 import { getAllCountries } from '../../../../core/client/country/country.actions';
@@ -18,7 +17,7 @@ import { getHcpProfiles, getHCPSpecialities } from '../hcp.actions';
 import { HcpInlineEditSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
 import EditableTable from '../../../../core/client/components/EditableTable/EditableTable';
-import { HCPFilter } from "../../../../information";
+import { HCPFilter } from '../../../../information';
 
 const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     const [comment, setComment] = useState("");
@@ -32,11 +31,11 @@ const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     const handleSubmit = () => {
         values.rows[rowIndex].comment = comment;
         submitForm();
-    }
+    };
 
     const handleOnBlur = () => {
         setTouched(true);
-    }
+    };
 
     useEffect(() => {
         setComment('');
@@ -113,7 +112,7 @@ export default function hcpUsers() {
     const onUpdateStatus = (user) => {
         setCurrentUser(user);
         setShow({ ...show, updateStatus: true });
-    }
+    };
 
     const handleFilterExecute = async (multiFilterSetting) => {
         const filterID = multiFilterSetting.selectedSettingID;
@@ -131,7 +130,7 @@ export default function hcpUsers() {
                     filters: multiFilterSetting.filters,
                     logic: multiFilterSetting.logic
                 }
-            }
+            };
 
             if (filterID && shouldUpdateFilter) {
                 try {
@@ -158,12 +157,11 @@ export default function hcpUsers() {
                     return Promise.reject();
                 }
             }
-        }
-        else {
+        } else {
             history.push(`/information/list/cdp`);
         }
         setIsFilterEnabled(true);
-    }
+    };
 
     const loadHcpProfiles = (filterSetting) => {
         const requestBody = filterSetting && filterSetting.filters.length
@@ -187,34 +185,35 @@ export default function hcpUsers() {
         setCurrentUser(user);
     }
 
-    const syncConsents = async (user) => {
-        try{
-            await axios.get(`/api/hcp-profiles/${user.id}/sync-consents`);
+    const syncHcpConsentsInVeeva = async (user) => {
+        if(confirm('Are you sure you want to sync consents with Veeva CRM?')) {
+            try {
+                await axios.put(`/api/hcp-profiles/${user.id}/sync-consents-with-veeva`);
 
-            addToast('Successfully synced consents.', {
-                appearance: 'success',
-                autoDismiss: true
-            });
+                addToast('Consents are successfully synced with Veeva CRM.', {
+                    appearance: 'success',
+                    autoDismiss: true
+                });
+            } catch(err) {
+                addToast(err, {
+                    appearance: 'error',
+                    autoDismiss: true
+                });
+            }
         }
-        catch(err){
-            addToast(err, {
-                appearance: 'error',
-                autoDismiss: true
-            });
-        }
-    }
+    };
 
     const onTableRowSave = (user, tableProps) => {
         setShow({ ...show, saveConfirmation: true });
         setCurrentUser(user);
         setEditableTableProps({ ...editableTableProps, ...tableProps });
-    }
+    };
 
     const getCountryName = (country_iso2) => {
         if (!allCountries || !country_iso2) return null;
         const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
         return country && country.countryname;
-    }
+    };
 
     const renderUuidAuthorities = () => {
         const authorityDropdown = (authorities) => {
@@ -251,13 +250,11 @@ export default function hcpUsers() {
                 return authorityDropdown(authorityByCountry);
             }
 
-            return authorityByCountry.map(authority =>
-            (
+            return authorityByCountry.map(authority => (
                 <a key={authority.link} className="mr-3" role="button" onClick={() => openAuthorityLink(authority.link)}>
                     <img src={authority.logo} title={authority.name + " Logo"} alt={authority.name} height={authority.heightSingle} />
                 </a>
-            )
-            );
+            ));
         }
 
         return authorityDropdown(uuidAuthorities);
@@ -280,14 +277,14 @@ export default function hcpUsers() {
     const openAuthorityLink = (link) => {
         if (!link) return;
         window.open(link, 'name', 'width=600,height=400');
-    }
+    };
 
     const openDiscoverHcpsWindow = (hcp) => {
         const width = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) * 0.8;
         const height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) * 0.9;
         window.open(`/information/discover-professionals?id=${hcp.id}`, 'name', `width=${width || 600},height=${height || 400}`);
         setSelectedRow(hcp.id);
-    }
+    };
 
     const getSpecialtyOptions = async (value, row) => {
         const { country_iso2, locale } = row;
@@ -303,7 +300,7 @@ export default function hcpUsers() {
         }));
 
         return options;
-    }
+    };
 
     const getSpecialtyDescription = (specialty_onekey, row) => {
         const { locale, country_iso2 } = row;
@@ -321,36 +318,34 @@ export default function hcpUsers() {
         }
 
         return row.specialty_description;
-    }
+    };
 
     const handleSpecialtyChange = async (updatedValue, oldValue, row, formikProps, { rowIndex }) => {
         const sp_desc = getSpecialtyDescription(updatedValue, row);
         formikProps.values.rows[rowIndex].specialty_description = sp_desc;
-    }
+    };
 
     const formatDate = (date) => {
         return (new Date(date)).toLocaleDateString('en-GB').replace(/\//g, '.')
-    }
+    };
 
     const submitHandler = ({ getUpdatedCells }, done) => {
         const updatedCells = getUpdatedCells(["id", "comment"]);
-        axios.put('/api/hcp-profiles/update-hcps', updatedCells)
-            .then(({ data }) => {
-                addToast('Successfully saved changes.', {
-                    appearance: 'success',
-                    autoDismiss: true
-                });
-                done(data.data);
-                setShow({ ...show, saveConfirmation: false });
-            })
-            .catch(err => {
-                addToast('Could not save changes. Please correct the following errors.', {
-                    appearance: 'error',
-                    autoDismiss: true
-                });
-                done(null, err.response.data.errors);
+        axios.put('/api/hcp-profiles/update-hcps', updatedCells).then(({ data }) => {
+            addToast('Successfully saved changes.', {
+                appearance: 'success',
+                autoDismiss: true
             });
-    }
+            done(data.data);
+            setShow({ ...show, saveConfirmation: false });
+        }).catch(err => {
+            addToast('Could not save changes. Please correct the following errors.', {
+                appearance: 'error',
+                autoDismiss: true
+            });
+            done(null, err.response.data.errors);
+        });
+    };
 
     const generateSortHandler = (columnName) => () => urlChange(1, hcps.codBase, params.get('status'), columnName);
 
@@ -366,18 +361,18 @@ export default function hcpUsers() {
                         : status === 'rejected'
                             ? <span><i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>Rejected</span>
                             : <span></span>
-    }
+    };
 
     const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps: editProps }) => {
         const { dirty, resetForm, initialValues, isValid } = formikProps;
 
         return <div className="position-relative" title={tableDirty ? "Save or reset changes to perform actions" : null}>
             {!hasRowChanged && <Dropdown className={`dropdown-customize ${dirty ? 'hcp-inline-disable' : ''}`}>
-                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
+                <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(initialValues.rows[rowIndex])}>Profile</Dropdown.Item></LinkContainer>
-                    <LinkContainer to="#"><Dropdown.Item onClick={() => syncConsents(initialValues.rows[rowIndex])}>Sync Consents</Dropdown.Item></LinkContainer>
+                    {row.status === 'self_verified' && <LinkContainer disabled={dirty} to="#"><Dropdown.Item onClick={() => syncHcpConsentsInVeeva(initialValues.rows[rowIndex])}>Sync with VeevaCRM</Dropdown.Item></LinkContainer>}
                     {row.status === 'not_verified' && <LinkContainer disabled={dirty} to="#"><Dropdown.Item onClick={() => onUpdateStatus(initialValues.rows[rowIndex])}>Manage Status</Dropdown.Item></LinkContainer>}
                 </Dropdown.Menu>
             </Dropdown>}
@@ -390,14 +385,14 @@ export default function hcpUsers() {
                 </>
             }
         </div>
-    }
+    };
 
     const RegistrationHeader = () => {
         return <span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type && sort.type.toLowerCase()}` : 'cdp-table__col-sorting'} >
             Date of <br /> Registration
             {!tableDirty && <i onClick={generateSortHandler('created_at')} className="icon icon-sort cdp-table__icon-sorting"></i>}
         </span>
-    }
+    };
 
     const columns = [
         {
@@ -500,26 +495,26 @@ export default function hcpUsers() {
         setIsFilterEnabled(false);
         await hcpFilterRef.current.multiFilterProps.resetFilter();
         history.push(location.pathname);
-    }
+    };
 
     const getQueryString = () => {
         const params1 = new URLSearchParams(location.search);
         params1.delete('status');
         const queryString = params1.toString();
         return '?' + queryString;
-    }
+    };
 
     const handleTableDirtyStatusChange = (dirty) => {
         setTableDirty(dirty);
         window.tableDirty = dirty;
-    }
+    };
 
     const alertUserBeforeClosingWindow = (e) => {
         if (window.tableDirty) {
             e.preventDefault();
             e.returnValue = '';
         }
-    }
+    };
 
     useEffect(() => {
         dispatch(getAllCountries());
@@ -535,13 +530,13 @@ export default function hcpUsers() {
         const urlParams = new URLSearchParams(location.search);
         const filterID = urlParams.get('filter');
 
-        if (filterID) axios.get(`/api/filter/${filterID}`)
-            .then(res => {
+        if (filterID) {
+            axios.get(`/api/filter/${filterID}`).then(res => {
                 setSelectedFilterSetting(res.data);
                 setIsFilterEnabled(true);
                 loadHcpProfiles(res.data.settings);
-            })
-        else {
+            });
+        } else {
             let filterSetting;
 
             if (location.state && location.state.filterSetting) {
@@ -549,8 +544,7 @@ export default function hcpUsers() {
 
                 setIsFilterEnabled(true);
                 setSelectedFilterSetting({ settings: filterSetting });
-            }
-            else {
+            } else {
                 const { filters, logic } = hcpFilterRef.current.multiFilterProps.values || {};
 
                 filterSetting = filters && filters.length
