@@ -416,16 +416,14 @@ async function getApplicationLog(req, res) {
         const applicationID = req.params.id;
         const event_type = req.query.event_type || null;
         const page = req.query.page ? +req.query.page : 1;
-        const limit = 50;
+        const limit = 1;
         const offset = page ? (+page - 1) * limit : 0;
 
         const application = await Application.findOne({ where: { id: applicationID } });
 
         if (!application) return res.status(400).send('Application not found.');
 
-        console.log(offset, limit);
-
-        const applicationLog = await Audit.findAll({
+        const { count , rows: applicationLog } = await Audit.findAndCountAll({
             where: {
                 actor: applicationID,
                 ...(event_type ? { event_type } : null)
@@ -434,8 +432,8 @@ async function getApplicationLog(req, res) {
             offset,
             logging: console.log
         });
-        console.log(applicationLog);
-        res.json(applicationLog);
+
+        res.json({ data: applicationLog, metadata: { count }});
     } catch(err) {
         logger.error(err);
         res.status(500).send('Internal server error');

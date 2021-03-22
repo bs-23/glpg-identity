@@ -6,49 +6,55 @@ const ApplicationLog = (props) => {
     const { id } = props;
     const [applicationLog, setApplicationLog] = useState([]);
     const [currentEvent, setCurrentEvent] = useState(null);
+    const [totalLogCount, setTotalLogCount] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const limit = 1;
 
     const showDateTime = (date) => {
         var today = new Date(date);
         var date = today.getDate()+'.'+(today.getMonth()+1)+'.'+today.getFullYear();
         var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-        var dateTime = date+' at '+time;
+        var dateTime = date+' '+time;
         return dateTime;
     }
 
     const getLogText = (log) => {
         const { event_type, table_name, event_time } = log;
         if (event_type === 'CREATE') {
-            return `Created a record in the table ${table_name} at ${showDateTime(event_time)}`;
+            return `Created a record in the table ${table_name}.`;
         }
         if (event_type === 'DELETE') {
-            return `Deleted a record in the table ${table_name} at ${showDateTime(event_time)}`;
+            return `Deleted a record in the table ${table_name}.`;
         }
         if (event_type === 'UPDATED') {
-            return `Updated a record in the table ${table_name} at ${showDateTime(event_time)}`;
+            return `Updated a record in the table ${table_name}.`;
         }
         if (event_type === 'LOGIN') {
-            return `Logged in to the system at ${showDateTime(event_time)}`;
+            return `Logged in to the system.`;
         }
         if (event_type === 'LOGOUT') {
-            return `Logged out of the system at ${showDateTime(event_time)}`;
+            return `Logged out of the system.`;
         }
         if (event_type === 'UNAUTHORIZE') {
-            return `Made unauthorized request at ${showDateTime(event_time)}`;
+            return `Made unauthorized request.`;
         }
         if (event_type === 'BAD_REQUEST') {
-            return `Made a bad request at ${showDateTime(event_time)}`;
+            return `Made a bad request.`;
         }
     }
 
     const getApplicationLog = async function() {
         const queryObject = new URLSearchParams('');
 
+        queryObject.append('page', currentPage);
         currentEvent && queryObject.append('event_type', currentEvent);
 
         const queryString = queryObject.toString();
 
         const { data } = await axios.get(`/api/applications/${id}/log${queryString ? '?' + queryString : ''}`);
-        setApplicationLog(data);
+        setApplicationLog(data.data);
+        setTotalLogCount(data.metadata.count);
     }
 
     const onApplicationExport = () => {
@@ -81,7 +87,7 @@ const ApplicationLog = (props) => {
 
     useEffect(() => {
         getApplicationLog();
-    }, [currentEvent]);
+    }, [currentEvent, currentPage]);
 
     return <div>
         <select onChange={(e) => setCurrentEvent(e.target.value)}>
@@ -98,9 +104,22 @@ const ApplicationLog = (props) => {
         {
             applicationLog.length
                 ? applicationLog.map(log => {
-                    return <div key={log.id}>{getLogText(log)}</div>
+                    return <div key={log.id}>
+                        <span className="font-weight-bold">{showDateTime(log.event_time)}: </span>
+                        {getLogText(log)}
+                    </div>
                 })
                 : <div>No log found.</div>
+        }
+        {((currentPage === 1 &&
+            totalLogCount > limit) ||
+            (currentPage > 1))
+            && applicationLog.length &&
+            <div className="pagination justify-content-end align-items-center border-top p-3">
+                <span className="cdp-text-primary font-weight-bold">{(currentPage-1) * limit + ' - ' + currentPage * limit}</span> <span className="text-muted pl-1 pr-2"> {' of ' + totalLogCount}</span>
+                <span className="pagination-btn" onClick={() => setCurrentPage(currentPage-1)} disabled={currentPage <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
+                <span className="pagination-btn" onClick={() => setCurrentPage(currentPage+1)} disabled={currentPage * limit === totalLogCount}><i className="icon icon-arrow-down ml-2 next"></i></span>
+            </div>
         }
     </div>
 }
