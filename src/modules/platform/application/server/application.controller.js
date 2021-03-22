@@ -13,6 +13,7 @@ const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/
 const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 const Audit = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
 const storageService = require(path.join(process.cwd(), 'src/modules/core/server/storage/storage.service'));
+const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
 
 const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 
@@ -441,6 +442,37 @@ async function getApplicationLog(req, res) {
     }
 }
 
+async function exportApplicationLog(req, res) {
+    try {
+        const applicationID = req.params.id;
+        const event_type = req.query.event_type || null;
+
+        const application = await Application.findOne({ where: { id: applicationID } });
+
+        if (!application) return res.status(400).send('Application not found.');
+
+        const applicationLog = await Audit.findAll({
+            where: {
+                actor: applicationID,
+                ...(event_type ? { event_type } : null)
+            }
+        });
+
+        const sheetName = 'application-log';
+        const fileBuffer = ExportService.exportToExcel(applicationLog.map(app_log => app_log.dataValues), sheetName);
+
+        res.writeHead(200, {
+            'Content-Disposition': `attachment;filename=${sheetName.replace(' ', '_')}.xlsx`,
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+
+        res.end(fileBuffer);
+    } catch(err) {
+        logger.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getToken = getToken;
 exports.getApplications = getApplications;
 exports.saveData = saveData;
@@ -450,3 +482,4 @@ exports.createApplication = createApplication;
 exports.getApplication = getApplication;
 exports.updateApplication = updateApplication;
 exports.getApplicationLog = getApplicationLog;
+exports.exportApplicationLog = exportApplicationLog;
