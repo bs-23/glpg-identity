@@ -2,6 +2,7 @@ import React from 'react';
 import { Switch, useRouteMatch } from 'react-router-dom';
 import PrivateRoute from '../core/client/PrivateRoute';
 import MarketingManagement from './marketing-management.component';
+import { Campaigns } from './campaign';
 
 export default function MarketingRoutes() {
     let { path } = useRouteMatch();
@@ -9,7 +10,7 @@ export default function MarketingRoutes() {
     return (
         <Switch>
             <PrivateRoute exact path={path} component={MarketingManagement} module={'marketing-and-promotional'} />
-            {/* <PrivateRoute path={`${path}/list/cdp`} component={HcpUsers} module={'manage-hcp'} /> */}
+            <PrivateRoute path={`${path}/mass-mailing`} component={Campaigns} module={'mass-mailing-management'} />
         </Switch>
     );
 }

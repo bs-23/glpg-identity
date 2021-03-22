@@ -6,10 +6,10 @@ const initialState = {
 
 export default function reducer(state = initialState, action) {
     switch (action.type) {
-        case Types.GET_CAMPAIGNS: {
+        case Types.GET_CAMPAIGNS_FULFILLED: {
             return {
                 ...state,
-                hcps: action.payload.data.data
+                campaigns: action.payload.data
             };
         }
     }
