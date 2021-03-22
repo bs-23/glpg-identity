@@ -45,11 +45,29 @@ function invalidEmail(email) {
     return true;
 }
 
+function invalidName(name) {
+    const invalidChars = ["É", "Ë", "Ï", "Ó", "Ö", "Ü", "é", "ë", "ï", "ó", "ö", "ü",
+        "À", "È", "É", "Ì", "Ò", "Ó", "Ù", "à", "è", "é", "ì", "ò", "ó", "ù",
+        "Ä", "Ö", "Ü", "ẞ", "ä", "ö", "ü", "ß",
+        "À", "Â", "Æ", "Ç", "É", "È", "Ê", "Ë", "Ï", "Î", "Ô", "Œ", "Ù", "Û", "Ü", "Ÿ",
+        "à", "â", "æ", "ç", "é", "è", "ê", "ë", "ï", "î", "ô", "œ", "ù", "û", "ü", "ÿ"
+
+    ];
+    if (name) {
+        if (new RegExp(invalidChars.join("|")).test(name)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 export const HcpInlineEditSchema = object().shape({
     first_name: string()
         .matches(XRegExp('^[\\pL.-]+(?:\\s[\\pL.]+)*$'), 'This field only contains letters')
         .min(2, 'This field must be at least 2 characters long.')
         .max(50, 'This field must be at most 50 characters long.')
+        .test('invalid-email', 'Special character is not allowed)',
+            name => invalidName(name))
         .required('This field must not be empty.'),
     last_name: string()
         .matches(XRegExp('^[\\pL.-]+(?:\\s[\\pL.]+)*$'), 'This field only contains letters')
@@ -65,6 +83,7 @@ export const HcpInlineEditSchema = object().shape({
         .max(100, 'This field must be at most 100 characters long.')
         .required('This field must not be empty.'),
     uuid: string()
+        .min(2, 'This field must be at least 2 characters long.')
         .max(20, 'This field must be at most 20 characters long.')
         .required('This field must not be empty.'),
     country_iso2: string()
