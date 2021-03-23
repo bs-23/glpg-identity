@@ -3,6 +3,8 @@ import parse from 'html-react-parser';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import axios from 'axios';
 import { useToasts } from 'react-toast-notifications';
+import Card from 'react-bootstrap/Card';
+import Accordion from 'react-bootstrap/Accordion';
 import { ConsentSyncSchema } from '../hcp.schema';
 
 const VeevaConsentSync = ({ userID, consents, onClose }) => {
@@ -16,7 +18,6 @@ const VeevaConsentSync = ({ userID, consents, onClose }) => {
         return dateTime;
     }
 
-    console.log(userID, consents)
     return <div>
         <Formik
             initialValues={{
@@ -47,24 +48,26 @@ const VeevaConsentSync = ({ userID, consents, onClose }) => {
                 <Form onSubmit={formikProps.handleSubmit}>
                     <div className="table-responsive shadow-sm bg-white mb-3 cdp-table__responsive-wrapper">
                         <div><span className="font-weight-bold">Most Recent Consent Sync Time: </span>{consents && showDateTime(consents[0].latestConsentSyncTime)}</div>
-                        <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
-                            <thead className="cdp-bg-primary text-white cdp-table__header">
-                                <tr>
-                                    <th width="12%">Preference</th>
-                                    <th width="12%">Rich Text</th>
-                                    <th width="12%">Opt Type</th>
-                                </tr>
-                            </thead>
-                            <tbody className="cdp-table__body bg-white">
-                                {(consents|| []).map(row => (
-                                    <tr key={row.id}>
-                                        <td data-for="Preference" className="text-break">{row.preference}</td>
-                                        <td data-for="Rich Text" className="text-break">{parse(row.rich_text)}</td>
-                                        <td data-for="Opt Type" className="text-break">{row.opt_type}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        <div className="mt-2 mb-2">
+                            <div className="col accordion-consent rounded p-0">
+                                <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
+                                {consents && consents.length ? <Accordion>{consents.map(consent =>
+                                    <Card key={consent.id}>
+                                        <Accordion.Collapse eventKey={consent.id}>
+                                            <Card.Body>
+                                                <div>{parse(consent.rich_text)}</div>
+                                                <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Opt-Type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
+                                                <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Updated on:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
+                                            </Card.Body>
+                                        </Accordion.Collapse>
+                                        <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
+                                            <span className="d-flex align-items-center"><i className={`icon ${consent.consent_given ? 'icon-check-filled' : 'icon-close-circle text-danger'} cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.preference}</span></span>
+                                            <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
+                                        </Accordion.Toggle>
+                                    </Card>
+                                )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent.</div>}
+                            </div>
+                        </div>
                         <div className="col-12 col-sm-12">
                             <div className="form-group mb-0">
                                 <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
