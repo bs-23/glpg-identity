@@ -10,6 +10,10 @@ const Data = require('./data.model');
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
+const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
+const Audit = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
+const storageService = require(path.join(process.cwd(), 'src/modules/core/server/storage/storage.service'));
+const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
 
 const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 
@@ -112,8 +116,38 @@ async function getToken(req, res) {
 
 async function getApplications(req, res) {
     try {
+        const orderBy = req.query.orderBy
+            ? req.query.orderBy
+            : null;
+
+        const orderType = req.query.orderType === 'ASC' || req.query.orderType === 'DESC'
+            ? req.query.orderType
+            : 'ASC';
+
+        const order = [
+            ['created_at', 'DESC'],
+            ['id', 'DESC']
+        ];
+
+        const sortableColumns = Object.keys(Application.rawAttributes);
+
+        if (orderBy && sortableColumns.includes(orderBy)) {
+            order.splice(0, 0, [orderBy, orderType]);
+        }
+
+        if (orderBy === 'created_by') {
+            order.splice(0, 0, [{ model: User, as: 'createdByUser' }, 'first_name', orderType]);
+            order.splice(1, 0, [{ model: User, as: 'createdByUser' }, 'last_name', orderType]);
+        }
+
+        console.log(order)
+
         const applications = await Application.findAll({
-            attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description', 'created_at']
+            include: [
+                { model: User, as: 'createdByUser', attributes: ['id', 'first_name', 'last_name'] }
+            ],
+            attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description', 'created_at'],
+            order
         });
 
         res.json(applications);
@@ -132,10 +166,12 @@ async function getApplication(req, res) {
                 { model: User, as: 'createdByUser', attributes: ['id', 'first_name', 'last_name'] },
                 { model: User, as: 'updatedByUser', attributes: ['id', 'first_name', 'last_name'] }
             ],
-            attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description', 'metadata']
+            attributes: ['id', 'name', 'type', 'email', 'is_active', 'slug', 'description', 'metadata', 'logo_url']
         });
 
-        res.json(application);
+        const logo_url = `${nodecache.getValue('S3_BUCKET_URL')}/application/${application.id}/${application.logo_url}`;
+
+        res.json({ ...application.dataValues, logo_url });
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
@@ -155,6 +191,8 @@ async function createApplication(req, res) {
             metadata
         } = req.body;
 
+        const logo = req.files[0];
+
         if (!email) return res.status(400).send('Must provide email.');
 
         if (!password || !confirm_password) return res.status(400).send('Must provide password and confirm password.');
@@ -167,13 +205,13 @@ async function createApplication(req, res) {
 
         if (hasApplicationWithSameName) return res.status(400).send('Application with the same name already exists.');
 
-        const hasApplicationWithSameEmail = application = await Application.findOne({
+        const hasApplicationWithSameEmail = await Application.findOne({
             where: { email: { [Op.iLike]: email } }
         });
 
         if (hasApplicationWithSameEmail) return res.status(400).send('Application with the same email already exists.');
 
-        await Application.create({
+        const application = await Application.create({
             name,
             slug: convertToSlug(name),
             type: type || null,
@@ -181,10 +219,34 @@ async function createApplication(req, res) {
             is_active,
             description: (description || '').trim(),
             password,
-            metadata,
+            metadata: JSON.parse(metadata),
             created_by: req.user.id,
             updated_by: req.user.id
         });
+
+        const bucketURL = nodecache.getValue('S3_BUCKET_URL');
+        const bucketName = bucketURL.split('.')[0].split('//')[1];
+
+        const uploadOptions = {
+            bucket: bucketName,
+            folder: `application/${application.id}/`,
+            fileName: `logo${path.extname(logo.originalname)}`,
+            fileContent: logo.buffer
+        };
+
+        const storageServiceResponse = await storageService.upload(uploadOptions);
+
+        await File.create({
+            name: `logo${path.extname(logo.originalname)}`,
+            bucket_name: bucketName,
+            key: storageServiceResponse.key,
+            owner_id: application.id,
+            table_name: 'applications'
+        });
+
+        await application.update({ logo_url: `logo${path.extname(logo.originalname)}` });
+
+        console.log(storageServiceResponse);
 
         res.json(application);
     } catch (err) {
@@ -203,7 +265,10 @@ async function updateApplication(req, res) {
             description,
             metadata
         } = req.body;
+
         const application_id = req.params.id;
+
+        const logo = req.files[0];
 
         const application = await Application.findOne({
             where: { id: application_id }
@@ -236,9 +301,48 @@ async function updateApplication(req, res) {
             email: email && email.toLowerCase(),
             is_active,
             description: description && description.trim(),
-            metadata,
+            metadata: JSON.parse(metadata),
             updated_by: req.user.id
         });
+
+        if (logo) {
+            const bucketURL = nodecache.getValue('S3_BUCKET_URL');
+            const bucketName = bucketURL.split('.')[0].split('//')[1];
+            const previousKey = `application/${application.id}/${application.logo_url}`;
+
+            const deleteParam = {
+                Bucket: bucketName,
+                Delete: {
+                    Objects: [{ Key: previousKey }]
+                }
+            };
+
+            await storageService.deleteFiles(deleteParam);
+
+            const uploadOptions = {
+                bucket: bucketName,
+                folder: `application/${application.id}/`,
+                fileName: `logo${path.extname(logo.originalname)}`,
+                fileContent: logo.buffer
+            };
+
+            const storageServiceResponse = await storageService.upload(uploadOptions);
+
+            // Update file name extension and key
+            const key = `application/${application.id}/${logo.logo_url}`;
+            const logoFile = await File.findOne({ where: { key }});
+
+            if (logoFile) {
+                await logoFile.update({
+                    name: `logo${path.extname(logo.originalname)}`,
+                    key: storageServiceResponse.key
+                });
+            }
+
+            await application.update({ logo_url: `logo${path.extname(logo.originalname)}` });
+
+            console.log(storageServiceResponse);
+        }
 
         res.json(application);
     } catch (err) {
@@ -337,6 +441,66 @@ async function clearApplicationCache() {
     }
 }
 
+async function getApplicationLog(req, res) {
+    try {
+        const applicationID = req.params.id;
+        const event_type = req.query.event_type || null;
+        const page = req.query.page ? +req.query.page : 1;
+        const limit = 1;
+        const offset = page ? (+page - 1) * limit : 0;
+
+        const application = await Application.findOne({ where: { id: applicationID } });
+
+        if (!application) return res.status(400).send('Application not found.');
+
+        const { count , rows: applicationLog } = await Audit.findAndCountAll({
+            where: {
+                actor: applicationID,
+                ...(event_type ? { event_type } : null)
+            },
+            limit,
+            offset,
+            logging: console.log
+        });
+
+        res.json({ data: applicationLog, metadata: { count }});
+    } catch(err) {
+        logger.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function exportApplicationLog(req, res) {
+    try {
+        const applicationID = req.params.id;
+        const event_type = req.query.event_type || null;
+
+        const application = await Application.findOne({ where: { id: applicationID } });
+
+        if (!application) return res.status(400).send('Application not found.');
+
+        const applicationLog = await Audit.findAll({
+            where: {
+                actor: applicationID,
+                ...(event_type ? { event_type } : null)
+            }
+        });
+
+        const sheetName = 'application-log';
+        const fileBuffer = ExportService.exportToExcel(applicationLog.map(app_log => app_log.dataValues), sheetName);
+
+        res.writeHead(200, {
+            'Content-Disposition': `attachment;filename=${sheetName.replace(' ', '_')}.xlsx`,
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+
+        res.end(fileBuffer);
+    } catch(err) {
+        logger.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getToken = getToken;
 exports.getApplications = getApplications;
 exports.saveData = saveData;
@@ -345,3 +509,5 @@ exports.clearApplicationCache = clearApplicationCache;
 exports.createApplication = createApplication;
 exports.getApplication = getApplication;
 exports.updateApplication = updateApplication;
+exports.getApplicationLog = getApplicationLog;
+exports.exportApplicationLog = exportApplicationLog;

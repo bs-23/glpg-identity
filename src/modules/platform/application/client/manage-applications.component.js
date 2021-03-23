@@ -10,18 +10,19 @@ import { getApplications } from './application.actions';
 import { useDispatch, useSelector } from "react-redux";
 import ApplicationForm from './application-form.component';
 import ApplicationDetailsModal from "./application-details.component";
+import { ApplicationLog } from '../../../platform';
 
 export default function ManageApplications() {
     const [modalShow, setModalShow] = useState({
         createApplication: false,
-        applicationDetails: false
+        applicationDetails: false,
+        applicationLog: false
     });
     const [isEditing, setIsEditing] = useState(false);
-    // const [permissionSetDetailID, setPermissionSetDetailID] = useState(null);
     const [applicationId, setApplicationId] = useState(null);
     const [showFaq, setShowFaq] = useState(false);
+    const [sort, setSort] = useState({ value: null, type: 'ASC' });
     const dispatch = useDispatch();
-
     const applications = useSelector(state => state.applicationReducer.applications);
 
     const handleCloseFaq = () => setShowFaq(false);
@@ -43,11 +44,21 @@ export default function ManageApplications() {
         setApplicationId(null);
     }
 
-    const handlepEditClick = (data) => {
+    const handleEditClick = (data) => {
         setIsEditing(true);
         setApplicationId(data.id);
         setModalShow({ ...modalShow, createApplication: true });
     }
+
+    useEffect(() => {
+        const query = new URLSearchParams('');
+
+        if (sort.value) {
+            query.append('orderBy', sort.value);
+            if (sort.type === 'DESC') query.append('orderType', sort.type);
+            dispatch(getApplications(query.toString() ?  '?' + query.toString() : ''));
+        }
+    }, [sort]);
 
     useEffect(() => {
         dispatch(getApplications());
@@ -98,17 +109,53 @@ export default function ManageApplications() {
                             <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
-                                            <th width="20%" className="py-2">Name</th>
-                                            <th width="20%" className="py-2">Email</th>
-                                            <th width="10%" className="py-2">Type</th>
-                                            <th width="5%" className="py-2">Is Active</th>
-                                            <th width="30%" className="py-2">Description</th>
-                                            <th width="10%" className="py-2">Creation Date</th>
+                                            <th width="20%" className="py-2">
+                                                <span className={sort.value === 'name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => setSort({ value: 'name', type: sort.type === 'ASC' ? 'DESC' : 'ASC' })}>
+                                                    Name
+                                                    <i className="icon icon-sort cdp-table__icon-sorting"></i>
+                                                </span>
+                                            </th>
+                                            <th width="20%" className="py-2">
+                                                <span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => setSort({ value: 'email', type: sort.type === 'ASC' ? 'DESC' : 'ASC' })}>
+                                                    Email
+                                                    <i className="icon icon-sort cdp-table__icon-sorting"></i>
+                                                </span>
+                                            </th>
+                                            <th width="10%" className="py-2">
+                                                <span className={sort.value === 'type' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => setSort({ value: 'type', type: sort.type === 'ASC' ? 'DESC' : 'ASC' })}>
+                                                    Type
+                                                    <i className="icon icon-sort cdp-table__icon-sorting"></i>
+                                                </span>
+                                            </th>
+                                            <th width="5%" className="py-2">
+                                                <span className={sort.value === 'is_active' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => setSort({ value: 'is_active', type: sort.type === 'ASC' ? 'DESC' : 'ASC' })}>
+                                                    Is Active
+                                                    <i className="icon icon-sort cdp-table__icon-sorting"></i>
+                                                </span>
+                                            </th>
+                                            <th width="30%" className="py-2">
+                                                <span className={sort.value === 'description' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => setSort({ value: 'description', type: sort.type === 'ASC' ? 'DESC' : 'ASC' })}>
+                                                    Description
+                                                    <i className="icon icon-sort cdp-table__icon-sorting"></i>
+                                                </span>
+                                            </th>
+                                            <th width="5%" className="py-2">
+                                                <span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => setSort({ value: 'created_at', type: sort.type === 'ASC' ? 'DESC' : 'ASC' })}>
+                                                    Creation Date
+                                                    <i className="icon icon-sort cdp-table__icon-sorting"></i>
+                                                </span>
+                                            </th>
+                                            <th width="5%" className="py-2">
+                                                <span className={sort.value === 'created_by' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => setSort({ value: 'created_by', type: sort.type === 'ASC' ? 'DESC' : 'ASC' })}>
+                                                    Created By
+                                                    <i className="icon icon-sort cdp-table__icon-sorting"></i>
+                                                </span>
+                                            </th>
                                             <th width="5%" className="py-2">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
-                                        {applications.map(row => (
+                                        {(applications || []).map(row => (
                                             <tr key={row.id}>
                                                 <td data-for="Title">{row.name}</td>
                                                 <td data-for="Email">{row.email}</td>
@@ -116,13 +163,14 @@ export default function ManageApplications() {
                                                 <td data-for="Is Active">{row.is_active ? 'Active' : 'Inactive'}</td>
                                                 <td data-for="Description">{row.description || '--'}</td>
                                                 <td data-for="Creation Date">{row.created_at ? (new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.') : '--'}</td>
+                                                <td data-for="Created By">{row.createdByUser.first_name + ' ' + row.createdByUser.last_name}</td>
                                                 <td data-for="Action">
                                                     <Dropdown className="dropdown-customize">
                                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1">
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <LinkContainer to="#">
-                                                                <Dropdown.Item onClick={() => handlepEditClick(row)}>Edit</Dropdown.Item>
+                                                                <Dropdown.Item onClick={() => handleEditClick(row)}>Edit</Dropdown.Item>
                                                             </LinkContainer>
                                                             <LinkContainer to="#">
                                                                 <Dropdown.Item
@@ -135,6 +183,16 @@ export default function ManageApplications() {
                                                                     }
                                                                 >
                                                                     Details
+                                                                </Dropdown.Item>
+                                                            </LinkContainer>
+                                                            <LinkContainer to="#">
+                                                                <Dropdown.Item
+                                                                    onClick={() => {
+                                                                        setApplicationId(row.id);
+                                                                        setModalShow({ ...modalShow, applicationLog: true })}
+                                                                    }
+                                                                >
+                                                                    Log
                                                                 </Dropdown.Item>
                                                             </LinkContainer>
                                                         </Dropdown.Menu>
@@ -178,6 +236,26 @@ export default function ManageApplications() {
                                 />
                             </Modal.Body>
                         </Modal>
+
+                        <Modal
+                            show={modalShow.applicationLog}
+                            onHide={() => { setModalShow({ ...modalShow, applicationLog: false }) }}
+                            dialogClassName="modal-90w modal-customize"
+                            aria-labelledby="example-custom-modal-styling-title"
+                            size="lg"
+                            centered
+                            size="xl"
+                        >
+                            <Modal.Header closeButton>
+                                <Modal.Title id="example-custom-modal-styling-title">
+                                    Application Log
+                                </Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <ApplicationLog id={applicationId} />
+                            </Modal.Body>
+                        </Modal>
+
                         <ApplicationDetailsModal
                             applicationId={applicationId}
                             show={modalShow.applicationDetails}

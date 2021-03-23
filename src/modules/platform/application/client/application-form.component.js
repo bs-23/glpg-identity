@@ -28,7 +28,8 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
     const [application, setApplication] = useState({});
 
     const metadataOptions = {
-        standard: [
+        "standard": [],
+        "business-partner": [
             "request_notification_link"
         ],
         "hcp-portal": [
@@ -57,24 +58,41 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
         return metadataObject;
     }
 
+    const handleFileChange = (e, formikProps) => {
+        const selectedLogoFile = e.target.files[0];
+        formikProps.setFieldValue('logo', selectedLogoFile);
+
+        const logoImageTag = document.getElementById('logo');
+        const reader = new FileReader();
+
+        reader.addEventListener('load', function() {
+            logoImageTag.src = reader.result;
+        });
+
+        if (selectedLogoFile) {
+            reader.readAsDataURL(selectedLogoFile);
+        }
+    }
+
     const renderMetadata = (formikProps) => {
         const { metadata } = formikProps.values;
 
         if (!metadata) return null;
 
         return <div>
-            <span className="cursor-pointer btn cdp-btn-secondary text-white btn-sm my-2" onClick={() => {
+            {/* <span className="cursor-pointer btn cdp-btn-secondary text-white btn-sm my-2" onClick={() => {
                 const metadata = [...formikProps.values.metadata];
                 metadata.push({ key:'', value:'' });
                 formikProps.setFieldValue('metadata', metadata);
             }}>
                 <i className="icon icon-plus"></i> <span className="pl-1">Add Property</span>
-            </span>
+            </span> */}
             {
                 metadata.map((item, ind) => {
                     return <div key={ind} className="row mb-3">
                         <div className="col-12 col-md-5">
-                            <Field  // input field for key
+                            <label>{item.key}</label>
+                            {/* <Field  // input field for key
                                 as="select"
                                 value={item.key}
                                 className="form-control"
@@ -94,7 +112,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                     }
                                 </>
                             </Field>
-                            <div className="invalid-feedback"><ErrorMessageForArray name={`metadata[${ind}].key`} /></div>
+                            <div className="invalid-feedback"><ErrorMessageForArray name={`metadata[${ind}].key`} /></div> */}
                         </div>
                         <div className="col-12 col-md-5">
                             <Field  // input field for value
@@ -110,7 +128,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                             />
                             <div className="invalid-feedback"><ErrorMessageForArray name={`metadata[${ind}].value`} /></div>
                         </div>
-                        <div className="col-12 col-md-2">
+                        {/* <div className="col-12 col-md-2">
                             <span
                                 onClick={() => {
                                     const updatedMetadata = formikProps.values.metadata.filter((item, index) => ind !== index);
@@ -120,7 +138,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                             >
                                 <i class="fas fa-times"></i>
                             </span>
-                        </div>
+                        </div> */}
                     </div>
                 })
             }
@@ -128,13 +146,19 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
     }
 
     const handleSubmit = (values, actions) => {
-        const payload = { ...values };
+        let payload = { ...values };
 
-        payload.metadata = convertMetadataArrayToObject(values.metadata);
+        payload.metadata = JSON.stringify(convertMetadataArrayToObject(values.metadata));
+
+        var form_data = new FormData();
+
+        for (const key in payload) {
+            form_data.append(key, payload[key]);
+        }
 
         const promise = isEditing
-            ? axios.put(`/api/applications/${applicationId}`, payload)
-            : axios.post('/api/applications', payload);
+            ? axios.put(`/api/applications/${applicationId}`, form_data)
+            : axios.post('/api/applications', form_data);
 
         promise.then(() => {
             const successMessage = isEditing
@@ -225,13 +249,17 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                                     name="type"
                                                     as="select"
                                                     onChange={e => {
-                                                        formikProps.setFieldValue('metadata', []);
+                                                        const type = e.target.value;
+                                                        const keys = metadataOptions[type];
+
+                                                        formikProps.setFieldValue('metadata', keys.map(key => ({ key: key, value: '' })));
                                                         formikProps.handleChange(e);
                                                     }}
                                                 >
                                                     <option value="">--Select a type--</option>
                                                     <option value="standard">Standard</option>
                                                     <option value="hcp-portal">HCP Portal</option>
+                                                    <option value="business-partner">Business Partner</option>
                                                 </Field>
                                                 <div className="invalid-feedback"><ErrorMessage name="type"/></div>
                                             </div>
@@ -264,6 +292,22 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                     <div className="col-12">
                                         <div className="row">
                                             <FormField label="Description" type="text" name="description" component="textarea" required={false} />
+                                        </div>
+                                    </div>
+                                    <div className="col-12">
+                                        <label className="font-weight-bold" htmlFor="logo">Logo</label>
+                                        <div className="row align-items-center">
+                                            <div className="col-12 col-sm-6">
+                                                <div className="custom-file">
+                                                    <input className="custom-file-input" id="customFile" type="file" name="logo" onChange={e => handleFileChange(e, formikProps)} />
+                                                    <label className="custom-file-label" for="customFile">Choose file</label>
+                                                </div>
+                                            </div>
+                                            <div className="col-12 col-sm-6">
+                                                <div className="form-group">
+                                                    <img src={(application || {}).logo_url} id="logo" width="300" />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="col-12">
