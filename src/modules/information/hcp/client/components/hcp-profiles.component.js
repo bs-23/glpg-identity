@@ -17,7 +17,7 @@ import { getHcpProfiles, getHCPSpecialities } from '../hcp.actions';
 import { HcpInlineEditSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
 import EditableTable from '../../../../core/client/components/EditableTable/EditableTable';
-import { HCPFilter } from '../../../../information';
+import { HCPFilter, VeevaConsentSync } from '../../../../information';
 
 const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     const [comment, setComment] = useState("");
@@ -186,21 +186,8 @@ export default function hcpUsers() {
     }
 
     const syncHcpConsentsInVeeva = async (user) => {
-        if(confirm('Are you sure you want to sync consents with Veeva CRM?')) {
-            try {
-                await axios.put(`/api/hcp-profiles/${user.id}/sync-consents-with-veeva`);
-
-                addToast('Consents are successfully synced with Veeva CRM.', {
-                    appearance: 'success',
-                    autoDismiss: true
-                });
-            } catch(err) {
-                addToast(err, {
-                    appearance: 'error',
-                    autoDismiss: true
-                });
-            }
-        }
+        setShow({ ...show, syncConsent: true });
+        setCurrentUser(user);
     };
 
     const onTableRowSave = (user, tableProps) => {
@@ -751,6 +738,29 @@ export default function hcpUsers() {
                                     setShow({ ...show, updateStatus: false });
                                 }}
                             />
+
+                            <Modal
+                                size="lg"
+                                show={show.syncConsent}
+                                onShow={getConsentsForCurrentUser}
+                                onHide={() => { setShow({ ...show, syncConsent: false }) }}
+                                dialogClassName="modal-customize mw-75"
+                                aria-labelledby="example-custom-modal-styling-title"
+                                centered
+                            >
+                                <Modal.Header closeButton>
+                                    <Modal.Title id="example-custom-modal-styling-title">
+                                        Sync Consents
+                                    </Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <VeevaConsentSync
+                                        userID={currentUser.id}
+                                        consents={currentUser.consents}
+                                        onClose={() => { setShow({ ...show, syncConsent: false }) }}
+                                    />
+                                </Modal.Body>
+                            </Modal>
 
                             <SaveConfirmation
                                 show={show.saveConfirmation}

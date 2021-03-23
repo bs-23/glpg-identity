@@ -95,3 +95,10 @@ export const HcpInlineEditSchema = object().shape({
         .max(25, 'This field must be at most 25 characters long')
         .nullable()
 });
+
+export const ConsentSyncSchema = object().shape({
+    comment: string()
+        .transform(value => value.trim())
+        .max(500, 'This field must be at most 500 characters long.')
+        .required('This field must not be empty.')
+});

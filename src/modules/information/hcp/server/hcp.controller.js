@@ -25,6 +25,7 @@ const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston')
 const hcpService = require('./services/hcp.service');
 const veevaService = require('./services/veeva.service');
 const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
+const Audit = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model.js'));
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -1137,6 +1138,16 @@ async function getHCPUserConsents(req, res) {
 
         if (!userConsents.length) return res.json([]);
 
+        const latestConsentSyncTime = await Audit.max(
+            'event_time',
+            {
+                where: {
+                    event_type: 'SYNC_CONSENTS_WITH_VEEVA',
+                    object_id: doc.id
+                }
+            }
+        );
+
         response.data = userConsents.map(userConsent => {
             return {
                 consent_given: userConsent.consent_confirmed,
@@ -1144,7 +1155,8 @@ async function getHCPUserConsents(req, res) {
                 id: userConsent.consent_id,
                 opt_type: userConsent.opt_type,
                 preference: userConsent.consent.preference,
-                rich_text: userConsent.rich_text
+                rich_text: userConsent.rich_text,
+                latestConsentSyncTime
             };
         });
 
@@ -1732,6 +1744,14 @@ async function syncHCPConsentsInVeeva(req, res) {
         if(!hcp) res.status(404).send('Hcp not found.');
 
         veevaService.syncHcpConsentsInVeeva(hcp, req.user);
+
+        logService.log({
+            event_type: 'SYNC_CONSENTS_WITH_VEEVA',
+            object_id: hcp.id,
+            table_name: 'hcp_profiles',
+            actor: req.user.id,
+            remarks: req.body.comment.trim()
+        });
 
         res.sendStatus(200);
     } catch(err) {

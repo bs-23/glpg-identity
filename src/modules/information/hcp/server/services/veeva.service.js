@@ -92,13 +92,18 @@ async function syncHcpConsentsInVeeva(hcp, actor) {
                     }, { headers });
 
                     const hcpConsent = await HcpConsents.findOne({ where: { id: hcp_consent.id }});
+                    const previousConsentValue = {...hcpConsent.dataValues};
+
                     await hcpConsent.update({ veeva_multichannel_consent_id: data.id });
+
+                    const updatesInConsent = auditService.difference(hcpConsent.dataValues, previousConsentValue);
 
                     auditService.log({
                         event_type: 'UPDATE',
                         object_id: hcp.id,
                         table_name: 'hcp_consents',
-                        actor: actor.id
+                        actor: actor.id,
+                        changes: updatesInConsent
                     });
 
                     if(hcpConsent.opt_type === 'opt-out') {

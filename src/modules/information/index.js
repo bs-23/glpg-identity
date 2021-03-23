@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, useRouteMatch } from 'react-router-dom';
-import { HCPClientRoutes, hcpReducer, HCPUsers, CrdlpHcpProfiles, InformationManagement,SearchOrganizationHCP, SearchProfessionalHCP, HCPFilter } from './hcp';
+import { HCPClientRoutes, hcpReducer, HCPUsers, CrdlpHcpProfiles, InformationManagement,SearchOrganizationHCP, SearchProfessionalHCP, HCPFilter, VeevaConsentSync } from './hcp';
 
 export function InformationRoutes() {
     const { path } = useRouteMatch();
@@ -19,5 +19,6 @@ export {
     InformationManagement,
     SearchOrganizationHCP,
     SearchProfessionalHCP,
-    HCPFilter
+    HCPFilter,
+    VeevaConsentSync
 };
