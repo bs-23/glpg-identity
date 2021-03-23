@@ -8,6 +8,7 @@ const HcpProfile = require(path.join(process.cwd(), 'src/modules/information/hcp
 const ConsentCountries = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model'));
 const Partner = require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner.model'));
 const PartnerVendor = require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-vendor.model'));
+const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
 
 function ignoreCaseArray(str) {
     if (Array.isArray(str)) {
@@ -25,9 +26,26 @@ function ignoreCaseArray(str) {
 
 async function getStatistics(req, res) {
     try {
-        const { country } = req.query;
+        let { country } = req.query;
+        let evaluatedCountries = [];
 
-        const countryIgnoreCase = ignoreCaseArray(country);
+        const countryData = await Country.findAll();
+
+        if (!Array.isArray(country)) {
+            country = [country];
+        }
+
+        country.map(c => {
+            const countryDetails = countryData.find(cd => cd.country_iso2.toLowerCase() === c.toLowerCase());
+            if (countryDetails) {
+                const countryWithSameCodbase = countryData.filter(cd => cd.codbase === countryDetails.codbase);
+                countryWithSameCodbase.forEach(cwsc => evaluatedCountries.push(cwsc.country_iso2));
+            }
+        });
+
+        evaluatedCountries = [...new Set(evaluatedCountries)];
+
+        const countryIgnoreCase = ignoreCaseArray(evaluatedCountries);
 
         const hcps_count = await HCP.count({ where: { country_iso2: countryIgnoreCase } });
 
