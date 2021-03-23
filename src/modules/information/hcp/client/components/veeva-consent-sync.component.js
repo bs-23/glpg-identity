@@ -77,7 +77,10 @@ const VeevaConsentSync = ({ userID, consents, onClose }) => {
                                 <div className="invalid-feedback"><ErrorMessage name="comment" /></div>
                             </div>
                         </div>
-                        <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Sync with VeevaCRM</button>
+                        <div className="ml-3 mr-3">
+                            <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Sync with VeevaCRM</button>
+                            <span className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" onClick={() => onClose()}>Cancel</span>
+                        </div>
                     </div>
                 </Form>
             )}

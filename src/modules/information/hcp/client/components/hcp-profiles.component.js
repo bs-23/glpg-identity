@@ -359,7 +359,9 @@ export default function hcpUsers() {
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(initialValues.rows[rowIndex])}>Profile</Dropdown.Item></LinkContainer>
-                    {row.status === 'self_verified' && <LinkContainer disabled={dirty} to="#"><Dropdown.Item onClick={() => syncHcpConsentsInVeeva(initialValues.rows[rowIndex])}>Sync with VeevaCRM</Dropdown.Item></LinkContainer>}
+                    {(row.status === 'self_verified' || row.status === 'manually_verified') && row.individual_id_onekey &&
+                        <LinkContainer disabled={dirty} to="#"><Dropdown.Item onClick={() => syncHcpConsentsInVeeva(initialValues.rows[rowIndex])}>Sync with VeevaCRM</Dropdown.Item></LinkContainer>
+                    }
                     {row.status === 'not_verified' && <LinkContainer disabled={dirty} to="#"><Dropdown.Item onClick={() => onUpdateStatus(initialValues.rows[rowIndex])}>Manage Status</Dropdown.Item></LinkContainer>}
                 </Dropdown.Menu>
             </Dropdown>}
@@ -750,7 +752,7 @@ export default function hcpUsers() {
                             >
                                 <Modal.Header closeButton>
                                     <Modal.Title id="example-custom-modal-styling-title">
-                                        Sync Consents
+                                        Are you sure you want to sync consents with Veeva CRM?
                                     </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
