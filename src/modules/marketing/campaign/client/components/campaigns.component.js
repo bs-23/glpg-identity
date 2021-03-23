@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Modal from 'react-bootstrap/Modal';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Popover from 'react-bootstrap/Popover';
-import parse from 'html-react-parser';
 
 import Faq from '../../../../platform/faq/client/faq.component';
 import { getCampaigns } from '../campaign.actions';
@@ -13,12 +10,14 @@ import { getCampaigns } from '../campaign.actions';
 
 const CampaignsComponent = () => {
     const dispatch = useDispatch();
+    const location = useLocation();
+    const history = useHistory();
 
     const [showFaq, setShowFaq] = useState(false);
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
 
-    const campaigns = useSelector(state => state.campaignReducer.campaigns);
+    const campaignList = useSelector(state => state.campaignReducer.campaignList);
 
     const getFormattedDate = (dateString) => {
         const pad2 = (n) => (n < 10 ? '0' + n : n);
@@ -36,9 +35,42 @@ const CampaignsComponent = () => {
         return `${day} ${monthName} ${year}`;
     }
 
+    const deleteCampaign = (campaign) => {
+        alert(campaign.title);
+    };
+
+    const pageLeft = () => {
+        if (campaignList.page > 1)
+            urlChange(campaignList.page - 1);
+    };
+
+    const pageRight = () => {
+        if (campaignList.end !== campaignList.total)
+            urlChange(campaignList.page + 1);
+    };
+
+    const urlChange = (pageNo) => {
+        const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
+        const search = new URLSearchParams();
+        page && search.append('page', page);
+
+        const url = location.pathname + search
+            ? `?${search.toString()}`
+            : '';
+
+        history.push(url);
+    };
+
     useEffect(() => {
-        dispatch(getCampaigns());
-    }, []);
+        const searchObj = {};
+        const searchParams = location.search.slice(1).split("&");
+
+        searchParams.forEach(element => {
+            searchObj[element.split("=")[0]] = element.split("=")[1];
+        });
+
+        dispatch(getCampaigns(searchObj.page));
+    }, [location]);
 
     return (
         <main className="app__content cdp-light-bg h-100">
@@ -82,7 +114,7 @@ const CampaignsComponent = () => {
                             </div>
                         </div>
 
-                        {campaigns && campaigns.length > 0 &&
+                        {campaignList && campaignList.campaigns && campaignList.campaigns.length > 0 &&
                             <div className="table-responsive shadow-sm bg-white mb-3 cdp-table__responsive-wrapper">
                                 <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
@@ -92,26 +124,32 @@ const CampaignsComponent = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
-                                        {campaigns.map((row, index) => (
+                                        {campaignList.campaigns.map((campaign, index) => (
                                             <tr key={index}>
                                                 <td data-for="Title">
-                                                    <b>{row.title}</b>
+                                                    <b>{campaign.title}</b>
                                                     <br />
-                                                    {getFormattedDate(row.sendTime)}
+                                                    {getFormattedDate(campaign.sendTime)}
                                                     <br />
-                                                    {row.previewText}
+                                                    {campaign.previewText}
                                                 </td>
-                                                <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
-                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-2 px-sm-1 dropdown-toggle ">
-                                                    </Dropdown.Toggle>
-                                                    <Dropdown.Menu>
-
-                                                    </Dropdown.Menu>
-                                                </Dropdown></td>
+                                                <td data-for="Action">
+                                                    <a className="link-with-underline cursor-pointer" onClick={() => deleteCampaign(campaign)}>Delete</a>
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
+                                {((campaignList.page === 1 &&
+                                    campaignList.total > campaignList.limit) ||
+                                    (campaignList.page > 1))
+                                    && campaignList.campaigns &&
+                                    <div className="pagination justify-content-end align-items-center border-top p-3">
+                                        <span className="cdp-text-primary font-weight-bold">{campaignList.start + ' - ' + campaignList.end}</span> <span className="text-muted pl-1 pr-2"> {' of ' + campaignList.total}</span>
+                                        <span className="pagination-btn" onClick={() => pageLeft()} disabled={campaignList.page <= 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
+                                        <span className="pagination-btn" onClick={() => pageRight()} disabled={campaignList.end === campaignList.total}><i className="icon icon-arrow-down ml-2 next"></i></span>
+                                    </div>
+                                }
                             </div>
                         }
                     </div>

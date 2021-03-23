@@ -1,7 +1,7 @@
 import Types from './campaign.types';
 
 const initialState = {
-    campaigns: []
+    campaignList: {}
 };
 
 export default function reducer(state = initialState, action) {
@@ -9,7 +9,7 @@ export default function reducer(state = initialState, action) {
         case Types.GET_CAMPAIGNS_FULFILLED: {
             return {
                 ...state,
-                campaigns: action.payload.data
+                campaignList: action.payload.data
             };
         }
     }

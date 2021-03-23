@@ -11,24 +11,39 @@ const auth = {
 
 async function getCampaigns(req, res) {
     try {
-        let url = `${nodecache.getValue('MAILCHIMP_BASE_URL')}/campaigns`;
+        const page = req.query.page ? +req.query.page - 1 : 0;
+        const limit = req.query.limit ? +req.query.limit : 5;
+        const offset = page * limit;
+
+        let url = `${nodecache.getValue('MAILCHIMP_BASE_URL')}/campaigns?sort_field=create_time&sort_dir=DESC&count=${limit}&offset=${offset}`;
         const response = await axios.get(url, { auth });
-        const { campaigns } = response.data;
-        const data = campaigns.map(campaign => {
+
+        const campaigns = response.data.campaigns.map(campaign => {
             return {
+                id: campaign.id,
                 title: campaign.settings.title,
                 previewText: campaign.settings.preview_text,
                 subject: campaign.settings.subject_line,
-                status: campaign.delivery_status.status,
+                status: campaign.status,
+                type: campaign.type,
                 emailsSent: campaign.delivery_status.emails_sent,
                 sendTime: campaign.send_time,
                 campaign
             };
         });
-
+        const total = response.data.total_items;
+        const data = {
+            campaigns,
+            total,
+            page: page + 1,
+            limit,
+            start: limit * page + 1,
+            end: offset + limit > total ? total : offset + limit
+        };
         res.json(data);
     } catch (error) {
         logger.error(error);
+        res.status(500).send('Internal server error');
     }
 }
 
