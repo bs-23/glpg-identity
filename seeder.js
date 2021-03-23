@@ -128,11 +128,11 @@ async function init() {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
-                    const platform = Service.findOne({ where: { slug: 'platform' }});
-                    const information = Service.findOne({ where: { slug: 'information' }});
-                    const privacy = Service.findOne({ where: { slug: 'privacy' }});
-                    const businessPartner = Service.findOne({ where: { slug: 'business-partner' }});
-                    const clinicalTrials = Service.findOne({ where: { slug: 'clinical-trials' }});
+                    const platform = Service.findOne({ where: { slug: 'platform' } });
+                    const information = Service.findOne({ where: { slug: 'information' } });
+                    const privacy = Service.findOne({ where: { slug: 'privacy' } });
+                    const businessPartner = Service.findOne({ where: { slug: 'business-partner' } });
+                    const clinicalTrials = Service.findOne({ where: { slug: 'clinical-trials' } });
 
                     Promise.all([platform, information, privacy, businessPartner, clinicalTrials]).then(values => {
                         const [platform, information, privacy, businessPartner, clinicalTrials] = values;
@@ -155,7 +155,8 @@ async function init() {
                             { title: "Manage New Consent", slug: "manage-consent", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
                             { title: "Configure Consent Category", slug: "consent-category", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
                             { title: "Assign Consent to Country", slug: "consent-country", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
-                            { title: "Generate Data Privacy & Consent Performance Report", slug: "consent-performance", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id }
+                            { title: "Generate Data Privacy & Consent Performance Report", slug: "consent-performance", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
+                            { title: "Import Consents", slug: "import-consents", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id }
                         ];
 
                         const clinicalTrialsServices = [
