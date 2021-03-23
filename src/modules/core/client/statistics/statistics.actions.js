@@ -10,3 +10,9 @@ export function getStatistics(query = '') {
         })
     };
 }
+
+export function clearStatistics() {
+    return {
+        type: Types.CLEAR_STATISTICS
+    }
+}

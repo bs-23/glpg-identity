@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Select, { components } from 'react-select';
-import { getStatistics } from './statistics.actions';
+import { getStatistics, clearStatistics } from './statistics.actions';
 
 export default function HotStatistic() {
     const dispatch = useDispatch();
@@ -46,6 +46,8 @@ export default function HotStatistic() {
             selectedCountryCodes.forEach(sc => query.append('country', sc));
 
             dispatch(getStatistics(`?${query.toString()}`));
+        } else {
+            dispatch(clearStatistics());
         }
     }, [selectedCountries]);
 
@@ -91,19 +93,19 @@ export default function HotStatistic() {
                     />
                     <div className="col-6 col-md-4 hot-statistics__box pb-4">
                         <div className="hot-statistics__title pb-3">Total HCP Users</div>
-                        <div className="hot-statistics__amount">{statistics.hcps_count}</div>
+                        <div className="hot-statistics__amount">{statistics.hcps_count || 0}</div>
                     </div>
                     <div className="col-6 col-md-4 hot-statistics__box pb-4">
                         <div className="hot-statistics__title pb-3">Total Consents</div>
-                        <div className="hot-statistics__amount">{statistics.consents_count}</div>
+                        <div className="hot-statistics__amount">{statistics.consents_count || 0}</div>
                     </div>
                     <div className="col-6 col-md-4 hot-statistics__box pb-4">
                         <div className="hot-statistics__title pb-3"> Total Captured Consents</div>
-                        <div className="hot-statistics__amount">{statistics.captured_consents_count}</div>
+                        <div className="hot-statistics__amount">{statistics.captured_consents_count || 0}</div>
                     </div>
                     <div className="col-6 col-md-4 hot-statistics__box pb-4">
                         <div className="hot-statistics__title pb-3"> Total Busniess Partners</div>
-                        <div className="hot-statistics__amount">{statistics.business_partner_count}</div>
+                        <div className="hot-statistics__amount">{statistics.business_partner_count || 0}</div>
                     </div>
                     <div className="col-6 col-md-4 hot-statistics__box pb-4">
                         <div className="hot-statistics__title pb-3"> Total Campaigns</div>
