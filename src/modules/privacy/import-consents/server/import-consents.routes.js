@@ -3,7 +3,7 @@ const controller = require('./import-consents.controller');
 const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware.js'));
 const { Services } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
 const { ServiceGuard } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.middleware'));
-const multer = require(path.join(process.cwd(), 'src/config/server/lib/multer'));
+const multer = require(path.join(process.cwd(), 'src/config/server/lib/multer-csv'));
 const { validateFile } = require('./import-consents.schema');
 
 module.exports = app => {

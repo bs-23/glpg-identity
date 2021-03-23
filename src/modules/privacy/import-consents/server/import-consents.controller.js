@@ -1,6 +1,6 @@
 async function bulkImportConsents(req, res) {
     try {
-        const file = req;
+        const file = req.files;
 
         console.log(file);
 
