@@ -1,8 +1,8 @@
 const path = require('path');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model.js'));
-const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
+const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model'));
+const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const Consent = sequelize.cdpConnector.define('consents', {

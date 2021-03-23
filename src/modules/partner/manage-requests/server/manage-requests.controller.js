@@ -1,11 +1,12 @@
 const path = require('path');
-const PartnerRequest = require('./partner-request.model');
-const Application = require('./../../../platform/application/server/application.model');
 const { Op } = require('sequelize');
-const ArchiveService = require(path.join(process.cwd(), 'src/modules/core/server/archive/archive.service.js'));
-const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
+
+const PartnerRequest = require('./partner-request.model');
+const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
+const ArchiveService = require(path.join(process.cwd(), 'src/modules/core/server/archive/archive.service.js'));
+const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
 async function getPartnerRequests(req, res) {
@@ -53,7 +54,7 @@ async function createPartnerRequest(req, res) {
             email,
             mdr_id,
             country_iso2,
-            language,
+            locale,
             uuid,
             is_supplier,
             is_customer,
@@ -77,7 +78,7 @@ async function createPartnerRequest(req, res) {
             email,
             mdr_id,
             country_iso2,
-            locale: language.toLowerCase() + "_" + country_iso2.toUpperCase(),
+            locale,
             created_by: req.user.id,
             updated_by: req.user.id,
         };
@@ -139,8 +140,13 @@ async function getPartnerRequest(req, res) {
 
 async function sendForm(req, res) {
     try {
+        const { id } = req.params;
+
+        const partnerRequest = await PartnerRequest.findOne({ where: { id } })
+
+        if (!partnerRequest) return res.status(400).send('Partner Request not found.');
+
         const {
-            id,
             application_id,
             first_name,
             last_name,
@@ -148,11 +154,12 @@ async function sendForm(req, res) {
             partner_type,
             country_iso2,
             locale
-        } = req.body;
+        } = partnerRequest.dataValues;
 
         const userApplication = await Application.findOne({ where: { id: application_id } });
         const jwt_token = jwt.sign({
-            request_id: id
+            request_id: id,
+            status: 'new'
         }, userApplication.auth_secret, {
             expiresIn: '1h'
         });
@@ -172,7 +179,7 @@ async function sendForm(req, res) {
             attributes: ['metadata']
         });
 
-        const sendFormLink = JSON.parse(metaData[0].dataValues.metadata).request_notification_link;
+        const sendFormLink = metaData[0].dataValues.metadata.request_notification_link;
 
         await axios.post(sendFormLink, payload);
         res.json('Form sent successfully.');

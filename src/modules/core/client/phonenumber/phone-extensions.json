@@ -1,0 +1,74 @@
+[
+    {
+        "countryCallingCode": "376",
+        "countryCode": "AD",
+        "countryNameEn": "Andorra",
+        "region": "Europe"
+    },
+    {
+        "countryCallingCode": "880",
+        "countryCode": "BD",
+        "countryNameEn": "Bangladesh",
+        "region": "Asia & Pacific"
+    },
+    {
+        "countryCallingCode": "32",
+        "countryCode": "BE",
+        "countryNameEn": "Belgium",
+        "region": "Europe"
+    },
+    {
+        "countryCallingCode": "49",
+        "countryCode": "DE",
+        "countryNameEn": "Germany",
+        "region": "Europe"
+    },
+    {
+        "countryCallingCode": "34",
+        "countryCode": "ES",
+        "countryNameEn": "Spain",
+        "region": "Europe"
+    },
+    {
+        "countryCallingCode": "33",
+        "countryCode": "FR",
+        "countryNameEn": "France",
+        "region": "Europe"
+    },
+    {
+        "countryCallingCode": "353",
+        "countryCode": "IE",
+        "countryNameEn": "Ireland",
+        "region": "Europe"
+    },
+    {
+        "countryCallingCode": "39",
+        "countryCode": "IT",
+        "countryNameEn": "Italy",
+        "region": "Europe"
+    },
+    {
+        "countryCallingCode": "352",
+        "countryCode": "LU",
+        "countryNameEn": "Luxembourg",
+        "region": "Europe"
+    },
+    {
+        "countryCallingCode": "377",
+        "countryCode": "MC",
+        "countryNameEn": "Monaco",
+        "region": "Europe"
+    },
+    {
+        "countryCallingCode": "31",
+        "countryCode": "NL",
+        "countryNameEn": "Netherlands",
+        "region": "Europe"
+    },
+    {
+        "countryCallingCode": "44",
+        "countryCode": "GB",
+        "countryNameEn": "United Kingdom",
+        "region": "Europe"
+    }
+]

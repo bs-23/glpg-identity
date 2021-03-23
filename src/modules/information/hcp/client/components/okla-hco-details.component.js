@@ -27,8 +27,8 @@ const OklaHcoDetails = ({ hco, setSelectedHco }) => {
     }, [hco]);
 
     return <Modal
-        dialogClassName='custom-modal-size'
         centered
+        size="xl"
         show={!!hcoDetails}
         onHide={() => hideHcoDetails()}>
         <Modal.Header closeButton>
@@ -46,35 +46,35 @@ const OklaHcoDetails = ({ hco, setSelectedHco }) => {
                                     <strong className="okla-search__details-title">Name</strong>
                                     <span className="okla-search__details-value">{hcoDetails.name || '--'}</span>
                                 </div>
-                                <div className="col-12 col-sm-6 mb-3">
+                                <div className="col-6 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">OneKey Workplace ID</strong>
                                     <span className="okla-search__details-value">{hcoDetails.workplaceEid || '--'}</span>
                                 </div>
                                 {
                                     hcoDetails.externalIdentifiers.map((identifier, identifierIdx) => (
-                                        <div className="col-12 col-sm-6 mb-3" key={'id-' + identifierIdx}>
+                                        <div className="col-6 col-sm-6 mb-3" key={'id-' + identifierIdx}>
                                             <strong className="okla-search__details-title">{identifier.name}</strong>
                                             <span className="okla-search__details-value">{identifier.value || '--'}</span>
                                         </div>
                                     ))
                                 }
-                                <div className="col-12 col-sm-6 mb-3">
+                                <div className="col-6 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">Specialties</strong>
                                     <span className="okla-search__details-value">{hcoDetails.specialties ? hcoDetails.specialties.join(', ') : '--'}</span>
                                 </div>
-                                <div className="col-12 col-sm-6 mb-3">
+                                <div className="col-6 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">Status</strong>
                                     <span className="okla-search__details-value">{hcoDetails.isValid ? 'Valid' : 'Invalid'}</span>
                                 </div>
-                                <div className="col-12 col-sm-6 mb-3">
+                                <div className="col-6 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">Contract status</strong>
                                     <span className="okla-search__details-value">{hcoDetails.isInContract ? 'In my contract' : 'Not in my contract'}</span>
                                 </div>
-                                <div className="col-12 col-sm-6 mb-3">
+                                <div className="col-6 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">Type</strong>
                                     <span className="okla-search__details-value">{hcoDetails.type || '--'}</span>
                                 </div>
-                                <div className="col-12 col-sm-6 mb-3">
+                                <div className="col-6 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">Activity</strong>
                                     <span className="okla-search__details-value">{hcoDetails.activity || '--'}</span>
                                 </div>
@@ -87,19 +87,19 @@ const OklaHcoDetails = ({ hco, setSelectedHco }) => {
                                     <span className="okla-search__details-value">{c.number}</span>
                                 </div>))}
 
-                                <div className="col-12 col-sm-6 mb-3">
+                                <div className="col-6 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">Address</strong>
                                     <span className="okla-search__details-value">{hcoDetails.address || '--'}</span>
                                 </div>
-                                <div className="col-12 col-sm-6 mb-3">
+                                <div className="col-6 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">City</strong>
                                     <span className="okla-search__details-value">{hcoDetails.city || '--'}</span>
                                 </div>
-                                <div className="col-12 col-sm-6 mb-3">
+                                <div className="col-6 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">Post Code</strong>
                                     <span className="okla-search__details-value">{hcoDetails.postCode || '--'}</span>
                                 </div>
-                                <div className="col-12 col-sm-6 mb-3">
+                                <div className="col-6 col-sm-6 mb-3">
                                     <strong className="okla-search__details-title">Country</strong>
                                     <span className="okla-search__details-value">{getCountryName(hcoDetails.countryIso2)}</span>
                                 </div>

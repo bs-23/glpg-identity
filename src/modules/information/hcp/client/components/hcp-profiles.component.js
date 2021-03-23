@@ -351,19 +351,6 @@ export default function hcpUsers() {
                             : <span></span>
     }
 
-    const renderOptInTypes = ({ value }) => {
-        if (!value) return null;
-
-        const allOptTypes = ['single-opt-in', 'double-opt-in', 'opt-out'];
-
-        return <div className="text-center ml-n2">
-            {value.includes('single-opt-in') ? <i title="Single Opt-In" className="fas fa-check cdp-text-primary mr-3"></i> : ''}
-            {value.includes('double-opt-in') ? <i title="Double Opt-In" className="fas fa-check-double cdp-text-primary mr-3"></i> : ''}
-            {value.includes('opt-out') ? <i title="Opt-out" className="far fa-window-close text-danger"></i> : ''}
-            {value.filter(val => allOptTypes.some(ot => ot === val)).length ? '' : <div>N/A</div>}
-        </div>
-    }
-
     const renderActions = ({ row, rowIndex, formikProps, hasRowChanged, editableTableProps: editProps }) => {
         const { dirty, resetForm, initialValues, isValid } = formikProps;
 
@@ -387,24 +374,6 @@ export default function hcpUsers() {
         </div>
     }
 
-    const hintpopup = (
-        <Popover id="popover-basic" className="shadow-lg">
-            <Popover.Content className="px-3">
-                <ul className="list-unstyled mb-0">
-                    <li className="pl-0 pb-2"><i className="fas fa-check mr-1"></i> Single Opt-In</li>
-                    <li className="pl-0 pb-2"><i className="fas fa-check-double mr-1"></i> Double Opt-In</li>
-                    <li className="pl-0 pb-2"><i className="far fa-window-close text-danger mr-1"></i> Opt Out</li>
-                </ul>
-            </Popover.Content>
-        </Popover>
-    );
-
-    const CustomOptInHeader = () => {
-        return <div>Opt Type <OverlayTrigger trigger="click" rootClose placement="left" overlay={hintpopup}>
-            <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
-        </OverlayTrigger></div>
-    }
-
     const RegistrationHeader = () => {
         return <span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type && sort.type.toLowerCase()}` : 'cdp-table__col-sorting'} >
             Date of <br /> Registration
@@ -414,15 +383,6 @@ export default function hcpUsers() {
 
     const columns = [
         {
-            id: 'email',
-            name: 'Email',
-            unique: true,
-            onSort: generateSortHandler('email'),
-            fieldType: { name: 'email', maxLength: '100' },
-            width: "12%",
-            editable: (row) => ['manually_verified', 'self_verified'].includes(row.status)
-        },
-        {
             id: 'created_at',
             name: 'Date of Registration',
             editable: false,
@@ -431,6 +391,15 @@ export default function hcpUsers() {
             fieldType: { name: 'date' },
             CustomHeader: RegistrationHeader,
             width: "8%"
+        },
+        {
+            id: 'email',
+            name: 'Email',
+            unique: true,
+            onSort: generateSortHandler('email'),
+            fieldType: { name: 'email', maxLength: '100' },
+            width: "12%",
+            editable: (row) => ['manually_verified', 'self_verified'].includes(row.status)
         },
         {
             id: 'first_name',
@@ -491,13 +460,11 @@ export default function hcpUsers() {
             fieldType: { name: 'text', maxLength: '25' },
         },
         {
-            id: 'opt_types',
-            name: 'Opt-In-Types',
-            editable: false,
-            customCell: renderOptInTypes,
-            CustomHeader: CustomOptInHeader,
-            class: "text-center",
-            width: "8%"
+            id: 'individual_id_onekey',
+            name: 'OneKeyID',
+            editable: (row) => ['manually_verified'].includes(row.status),
+            width: "8%",
+            unique: true
         },
         {
             id: 'action',
@@ -612,18 +579,23 @@ export default function hcpUsers() {
                 </div>
                 <div className="row">
                     <div className="col-12">
+                        <h4 className="cdp-text-primary font-weight-bold my-3">List of HCP User</h4>
                         <div>
-                            <div className="d-sm-flex justify-content-between align-items-end mt-1">
+                            <div className="d-sm-flex justify-content-between align-items-end mt-1 cdp-table__responsive-sticky-panel">
                                 <div>
-                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1 d-flex pb-2">
-                                        List of HCP User
-                                    </h4>
-                                    <div>
-                                        <div className="custom-tab px-3 py-3 cdp-border-primary active">Customer Data Platform</div>
-                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/crdlp">CRDLP</NavLink>
-                                    </div>
+                                    <div className="custom-tab px-3 py-3 cdp-border-primary active">Customer Data Platform</div>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/crdlp">CRDLP</NavLink>
                                 </div>
                                 <div className="d-flex pt-3 pt-sm-0 mb-2">
+                                    {hcps['users'] && hcps['users'].length > 0 &&
+                                        <Accordion className="cdp-table__responsive-accordion d-block d-sm-none">
+                                            <Accordion.Toggle eventKey="0" className="btn btn-sm px-3 mr-2 cdp-btn-outline-primary rounded shadow-0 mb-0 p-2"><i className="fas fa-sort cdp-text-primary"></i></Accordion.Toggle>
+                                            <Accordion.Collapse eventKey="0" className="cdp-table__responsive-accordion-body">
+                                                <div className="cdp-bg-primary p-2 text-white">
+                                                </div>
+                                            </Accordion.Collapse>
+                                        </Accordion>
+                                    }
                                     <div className="mr-2">
                                         <div>
                                             {renderUuidAuthorities()}
@@ -634,9 +606,9 @@ export default function hcpUsers() {
                                             className={`btn ${isFilterEnabled ? 'multifilter_enabled cdp-btn-primary text-white' : 'cdp-btn-outline-primary'} ${tableDirty ? 'hcp-inline-disable' : null}`}
                                             onClick={() => setShow({ ...show, filterSidebar: true })}
                                         >
-                                            <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
-                                            <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
-                                            Filter
+                                            <i className={`fas fa-filter  ${isFilterEnabled ? '' : ''}`}></i>
+                                            <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon ' : 'd-none'}`}></i>
+                                            <span className="d-none d-sm-inline-block ml-2"> Filter</span>
                                         </button>
                                     </div>
                                     {
@@ -670,7 +642,7 @@ export default function hcpUsers() {
                                     </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    <div className="px-4 py-3">
+                                    <div className="p-3">
                                         <div className="row">
                                             <div className="col">
                                                 <h4 className="mt-1 font-weight-bold">{`${currentUser.first_name || ''} ${currentUser.last_name || ''}`}</h4>

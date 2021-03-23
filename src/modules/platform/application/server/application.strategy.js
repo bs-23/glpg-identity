@@ -11,6 +11,8 @@ module.exports = function () {
     }, function (payload, done) {
         Application.findOne({ where: { id: payload.id } }).then(doc => {
             if (doc) {
+                if (!doc.is_active) return done(null, false);
+
                 return done(null, doc);
             }
 

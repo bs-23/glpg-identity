@@ -20,13 +20,22 @@ export function getPartnerRequest(id) {
         })
     };
 }
-export function sendForm(data) {
+export function sendForm(request_id) {
     return {
         type: Types.SEND_FORM,
         payload: axios({
-            method: 'post',
-            url: `/api/partner-requests/${data.id}/send-form`,
-            data
+            method: 'get',
+            url: `/api/partner-requests/${request_id}/send-form`
+        })
+    };
+};
+
+export function resendForm(request_id) {
+    return {
+        type: Types.RESEND_FORM,
+        payload: axios({
+            method: 'get',
+            url: `/api/partner-requests/${request_id}/resend-form`
         })
     };
 };

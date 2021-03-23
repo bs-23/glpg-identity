@@ -169,24 +169,84 @@ const ConsentPerformanceReport = () => {
                     <div className="col-12">
                         <div>
                             <h4 className="cdp-text-primary font-weight-bold my-3">Consent Performance Report</h4>
-                            <div className="d-sm-flex justify-content-between align-items-end mb-0 mt-4">
-                                <div>
-                                   
+                            <div className="d-sm-flex justify-content-between align-items-end mb-0 mt-sm-4 cdp-table__responsive-sticky-panel py-2 py-sm-0">
+                                <div className="d-flex align-items-center">
                                     <div>
-                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/consent/consent-performance-report/cdp"><span className="d-block d-lg-none">CDP</span><span className="d-none d-lg-block">Customer Data Platform</span></NavLink>
+                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/consent/consent-performance-report/cdp">Customer Data Platform</NavLink>
                                         <NavLink className="custom-tab px-3 px-lg-4 py-3 cdp-border-primary" to="/consent/consent-performance-report/veeva-crm"><img alt="Veeva CRM LOGO" src="/assets/logo/logo-veevacrm.svg" height="13" /></NavLink>
                                     </div>
+                                    {consents_report['hcp_consents'] && consents_report['hcp_consents'].length > 0 &&
+                                        <Accordion className="cdp-table__responsive-accordion d-block d-sm-none">
+                                            <Accordion.Toggle eventKey="0" className="btn btn-sm borrder-0 shadow-0 mb-0 ml-2"><i className="fas fa-sort cdp-text-primary"></i></Accordion.Toggle>
+                                            <Accordion.Collapse eventKey="0" className="cdp-table__responsive-accordion-body">
+                                                <div className="cdp-bg-primary p-2 text-white">
+                                                    <LinkContainer to={getUrl('name')}>
+                                                        <span
+                                                            className={consents_report.orderBy === 'name' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                            onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'name', getorderType('name')))}
+                                                        >
+                                                            Name
+                                                            <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                    </LinkContainer>
+
+                                                    <LinkContainer to={getUrl('email')}>
+                                                        <span
+                                                            className={consents_report.orderBy === 'email' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                            onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'email', getorderType('email')))}
+                                                        >
+                                                            Email
+                                                            <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                    </LinkContainer>
+
+                                                    <LinkContainer to={getUrl('preferences')}>
+                                                        <span
+                                                            className={consents_report.orderBy === 'preferences' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                            onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'preferences', getorderType('preferences')))}
+                                                        >
+                                                            Content Type
+                                                            <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                    </LinkContainer>
+                                                    <LinkContainer to={getUrl('opt_type')}>
+                                                        <span
+                                                            className={consents_report.orderBy === 'opt_type' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                            onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'opt_type', getorderType('opt_type')))}
+                                                        >
+                                                            Opt Type
+                                                            <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                    </LinkContainer>
+
+                                                    <LinkContainer to={getUrl('legal_basis')}>
+                                                        <span
+                                                            className={consents_report.orderBy === 'legal_basis' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                            onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'legal_basis', getorderType('legal_basis')))}
+                                                        >
+                                                            Legal Basis
+                                                            <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                    </LinkContainer>
+
+                                                    <LinkContainer to={getUrl('date')}>
+                                                        <span
+                                                            className={consents_report.orderBy === 'date' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
+                                                            onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'date', getorderType('date')))}
+                                                        >
+                                                            Date
+                                                            <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                    </LinkContainer>
+                                                </div>
+                                            </Accordion.Collapse>
+                                        </Accordion>
+                                    }
                                 </div>
 
                                 <div className="d-flex pt-3 pt-sm-0 mb-2">
 
                                     <React.Fragment>
-                                        <button className="btn cdp-btn-outline-primary mr-2" onClick={() => exportExcelFile()}><i className="fas fa-download"></i> <span className="d-none d-lg-block pl-1">Export Full Report</span></button>
+                                        <button className="btn cdp-btn-outline-primary mr-2" onClick={() => exportExcelFile()}><i className="fas fa-download"></i> <span className="d-none d-lg-inline-block pl-1">Export Full Report</span></button>
 
                                         {countries && consents_report['countries'] &&
-                                            <Dropdown className="ml-auto dropdown-customize mr-2">
-                                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
-                                                    <i className="icon icon-filter mr-2 mb-n1"></i> {consents_report.codbase && (countries.find(i => i.codbase === consents_report.codbase)) ? (countries.find(i => i.codbase === consents_report.codbase)).codbase_desc : 'Filter by Country'}
+                                                <Dropdown className="ml-auto dropdown-customize mr-2">
+                                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center dropdown-toggle position-relative">
+                                                    <i className="icon icon-filter mr-2 mb-n1 d-none d-sm-inline-block"></i> {consents_report.codbase && (countries.find(i => i.codbase === consents_report.codbase)) ? (countries.find(i => i.codbase === consents_report.codbase)).codbase_desc : 'Filter by Country'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
                                                     <LinkContainer to={`/consent/consent-performance-report/veeva-crm${makeUrl([
@@ -218,8 +278,8 @@ const ConsentPerformanceReport = () => {
                                         }
 
                                         <Dropdown className="ml-auto dropdown-customize">
-                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center">
-                                                <i className="icon icon-filter mr-2 mb-n1"></i> {consents_report.opt_type && (allOptTypes.includes(consents_report.opt_type)) ? consents_report.opt_type : 'Filter by Opt Type'}
+                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center dropdown-toggle position-relative">
+                                                <i className="icon icon-filter mr-2 mb-n1 d-none d-sm-inline-block"></i> {consents_report.opt_type && (allOptTypes.includes(consents_report.opt_type)) ? consents_report.opt_type : 'Filter by Opt Type'}
                                             </Dropdown.Toggle>
                                             <Dropdown.Menu>
                                                 <LinkContainer to={`/consent/consent-performance-report/veeva-crm${makeUrl([{ name: 'codbase', value: consents_report.codbase }, { name: 'orderBy', value: consents_report.orderBy }, { name: 'orderType', value: consents_report.orderType }])}`}>
@@ -241,7 +301,6 @@ const ConsentPerformanceReport = () => {
                                     </React.Fragment>
                                 </div>
                             </div>
-
 
                             <Modal
                                 size="lg"

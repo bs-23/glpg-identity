@@ -44,6 +44,7 @@ async function init() {
     const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model"));
     const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model"));
     const Localization = require(path.join(process.cwd(), 'src/modules/core/server/localization/localization.model'));
+    const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
     require(path.join(process.cwd(), "src/modules/platform/role/server/role.model"));
     require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
     const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model'));
@@ -58,6 +59,7 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-vendor.model'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner.model'));
+    require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-consents.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 
     await sequelize.cdpConnector.sync();
@@ -69,8 +71,7 @@ async function init() {
             where: { email: 'glpg@brainstation-23.com' }, defaults: {
                 first_name: 'System',
                 last_name: 'Admin',
-                password: 'P@ssword123',
-                type: 'admin'
+                password: 'P@ssword123'
             }
         }).then(function () {
             callback();
@@ -141,7 +142,8 @@ async function init() {
                             { title: "Manage Profiles", slug: "manage-profile", parent_id: platform.id, created_by: admin.id, updated_by: admin.id },
                             { title: "Define Roles", slug: "manage-role", parent_id: platform.id, created_by: admin.id, updated_by: admin.id },
                             { title: "Manage Permission Sets", slug: "manage-permission-sets", parent_id: platform.id, created_by: admin.id, updated_by: admin.id },
-                            { title: "Manage FAQs", slug: "manage-faqs", parent_id: platform.id, created_by: admin.id, updated_by: admin.id }
+                            { title: "Manage FAQs", slug: "manage-faqs", parent_id: platform.id, created_by: admin.id, updated_by: admin.id },
+                            { title: "Manage Service Accounts", slug: "manage-service-accounts", parent_id: platform.id, created_by: admin.id, updated_by: admin.id }
                         ];
 
                         const informationServices = [
@@ -158,13 +160,13 @@ async function init() {
 
                         const clinicalTrialsServices = [
                             { title: "Manage Content Clinical Trail", slug: "manage-clinical-trials", parent_id: clinicalTrials.id, created_by: admin.id, updated_by: admin.id },
-                        ]
+                        ];
 
                         const businessPartnerServices = [
                             { title: "Manage Vendor Request", slug: "manage-vendor-request", parent_id: businessPartner.id, created_by: admin.id, updated_by: admin.id },
                             { title: "Manage Healthcare Entity Request", slug: "manage-entity-request", parent_id: businessPartner.id, created_by: admin.id, updated_by: admin.id },
                             { title: "Business Partner Management to Submit to ERP Systems", slug: "manage-business-partners", parent_id: businessPartner.id, created_by: admin.id, updated_by: admin.id },
-                        ]
+                        ];
 
                         const allServices = [
                             ...platformServices,
@@ -172,7 +174,7 @@ async function init() {
                             ...privacyServices,
                             ...clinicalTrialsServices,
                             ...businessPartnerServices
-                        ]
+                        ];
 
                         Service.bulkCreate(allServices, { returning: true, ignoreDuplicates: false }).then(res => { callback() });
                     })
@@ -225,13 +227,12 @@ async function init() {
     function permissionSetServiceCategorySeeder(callback) {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
             Promise.all([
-                // Service Categories
                 Service.findOne({ where: { slug: 'information' }, include: { model: Service, as: 'childServices' } }),
                 Service.findOne({ where: { slug: 'platform' }, include: { model: Service, as: 'childServices' } }),
                 Service.findOne({ where: { slug: 'privacy' }, include: { model: Service, as: 'childServices' } }),
                 Service.findOne({ where: { slug: 'business-partner' }, include: { model: Service, as: 'childServices' } }),
                 Service.findOne({ where: { slug: 'clinical-trials' }, include: { model: Service, as: 'childServices' } }),
-                // Permission Sets
+
                 PermissionSet.findOne({ where: { slug: 'system_admin' } }),
                 PermissionSet.findOne({ where: { slug: 'site_admin' } }),
                 PermissionSet.findOne({ where: { slug: 'data_privacy_officer' } }),
@@ -252,21 +253,20 @@ async function init() {
                 ] = values;
 
                 const permissionSet_serviceCategory = [
-                    // Setup System Admin PermissionSet Service Category
                     { permissionset_id: systemAdmin_permissionSet.id, service_id: informationServiceCategory.id },
                     { permissionset_id: systemAdmin_permissionSet.id, service_id: platformServiceCategory.id },
                     { permissionset_id: systemAdmin_permissionSet.id, service_id: privacyServiceCategory.id },
                     { permissionset_id: systemAdmin_permissionSet.id, service_id: businessPartnerServiceCategory.id },
                     { permissionset_id: systemAdmin_permissionSet.id, service_id: clinicalTrialServiceCategory.id },
-                    // Setup Site Admin PermissionSet Service Category
+
                     { permissionset_id: siteAdmin_permissionSet.id, service_id: informationServiceCategory.id },
                     { permissionset_id: siteAdmin_permissionSet.id, service_id: platformServiceCategory.id },
                     { permissionset_id: siteAdmin_permissionSet.id, service_id: privacyServiceCategory.id },
-                    // Setup DPO Admin PermissionSet Service Category
+
                     { permissionset_id: dpo_permissionSet.id, service_id: privacyServiceCategory.id },
-                    // Setup GDS PermissionSet
+
                     { permissionset_id: gds_permissionSet.id, service_id: informationServiceCategory.id },
-                    // Setup LDS PermissionSet Service Category
+
                     { permissionset_id: lds_permissionSet.id, service_id: informationServiceCategory.id }
                 ];
 
@@ -360,12 +360,13 @@ async function init() {
                     type: 'hcp-portal',
                     email: 'hcp-portal@glpg.com',
                     password: 'P@ssword123',
-                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                    is_active: true,
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
-                    logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
-                    metadata: JSON.stringify({
+                    logo_url: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
+                    metadata: {
+                        approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
                         cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-hcpportal/clear/author-publish-cache"
-                    }),
+                    },
                     created_by: admin.id,
                     updated_by: admin.id
                 },
@@ -376,12 +377,13 @@ async function init() {
                     type: 'hcp-portal',
                     email: 'jyseleca@glpg.com',
                     password: 'P@ssword123',
-                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                    is_active: true,
                     auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
-                    logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
-                    metadata: JSON.stringify({
-                        cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-brandx/clear/author-publish-cache"
-                    }),
+                    logo_url: `${nodecache.getValue('S3_BUCKET_URL')}/jyseleca/logo.png`,
+                    metadata: {
+                        cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-brandx/clear/author-publish-cache",
+                        approve_user_path: '/bin/public/glpg-brandx/mail/approve-user'
+                    },
                     created_by: admin.id,
                     updated_by: admin.id
                 },
@@ -389,11 +391,10 @@ async function init() {
                     id: '0da54f98-6ec0-4055-8ce7-4ab2aa1fe921',
                     name: 'Clinical Trials',
                     slug: convertToSlug('Clinical Trials'),
-                    email: 'clinical-trial-portal@glpg.com',
+                    email: 'clinicaltrials-portal@glpg.com',
                     password: 'P@ssword123',
-                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
-                    auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
-                    logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
+                    type: 'standard',
+                    is_active: true,
                     created_by: admin.id,
                     updated_by: admin.id
                 },
@@ -403,14 +404,14 @@ async function init() {
                     slug: convertToSlug('Patients Organization'),
                     email: 'patients-organization@glpg.com',
                     password: 'P@ssword123',
-                    approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+                    type: 'standard',
+                    is_active: true,
                     auth_secret: 'b248eaa4-583f-4ecd-9e9c-be8f58ab3c3e',
-                    logo_link: `${nodecache.getValue('S3_BUCKET_URL')}/hcp-portal/logo.png`,
                     created_by: admin.id,
                     updated_by: admin.id,
-                    metadata: JSON.stringify({
+                    metadata: {
                         request_notification_link: 'https://onboarding-business-partner-dev.glpg.com/bin/public/glpg-forms/sendForm.invitation.html'
-                    })
+                    }
                 }
             ];
 
@@ -604,7 +605,6 @@ async function init() {
     function localizationSeeder(callback) {
         const localizations = [
             { language_family: 'English', language_variant: 'British English', country_iso2: 'GB', locale: 'en_GB' },
-            { language_family: 'English', language_variant: 'English', locale: 'en' },
             { language_family: 'Dutch', language_variant: 'Belgian Dutch', country_iso2: 'BE', locale: 'nl_BE' },
             { language_family: 'Dutch', language_variant: 'Standard Dutch', country_iso2: 'NL', locale: 'nl_NL' },
             { language_family: 'French', language_variant: 'Belgian French', country_iso2: 'BE', locale: 'fr_BE' },
@@ -612,10 +612,35 @@ async function init() {
             { language_family: 'French', language_variant: 'Luxembourgish French', country_iso2: 'LU', locale: 'fr_LU' },
             { language_family: 'German', language_variant: 'Standard German', country_iso2: 'DE', locale: 'de_DE' },
             { language_family: 'Spanish', language_variant: 'Castilian Spanish', country_iso2: 'ES', locale: 'es_ES' },
-        ]
+        ];
 
         Localization.destroy({ truncate: { cascade: true } }).then(() => {
             Localization.bulkCreate(localizations, {
+                returning: true,
+                ignoreDuplicates: false
+            }).then(function () {
+                callback();
+            });
+        });
+    }
+
+    function countriesSeeder(callback) {
+        const countries = [
+            { country_iso2: 'BE', country_iso3: 'BEL', codbase: 'WBE', countryname: 'Belgium', codbase_desc: 'Belgium', codbase_desc_okws: 'OneKey Belgium' },
+            { country_iso2: 'DE', country_iso3: 'DEU', codbase: 'WDE', countryname: 'Germany', codbase_desc: 'Germany', codbase_desc_okws: 'OneKey Germany' },
+            { country_iso2: 'ES', country_iso3: 'ESP', codbase: 'WES', countryname: 'Spain', codbase_desc: 'Spain', codbase_desc_okws: 'OneKey Spain' },
+            { country_iso2: 'FR', country_iso3: 'FRA', codbase: 'WFR', countryname: 'France', codbase_desc: 'France', codbase_desc_okws: 'OneKey France' },
+            { country_iso2: 'GB', country_iso3: 'GBR', codbase: 'WUK', countryname: 'United Kingdom', codbase_desc: 'United Kingdom', codbase_desc_okws: 'OneKey United Kingdom' },
+            { country_iso2: 'IE', country_iso3: 'IRL', codbase: 'WUK', countryname: 'Ireland', codbase_desc: 'United Kingdom', codbase_desc_okws: 'OneKey United Kingdom' },
+            { country_iso2: 'IT', country_iso3: 'ITA', codbase: 'WIT', countryname: 'Italy', codbase_desc: 'Italy', codbase_desc_okws: 'OneKey Italy' },
+            { country_iso2: 'LU', country_iso3: 'LUX', codbase: 'WBE', countryname: 'Luxembourg', codbase_desc: 'Belgium', codbase_desc_okws: 'OneKey Belgium' },
+            { country_iso2: 'MC', country_iso3: 'MCO', codbase: 'WFR', countryname: 'Monaco', codbase_desc: 'France', codbase_desc_okws: 'OneKey France' },
+            { country_iso2: 'NL', country_iso3: 'NLD', codbase: 'WNL', countryname: 'Netherlands', codbase_desc: 'Netherlands', codbase_desc_okws: 'OneKey Netherlands' },
+            { country_iso2: 'AD', country_iso3: 'AND', codbase: 'WFR', countryname: 'Andorra', codbase_desc: 'France', codbase_desc_okws: 'OneKey France' }
+        ];
+
+        Country.destroy({ truncate: { cascade: true } }).then(() => {
+            Country.bulkCreate(countries, {
                 returning: true,
                 ignoreDuplicates: false
             }).then(function () {
@@ -636,12 +661,13 @@ async function init() {
         applicationSeeder,
         permissionSetApplicationsSeeder,
         consentSeeder,
-        localizationSeeder
+        localizationSeeder,
+        countriesSeeder
     ], function (err) {
-            if (err) console.error(err);
-            else console.info('DB seed completed!');
-            process.exit();
-        });
+        if (err) console.error(err);
+        else console.info('DB seed completed!');
+        process.exit();
+    });
 }
 
 init();

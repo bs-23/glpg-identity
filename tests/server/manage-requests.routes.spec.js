@@ -44,6 +44,7 @@ describe('Manage Requests Routes', () => {
                 procurement_contact: "test@gmail.com",
                 country_iso2: "BE",
                 language: "fr",
+                locale: "nl_NL",
                 mdr_id: "test_mdr_id",
                 onekey_id: "",
                 specialty: "SP.WBE.21",

@@ -17,7 +17,7 @@ export default function Faq(props) {
 
     return (
         <React.Fragment>
-            <div className={`faq shadow-sm bg-white ${show ? "faq-expand" : ""}`}>
+            <div className={`faq shadow-sm bg-white mb-3 ${show ? "faq-expand" : ""}`}>
                 <h5 className="faq__header p-3 font-weight-bold mb-0 d-flex justify-content-between">
                     Questions You May Have
                     <i onClick={() => setShow(true)} class="icon icon-expand faq-icon-expand faq__icon-toggle d-none d-lg-block cursor-pointer"></i>

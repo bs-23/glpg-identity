@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import { getPartnerById, approveUser } from '../manage-partners.actions';
+import { getPartnerById, approveBusinessPartner, resendFormForCorrection } from '../manage-partners.actions';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import { useToasts } from 'react-toast-notifications';
 
 const PartnerStatusManage = (props) => {
     const [, setStatusShow] = useState(false);
-    const [statusSelect, setStatusSelect] = useState(null);
+    const [statusAction, setStatusAction] = useState(null);
     const dispatch = useDispatch();
     const { addToast } = useToasts();
     const partner = useSelector(state => state.managePartnerReducer.partner);
     const handleClose = () => {
-        setStatusSelect(null);
+        setStatusAction(null);
         setStatusShow(false);
         props.changeStatusShow(false);
     };
@@ -35,8 +35,8 @@ const PartnerStatusManage = (props) => {
             });
     }
 
-    const userApprove = () => {
-        dispatch(approveUser(props.partnerInfo.id, props.detailType)).then(() => {
+    const approvePartner = () => {
+        dispatch(approveBusinessPartner(props.partnerInfo.id, props.detailType)).then(() => {
             addToast('User approved', {
                 appearance: 'success',
                 autoDismiss: true
@@ -51,9 +51,27 @@ const PartnerStatusManage = (props) => {
         handleClose();
     }
 
+    const resendForm = () => {
+        dispatch(resendFormForCorrection(props.partnerInfo.id, props.detailType)).then(() => {
+            addToast('Form sent for correction', {
+                appearance: 'success',
+                autoDismiss: true
+            });
+        }).catch(error => {
+            addToast(error.response.data, {
+                appearance: 'error',
+                autoDismiss: true
+            });
+        });
+
+        handleClose();
+    }
+
     const confirmStatus = () => {
-        if (statusSelect === 'approve') {
-            userApprove();
+        if (statusAction === 'approve') {
+            approvePartner();
+        } else if(statusAction === 'resend-form') {
+            resendForm();
         }
     }
 
@@ -106,11 +124,13 @@ const PartnerStatusManage = (props) => {
 
                         </div>
                         <div className="col-12 d-flex">
-                            <button onClick={() => setStatusSelect("approve")} className={statusSelect === 'approve' ? "btn btn-block mr-2 cdp-btn-primary mt-4 p-2 font-weight-bold text-white" : "btn btn-block mr-2 cdp-btn-outline-primary mt-4 p-2 font-weight-bold"}>Approve User</button>
-                            <button disabled className="btn btn-block ml-2 btn-danger mt-4 p-2 font-weight-bold">Correction Required</button>
+                            <button onClick={() => setStatusAction("approve")} className={statusAction === 'approve' ? "btn btn-block mr-2 cdp-btn-primary mt-4 p-2 font-weight-bold text-white" : "btn btn-block mr-2 cdp-btn-outline-primary mt-4 p-2 font-weight-bold"}>Approve User</button>
+
+                            <button onClick={() => setStatusAction("resend-form")}
+                            className={statusAction === 'resend-form' ? "btn btn-block ml-2 btn-danger mt-4 p-2 font-weight-bold" : "btn btn-block ml-2 btn-outline-danger mt-4 p-2 font-weight-bold"}>Correction Required</button>
                         </div>
                         <div className="col-12">
-                            <button disabled={!statusSelect} onClick={() => confirmStatus()} className="btn btn-block btn-secondary mt-4 p-2 font-weight-bold">Confirm and Approve for SAP Export</button>
+                            <button disabled={!statusAction} onClick={() => confirmStatus()} className="btn btn-block btn-secondary mt-4 p-2 font-weight-bold">Confirm</button>
                         </div>
                     </div>
                 }

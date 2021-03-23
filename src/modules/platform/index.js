@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route, useRouteMatch } from 'react-router-dom';
+import { ApplicationRoutes, applicationReducer, ApplicationLog } from './application';
 import { FaqClientRoutes, faqReducer, Faq, ManageFaq } from './faq';
 import { UserClientRoutes, userReducer, userActions, Login, Dashboard, ForgotPassword, ResetPassword, MyProfile, UserForm } from './user';
 import { ProfileClientRoutes, profileReducer, ManageProfiles, profileActions } from './profile';
@@ -11,6 +12,7 @@ export function PlatformRoutes() {
 
     return (
         <Route>
+            <ApplicationRoutes path={path} />
             <UserClientRoutes path={path} />
             <FaqClientRoutes path={path} />
             <ProfileClientRoutes path={path} />
@@ -26,6 +28,7 @@ export {
     profileReducer,
     roleReducer,
     permissionSetReducer,
+    applicationReducer,
     userActions,
     Login,
     Dashboard,
@@ -39,5 +42,6 @@ export {
     ManageProfiles,
     ManageRoles,
     UserForm,
-    profileActions
+    profileActions,
+    ApplicationLog
 };

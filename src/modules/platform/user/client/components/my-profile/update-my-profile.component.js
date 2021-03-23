@@ -12,40 +12,12 @@ const UpdateMyProfile = () => {
     const myProfileInfo = useSelector(state => state.userReducer.loggedInUser);
     const countries = useSelector(state => state.countryReducer.countries);
     const [selectedCountryCode, setSelectedCountryCode] = useState(0);
+    const [phoneFieldRef, setPhoneFieldRef] = useState(null);
     const { addToast } = useToasts();
     const dispatch = useDispatch();
-
+    const desiredCountryList = useSelector(state => state.phoneExtensionReducer.phone_extensions);
+    const getMyCountryISO2 = useSelector(state => state.userReducer.loggedInUser.countries);
     const CountryCodesObject = CountryCodes.customList('countryCode', '+{countryCallingCode}');
-
-    const getMyCountryISO2 = () => {
-        if(!myProfileInfo) return [];
-
-        const myProfile = myProfileInfo.profile;
-        const myRole = myProfileInfo.role;
-        const myProfileCountries = [];
-        const myRoleCountries = [];
-
-        if(myProfile && myProfile.permissionSets) {
-            myProfile.permissionSets.map(ps => {
-                if(ps.countries) {
-                    ps.countries.map(country_iso2 => myProfileCountries.push(country_iso2));
-                }
-            })
-        }
-
-        if(myRole && myRole.permissionSets) {
-            myRole.permissionSets.map(ps => {
-                if(ps.countries){
-                    ps.countries.map(country_iso2 => myRoleCountries.push(country_iso2));
-                }
-            });
-        }
-
-        const myCountries = [...new Set([...myProfileCountries, ...myRoleCountries])];
-
-        return myCountries;
-    }
-
     const getMyApplicationNames = () => {
         if(!myProfileInfo) return [];
 
@@ -69,9 +41,7 @@ const UpdateMyProfile = () => {
                 }
             });
         }
-
         const myApplicationNames = [...new Set([...myProfileApplications, ...myRoleApplications])];
-
         return myApplicationNames;
     }
 
@@ -87,34 +57,12 @@ const UpdateMyProfile = () => {
         return getDatasyncCountryIndexFromPhone(phone) >= 0;
     }
 
-    const activateCountryCodeFlagFromPhone = (phone) => {
-        if(!phone) return;
-        const countryIndex = getDatasyncCountryIndexFromPhone(phone);
-        setSelectedCountryCode(countryIndex);
-    }
-
-    const getPhoneNumberWithoutCountryCode = (phone) => {
-        if(!phone) return '';
-
-        const countryIdx = getDatasyncCountryIndexFromPhone(phone);
-        if(countryIdx < 0) return phone;
-
-        const countryCodeForPhoneNumber = CountryCodesObject[countries[countryIdx].country_iso2];
-        let phoneWithoutCountryCodeStartingIdx = phone.indexOf(countryCodeForPhoneNumber);
-        phoneWithoutCountryCodeStartingIdx = phoneWithoutCountryCodeStartingIdx + countryCodeForPhoneNumber.length;
-        const phoneWithoutCountryCode = phone.substr(phoneWithoutCountryCodeStartingIdx);
-        return phoneWithoutCountryCode;
-    }
-
     const initialFormValues = {
         first_name: myProfileInfo && myProfileInfo.first_name,
         last_name: myProfileInfo && myProfileInfo.last_name,
         email: myProfileInfo && myProfileInfo.email,
-        phone: myProfileInfo && getPhoneNumberWithoutCountryCode(myProfileInfo.phone),
-        isCountryFlagActive: myProfileInfo && (myProfileInfo.phone === '' || isCountryDetectedFromPhone(myProfileInfo.phone)),
-        country_code: selectedCountryCode >= 0 && countries && countries.length
-            ? CountryCodesObject[countries[selectedCountryCode].country_iso2]
-            : ''
+        phone: myProfileInfo ? myProfileInfo.phone: '',
+        isCountryFlagActive: myProfileInfo && (myProfileInfo.phone === '' || isCountryDetectedFromPhone(myProfileInfo.phone))
     }
 
     const generateCountryIconPath = (country) => {
@@ -122,12 +70,26 @@ const UpdateMyProfile = () => {
         return `/assets/flag/flag-placeholder.svg`;
     }
 
+    const onChangePhonefield = (phoneNumber) => {
+        if (!phoneNumber) return;
+            const phoneNumberCountryISO = new PhoneNumber(phoneNumber).getRegionCode();
+            let selectedCountry = desiredCountryList.find(country => country.countryCode === phoneNumberCountryISO);
+        if (selectedCountry === undefined) { phoneFieldRef !== null ? phoneFieldRef.disabled = true : ''}
+            else {
+            selectedCountry.flag = generateCountryIconPath(selectedCountry.countryNameEn);
+            if (phoneFieldRef !== null) {
+                phoneFieldRef.disabled = false;
+            }
+        }
+            selectedCountry === undefined ? null : selectedCountry.flag = generateCountryIconPath(selectedCountry.countryNameEn);
+            return selectedCountry === undefined ? null : selectedCountry;
+    };
     const formSubmitHandler = async (values, actions) => {
         try{
             const matchedCountry = countries[selectedCountryCode];
             let countryCodeForPhoneNumber = '';
             if(matchedCountry) countryCodeForPhoneNumber = CountryCodesObject[matchedCountry.country_iso2];
-            const phone = values.phone ? countryCodeForPhoneNumber + values.phone : null;
+            const phone = values.phone ? values.phone : '';
 
             delete values.isCountryFlagActive;
 
@@ -158,35 +120,11 @@ const UpdateMyProfile = () => {
         return codbaseDescriptions;
     }
 
-    const handleCountryFlagClick = (index, formikProps) => {
-        const { setFieldValue, values, dirty} = formikProps;
-        setFieldValue('isCountryFlagActive', true);
-        setSelectedCountryCode(index);
-        const countryCode = CountryCodesObject[countries[index].country_iso2];
-        setFieldValue('country_code', countryCode);
-        if(dirty){
-            myProfileInfo.first_name = values.first_name;
-            myProfileInfo.last_name = values.last_name;
-            myProfileInfo.email = values.email;
-            myProfileInfo.phone = values.phone;
-        }
-    }
-
     const handlePhoneFieldChange = (e, formikProps) => {
         const currentPhoneValue = e.target.value;
         const { setFieldValue } = formikProps;
-
-        const isCountryFlagActive = selectedCountryCode >= 0 && selectedCountryCode < countries.length;
-
-        if(isCountryFlagActive) {
-            setFieldValue('phone', currentPhoneValue);
+            currentPhoneValue === null ? setFieldValue('phone', ''): setFieldValue('phone', currentPhoneValue);
             setFieldValue('isCountryFlagActive', true);
-        }else{
-            const wasCountryFoundForPhoneCountryCode = getDatasyncCountryIndexFromPhone(currentPhoneValue) >= 0 ? true : false;
-            setFieldValue('phone', getPhoneNumberWithoutCountryCode(currentPhoneValue));
-            setFieldValue('isCountryFlagActive', wasCountryFoundForPhoneCountryCode);
-            activateCountryCodeFlagFromPhone(currentPhoneValue);
-        }
     }
 
     const renderServices = () => {
@@ -215,10 +153,6 @@ const UpdateMyProfile = () => {
             });
         })
     }
-
-    useEffect(() => {
-        if(myProfileInfo) activateCountryCodeFlagFromPhone(myProfileInfo.phone);
-    }, [myProfileInfo, countries])
 
     return <div className="px-3 py-2 bg-white shadow-sm rounded">
                 <Formik
@@ -267,33 +201,39 @@ const UpdateMyProfile = () => {
                                                 <div className="phone-list">
                                                     <div className="input-group phone-input">
                                                         <span className="input-group-btn">
-                                                            <Dropdown>
-                                                                {
-                                                                    selectedCountryCode >= 0 && selectedCountryCode < countries.length
-                                                                        ? <Dropdown.Toggle  variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
-                                                                            <img height="20" width="20" src={generateCountryIconPath(countries[selectedCountryCode].codbase_desc)} title={countries[selectedCountryCode].codbase_desc} />
-                                                                            <span className="country-phone-code pl-1">{ CountryCodesObject[countries[selectedCountryCode].country_iso2] }</span>
-                                                                            </Dropdown.Toggle>
-                                                                        : <Dropdown.Toggle variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
-                                                                            <img height="20" width="20" src={generateCountryIconPath()} title="Unknown Country" />
-                                                                            <span className="country-phone-code pl-1">xxxx</span>
-                                                                            </Dropdown.Toggle>
-                                                                }
-                                                                <Dropdown.Menu>
+                                                    <Dropdown>
+                                                        {desiredCountryList.map((country, index) => {
+                                                            return (index === selectedCountryCode ?
+                                                                <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
                                                                     {
-                                                                        countries.map( (country, index) => {
-                                                                            return index === selectedCountryCode ? null :
-                                                                            (<Dropdown.Item onClick={(e) => handleCountryFlagClick(index, formikProps)} key={index} className="px-2 d-flex align-items-center">
-                                                                                <img height="20" width="20" src={generateCountryIconPath(country.codbase_desc)} title={country.codbase_desc} />
-                                                                                <span className="country-name pl-2">{ country.codbase_desc }</span>
-                                                                                <span className="country-phone-code pl-1">{ CountryCodesObject[country.country_iso2] }</span>
-                                                                            </Dropdown.Item>)
-                                                                        })
+                                                                        onChangePhonefield(formikProps.values.phone) === null || onChangePhonefield(formikProps.values.phone) === undefined ?
+                                                                            <span height="20" width="20">Select</span> :
+                                                                            <img className="mr-2" height="20" width="20" src={onChangePhonefield(formikProps.values.phone) === null || onChangePhonefield(formikProps.values.phone) === undefined ? '' : onChangePhonefield(formikProps.values.phone).flag} />
                                                                     }
-                                                                </Dropdown.Menu>
-                                                            </Dropdown>
+                                                                    <span className="country-phone-code">
+                                                                        {onChangePhonefield(formikProps.values.phone) === null || onChangePhonefield(formikProps.values.phone) === undefined ? "" : onChangePhonefield(formikProps.values.phone).countryCode}
+                                                                    </span>
+                                                                </Dropdown.Toggle> : null);
+                                                        })}
+                                                        <Dropdown.Menu>
+                                                            {desiredCountryList.map((country, index) => {
+                                                                return index === selectedCountryCode ? null :
+                                                                    (<Dropdown.Item onClick={() => {
+                                                                        setSelectedCountryCode(index);
+                                                                        const countryCode = country.countryCallingCode;
+                                                                        formikProps.setFieldValue('country_code', countryCode);
+                                                                        formikProps.setFieldValue('phone', `+${countryCode}`);
+                                                                        phoneFieldRef.focus();
+                                                                    }} key={index} className="px-2 d-flex align-items-center">
+                                                                        <img height="20" width="20" src={generateCountryIconPath(country.countryNameEn)} />
+                                                                        <span className="country-name pl-2">{country.countryNameEn}</span>
+                                                                        <span className="country-phone-code pl-1">{`+${country.countryCallingCode}`}</span>
+                                                                    </Dropdown.Item>)
+                                                            })}
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
                                                         </span>
-                                                        <Field data-testid="phone" className="form-control rounded" type="text" name="phone" onChange={(e) => handlePhoneFieldChange(e, formikProps)} />
+                                                <Field data-testid="phone" innerRef={(ele) => setPhoneFieldRef(ele)} className="form-control rounded" type="text" name="phone" onChange={(e) => handlePhoneFieldChange(e, formikProps)} />
                                                     </div>
                                                 </div>
                                             </div>
@@ -326,11 +266,11 @@ const UpdateMyProfile = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    {getMyCountryISO2().length > 0 && <div className="row">
+                                    {getMyCountryISO2.length > 0 && <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label className="font-weight-bold-light" htmlFor="countries">Countries<span className="text-danger"></span></label>
-                                                {getCodbaseDescriptionsFromISOCodes(getMyCountryISO2()).map(country => <div key={country} className="custom-control custom-checkbox pl-3">
+                                                {getCodbaseDescriptionsFromISOCodes(getMyCountryISO2).map(country => <div key={country} className="custom-control custom-checkbox pl-3">
                                                     <i className="icon icon-check-filled cdp-text-primary mr-2 consent-check"></i>
                                                     <span>{country}</span>
                                                 </div>)}

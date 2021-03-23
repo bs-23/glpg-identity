@@ -8,6 +8,7 @@ import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import { Faq } from '../../../../platform';
 import { partnerRequestSchemaForWholesalers } from './../manage-requests.schema';
 import { getPartnerRequests, createPartnerRequest, deletePartnerRequest, getPartnerRequest, updatePartnerRequest, sendForm } from '../manage-requests.actions';
+import { getLocalizations } from '../../../../core/client/localization/localization.actions';
 
 const WholesalerPartnerRequests = () => {
     const dispatch = useDispatch();
@@ -21,12 +22,12 @@ const WholesalerPartnerRequests = () => {
     const [partnerRequestId, setPartnerRequestId] = useState(undefined);
     const [sendFormId, setSendFormId] = useState(undefined);
 
-    const countryLanguages = [
-        { language_name: 'English', language_code: 'en' },
-        { language_name: 'French', language_code: 'fr' },
-        { language_name: 'German', language_code: 'de' },
-        { language_name: 'Dutch', language_code: 'nl' }
-    ];
+    // const countryLanguages = [
+    //     { language_name: 'English', language_code: 'en' },
+    //     { language_name: 'French', language_code: 'fr' },
+    //     { language_name: 'German', language_code: 'de' },
+    //     { language_name: 'Dutch', language_code: 'nl' }
+    // ];
     const partnerTypes = ['SUPL', 'CUST', 'HCP', 'HCO', 'POR', 'ZVST'];
     const [requestToDelete, setRequestToDelete] = useState(null);
 
@@ -40,11 +41,19 @@ const WholesalerPartnerRequests = () => {
 
     const countries = useSelector(state => state.countryReducer.countries);
 
+    const userCountries = useSelector(state => state.userReducer.loggedInUser.countries);
+    const localizations = useSelector(state => state.localizationReducer.localizations);
+
     const getCountryName = (country_iso2) => {
         if (!countries || !country_iso2) return null;
         const country = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
         return country && country.countryname;
     };
+
+    const getLocales = (country_iso2) => {
+        let countryLanguages = localizations.filter(({ country_iso2: c_iso2 }) => country_iso2 === c_iso2);
+        return countryLanguages;
+    }
 
     const deleteRequest = (id) => {
         dispatch(deletePartnerRequest(id)).then(() => {
@@ -160,7 +169,7 @@ const WholesalerPartnerRequests = () => {
 
     useEffect(() => {
         if (formData) {
-            dispatch(sendForm(formData)).then(() => {
+            dispatch(sendForm(formData.id)).then(() => {
                 dispatch(updatePartnerRequest(formData.id, { ...formData, status: 'email_sent' }));
             }).catch(() => {
                 addToast('An error occured. Please try again.', {
@@ -177,6 +186,10 @@ const WholesalerPartnerRequests = () => {
             setCompanyCodes(codes);
         }
     }, [request.company_codes]);
+
+    useEffect(() => {
+        dispatch(getLocalizations());
+    }, []);
 
     return (
         <main className="app__content cdp-light-bg">
@@ -249,7 +262,7 @@ const WholesalerPartnerRequests = () => {
                                             (
                                                 <tr key={index}>
                                                     <td data-for="Name">{`${row.first_name} ${row.last_name}`}</td>
-                                                    <td data-for="Status" class="text-capitalize">{row.status.replaceAll('_', ' ')}</td>
+                                                    <td data-for="Status" class="text-capitalize">{row.status.split('_').join(' ')}</td>
                                                     <td data-for="Company Code">
                                                     {
                                                         row.company_codes && row.company_codes.length && row.company_codes.map((companyCode, idx) => (
@@ -323,7 +336,7 @@ const WholesalerPartnerRequests = () => {
                             procurement_contact: partnerRequestId && Object.keys(request).length ? request.procurement_contact : '',
                             company_codes: [],
                             country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
-                            language: partnerRequestId && Object.keys(request).length ? request.locale.split('_')[0] : 'en',
+                            locale: partnerRequestId && Object.keys(request).length ? request.locale : '',
                             partner_type: partnerRequestId && Object.keys(request).length ? request.partner_type : '',
                         }}
                         displayName="PartnerRequestsForm"
@@ -453,24 +466,33 @@ const WholesalerPartnerRequests = () => {
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="country_iso2">Country <span className="text-danger">*</span></label>
-                                            <Field data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
+                                            <Field
+                                                data-testid="country_iso2"
+                                                as="select"
+                                                name="country_iso2"
+                                                className="form-control"
+                                                onChange={(e) => {
+                                                    formikProps.setFieldValue('locale', '');
+                                                    formikProps.handleChange(e);
+                                                }}
+                                            >
                                                 <option key="select-country" value="" disabled>--Select Country--</option>
-                                                {countries.map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
+                                                {countries.filter(c => userCountries.includes(c.country_iso2)).map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
                                             </Field>
                                             <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="form-group">
-                                            <label className="font-weight-bold" htmlFor="language">Language <span className="text-danger">*</span></label>
-                                            <Field className="form-control lang_code" as="select" name="language" className="form-control" id="language">
-                                                <option key="select-language" value="" disabled>--Select Language--</option>
-                                                {countryLanguages.map((element, lang_idx) => {
-                                                    const { language_name, language_code } = element;
-                                                    return language_name && <option key={lang_idx} value={language_code}>{language_name}</option>
+                                            <label className="font-weight-bold" htmlFor="locale">Localization <span className="text-danger">*</span></label>
+                                            <Field className="form-control lang_code" as="select" name="locale" className="form-control" id="locale">
+                                                <option key="select-locale" value="" disabled>--Select Localization--</option>
+                                                {getLocales(formikProps.values.country_iso2).map((element, lang_idx) => {
+                                                    const { language_variant, locale } = element;
+                                                    return language_variant && <option key={lang_idx} value={locale}>{language_variant}</option>
                                                 })}
                                             </Field>
-                                            <div className="invalid-feedback"><ErrorMessage name="language" /></div>
+                                            <div className="invalid-feedback"><ErrorMessage name="locale" /></div>
                                         </div>
                                     </div>
 
