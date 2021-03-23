@@ -1593,6 +1593,7 @@ async function updateHCPConsents(req, res) {
 
         if (req.body.consents && req.body.consents.length) {
             await hcpService.updateConsents(hcpUser, req.body.consents, req.user);
+            await veevaService.syncHcpConsentsInVeeva(hcpUser, req.user);
         }
 
         response.data = {
