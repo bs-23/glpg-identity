@@ -1138,15 +1138,12 @@ async function getHCPUserConsents(req, res) {
 
         if (!userConsents.length) return res.json([]);
 
-        const latestConsentSyncTime = await Audit.max(
-            'event_time',
-            {
-                where: {
-                    event_type: 'SYNC_CONSENTS_WITH_VEEVA',
-                    object_id: doc.id
-                }
+        const latestConsentSyncTime = await Audit.max('event_time', {
+            where: {
+                event_type: 'VEEVA_CONSENT_SYNC',
+                object_id: doc.id
             }
-        );
+        });
 
         response.data = userConsents.map(userConsent => {
             return {
@@ -1746,9 +1743,9 @@ async function syncHCPConsentsInVeeva(req, res) {
         veevaService.syncHcpConsentsInVeeva(hcp, req.user);
 
         logService.log({
-            event_type: 'SYNC_CONSENTS_WITH_VEEVA',
+            event_type: 'VEEVA_CONSENT_SYNC',
             object_id: hcp.id,
-            table_name: 'hcp_profiles',
+            table_name: 'hcp_consents',
             actor: req.user.id,
             remarks: req.body.comment.trim()
         });

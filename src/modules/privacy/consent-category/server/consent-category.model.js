@@ -2,9 +2,7 @@ const path = require('path');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
-
-const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model'));
 
 const ConsentCategory = sequelize.cdpConnector.define('consent_categories', {
     id: {
@@ -33,6 +31,7 @@ const ConsentCategory = sequelize.cdpConnector.define('consent_categories', {
         type: DataTypes.UUID
     },
     veeva_content_type_id: {
+        unique: true,
         type: DataTypes.STRING(18)
     }
 }, {

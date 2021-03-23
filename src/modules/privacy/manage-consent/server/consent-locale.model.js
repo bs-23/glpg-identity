@@ -27,6 +27,7 @@ const ConsentLanguage = sequelize.cdpConnector.define('consent_locales', {
         type: DataTypes.STRING
     },
     veeva_consent_type_id: {
+        unique: true,
         type: DataTypes.STRING(18)
     }
 }, {
