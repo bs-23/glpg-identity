@@ -12,7 +12,7 @@ const auth = {
 async function getCampaigns(req, res) {
     try {
         const page = req.query.page ? +req.query.page - 1 : 0;
-        const limit = req.query.limit ? +req.query.limit : 5;
+        const limit = req.query.limit ? +req.query.limit : 15;
         const offset = page * limit;
 
         let url = `${nodecache.getValue('MAILCHIMP_BASE_URL')}/campaigns?sort_field=create_time&sort_dir=DESC&count=${limit}&offset=${offset}`;
@@ -27,8 +27,7 @@ async function getCampaigns(req, res) {
                 status: campaign.status,
                 type: campaign.type,
                 emailsSent: campaign.delivery_status.emails_sent,
-                sendTime: campaign.send_time,
-                campaign
+                sendTime: campaign.send_time
             };
         });
         const total = response.data.total_items;
@@ -38,7 +37,8 @@ async function getCampaigns(req, res) {
             page: page + 1,
             limit,
             start: limit * page + 1,
-            end: offset + limit > total ? total : offset + limit
+            end: offset + limit > total ? total : offset + limit,
+            ffff: response.data
         };
         res.json(data);
     } catch (error) {

@@ -14,6 +14,7 @@ const CampaignsComponent = () => {
     const history = useHistory();
 
     const [showFaq, setShowFaq] = useState(false);
+    const [campaignToDelete, setCampaignToDelete] = useState(null);
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
 
@@ -35,8 +36,8 @@ const CampaignsComponent = () => {
         return `${day} ${monthName} ${year}`;
     }
 
-    const deleteCampaign = (campaign) => {
-        alert(campaign.title);
+    const deleteCampaign = () => {
+        // to-do: call delete api
     };
 
     const pageLeft = () => {
@@ -134,7 +135,7 @@ const CampaignsComponent = () => {
                                                     {campaign.previewText}
                                                 </td>
                                                 <td data-for="Action">
-                                                    <a className="link-with-underline cursor-pointer" onClick={() => deleteCampaign(campaign)}>Delete</a>
+                                                    <a className="link-with-underline cursor-pointer" onClick={() => setCampaignToDelete(campaign)}>Delete</a>
                                                 </td>
                                             </tr>
                                         ))}
@@ -152,6 +153,22 @@ const CampaignsComponent = () => {
                                 }
                             </div>
                         }
+
+                        <Modal
+                            centered
+                            show={!!campaignToDelete}
+                            onHide={() => setCampaignToDelete(null)}>
+                            <Modal.Header closeButton>
+                                <Modal.Title className="modal-title_small">Delete Campaign</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <div>Are you sure you want to the Campaign <b>{campaignToDelete ? campaignToDelete.title : ''}?</b></div>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <button className="btn cdp-btn-outline-primary" onClick={() => setCampaignToDelete(null)}>Cancel</button>
+                                <button className="ml-2 btn cdp-btn-secondary text-white" onClick={() => deleteCampaign()}>Confirm</button>
+                            </Modal.Footer>
+                        </Modal>
                     </div>
                 </div>
             </div>
