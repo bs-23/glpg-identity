@@ -43,10 +43,15 @@ const ApplicationDetails = ({ applicationId }) => {
                     {applicationDetails && applicationDetails.updatedByUser ? `${applicationDetails.updatedByUser.first_name} ${applicationDetails.updatedByUser.last_name}` : '--'}
                 </span>
             </div>
-            <div className="col-12 pb-3">
-                <span className="mr-2 d-block profile-detail__label">Metadata</span>
-                <span className="profile-detail__value">{applicationDetails && applicationDetails.metadata ? JSON.stringify(applicationDetails.metadata) : nullValueToken}</span>
-            </div>
+            {
+                applicationDetails && applicationDetails.metadata && Object.keys(applicationDetails.metadata).length &&
+                Object.keys(applicationDetails.metadata).map(key => {
+                    return <div className="col-6 col-md-4 pb-3" key={key}>
+                        <span className="mr-2 d-block profile-detail__label">{key}</span>
+                        <span className="profile-detail__value">{applicationDetails.metadata[key]}</span>
+                    </div>
+                })
+            }
             <div className="col-12 pb-3">
                 <span className="mr-2 d-block profile-detail__label">Description</span>
                 <span className="profile-detail__value">{applicationDetails && applicationDetails.description ? applicationDetails.description : nullValueToken}</span>
