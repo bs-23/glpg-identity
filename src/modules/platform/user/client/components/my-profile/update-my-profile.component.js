@@ -61,7 +61,7 @@ const UpdateMyProfile = () => {
         first_name: myProfileInfo && myProfileInfo.first_name,
         last_name: myProfileInfo && myProfileInfo.last_name,
         email: myProfileInfo && myProfileInfo.email,
-        phone: myProfileInfo && myProfileInfo.phone,
+        phone: myProfileInfo ? myProfileInfo.phone: '',
         isCountryFlagActive: myProfileInfo && (myProfileInfo.phone === '' || isCountryDetectedFromPhone(myProfileInfo.phone))
     }
 
@@ -89,7 +89,7 @@ const UpdateMyProfile = () => {
             const matchedCountry = countries[selectedCountryCode];
             let countryCodeForPhoneNumber = '';
             if(matchedCountry) countryCodeForPhoneNumber = CountryCodesObject[matchedCountry.country_iso2];
-            const phone = values.phone ? values.phone : null;
+            const phone = values.phone ? values.phone : '';
 
             delete values.isCountryFlagActive;
 
