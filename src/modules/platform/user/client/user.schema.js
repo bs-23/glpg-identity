@@ -136,6 +136,7 @@ export const updateMyProfileSchema = object().shape({
     last_name: cdpUserSchema.last_name,
     email: cdpUserSchema.email,
     phone: string()
+        .nullable()
         .matches(/^[0-9\+]*$/, 'This field only contains digits')
         .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`,
             function () {

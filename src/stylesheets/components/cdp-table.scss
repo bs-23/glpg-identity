@@ -85,10 +85,9 @@
 
                 &__btn-wrap {
                     width: 100%;
-                    background: #F8FFB5;
+                    /*background: #F8FFB5;
                     justify-content: center;
-                    box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 15%);
-
+                    box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 15%);*/
                     i {
                         border: 1px solid;
                         padding: 0px 10px;
@@ -294,6 +293,13 @@
                     position: sticky;
                     top: 0px;
                     z-index: 100;
+                }
+
+                button:active,
+                button:focus {
+                    .fa-sort {
+                        color: $white-color;
+                    }
                 }
             }
 
