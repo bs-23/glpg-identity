@@ -24,7 +24,7 @@ const Application = sequelize.cdpConnector.define('applications', {
     },
     type: {
         type: DataTypes.ENUM,
-        values: ['standard', 'hcp-portal']
+        values: ['standard', 'hcp-portal', 'business-partner']
     },
     email: {
         unique: true,

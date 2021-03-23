@@ -476,7 +476,6 @@ export default function hcpUsers() {
             id: 'individual_id_onekey',
             name: 'OneKeyID',
             editable: (row) => ['manually_verified'].includes(row.status),
-            class: "text-center",
             width: "8%",
             unique: true
         },
@@ -592,18 +591,23 @@ export default function hcpUsers() {
                 </div>
                 <div className="row">
                     <div className="col-12">
+                        <h4 className="cdp-text-primary font-weight-bold my-3">List of HCP User</h4>
                         <div>
-                            <div className="d-sm-flex justify-content-between align-items-end mt-1">
+                            <div className="d-sm-flex justify-content-between align-items-end mt-1 cdp-table__responsive-sticky-panel">
                                 <div>
-                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1 d-flex pb-2">
-                                        List of HCP User
-                                    </h4>
-                                    <div>
-                                        <div className="custom-tab px-3 py-3 cdp-border-primary active">Customer Data Platform</div>
-                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/crdlp">CRDLP</NavLink>
-                                    </div>
+                                    <div className="custom-tab px-3 py-3 cdp-border-primary active">Customer Data Platform</div>
+                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/information/list/crdlp">CRDLP</NavLink>
                                 </div>
                                 <div className="d-flex pt-3 pt-sm-0 mb-2">
+                                    {hcps['users'] && hcps['users'].length > 0 &&
+                                        <Accordion className="cdp-table__responsive-accordion d-block d-sm-none">
+                                            <Accordion.Toggle eventKey="0" className="btn btn-sm px-3 mr-2 cdp-btn-outline-primary rounded shadow-0 mb-0 p-2"><i className="fas fa-sort cdp-text-primary"></i></Accordion.Toggle>
+                                            <Accordion.Collapse eventKey="0" className="cdp-table__responsive-accordion-body">
+                                                <div className="cdp-bg-primary p-2 text-white">
+                                                </div>
+                                            </Accordion.Collapse>
+                                        </Accordion>
+                                    }
                                     <div className="mr-2">
                                         <div>
                                             {renderUuidAuthorities()}
@@ -614,9 +618,9 @@ export default function hcpUsers() {
                                             className={`btn ${isFilterEnabled ? 'multifilter_enabled cdp-btn-primary text-white' : 'cdp-btn-outline-primary'} ${tableDirty ? 'hcp-inline-disable' : null}`}
                                             onClick={() => setShow({ ...show, filterSidebar: true })}
                                         >
-                                            <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
-                                            <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
-                                            Filter
+                                            <i className={`fas fa-filter  ${isFilterEnabled ? '' : ''}`}></i>
+                                            <i className={`fas fa-database ${isFilterEnabled ? 'd-inline-block filter__sub-icon ' : 'd-none'}`}></i>
+                                            <span className="d-none d-sm-inline-block ml-2"> Filter</span>
                                         </button>
                                     </div>
                                     {

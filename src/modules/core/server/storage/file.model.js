@@ -28,8 +28,14 @@ const File = sequelize.cdpConnector.define('files', {
     table_name: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['partners', 'partner_vendors'],
+        values: ['partners', 'partner_vendors', 'applications'],
         defaultValue: 'partners'
+    },
+    created_by: {
+        type: DataTypes.UUID
+    },
+    updated_by: {
+        type: DataTypes.UUID
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
