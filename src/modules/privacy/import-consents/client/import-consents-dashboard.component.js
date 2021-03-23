@@ -82,13 +82,19 @@ export default function ImportConsentsDashboard() {
                                             validationSchema={ImportConsentsSchema}
                                             onSubmit={(values, actions) => {
                                                 console.log(values);
-                                                axios.post(`/api/consent/bulk-import`, values, {
+
+                                                const data = new FormData();
+                                                data.append('consent_category', values.consent_category);
+                                                data.append('consent_id', values.consent_id);
+                                                data.append('file', values.file);
+
+                                                axios.post(`/api/consent/bulk-import`, data, {
                                                     headers: {
                                                         'Content-Type': 'multipart/form-data'
                                                     }
                                                 })
-                                                    .then((x) => console.log(x))
-                                                    .catch(err => console.log(err))
+                                                    .then((x) => console.log('SUCCESS', x))
+                                                    .catch(err => console.log('ERROR', err))
 
                                                 actions.setSubmitting(false);
                                                 actions.resetForm();
