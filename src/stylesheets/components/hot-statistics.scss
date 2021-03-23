@@ -6,6 +6,11 @@
         }
     }
 
+    &__icon {
+        color: $gray-ccc;
+        font-size: 18px;
+    }
+
     &__title {
         font-size: 14px;
         font-weight: 600;
@@ -13,8 +18,8 @@
     }
 
     &__amount {
-        font-size: 18px;
-        font-weight: bold;
+        font-size: 32px;
+        font-weight: 600;
         color: $primary-color;
     }
 }

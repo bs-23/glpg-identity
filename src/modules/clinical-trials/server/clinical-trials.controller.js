@@ -738,33 +738,33 @@ async function getTrials(req, res) {
         if(! free_text_search){
             return true;
         }
-        if(x.indication.toLowerCase().includes(free_text_search)){
-            return true;
-        }
-        if(x.indication_group.toLowerCase().includes(free_text_search)){
-            return true;
-        }
-        if(x.phase.toLowerCase().includes(free_text_search)){
-            return true;
-        }
-        if(x.gender.toLowerCase().includes(free_text_search)){
-            return true;
-        }
-        if(x.std_age.toLowerCase().includes(free_text_search)){
-            return true;
-        }
-        if(x.clinical_trial_brief_title.toLowerCase().includes(free_text_search)){
-            return true;
-        }
-        if(x.official_title.toLowerCase().includes(free_text_search)){
-            return true;
-        }
-        if(x.trial_status.toLowerCase().includes(free_text_search)){
-            return true;
-        }
-        if(String(x.distance).includes(free_text_search)){
-            return true;
-        }
+        let isFound = false;
+
+        [
+            'indication',
+            'indication_group',
+            'phase',
+            'gender',
+            'std_age',
+            'clinical_trial_brief_title',
+            'official_title',
+            'trial_status',
+            'distance',
+            'trial_fixed_id',
+            'protocol_number',
+            'gov_identifier',
+            'eudract_number',
+            'inclusion_criteria',
+            'exclusion_criteria',
+            'note_criteria',
+            'type_of_drug',
+            'story_telling'
+        ].forEach(search_field=>{
+            if(String(x[search_field]).toLowerCase().includes(free_text_search)){
+                isFound = true;
+            }
+        });
+        return isFound;
     } catch(ex){
     }
         return false;
