@@ -61,55 +61,47 @@ export default function HotStatistic() {
             </h5>
             <div className="p-3 shadow-sm hot-statistics__box-wrap">
                 <div className="row">
-                    {/*<div className="col-12 hot-statistics__box pb-4">
-                        <div className="form-group">
-                            <select className="form-control">
-                                <option><img height="20" width="20" src="/assets/flag/flag-belgium.svg" /><span>Belgium</span></option>
-                                <option><img height="20" width="20" src="/assets/flag/flag-germany.svg" /><span>Germany</span></option>
-                                <option><img height="20" width="20" src="/assets/flag/flag-spain.svg" /><span>Spain</span></option>
-                                <option><img height="20" width="20" src="/assets/flag/flag-france.svg" /><span>France</span></option>
-                                <option><img height="20" width="20" src="/assets/flag/flag-ireland.svg" /><span>Ireland</span></option>
-                                <option><img height="20" width="20" src="/assets/flag/flag-italy.svg" /><span>Italy</span></option>
-                                <option><img height="20" width="20" src="/assets/flag/flag-luxembourg.svg" /><span>Luxembourg</span></option>
-                                <option><img height="20" width="20" src="/assets/flag/flag-monaco.svg" /><span>Monaco</span></option>
-                                <option><img height="20" width="20" src="/assets/flag/flag-netherlands.svg" /><span>Netherlands</span></option>
-                                <option><img height="20" width="20" src="/assets/flag/flag-united-kingdom.svg" /><span>United Kingdom</span></option>
-                            </select>
-                        </div>
-                    </div>*/}
-                    <Select
-                        defaultValue={[]}
-                        isMulti={true}
-                        name="countries"
-                        components={{ Option: CustomOption }}
-                        hideSelectedOptions={false}
-                        options={getCountriesOptions()}
-                        className="multiselect"
-                        classNamePrefix="multiselect"
-                        value={selectedCountries}
-                        onChange={selectedOption => {
-                            setSelectedCountries(selectedOption);
-                        }}
-                    />
-                    <div className="col-6 col-md-4 hot-statistics__box pb-4">
-                        <div className="hot-statistics__title pb-3">Total HCP Users</div>
+                    <div className="col-12 mb-3">
+                        <Select
+                            defaultValue={[]}
+                            isMulti={true}
+                            name="countries"
+                            components={{ Option: CustomOption }}
+                            hideSelectedOptions={false}
+                            options={getCountriesOptions()}
+                            className="multiselect"
+                            menuPlacement="top"
+                            classNamePrefix="multiselect"
+                            value={selectedCountries}
+                            onChange={selectedOption => {
+                                setSelectedCountries(selectedOption);
+                            }}
+                        />
+                    </div>
+                    <div className="col-6  hot-statistics__box pb-4">
+                        <i className="fas fa-user-md hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">{statistics.hcps_count || 0}</div>
+                        <div className="hot-statistics__title pb-3">Total HCP Users</div>
                     </div>
-                    <div className="col-6 col-md-4 hot-statistics__box pb-4">
-                        <div className="hot-statistics__title pb-3">Total Consents</div>
+                    <div className="col-6  hot-statistics__box pb-4">
+                        <i class="icon icon-data-consent-management hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">{statistics.consents_count || 0}</div>
+                        <div className="hot-statistics__title pb-3">Total Consents</div>
                     </div>
-                    <div className="col-6 col-md-4 hot-statistics__box pb-4">
-                        <div className="hot-statistics__title pb-3"> Total Captured Consents</div>
+                    <div className="col-6  hot-statistics__box pb-4">
+                        <i class="icon icon-accept hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">{statistics.captured_consents_count || 0}</div>
+                        <div className="hot-statistics__title pb-3"> Total Captured Consents</div>
                     </div>
-                    <div className="col-6 col-md-4 hot-statistics__box pb-4">
-                        <div className="hot-statistics__title pb-3"> Total Busniess Partners</div>
+                    <div className="col-6  hot-statistics__box pb-4">
+                        <i class="icon icon-partner hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">{statistics.business_partner_count || 0}</div>
+                        <div className="hot-statistics__title pb-3"> Total Busniess Partners</div>
                     </div>
-                    <div className="col-6 col-md-4 hot-statistics__box pb-4">
-                        <div className="hot-statistics__title pb-3"> Total Campaigns</div>
+                    <div className="col-6 hot-statistics__box pb-4">
+                        <i class="icon icon-marketing-promotion hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">0</div>
+                        <div className="hot-statistics__title pb-3"> Total Campaigns</div>
                     </div>
                 </div>
             </div>
