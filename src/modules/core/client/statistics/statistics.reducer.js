@@ -12,6 +12,13 @@ export default function reducer(state = initialState, action) {
                 statistics: action.payload.data
             };
         }
+
+        case Types.CLEAR_STATISTICS: {
+            return {
+                ...state,
+                statistics: {}
+            };
+        }
     }
 
     return state;

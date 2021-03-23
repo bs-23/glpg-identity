@@ -239,6 +239,8 @@ export default function CrdlpHcpProfiles() {
                                 <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
+                                                <th width="10%"><span className={sort.value === 'personemail' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'firstname')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+
                                                 <th width="10%"><span className={sort.value === 'firstname' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'firstname')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
                                                 <th width="10%"><span className={sort.value === 'lastname' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'lastname')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
@@ -247,13 +249,13 @@ export default function CrdlpHcpProfiles() {
 
                                                 <th width="15%"><span className={sort.value === 'uuid_1' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'uuid_1')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                <th width="15%"><span className={sort.value === 'individual_id_onekey' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'individual_id_onekey')}>Individual Onekey ID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
-
                                                 <th width="8%"><span className={sort.value === 'country_iso2' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'country_iso2')}>Country<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
                                                 <th width="15%">Specialty</th>
 
                                                 <th width="10%">Phone</th>
+
+                                                <th width="15%"><span className={sort.value === 'individual_id_onekey' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'individual_id_onekey')}>OneKeyID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
                                                 <th width="10%">Action</th>
                                             </tr>
@@ -261,6 +263,7 @@ export default function CrdlpHcpProfiles() {
                                         <tbody className="cdp-table__body bg-white">
                                             {hcpUsers.users.map((row, idx) => (
                                                 <tr key={'user-' + idx}>
+                                                    <td data-for="Email" className="text-break">{row.personemail || '--'}</td>
                                                     <td data-for="First Name" className="text-break">{row.firstname || '--'}</td>
                                                     <td data-for="Last Name" className="text-break">{row.lastname || '--'}</td>
                                                     <td data-for="Status">
@@ -273,7 +276,6 @@ export default function CrdlpHcpProfiles() {
                                                         }
                                                     </td>
                                                     <td data-for="UUID" className="text-break">{row.uuid_1 || '--'}</td>
-                                                    <td data-for="Individual Onekey ID" className="text-break">{row.individual_id_onekey || '--'}</td>
                                                     <td data-for="Country">{getCountryName(row.country_iso2) || '--'}</td>
                                                     <td data-for="Specialty">
                                                         {row.specialties && row.specialties.length ?
@@ -282,6 +284,7 @@ export default function CrdlpHcpProfiles() {
                                                         }
                                                     </td>
                                                     <td data-for="Phone" className="text-break">{row.telephone || '--'}</td>
+                                                    <td data-for="OnekeyID" className="text-break">{row.individual_id_onekey || '--'}</td>
                                                     <td data-for="Action">
                                                         <button className="btn cdp-btn-outline-primary btn-sm" onClick={() => setProfileDetails(row)}><i class="icon icon-user mr-2" ></i>Profile</button>
                                                     </td>
