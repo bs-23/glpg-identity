@@ -8,6 +8,45 @@ const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-con
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
 const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model'));
 const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model'));
+const serviceUrl = nodecache.getValue('SALESFORCE_SERVICE_URL');
+
+async function getAuthorizationHeader() {
+    try {
+        const auth = async function() {
+            const grant_type = 'password';
+            const client_id = nodecache.getValue('SALESFORCE_SERVICE_CLIENT_ID');;
+            const client_secret = nodecache.getValue('SALESFORCE_SERVICE_CLIENT_SECRET');
+            const username = nodecache.getValue('SALESFORCE_SERVICE_USERNAME');
+            const password = nodecache.getValue('SALESFORCE_SERVICE_PASSWORD');
+
+            const { data } = await axios.post(`${serviceUrl}/oauth2/token?grant_type=${grant_type}&client_id=${client_id}&client_secret=${client_secret}&username=${username}&password=${password}`);
+
+            return data.access_token;
+        };
+
+        const access_token = await auth();
+        const headers = { authorization: `Bearer ${access_token}` };
+
+        return headers;
+    } catch(err) {
+        logger.error(err);
+    }
+}
+
+async function getAccountByOneKeyId(oneKeyId) {
+    try {
+        const headers = await getAuthorizationHeader();
+        const query = `SELECT + Id, Name, PersonEmail, Secondary_Email__c,
+            (SELECT + Id + FROM + Multichannel_Consent_vod__r) +
+            FROM + Account + WHERE + QIDC__OneKeyId_IMS__c = '${oneKeyId}'`;
+        const account_response = await axios.get(`${serviceUrl}/data/v48.0/query?q=${query}`, { headers });
+        const account = account_response.data.totalSize ? account_response.data.records[0] : null;
+
+        return account;
+    } catch(err) {
+        logger.error(err);
+    }
+}
 
 async function syncHcpConsentsInVeeva(hcp, actor) {
     if(!hcp.individual_id_onekey) return;
@@ -36,28 +75,8 @@ async function syncHcpConsentsInVeeva(hcp, actor) {
         });
 
         if(hcp_consents && hcp_consents.length) {
-            const serviceUrl = nodecache.getValue('SALESFORCE_SERVICE_URL');
-
-            const auth = async function() {
-                const grant_type = 'password';
-                const client_id = nodecache.getValue('SALESFORCE_SERVICE_CLIENT_ID');;
-                const client_secret = nodecache.getValue('SALESFORCE_SERVICE_CLIENT_SECRET');
-                const username = nodecache.getValue('SALESFORCE_SERVICE_USERNAME');
-                const password = nodecache.getValue('SALESFORCE_SERVICE_PASSWORD');
-
-                const { data } = await axios.post(`${serviceUrl}/oauth2/token?grant_type=${grant_type}&client_id=${client_id}&client_secret=${client_secret}&username=${username}&password=${password}`);
-
-                return data.access_token;
-            };
-
-            const access_token = await auth();
-            const headers = { authorization: `Bearer ${access_token}` };
-
-            const query = `SELECT + Id, Name, PersonEmail, Secondary_Email__c,
-                (SELECT + Id + FROM + Multichannel_Consent_vod__r) +
-                FROM + Account + WHERE + QIDC__OneKeyId_IMS__c = '${hcp.individual_id_onekey}'`;
-            const account_response = await axios.get(`${serviceUrl}/data/v48.0/query?q=${query}`, { headers });
-            const account = account_response.data.totalSize ? account_response.data.records[0] : null;
+            const headers = await getAuthorizationHeader();
+            const account = await getAccountByOneKeyId(hcp.individual_id_onekey);
 
             if(!account) return;
 
@@ -121,3 +140,4 @@ async function syncHcpConsentsInVeeva(hcp, actor) {
 }
 
 exports.syncHcpConsentsInVeeva = syncHcpConsentsInVeeva;
+exports.getAccountByOneKeyId = getAccountByOneKeyId;
