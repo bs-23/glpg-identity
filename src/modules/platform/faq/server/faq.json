@@ -86,6 +86,12 @@
         },
         {
             "category": "privacy",
+            "title": "Import Consents from Thirdparty events",
+            "slug": "import-consents",
+            "icon": "icon icon-global icon-2x "
+        },
+        {
+            "category": "privacy",
             "title": "Generate Data Privacy & Consent Performance Report",
             "slug": "consent-performance-report",
             "icon": "icon icon-handshake icon-2x "

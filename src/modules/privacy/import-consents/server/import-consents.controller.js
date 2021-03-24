@@ -21,7 +21,7 @@ async function bulkImportConsents(req, res) {
 
         const importRecord = await HcpConsentsImportRecord.create({
             consent_id: req.body.consent_id,
-            consent_locale: 'nl_NL',
+            consent_locale: req.body.locale,
             result,
             created_by: req.user.id
         });

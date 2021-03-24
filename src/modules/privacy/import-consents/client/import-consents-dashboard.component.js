@@ -63,6 +63,21 @@ export default function ImportConsentsDashboard() {
             [item['id'], item])).values()]);
     }
 
+    const DownloadFile = (id) => {
+        axios.get(`/api/consent/imported-hcp-consents/${id}/download`)
+            .then(({ data }) => {
+                const newWindow = window.open(data, '_blank', 'noopener,noreferrer')
+                if (newWindow) newWindow.opener = null
+            })
+            .catch(err => {
+                addToast('Could not download file', {
+                    appearance: 'error',
+                    autoDismiss: true
+                });
+            });
+
+    }
+
     return (
 
         <main className="app__content cdp-light-bg h-100">
@@ -229,7 +244,7 @@ export default function ImportConsentsDashboard() {
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
-                                                        <Dropdown.Item>Download</Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => DownloadFile(row.id)}>Download</Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
