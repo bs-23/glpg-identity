@@ -52,14 +52,14 @@ export default function HotStatistic() {
     }, [selectedCountries]);
 
     return (
-        <div className={`hot-statistics shadow-sm bg-white mb-3 ${show ? "cdp-inbox__expand" : ""}`}>
+        <div className={`hot-statistics shadow-sm bg-white ${show ? "cdp-inbox__expand" : ""}`}>
             <h5 className="p-3 cdp-text-primary font-weight-bold mb-0 d-flex justify-content-between cdp-inbox__header">
                 Hot Statistics
                 {/*<i onClick={() => setShow(true)} class="icon icon-expand cdp-inbox__icon-expand cdp-inbox__icon-toggle d-none d-lg-block cursor-pointer"></i>
                 <i class="icon icon-minimize cdp-inbox__icon-minimize cdp-inbox__icon-toggle cursor-pointer" onClick={() => setShow(false)}></i>*/}
                 <i className="fas fa-chart-line"></i>
             </h5>
-            <div className="p-3 shadow-sm hot-statistics__box-wrap">
+            <div className="px-3 pt-3 shadow-sm hot-statistics__box-wrap">
                 <div className="row">
                     <div className="col-12 mb-3">
                         <Select
@@ -78,30 +78,30 @@ export default function HotStatistic() {
                             }}
                         />
                     </div>
-                    <div className="col-6  hot-statistics__box pb-4">
+                    <div className="col-6 col-sm-4 hot-statistics__box py-3 border-top border-right border-bottom bg-white">
                         <i className="fas fa-user-md hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">{statistics.hcps_count || 0}</div>
-                        <div className="hot-statistics__title pb-3">Total HCP Users</div>
+                        <div className="hot-statistics__title">Total HCP Users</div>
                     </div>
-                    <div className="col-6  hot-statistics__box pb-4">
+                    <div className="col-6 col-sm-4 hot-statistics__box py-3 border-top border-right border-bottom bg-white">
                         <i class="icon icon-data-consent-management hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">{statistics.consents_count || 0}</div>
-                        <div className="hot-statistics__title pb-3">Total Consents</div>
+                        <div className="hot-statistics__title">Total Consents</div>
                     </div>
-                    <div className="col-6  hot-statistics__box pb-4">
+                    <div className="col-6 col-sm-4 hot-statistics__box py-3 border-top border-bottom bg-white">
                         <i class="icon icon-accept hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">{statistics.captured_consents_count || 0}</div>
-                        <div className="hot-statistics__title pb-3"> Total Captured Consents</div>
+                        <div className="hot-statistics__title"> Total Captured Consents</div>
                     </div>
-                    <div className="col-6  hot-statistics__box pb-4">
+                    <div className="col-6 col-sm-4 hot-statistics__box py-3 border-right bg-white">
                         <i class="icon icon-partner hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">{statistics.business_partner_count || 0}</div>
-                        <div className="hot-statistics__title pb-3"> Total Busniess Partners</div>
+                        <div className="hot-statistics__title"> Total Busniess Partners</div>
                     </div>
-                    <div className="col-6 hot-statistics__box pb-4">
+                    <div className="col-6 col-sm-4 hot-statistics__box py-3 border-right bg-white">
                         <i class="icon icon-marketing-promotion hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">0</div>
-                        <div className="hot-statistics__title pb-3"> Total Campaigns</div>
+                        <div className="hot-statistics__title">Total Campaigns</div>
                     </div>
                 </div>
             </div>

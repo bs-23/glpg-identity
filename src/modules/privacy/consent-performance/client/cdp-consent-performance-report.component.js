@@ -178,8 +178,8 @@ const CdpConsentPerformanceReport = () => {
                             <div className="d-sm-flex justify-content-between align-items-end mb-0 mt-4 cdp-table__responsive-sticky-panel">
                                 <div>
                                     <div>
-                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/consent/consent-performance-report/cdp">Customer Data Platform</NavLink>
-                                        <NavLink className="custom-tab px-4 py-3 cdp-border-primary" to="/consent/consent-performance-report/veeva-crm"><img alt="Veeva CRM LOGO" src="/assets/logo/logo-veevacrm.svg" height="13" /></NavLink>
+                                        <NavLink className="custom-tab px-2 py-3 cdp-border-primary" to="/consent/consent-performance-report/cdp">Customer Data Platform</NavLink>
+                                        <NavLink className="custom-tab px-2 py-3 cdp-border-primary" to="/consent/consent-performance-report/veeva-crm"><img alt="Veeva CRM LOGO" src="/assets/logo/logo-veevacrm.svg" height="13" /></NavLink>
                                     </div>
                                 </div>
                                 <div className="d-flex pt-3 pt-sm-0 mb-2">

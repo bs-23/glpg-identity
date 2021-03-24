@@ -170,15 +170,15 @@ const ConsentPerformanceReport = () => {
                         <div>
                             <h4 className="cdp-text-primary font-weight-bold my-3">Consent Performance Report</h4>
                             <div className="d-sm-flex justify-content-between align-items-end mb-0 mt-sm-4 cdp-table__responsive-sticky-panel py-2 py-sm-0">
-                                <div className="d-flex align-items-center">
+                                <div className="d-flex align-items-center justify-content-between">
                                     <div>
-                                        <NavLink className="custom-tab px-3 py-3 cdp-border-primary" to="/consent/consent-performance-report/cdp">Customer Data Platform</NavLink>
-                                        <NavLink className="custom-tab px-3 px-lg-4 py-3 cdp-border-primary" to="/consent/consent-performance-report/veeva-crm"><img alt="Veeva CRM LOGO" src="/assets/logo/logo-veevacrm.svg" height="13" /></NavLink>
+                                        <NavLink className="custom-tab px-2 py-3 cdp-border-primary" to="/consent/consent-performance-report/cdp">Customer Data Platform</NavLink>
+                                        <NavLink className="custom-tab px-2 px-lg-4 py-3 cdp-border-primary" to="/consent/consent-performance-report/veeva-crm"><img alt="Veeva CRM LOGO" src="/assets/logo/logo-veevacrm.svg" height="13" /></NavLink>
                                     </div>
                                     {consents_report['hcp_consents'] && consents_report['hcp_consents'].length > 0 &&
                                         <Accordion className="cdp-table__responsive-accordion d-block d-sm-none">
-                                            <Accordion.Toggle eventKey="0" className="btn btn-sm borrder-0 shadow-0 mb-0 ml-2"><i className="fas fa-sort cdp-text-primary"></i></Accordion.Toggle>
-                                            <Accordion.Collapse eventKey="0" className="cdp-table__responsive-accordion-body">
+                                            <Accordion.Toggle eventKey="0" className="btn btn-sm px-3 ml-2 cdp-btn-outline-primary rounded shadow-0 mb-0 p-2"><i className="fas fa-sort cdp-text-primary"></i></Accordion.Toggle>
+                                            <Accordion.Collapse eventKey="0" className="cdp-table__responsive-accordion-body mt-2">
                                                 <div className="cdp-bg-primary p-2 text-white">
                                                     <LinkContainer to={getUrl('name')}>
                                                         <span
