@@ -9,10 +9,10 @@ module.exports = multer({
     fileFilter: (req, file, cb) => {
         const fileExtension = path.extname(file.originalname);
 
-        if (fileExtension !== '.csv'
+        if (fileExtension !== '.xlsx'
         ) {
             cb(null, false);
-            return cb(new Error('Invalid file type. Only CSV is allowed.'), false);
+            return cb(new Error('Invalid file type. Only Excel (.xlsx) files are allowed.'), false);
         }
 
         if (file.originalname.length > MAX_FILE_NAME_LENGTH) {
