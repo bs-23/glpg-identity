@@ -6,6 +6,7 @@
     left: 0px;
     display: flex;
     justify-content: flex-end;
+    z-index: 1000;
 
     &__panel {
         background: white;
@@ -182,7 +183,8 @@
 
 
     @media (max-width: $screen-phone) {
-        height: calc(100vh - 70px);
+        height: 100vh;
+        position: fixed;
 
         &__panel {
             width: 100%;
