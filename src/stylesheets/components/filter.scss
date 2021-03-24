@@ -6,6 +6,7 @@
     left: 0px;
     display: flex;
     justify-content: flex-end;
+    z-index: 1000;
 
     &__panel {
         background: white;
