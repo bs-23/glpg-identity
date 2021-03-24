@@ -46,8 +46,11 @@ const VeevaConsentSync = ({ userID, consents, onClose }) => {
         >
             {formikProps => (
                 <Form onSubmit={formikProps.handleSubmit}>
+                    <div className="pb-3">
+                        <span className="text-secondary">Most Recent Consent Sync Time: </span>
+                        <span className="font-weight-bold-light pl-1">{consents && showDateTime(consents[0].latestConsentSyncTime)}</span>
+                    </div>
                     <div className="table-responsive shadow-sm bg-white mb-3 cdp-table__responsive-wrapper">
-                        <div><span className="font-weight-bold">Most Recent Consent Sync Time: </span>{consents && showDateTime(consents[0].latestConsentSyncTime)}</div>
                         <div className="mt-2 mb-2">
                             <div className="col accordion-consent rounded p-0">
                                 <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
@@ -58,7 +61,7 @@ const VeevaConsentSync = ({ userID, consents, onClose }) => {
                                                 <div>{parse(consent.rich_text)}</div>
                                                 <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Opt-Type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
                                                 <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Updated on:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
-                                                <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Veeva multi channel consent id:</span>{consent.veeva_multichannel_consent_id}</div>
+                                                <div><span className="pr-1 text-dark"><i className="fas fa-cogs mr-1 small"></i>Veeva multi channel consent id:</span>{consent.veeva_multichannel_consent_id}</div>
                                             </Card.Body>
                                         </Accordion.Collapse>
                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
@@ -69,7 +72,10 @@ const VeevaConsentSync = ({ userID, consents, onClose }) => {
                                 )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent.</div>}
                             </div>
                         </div>
-                        <div className="col-12 col-sm-12">
+                        
+                    </div>
+                    <div className="row">
+                        <div className="col-12">
                             <div className="form-group mb-0">
                                 <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
                                 <div>
@@ -78,9 +84,11 @@ const VeevaConsentSync = ({ userID, consents, onClose }) => {
                                 <div className="invalid-feedback"><ErrorMessage name="comment" /></div>
                             </div>
                         </div>
-                        <div className="ml-3 mr-3">
-                            <button type="submit" className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" >Sync with VeevaCRM</button>
-                            <span className="btn btn-block text-white cdp-btn-secondary mt-4 p-2" onClick={() => onClose()}>Cancel</span>
+                        <div className="col-8">
+                            <button type="submit" className="btn btn-block cdp-btn-primary my-4 p-2 font-weight-bold text-white" >Sync with VeevaCRM</button>
+                        </div>
+                        <div className="col-4">
+                            <span className="btn btn-block cdp-btn-outline-secondary my-4 p-2 font-weight-bold  " onClick={() => onClose()}>Cancel</span>
                         </div>
                     </div>
                 </Form>
