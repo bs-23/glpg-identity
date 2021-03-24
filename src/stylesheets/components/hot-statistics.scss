@@ -4,22 +4,38 @@
         &-wrap {
             background-color: $light-bg-color;
         }
+
+        @media (max-width: $screen-phone) {
+            border: 0px !important
+        }
     }
 
     &__icon {
         color: $gray-ccc;
-        font-size: 18px;
-    }
-
-    &__title {
-        font-size: 14px;
-        font-weight: 600;
-        color: $primary-color;
+        font-size: 24px;
+        height: 26px;
+        display: block;
     }
 
     &__amount {
         font-size: 32px;
         font-weight: 600;
         color: $primary-color;
+    }
+
+    &__title {
+        font-size: 14px;
+        font-weight: normal;
+        color: $primary-color;
+    }
+
+    .multiselect__control {
+        box-shadow: 0 0 0 0.2rem rgb(20 77 67 / 25%) !important;
+
+        &:focus,
+        &:hover,
+        &:active {
+            border-color: $primary-color-lighter !important;
+        }
     }
 }
