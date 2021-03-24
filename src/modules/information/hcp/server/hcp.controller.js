@@ -1133,7 +1133,7 @@ async function getHCPUserConsents(req, res) {
                 model: Consent,
                 as: 'consent'
             },
-            attributes: ['consent_id', 'consent_confirmed', 'rich_text', 'opt_type', 'updated_at']
+            attributes: ['consent_id', 'consent_confirmed', 'rich_text', 'opt_type', 'updated_at', 'veeva_multichannel_consent_id']
         });
 
         if (!userConsents.length) return res.json([]);
@@ -1153,6 +1153,7 @@ async function getHCPUserConsents(req, res) {
                 opt_type: userConsent.opt_type,
                 preference: userConsent.consent.preference,
                 rich_text: userConsent.rich_text,
+                veeva_multichannel_consent_id: userConsent.veeva_multichannel_consent_id,
                 latestConsentSyncTime
             };
         });

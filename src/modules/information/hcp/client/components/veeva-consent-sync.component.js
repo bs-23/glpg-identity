@@ -58,6 +58,7 @@ const VeevaConsentSync = ({ userID, consents, onClose }) => {
                                                 <div>{parse(consent.rich_text)}</div>
                                                 <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Opt-Type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
                                                 <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Updated on:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
+                                                <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Veeva multi channel consent id:</span>{consent.veeva_multichannel_consent_id}</div>
                                             </Card.Body>
                                         </Accordion.Collapse>
                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
