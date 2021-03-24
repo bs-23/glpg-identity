@@ -15,6 +15,7 @@ const Services = {
     CONSENT_COUNTRY: 'consent-country',
     CONSENT_CATEGORY: 'consent-category',
     CONSENT_PERFORMANCE: 'consent-performance',
+    IMPORT_CONSENTS: 'import-consents',
     MANAGE_CLINICAL_TRIALS: 'manage-clinical-trials',
     MANAGE_VENDOR_REQUEST: 'manage-vendor-request',
     MANAGE_ENTITY_REQUEST: 'manage-entity-request',
