@@ -756,7 +756,6 @@ export default function hcpUsers() {
                                     </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    <div className="alert alert-warning">Are you sure you want to sync consents with Veeva CRM?</div>
                                     <VeevaConsentSync
                                         userID={currentUser.id}
                                         consents={currentUser.consents}

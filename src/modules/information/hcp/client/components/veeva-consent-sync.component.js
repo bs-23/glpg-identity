@@ -47,7 +47,7 @@ const VeevaConsentSync = ({ userID, consents, onClose }) => {
             {formikProps => (
                 <Form onSubmit={formikProps.handleSubmit}>
                     <div className="pb-3">
-                        <span className="text-secondary">Most Recent Consent Sync Time: </span>
+                        <span className="text-secondary">Last execution date: </span>
                         <span className="font-weight-bold-light pl-1">{consents && showDateTime(consents[0].latestConsentSyncTime)}</span>
                     </div>
                     <div className="table-responsive shadow-sm bg-white mb-3 cdp-table__responsive-wrapper">
