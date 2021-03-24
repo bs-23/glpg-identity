@@ -7,6 +7,7 @@ import Modal from 'react-bootstrap/Modal';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { getConsentCategories } from '../../../privacy/consent-category/client/category.actions';
 import { getCdpConsents } from '../../../privacy/manage-consent/client/consent.actions';
+import { getImportedConsents } from './import-consents.actions';
 import { ImportConsentsSchema } from './import-consents.schema';
 import axios from 'axios';
 
@@ -18,10 +19,12 @@ export default function ImportConsentsDashboard() {
     const [showForm, setShowForm] = useState(false);
     const consent_categories = useSelector(state => state.consentCategoryReducer.consent_categories);
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
+    const imported_consents = useSelector(state => state.importedConsentReducer.imported_consents);
 
     useEffect(() => {
         dispatch(getConsentCategories());
         dispatch(getCdpConsents(null, null));
+        dispatch(getImportedConsents());
     }, []);
 
     return (
@@ -58,7 +61,7 @@ export default function ImportConsentsDashboard() {
                 </div>
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel">
+                        <div className="d-flex justify-content-between align-items-center py-3">
                             <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">Import Consents </h4>
                             <div class="d-flex justify-content-between align-items-center">
                                 <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
@@ -144,6 +147,30 @@ export default function ImportConsentsDashboard() {
                                     </Modal.Body>
                                 </Modal>
                             </div>
+                        </div>
+                        <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel">
+                            {imported_consents && imported_consents.length > 0 &&
+                                <table className="table table-hover table-sm mb-0 cdp-table mb-0 cdp-table__responsive">
+                                    <thead className="cdp-bg-primary text-white cdp-table__header">
+                                        <tr>
+                                            <th width="20%">Total consents</th>
+                                            <th width="20%">Locale</th>
+                                            <th width="20%">Created at</th>
+                                            <th width="20%">Created By</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="cdp-table__body bg-white">
+                                        {imported_consents.map(row => (
+                                            <tr key={row.id}>
+                                                <td className="text-break">{row.result.length}</td>
+                                                <td className="text-break">{row.consent_locale}</td>
+                                                <td className="text-break">{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
+                                                <td className="text-break">{row.created_by}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            }
                         </div>
                     </div>
                 </div>
