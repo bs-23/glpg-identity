@@ -40,7 +40,7 @@ async function uploadDucument(owner, file) {
     const uploadOptions = {
         bucket: bucketName,
         folder: `imported-hcp-consents/`,
-        fileName: owner.id,
+        fileName: owner.id + '.xlsx',
         fileContent: file.buffer
     };
 
