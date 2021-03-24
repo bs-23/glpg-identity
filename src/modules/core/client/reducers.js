@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import { countryReducer, localizationReducer, phoneExtensionReducer, statisticsReducer } from '../../core';
 import hcpReducer from '../../information/hcp/client/hcp.reducer';
-import { consentReducer, consentCategoryReducer, consentCountryReducer, consentPerformanceReducer } from '../../privacy';
+import { consentReducer, consentCategoryReducer, consentCountryReducer, consentPerformanceReducer, importedConsentReducer } from '../../privacy';
 import { faqReducer, userReducer, profileReducer, roleReducer, permissionSetReducer } from '../../platform';
 import { manageRequestsReducer, managePartnerReducer } from '../../partner';
 import { applicationReducer } from '../../platform';
@@ -27,5 +27,6 @@ export default combineReducers({
     consentPerformanceReducer,
     clinicalTrialsReducer,
     localizationsReducer,
-    applicationReducer
+    applicationReducer,
+    importedConsentReducer
 })
