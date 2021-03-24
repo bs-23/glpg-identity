@@ -6,6 +6,8 @@ export const ImportConsentsSchema = object().shape({
         .required('This field must not be empty.'),
     consent_id: string()
         .required('This field must not be empty.'),
+    locale: string()
+        .required('This field must not be empty.'),
     file: mixed().required('A file is required')
         .test('fileFormat', 'Excel (.xlsx) files only', (value) => {
             console.log(value);

@@ -68,6 +68,14 @@ const ConsentManagement = () => {
                                                 <span className="d-block cdp-list-group__link-activity">within 2 - 5 minutes</span>
                                             </span>
                                         </NavLink>
+                                        <NavLink to="/consent/import-hcp-consents" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
+                                            <i className="fas fa-fingerprint fa-3x cdp-list-group__icon"></i>
+                                            <span>
+                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Import Conents from Thirdparty events</strong>
+                                                <span className="d-block cdp-list-group__link-description">Import Conents from Thirdparty events</span>
+                                                <span className="d-block cdp-list-group__link-activity">within 2 - 5 minutes</span>
+                                            </span>
+                                        </NavLink>
                                         <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">
                                             <i className="icon icon-history icon-3x cdp-list-group__icon"></i>
                                             <span>
