@@ -2,8 +2,10 @@ const path = require('path');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model'));
+const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
 
-const ImportedHcpConsent = sequelize.cdpConnector.define('imported_hcp_consents', {
+const HcpConsentsImportRecord = sequelize.cdpConnector.define('hcp_consents_import_records', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -26,10 +28,13 @@ const ImportedHcpConsent = sequelize.cdpConnector.define('imported_hcp_consents'
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
-    tableName: 'imported_hcp_consents',
+    tableName: 'hcp_consents_import_records',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-module.exports = ImportedHcpConsent;
+HcpConsentsImportRecord.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
+HcpConsentsImportRecord.belongsTo(Consent, { as: 'consent', foreignKey: 'consent_id' });
+
+module.exports = HcpConsentsImportRecord;
