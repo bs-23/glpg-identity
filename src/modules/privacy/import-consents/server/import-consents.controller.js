@@ -5,6 +5,8 @@ const HcpConsentsImportRecord = require(path.join(process.cwd(), 'src/modules/pr
 const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
+const storageService = require(path.join(process.cwd(), 'src/modules/core/server/storage/storage.service'));
+const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 
 async function bulkImportConsents(req, res) {
     try {
@@ -17,18 +19,39 @@ async function bulkImportConsents(req, res) {
             rows.filter(r => r['OneKey ID Individual'] && r['Opt-In Date'])
                 .map(r => ({ onekey_id: r['OneKey ID Individual'], multichannel_consent_id: '12345' }));
 
-        await HcpConsentsImportRecord.create({
+        const importRecord = await HcpConsentsImportRecord.create({
             consent_id: req.body.consent_id,
             consent_locale: 'nl_NL',
             result,
             created_by: req.user.id
         });
 
+        await uploadDucument(importRecord, file);
+
         res.sendStatus(200);
     } catch (error) {
         logger.error(error);
         res.status(500).send('Internal server error');
     }
+}
+
+async function uploadDucument(owner, file) {
+    const bucketName = 'cdp-development';
+    const uploadOptions = {
+        bucket: bucketName,
+        folder: `imported-hcp-consents/`,
+        fileName: owner.id,
+        fileContent: file.buffer
+    };
+
+    const response = await storageService.upload(uploadOptions);
+    await File.create({
+        name: file.originalname,
+        bucket_name: bucketName,
+        key: response.key,
+        owner_id: owner.id,
+        table_name: 'hcp_consents_import_records'
+    });
 }
 
 async function getImportedHcpConsents(req, res) {
@@ -62,6 +85,23 @@ async function getImportedHcpConsents(req, res) {
     }
 }
 
+async function getDownloadUrl(req, res) {
+    try {
+        const file = await File.findOne({
+            where: { owner_id: req.params.id }
+        });
+
+        if (!file) return res.status(404).send('The file does not exist');
+
+        const url = storageService.getSignedUrl(file.bucket_name, file.key);
+
+        res.json(url)
+    } catch (error) {
+        logger.error(error);
+        res.status(500).send('Internal server error');
+    }
+}
 
 exports.bulkImportConsents = bulkImportConsents;
 exports.getImportedHcpConsents = getImportedHcpConsents;
+exports.getDownloadUrl = getDownloadUrl;

@@ -12,4 +12,7 @@ module.exports = app => {
 
     app.route('/api/consent/imported-hcp-consents')
         .get(CDPAuthStrategy, ServiceGuard([Services.IMPORT_CONSENTS]), controller.getImportedHcpConsents);
+
+    app.route('/api/consent/imported-hcp-consents/:id/download')
+        .get(CDPAuthStrategy, ServiceGuard([Services.IMPORT_CONSENTS]), controller.getDownloadUrl);
 };
