@@ -183,7 +183,8 @@
 
 
     @media (max-width: $screen-phone) {
-        height: calc(100vh - 70px);
+        height: 100vh;
+        position: fixed;
 
         &__panel {
             width: 100%;
