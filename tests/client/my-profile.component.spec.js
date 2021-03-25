@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, waitFor, fireEvent, wait } from '@testing-library/react';
+import { render, waitFor, fireEvent } from '@testing-library/react';
 import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { MemoryRouter } from 'react-router-dom';
@@ -8,6 +8,7 @@ import MockAdapter from 'axios-mock-adapter'
 import { Provider } from 'react-redux';
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store';
+import { screen } from '@testing-library/dom';
 import { getSignedInUserProfile } from '../../src/modules/platform/user/client/user.actions';
 import MyProfile from '../../src/modules/platform/user/client/components/my-profile/my-profile.component';
 
@@ -73,10 +74,12 @@ describe('Users component', () => {
 
         mockAxios.onPut('/api/users/profile').reply(200, {...loggedInUser, first_name: 'NewFirstName'});
 
-        await waitFor(() => fireEvent.click(update_button) );
+        fireEvent.click(update_button);
 
-        const allNameInstances = getAllByText('NewFirstName LastName');
-        expect(allNameInstances).toBeTruthy();
-
+        await waitFor(() =>{
+            const allNameInstances = screen.getAllByText('NewFirstName LastName');
+            debug(allNameInstances);
+            expect(allNameInstances).toBeTruthy();
+        });
     });
 });

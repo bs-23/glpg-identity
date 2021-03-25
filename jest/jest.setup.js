@@ -48,12 +48,12 @@ module.exports = async function () {
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-consents.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 
-
     const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model"));
     const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service.model"));
     const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model.js"));
     const PermissionSetService = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionset-service.model.js"));
     const UserProfilePermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model.js"));
+    const Countries = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
 
     await sequelize.cdpConnector.sync();
 
@@ -75,5 +75,6 @@ module.exports = async function () {
     await PartnerRequest.create(specHelper.partner_request);
     await Application.create(specHelper.defaultApplication);
     await Application.create(specHelper.partnerRequestApplication);
+    await Countries.bulkCreate(specHelper.countries, { returning: true, ignoreDuplicates: false });
     // await Partner.create(specHelper.partner);
 };
