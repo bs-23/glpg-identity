@@ -112,7 +112,7 @@ export default function ImportConsentsDashboard() {
                 </div>
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-flex justify-content-between align-items-center py-3">
+                        <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel">
                             <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">Import HCP Consents </h4>
                             <div class="d-flex justify-content-between align-items-center">
                                 <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
@@ -172,7 +172,7 @@ export default function ImportConsentsDashboard() {
                                                             <div className="form-group">
                                                                 <label className="font-weight-bold" htmlFor="consent_category">Select Consent Category <span className="text-danger">*</span></label>
                                                                 <Field data-testid="consent_category" as="select" name="consent_category" className="form-control">
-                                                                    <option key="select-consent-category" value="" disabled>--Select Consent Category--</option>
+                                                                    <option key="select-consent-category" value="" disabled>Select Consent Category</option>
                                                                     {consent_categories.map(category => {
                                                                         return <option key={category.id} value={category.id}>{category.title}</option>
                                                                     })
@@ -185,7 +185,7 @@ export default function ImportConsentsDashboard() {
                                                             <div className="form-group">
                                                                 <label className="font-weight-bold" htmlFor="consent_id">Select Consent <span className="text-danger">*</span></label>
                                                                 <Field data-testid="consent" as="select" name="consent_id" className="form-control">
-                                                                    <option key="select-consent" value="" disabled>--Select Consent--</option>
+                                                                    <option key="select-consent" value="" disabled>Select Consent</option>
                                                                     {cdp_consents.map(item => formikProps.values.consent_category === item.category_id &&
                                                                         <option key={item.id} value={item.id}>{item.preference}</option>)}
                                                                 </Field>
@@ -196,7 +196,7 @@ export default function ImportConsentsDashboard() {
                                                             <div className="form-group">
                                                                 <label className="font-weight-bold" htmlFor="locale">Select Localization <span className="text-danger">*</span></label>
                                                                 <Field data-testid="locale" as="select" name="locale" className="form-control">
-                                                                    <option key="select-locale" value="" disabled>--Select Localization--</option>
+                                                                    <option key="select-locale" value="" disabled>Select Localization</option>
                                                                     {consentLocales.map(item => formikProps.values.consent_id === item.consent_id &&
                                                                         <option key={item.id} value={item.locale_detail.locale}>{`${item.locale_detail.language_variant} ( ${item.locale_detail.locale} )`}</option>)}
                                                                 </Field>
@@ -213,7 +213,7 @@ export default function ImportConsentsDashboard() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <button type="submit" className="btn cdp-btn-primary mr-2 text-white shadow-sm">Save Changes</button>
+                                                    <button type="submit" className="btn cdp-btn-primary btn-block my-2 text-white shadow-sm">Save Changes</button>
                                                 </Form>
                                             )}
                                         </Formik>
@@ -221,7 +221,7 @@ export default function ImportConsentsDashboard() {
                                 </Modal>
                             </div>
                         </div>
-                        <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel">
+                        <div className="d-flex justify-content-between align-items-center cdp-table__responsive-wrapper">
                             {imported_consents && imported_consents.length > 0 &&
                                 <table className="table table-hover table-sm mb-0 cdp-table mb-0 cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
@@ -236,11 +236,11 @@ export default function ImportConsentsDashboard() {
                                     <tbody className="cdp-table__body bg-white">
                                         {imported_consents.map(row => (
                                             <tr key={row.id}>
-                                                <td className="text-break">{row.result.length}</td>
-                                                <td className="text-break">{row.consent_locale}</td>
-                                                <td className="text-break">{row.createdBy}</td>
-                                                <td className="text-break">{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
-                                                <td><Dropdown className="ml-auto dropdown-customize">
+                                                <td data-for="Total consents" className="text-break">{row.result.length}</td>
+                                                <td data-for="Locale" className="text-break">{row.consent_locale}</td>
+                                                <td data-for="Created By" className="text-break">{row.createdBy}</td>
+                                                <td data-for="Created On" className="text-break">{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
+                                                <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>

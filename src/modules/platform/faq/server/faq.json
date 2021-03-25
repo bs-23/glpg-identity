@@ -88,7 +88,7 @@
             "category": "privacy",
             "title": "Import Consents from Thirdparty events",
             "slug": "import-consents",
-            "icon": "icon icon-global icon-2x "
+            "icon": "fas fa-file-upload fa-2x"
         },
         {
             "category": "privacy",
