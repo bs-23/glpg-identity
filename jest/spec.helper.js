@@ -61,24 +61,24 @@ module.exports = {
     }),
     defaultApplication: {
         id: defaultApplicationId,
-        name: faker.company.companyName(),
-        slug: 'jyseleca',
+        name: 'Jyseleca',
+        slug: 'Jyseleca',
+        type: 'hcp-portal',
         email: 'jyseleca@glpg.com',
-        password: 'strong-password',
-        consent_confirmation_path: 'a',
-        journey_redirect_path: 'a',
-        reset_password_link: 'a',
-        login_link: 'a',
-        logo_link: 'a',
-        forgot_password_link: '',
+        password: 'P@ssword123',
+        is_active: true,
+        auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
+        logo_url: 'a',
+        metadata: {
+            cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-brandx/clear/author-publish-cache",
+            approve_user_path: '/bin/public/glpg-brandx/mail/approve-user'
+        },
         created_by: defaultAdminId,
         updated_by: defaultAdminId,
-        auth_secret: 'a8cb35f8-7090-4267-83c6-5ed2da1c4e93',
-        approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
         access_token: jwt.sign({
             id: defaultApplicationId,
             email: 'hcp-portal@glpg.com',
-        }, process.env.APPLICATION_TOKEN_SECRET, { expiresIn: '30d', issuer: defaultApplicationId }),
+        }, process.env.APPLICATION_TOKEN_SECRET, { expiresIn: '30d', issuer: defaultApplicationId })
     },
     partnerRequestApplication: {
         id: partnerRequestApplicationId,
@@ -86,14 +86,14 @@ module.exports = {
         slug: 'Patients Organization',
         email: 'patients-organization@glpg.com',
         password: 'P@ssword123',
-        approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+        type: 'standard',
+        is_active: true,
         auth_secret: 'b248eaa4-583f-4ecd-9e9c-be8f58ab3c3e',
-        logo_link: 'a',
         created_by: defaultAdminId,
         updated_by: defaultAdminId,
-        metadata: JSON.stringify({
+        metadata: {
             request_notification_link: 'https://onboarding-business-partner-dev.glpg.com/bin/public/glpg-forms/sendForm.invitation.html'
-        }),
+        },
         access_token: jwt.sign({
             id: partnerRequestApplicationId,
             email: 'patients-organization@glpg.com',
