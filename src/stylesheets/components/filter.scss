@@ -6,7 +6,6 @@
     left: 0px;
     display: flex;
     justify-content: flex-end;
-    z-index: 1000;
 
     &__panel {
         background: white;
@@ -69,7 +68,6 @@
             display: inline-flex;
             align-items: center;
             margin: 0px 5px 5px 0px;
-
             word-break: break-word !important;
             word-wrap: break-word !important;
         }
@@ -181,10 +179,10 @@
         }
     }
 
-
     @media (max-width: $screen-phone) {
         height: 100vh;
         position: fixed;
+        z-index: 1000;
 
         &__panel {
             width: 100%;
