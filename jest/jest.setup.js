@@ -62,8 +62,7 @@ module.exports = async function () {
     await UserProfile.bulkCreate(specHelper.userProfile, { returning: true, ignoreDuplicates: false });
     await PermissionSetService.bulkCreate(specHelper.permissionSet_service, { returning: true, ignoreDuplicates: false });
     await UserProfilePermissionSet.bulkCreate(specHelper.userProfile_permissionSet, { returning: true, ignoreDuplicates: false });
-    await Application.create(specHelper.defaultApplication);
-    await Application.create(specHelper.partnerRequestApplication);
+    // await Application.bulkCreate([specHelper.defaultApplication, specHelper.partnerRequestApplication], { returning: true, ignoreDuplicates: false });
     await User.create(specHelper.users.defaultAdmin);
     await User.create(specHelper.users.defaultUser);
     await Hcp_profile.create(specHelper.hcp.defaultUser);
@@ -74,5 +73,7 @@ module.exports = async function () {
     await Faq.create(specHelper.faq.demoFaq);
     await Localization.bulkCreate(specHelper.localizations, { returning: true, ignoreDuplicates: false });
     await PartnerRequest.create(specHelper.partner_request);
+    await Application.create(specHelper.defaultApplication);
+    await Application.create(specHelper.partnerRequestApplication);
     // await Partner.create(specHelper.partner);
 };
