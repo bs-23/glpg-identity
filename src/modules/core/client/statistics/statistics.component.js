@@ -73,6 +73,7 @@ export default function HotStatistic() {
                             menuPlacement="top"
                             classNamePrefix="multiselect"
                             value={selectedCountries}
+                            isClearable={false}
                             onChange={selectedOption => {
                                 setSelectedCountries(selectedOption);
                             }}
