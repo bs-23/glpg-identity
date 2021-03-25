@@ -73,10 +73,10 @@ describe('Users component', () => {
 
         mockAxios.onPut('/api/users/profile').reply(200, {...loggedInUser, first_name: 'NewFirstName'});
 
-        fireEvent.click(update_button);
-        await waitFor(() => {
-            const allNameInstances = getAllByText('NewFirstName LastName');
-            expect(allNameInstances).toBeTruthy();
-        })
+        await waitFor(() => fireEvent.click(update_button) );
+
+        const allNameInstances = getAllByText('NewFirstName LastName');
+        expect(allNameInstances).toBeTruthy();
+
     });
 });

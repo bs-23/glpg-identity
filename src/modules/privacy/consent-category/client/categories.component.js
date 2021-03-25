@@ -177,7 +177,7 @@ const ConsentCategories = () => {
                                     <div className="col-12 col-sm-12">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="title">Title <span className="text-danger">*</span></label>
-                                            <Field data-testid="title" className="form-control" type="text" name="title" />
+                                            <Field data-testid="title" className="form-control" type="text" name="title" id='title' />
                                             <div className="invalid-feedback" data-testid="titleError"><ErrorMessage name="title" /></div>
                                         </div>
                                     </div>
@@ -186,7 +186,7 @@ const ConsentCategories = () => {
                                     <div className="col-12 col-sm-12">
                                         <div className="form-group">
                                             <label className="font-weight-bold" htmlFor="legal_title">Legal Title</label>
-                                            <Field data-testid="legal_title" className="form-control" type="text" name="legal_title" />
+                                            <Field data-testid="legal_title" className="form-control" type="text" name="legal_title" id='legal_title' />
                                             <div className="invalid-feedback"><ErrorMessage name="legal_title" /></div>
                                         </div>
                                     </div>
