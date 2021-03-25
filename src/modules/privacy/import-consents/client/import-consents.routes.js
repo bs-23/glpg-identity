@@ -2,7 +2,7 @@ import React from "react";
 import { Switch, useRouteMatch } from "react-router-dom";
 
 import PrivateRoute from "../../../core/client/PrivateRoute";
-import ImportConsentsDashboard from "./import-consents-dashboard.component";
+import ImportConsentsDashboard from "./import-consents.component";
 
 export default function ClientRoutes() {
     let { path } = useRouteMatch();
