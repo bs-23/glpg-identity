@@ -18,7 +18,7 @@ const HcpConsentsImportRecord = sequelize.cdpConnector.define('hcp_consents_impo
     },
     consent_locale: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(6)
     },
     result: {
         type: DataTypes.JSON

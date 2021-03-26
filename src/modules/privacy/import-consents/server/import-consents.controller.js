@@ -15,22 +15,21 @@ async function bulkImportConsents(req, res) {
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(sheet);
         rows.splice(0, 1);
-        const result =
-            rows.filter(r => r['OneKey ID Individual'] && r['Opt-In Date'])
-                .map(r => ({ onekey_id: r['OneKey ID Individual'], multichannel_consent_id: '12345' }));
+        const result = rows.filter(r => r['OneKey ID Individual'] && r['Opt-In Date'])
+            .map(r => ({ onekey_id: r['OneKey ID Individual'], multichannel_consent_id: '12345' }));
 
-        const importRecord = await HcpConsentsImportRecord.create({
-            consent_id: req.body.consent_id,
-            consent_locale: req.body.locale,
-            result,
-            created_by: req.user.id
-        });
+        // const importRecord = await HcpConsentsImportRecord.create({
+        //     consent_id: req.body.consent_id,
+        //     consent_locale: req.body.locale,
+        //     result,
+        //     created_by: req.user.id
+        // });
 
-        await uploadDucument(importRecord, file);
+        //await uploadDucument(importRecord, file);
 
         res.sendStatus(200);
-    } catch (error) {
-        logger.error(error);
+    } catch (err) {
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -79,8 +78,8 @@ async function getImportedHcpConsents(req, res) {
             return i.dataValues;
         });
         res.json(data);
-    } catch (error) {
-        logger.error(error);
+    } catch (err) {
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
@@ -96,8 +95,8 @@ async function getDownloadUrl(req, res) {
         const url = storageService.getSignedUrl(file.bucket_name, file.key);
 
         res.json(url)
-    } catch (error) {
-        logger.error(error);
+    } catch (err) {
+        logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
