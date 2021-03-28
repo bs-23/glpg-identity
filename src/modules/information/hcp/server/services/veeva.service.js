@@ -141,5 +141,49 @@ async function syncHcpConsentsInVeeva(hcp, actor) {
     }
 }
 
+async function createMultiChannelConsent(oneKeyId, email, consent) {
+    try {
+        if(oneKeyId && email && consent &&
+            consent.consent_category &&
+            consent.consent_category.veeva_content_type_id &&
+            consent.consent_locales &&
+            consent.consent_locales[0].veeva_consent_type_id) {
+
+            const headers = await getAuthorizationHeader();
+            const account = await getAccountByOneKeyId(oneKeyId);
+
+            if(!account) return;
+
+            email = email.toLowerCase();
+            let channel_source = 'Account.Secondary_Email__C';
+
+            if(account.PersonEmail && account.PersonEmail.toLowerCase() === email) {
+                channel_source = 'Account.PersonEmail';
+            } else {
+                await axios.patch(`${serviceUrl}/data/v48.0/sobjects/Account/${account.Id}`, { Secondary_Email__c: email }, { headers });
+            }
+
+            const { data } = await axios.post(`${serviceUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
+                Account_vod__c: account.Id,
+                RecordTypeId: '0124J000000ouUlQAI',
+                Capture_Datetime_vod__c: new Date(consent.captured_date),
+                Channel_Value_vod__c: email,
+                Channel_Source_vod__c: channel_source,
+                Opt_Type_vod__c: consent.opt_type === 'opt-out' ? 'Opt_Out_vod' : 'Opt_In_vod',
+                Content_Type_vod__c: consent.consent_category.veeva_content_type_id,
+                GLPG_Consent_Source__c: consent.consent_source,
+                CDP_Consent_ID__c: consent.id,
+                Consent_Type_vod__c: consent.consent_locales[0].veeva_consent_type_id,
+                Default_Consent_Text_vod__c: parser(consent.consent_locales[0].rich_text).replace(/(<\/?(?:a)[^>]*>)|<[^>]+>/ig, '$1')
+            }, { headers });
+
+            return data;
+        }
+    } catch(err) {
+        logger.error(err);
+    }
+}
+
 exports.syncHcpConsentsInVeeva = syncHcpConsentsInVeeva;
 exports.getAccountByOneKeyId = getAccountByOneKeyId;
+exports.createMultiChannelConsent = createMultiChannelConsent;

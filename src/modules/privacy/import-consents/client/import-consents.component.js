@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import Faq from '../../../platform/faq/client/faq.component';
-import Dropdown from 'react-bootstrap/Dropdown';
-import { NavLink } from 'react-router-dom';
+import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
+import { NavLink } from 'react-router-dom';
+import Dropdown from 'react-bootstrap/Dropdown';
+import React, { useEffect, useState } from 'react';
+import { useToasts } from 'react-toast-notifications';
+import { useSelector, useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
-import { getConsentCategories } from '../../../privacy/consent-category/client/category.actions';
+
+import Faq from '../../../platform/faq/client/faq.component';
+import { getConsentImportRecords } from './import-consents.actions';
+import { ImportConsentsSchema } from './import-consents.schema';
 import { getCdpConsents } from '../../../privacy/manage-consent/client/consent.actions';
 import { getCountryConsents } from '../../consent-country/client/consent-country.actions';
-import { getImportedConsents } from './import-consents.actions';
-import { ImportConsentsSchema } from './import-consents.schema';
-import axios from 'axios';
-import { useToasts } from 'react-toast-notifications';
+import { getConsentCategories } from '../../../privacy/consent-category/client/category.actions';
 
 export default function ImportConsentsDashboard() {
     const dispatch = useDispatch();
@@ -25,17 +26,18 @@ export default function ImportConsentsDashboard() {
     const consent_categories = useSelector(state => state.consentCategoryReducer.consent_categories);
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const country_consents = useSelector(state => state.consentCountryReducer.country_consents);
-    const imported_consents = useSelector(state => state.importedConsentReducer.imported_consents);
+    const consent_import_records = useSelector(state => state.consentImportReducer.consent_import_records);
 
     useEffect(() => {
         async function getLocalizations() {
             const { data } = await axios.get('/api/localizations');
             setLocalizations(data);
         }
+
         getLocalizations();
         dispatch(getConsentCategories());
-        dispatch(getImportedConsents());
-        dispatch(getCdpConsents(null, null));
+        dispatch(getConsentImportRecords());
+        dispatch(getCdpConsents());
         dispatch(getCountryConsents());
     }, []);
 
@@ -47,39 +49,29 @@ export default function ImportConsentsDashboard() {
         const consent_locale_list = country_consents.map(x => x.consent);
         const temp_locales = [];
         consent_locale_list.forEach(elem => {
-
             elem.translations.forEach(item => {
                 item.locale_detail = localizations.filter(x => x.locale === item.locale)[0];
                 item.consent_id = elem.id;
                 temp_locales.push(item);
             });
-
         });
-        console.log([...new Map(temp_locales.map(item =>
-            [item['id'], item])).values()]);
 
-
-        setConsentLocales([...new Map(temp_locales.map(item =>
-            [item['id'], item])).values()]);
-    }
+        setConsentLocales([...new Map(temp_locales.map(item => [item['id'], item])).values()]);
+    };
 
     const DownloadFile = (id) => {
-        axios.get(`/api/consent/imported-hcp-consents/${id}/download`)
-            .then(({ data }) => {
-                const newWindow = window.open(data, '_blank', 'noopener,noreferrer')
-                if (newWindow) newWindow.opener = null
-            })
-            .catch(err => {
-                addToast('Could not download file', {
-                    appearance: 'error',
-                    autoDismiss: true
-                });
+        axios.get(`/api/consent-import/records/${id}/download`).then(({ data }) => {
+            const newWindow = window.open(data, '_blank', 'noopener,noreferrer')
+            if (newWindow) newWindow.opener = null
+        }).catch(err => {
+            addToast('Could not download file', {
+                appearance: 'error',
+                autoDismiss: true
             });
-
-    }
+        });
+    };
 
     return (
-
         <main className="app__content cdp-light-bg h-100">
             <div className="container-fluid">
                 <div className="row">
@@ -127,38 +119,30 @@ export default function ImportConsentsDashboard() {
                                     <Modal.Body>
                                         <Formik
                                             initialValues={{
-                                                consent_category: "",
-                                                consent_id: "",
-                                                locale: "",
-                                                file: ""
+                                                consent_category: '',
+                                                consent_id: '',
+                                                consent_locale: '',
+                                                file: ''
                                             }}
                                             displayName="ConsentImport"
                                             enableReinitialize={true}
                                             validationSchema={ImportConsentsSchema}
                                             onSubmit={(values, actions) => {
-
                                                 const data = new FormData();
                                                 data.append('consent_category', values.consent_category);
                                                 data.append('consent_id', values.consent_id);
-                                                data.append('locale', values.locale);
+                                                data.append('consent_locale', values.consent_locale);
                                                 data.append('file', values.file);
 
-                                                console.log(data);
-
-                                                axios.post(`/api/consent/bulk-import`, data, {
-                                                    headers: {
-                                                        'Content-Type': 'multipart/form-data'
-                                                    }
-                                                })
-                                                    .then(() => addToast('Consents imported successfully', {
+                                                axios.post(`/api/consent-import`, data, {
+                                                    headers: { 'Content-Type': 'multipart/form-data' }
+                                                }).then(() => addToast('Consents imported successfully', {
                                                         appearance: 'success',
                                                         autoDismiss: true
-                                                    }))
-                                                    .catch(err => addToast('Could not import consents', {
+                                                    })).catch(err => addToast('Could not import consents', {
                                                         appearance: 'error',
                                                         autoDismiss: true
-                                                    }))
-                                                    .finally(() => dispatch(getImportedConsents()));
+                                                    })).finally(() => dispatch(getConsentImportRecords()));
 
                                                 actions.setSubmitting(false);
                                                 actions.resetForm();
@@ -175,8 +159,7 @@ export default function ImportConsentsDashboard() {
                                                                     <option key="select-consent-category" value="" disabled>Select Consent Category</option>
                                                                     {consent_categories.map(category => {
                                                                         return <option key={category.id} value={category.id}>{category.title}</option>
-                                                                    })
-                                                                    }
+                                                                    })}
                                                                 </Field>
                                                                 <div className="invalid-feedback"><ErrorMessage name="consent_category" /></div>
                                                             </div>
@@ -187,20 +170,22 @@ export default function ImportConsentsDashboard() {
                                                                 <Field data-testid="consent" as="select" name="consent_id" className="form-control">
                                                                     <option key="select-consent" value="" disabled>Select Consent</option>
                                                                     {cdp_consents.map(item => formikProps.values.consent_category === item.category_id &&
-                                                                        <option key={item.id} value={item.id}>{item.preference}</option>)}
+                                                                        <option key={item.id} value={item.id}>{item.preference}</option>
+                                                                    )}
                                                                 </Field>
                                                                 <div className="invalid-feedback"><ErrorMessage name="consent_id" /></div>
                                                             </div>
                                                         </div>
                                                         <div className="col-12">
                                                             <div className="form-group">
-                                                                <label className="font-weight-bold" htmlFor="locale">Select Localization <span className="text-danger">*</span></label>
-                                                                <Field data-testid="locale" as="select" name="locale" className="form-control">
-                                                                    <option key="select-locale" value="" disabled>Select Localization</option>
+                                                                <label className="font-weight-bold" htmlFor="consent_locale">Select Localization <span className="text-danger">*</span></label>
+                                                                <Field data-testid="locale" as="select" name="consent_locale" className="form-control">
+                                                                    <option key="select-locale" value="" disabled>Select Consent Locale</option>
                                                                     {consentLocales.map(item => formikProps.values.consent_id === item.consent_id &&
-                                                                        <option key={item.id} value={item.locale_detail.locale}>{`${item.locale_detail.language_variant} ( ${item.locale_detail.locale} )`}</option>)}
+                                                                        <option key={item.id} value={item.locale_detail.locale}>{`${item.locale_detail.language_variant} ( ${item.locale_detail.locale} )`}</option>
+                                                                    )}
                                                                 </Field>
-                                                                <div className="invalid-feedback"><ErrorMessage name="locale" /></div>
+                                                                <div className="invalid-feedback"><ErrorMessage name="consent_locale" /></div>
                                                             </div>
                                                         </div>
                                                         <div className="col-12">
@@ -222,26 +207,30 @@ export default function ImportConsentsDashboard() {
                             </div>
                         </div>
                         <div className="d-flex justify-content-between align-items-center cdp-table__responsive-wrapper">
-                            {imported_consents && imported_consents.length > 0 &&
+                            {consent_import_records && consent_import_records.length > 0 &&
                                 <table className="table table-hover table-sm mb-0 cdp-table mb-0 cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
-                                            <th width="20%">Total consents</th>
-                                            <th width="20%">Locale</th>
-                                            <th width="20%">Created By</th>
-                                            <th width="20%">Created On</th>
-                                            <th width="20%">Action</th>
+                                            <th width="15%">Consent Preference</th>
+                                            <th width="15%">Consent Category</th>
+                                            <th width="15%">Consent Locale</th>
+                                            <th width="15%">Total Records</th>
+                                            <th width="15%">Executed By</th>
+                                            <th width="15%">Execution Date</th>
+                                            <th width="10%">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
-                                        {imported_consents.map(row => (
+                                        {consent_import_records.map(row => (
                                             <tr key={row.id}>
-                                                <td data-for="Total consents" className="text-break">{row.result.length}</td>
+                                                <td data-for="Category" className="text-break">{row.consent.preference}</td>
+                                                <td data-for="Category" className="text-break">{row.consent.consent_category.title}</td>
                                                 <td data-for="Locale" className="text-break">{row.consent_locale}</td>
-                                                <td data-for="Created By" className="text-break">{row.createdBy}</td>
+                                                <td data-for="Total Records" className="text-break">{row.data.length}</td>
+                                                <td data-for="Created By" className="text-break">{`${row.createdByUser.first_name} ${row.createdByUser.last_name}`}</td>
                                                 <td data-for="Created On" className="text-break">{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                 <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
-                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
+                                                    <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle">
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item onClick={() => DownloadFile(row.id)}>Download</Dropdown.Item>
@@ -249,24 +238,21 @@ export default function ImportConsentsDashboard() {
                                                 </Dropdown></td>
                                             </tr>
                                         ))}
-
                                     </tbody>
                                 </table>
                             }
                         </div>
-                        {imported_consents && imported_consents.length === 0 &&
+                        {consent_import_records && consent_import_records.length === 0 &&
                             <div className="row justify-content-center mt-5 pt-5 mb-3">
                                 <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
                                     <i class="icon icon-team icon-6x cdp-text-secondary"></i>
-                                    <h3 className="font-weight-bold cdp-text-primary pt-4">No Imported HCP Consent Found!</h3>
+                                    <h3 className="font-weight-bold cdp-text-primary pt-4">No record found!</h3>
                                 </div>
                             </div>
                         }
                     </div>
                 </div>
             </div>
-
         </main>
-
     )
 }

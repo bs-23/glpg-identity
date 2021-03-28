@@ -35,17 +35,17 @@ async function init() {
     const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model'));
     const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model'));
     const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model.js'));
-    const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model.js'));
-    const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model.js'));
-    const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model"));
-    const Service = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service.model"));
-    const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model"));
-    const PermissionSet_Service = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionset-service.model"));
-    const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model"));
-    const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model"));
+    const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model'));
+    const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model'));
+    const UserProfile = require(path.join(process.cwd(), 'src/modules/platform/profile/server/user-profile.model'));
+    const Service = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/service.model'));
+    const PermissionSet = require(path.join(process.cwd(), 'src/modules/platform/permission-set/server/permission-set.model'));
+    const PermissionSet_Service = require(path.join(process.cwd(), 'src/modules/platform/permission-set/server/permissionset-service.model'));
+    const PermissionSet_Application = require(path.join(process.cwd(), 'src/modules/platform/permission-set/server/permissionSet-application.model'));
+    const UserProfile_PermissionSet = require(path.join(process.cwd(), 'src/modules/platform/permission-set/server/userProfile-permissionSet.model'));
     const Localization = require(path.join(process.cwd(), 'src/modules/core/server/localization/localization.model'));
     const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
-    require(path.join(process.cwd(), "src/modules/platform/role/server/role.model"));
+    require(path.join(process.cwd(), 'src/modules/platform/role/server/role.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
     const Faq = require(path.join(process.cwd(), 'src/modules/platform/faq/server/faq.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
@@ -61,7 +61,7 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner.model'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-consents.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
-    require(path.join(process.cwd(), 'src/modules/privacy/import-consents/server/hcp-consents-import-record.model'));
+    require(path.join(process.cwd(), 'src/modules/privacy/import-consents/server/hcp-consent-import-record.model'));
 
     await sequelize.cdpConnector.sync();
 
@@ -456,8 +456,8 @@ async function init() {
         User.findOne({ where: { email: 'glpg@brainstation-23.com' } }).then(admin => {
             const consent_categories = [
                 { id: 'fe037405-c676-4d98-bd05-85008900c838', title: 'Direct Marketing', type: 'dm', slug: convertToSlug('Direct Marketing'), created_by: admin.id, veeva_content_type_id: 'a4N4J000000Pb5FUAS' },
-                { id: '29374bce-7c3f-4408-a138-c062143d2247', title: 'Medical Consent', type: 'mc', slug: convertToSlug('Medical Consent'), created_by: admin.id, veeva_content_type_id: 'a4N0C000000AqTBUA0' },
-                { id: '59953d51-2449-4b65-950f-9f88654019bb', title: 'General Consent', type: 'general', slug: convertToSlug('General Consent'), created_by: admin.id, veeva_content_type_id: 'a4N0C000000AqT6UAK' },
+                { id: '29374bce-7c3f-4408-a138-c062143d2247', title: 'Medical Consent', type: 'mc', slug: convertToSlug('Medical Consent'), created_by: admin.id },
+                { id: '59953d51-2449-4b65-950f-9f88654019bb', title: 'General Consent', type: 'general', slug: convertToSlug('General Consent'), created_by: admin.id },
                 { id: '3e1dff97-cea9-48cb-a37a-e3210269783b', title: 'Business Partner', type: 'bp', slug: convertToSlug('Business Partner'), created_by: admin.id }
             ];
 
@@ -498,20 +498,17 @@ async function init() {
                 {
                     rich_text: "<p>Ce site est strictement destiné aux médecins et non aux infirmie(è)r(es) et / ou au grand public. Vous déclarez explicitement être médecin au sens de l'article 3 de la loi sur l’art de guérir.</p>",
                     consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                    locale: 'fr_BE',
-                    veeva_consent_type_id: 'a3w0C0000008junQAA'
+                    locale: 'fr_BE'
                 },
                 {
                     rich_text: "<p>Deze website is strikt bedoeld voor geneesheren en niet voor verpleegkundigen en/of het grote publiek. U verklaart uitdrukkelijk dat u een geneesheer bent in de zin van artikel 3 van de wet betreffende de uitoefening van de gezondheidszorgberoepen.</p>",
                     consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                    locale: 'nl_BE',
-                    veeva_consent_type_id: 'a3w0C0000008judQAA'
+                    locale: 'nl_BE'
                 },
                 {
                     rich_text: "<p>Ik bevestig dat ik een professionele zorgverlener ben die in Nederland werkzaam is en ik accepteer de <a href='https://www.glpg.com/nederland/disclaimer' target='_blank'>Gebruiksvoorwaarden</a> van Galapagos.nl.</p>",
                     consent_id: 'ebea072a-81d4-4507-a46b-cb365ea0c6db',
-                    locale: 'nl_NL',
-                    veeva_consent_type_id: 'a3w0C0000008juYQAQ'
+                    locale: 'nl_NL'
                 },
                 {
                     rich_text: "<p>Je consens à ce que Galapagos m'envoie des informations promotionnelles et environnementales concernant tous les produits et services de Galapagos à l'adresse mail que j'ai fournie. <br> <br> Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href='https://www.glpg.com/belgique/fr-politique-de-confidentialite' target='_blank'>Déclaration de confidentialité</a>.</p>",
@@ -534,20 +531,17 @@ async function init() {
                 {
                     rich_text: "<p>Vous déclarez que les données saisies sont vos données personnelles et que les informations sont complètes et exactes. En aucun cas, vos données ne peuvent être partagées avec des tiers pour permettre à ces tiers d'accéder au présent site. Vous devez immédiatement informer Galapagos de toute utilisation non autorisée connue ou soupçonnée de vos informations personnelles dans le cadre de l'accès à ce site.</p>",
                     consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
-                    locale: 'fr_BE',
-                    veeva_consent_type_id: 'a3w0C0000008jv2QAA'
+                    locale: 'fr_BE'
                 },
                 {
                     rich_text: "<p>U verklaart dat de ingevulde gegevens uw persoonlijke gegevens zijn en dat de informatie volledig en accuraat is. Uw gegevens mogen in geen geval gedeeld worden met derden om die derden toegang te verlenen aan huidige website. U moet Galapagos onmiddellijk op de hoogte brengen van elk bekend of vermoeden van niet-geautoriseerd gebruik van uw persoonlijke gegevens inzake de toegang tot deze website.</p>",
                     consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
-                    locale: 'nl_BE',
-                    veeva_consent_type_id: 'a3w0C0000008jv7QAA'
+                    locale: 'nl_BE'
                 },
                 {
                     rich_text: "<p>Ik verklaar dat de ingevulde gegevens mijn persoonlijke gegevens zijn en dat de informatie volledig en accuraat is. Ik verklaar dat ik mijn gegevens niet zal delen met derden om die derden toegang te verlenen tot de huidige website. Ik zal Galapagos onmiddellijk op de hoogte brengen van elk bekend of vermoed niet-geautoriseerd gebruik van mijn persoonlijke gegevens inzake de toegang tot deze website.</p>",
                     consent_id: '2b9fa7f9-2c1e-4621-a091-5e4bf539b875',
-                    locale: 'nl_NL',
-                    veeva_consent_type_id: 'a3w0C0000008jusQAA'
+                    locale: 'nl_NL'
                 }
             ];
 

@@ -1,19 +1,17 @@
 import Types from './import-consents.types';
 
 const initialState = {
-    imported_consents: []
+    consent_import_records: []
 };
 
 export default function reducer(state = initialState, action) {
     switch (action.type) {
-        case Types.GET_IMPORTED_CONSENT_DATA_FULFILLED: {
-            console.log(action.payload.data);
+        case Types.GET_CONSENT_IMPORT_RECORDS_FULFILLED: {
             return {
                 ...state,
-                imported_consents: action.payload.data
+                consent_import_records: action.payload.data
             };
         }
-
     }
     return state;
 }

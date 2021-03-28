@@ -1,8 +1,5 @@
 const path = require('path');
-const XRegExp = require('xregexp');
-const { string, object } = require('yup');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
-
 
 function validateFile(upload) {
     return function (req, res, next) {
