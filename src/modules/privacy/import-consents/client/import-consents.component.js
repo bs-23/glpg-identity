@@ -110,7 +110,7 @@ export default function ImportConsentsDashboard() {
                                 <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Import consents</span>
                                 </button>
-                                <Modal dialogClassName="modal-90w modal-customize" centered show={showForm} onHide={() => setShowForm(false)}>
+                                <Modal dialogClassName="" size="lg" centered show={showForm} onHide={() => setShowForm(false)}>
                                     <Modal.Header closeButton>
                                         <Modal.Title>
                                             Import Consents
@@ -191,12 +191,14 @@ export default function ImportConsentsDashboard() {
                                                         <div className="col-12">
                                                             {
                                                                 formikProps.values.consent_locale && formikProps.values.consent_locale !== '' &&
-                                                                <label className="font-weight-bold" htmlFor="rich-text">Richtext Preview</label>
+                                                                <div className="form-group richtext-preview">
+                                                                    <label className="font-weight-bold" htmlFor="rich-text">Richtext Preview</label>
+                                                                    <div className="text-muted cdp-light-bg p-3 mb-3">
+                                                                        {parse(consentLocales.filter(x => (x.consent_id === formikProps.values.consent_id) && (x.locale === formikProps.values.consent_locale))[0] ?
+                                                                            consentLocales.filter(x => (x.consent_id === formikProps.values.consent_id) && (x.locale === formikProps.values.consent_locale))[0].rich_text : '')}
+                                                                    </div>
+                                                                </div>
                                                             }
-                                                            <div>
-                                                                {parse(consentLocales.filter(x => (x.consent_id === formikProps.values.consent_id) && (x.locale === formikProps.values.consent_locale))[0] ?
-                                                                    consentLocales.filter(x => (x.consent_id === formikProps.values.consent_id) && (x.locale === formikProps.values.consent_locale))[0].rich_text : '')}
-                                                            </div>
                                                         </div>
                                                         <div className="col-12">
                                                             <div className="form-group">
@@ -206,9 +208,10 @@ export default function ImportConsentsDashboard() {
                                                                 }} />
                                                                 <div className="invalid-feedback"><ErrorMessage name="file" /></div>
                                                             </div>
+                                                           
                                                         </div>
                                                     </div>
-                                                    <button type="submit" className="btn cdp-btn-primary btn-block my-2 text-white shadow-sm">Save Changes</button>
+                                                    <button type="submit" className="btn cdp-btn-primary btn-block my-3 py-2 text-white shadow">Save Changes</button>
                                                 </Form>
                                             )}
                                         </Formik>
