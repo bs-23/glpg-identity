@@ -7,6 +7,8 @@ import { useToasts } from 'react-toast-notifications';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import parse from 'html-react-parser';
+import fileDownload from 'js-file-download';
+
 import Faq from '../../../platform/faq/client/faq.component';
 import { getConsentImportRecords } from './import-consents.actions';
 import { ImportConsentsSchema } from './import-consents.schema';
@@ -91,6 +93,30 @@ export default function ImportConsentsDashboard() {
             addToast('Could not download file', {
                 appearance: 'error',
                 autoDismiss: true
+            });
+        });
+    };
+
+    const exportRecords = (id) => {
+        axios.get(`/api/consent-import/records/${id}/export`, {
+            responseType: 'blob',
+        }).then(res => {
+            const pad2 = (n) => (n < 10 ? '0' + n : n);
+
+            var date = new Date();
+            const timestamp = date.getFullYear().toString() + pad2(date.getMonth() + 1) + pad2(date.getDate()) + pad2(date.getHours()) + pad2(date.getMinutes()) + pad2(date.getSeconds());
+
+            fileDownload(res.data, `Imported_Consent_Records_${timestamp}.xlsx`);
+        }).catch(error => {
+            /**
+             * the error response is a blob because of the responseType option.
+             * text() converts it back to string
+             */
+            error.response.data.text().then(text => {
+                addToast(text, {
+                    appearance: 'warning',
+                    autoDismiss: true
+                });
             });
         });
     };
@@ -232,7 +258,6 @@ export default function ImportConsentsDashboard() {
                                                                 }} />
                                                                 <div className="invalid-feedback"><ErrorMessage name="file" /></div>
                                                             </div>
-                                                           
                                                         </div>
                                                     </div>
                                                     <button type="submit" className="btn cdp-btn-primary btn-block my-3 py-2 text-white shadow">Save Changes</button>
@@ -289,6 +314,7 @@ export default function ImportConsentsDashboard() {
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item onClick={() => DownloadFile(row.id)}>Download</Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => exportRecords(row.id)}>Export</Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>

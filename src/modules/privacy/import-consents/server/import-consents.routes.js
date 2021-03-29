@@ -11,8 +11,11 @@ module.exports = app => {
         .post(CDPAuthStrategy, ServiceGuard([Services.IMPORT_CONSENTS]), validateFile(multer.array('file', 1)), controller.importConsents);
 
     app.route('/api/consent-import/records')
-        .get(CDPAuthStrategy, ServiceGuard([Services.IMPORT_CONSENTS]), controller.getConsentImportRecord);
+        .get(CDPAuthStrategy, ServiceGuard([Services.IMPORT_CONSENTS]), controller.getConsentImportRecords);
 
     app.route('/api/consent-import/records/:id/download')
         .get(CDPAuthStrategy, ServiceGuard([Services.IMPORT_CONSENTS]), controller.getDownloadUrl);
+
+    app.route('/api/consent-import/records/:id/export')
+        .get(CDPAuthStrategy, ServiceGuard([Services.IMPORT_CONSENTS]), controller.exportRecords);
 };
