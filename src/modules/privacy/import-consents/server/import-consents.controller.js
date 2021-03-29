@@ -1,5 +1,6 @@
 const path = require('path');
 const XLSX = require('xlsx');
+const { Op } = require('sequelize');
 
 const HcpConsentImportRecord = require(path.join(process.cwd(), 'src/modules/privacy/import-consents/server/hcp-consent-import-record.model'));
 const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
@@ -10,6 +11,7 @@ const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston')
 const storageService = require(path.join(process.cwd(), 'src/modules/core/server/storage/storage.service'));
 const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 const veevaService = require(path.join(process.cwd(), 'src/modules/information/hcp/server/services/veeva.service'));
+const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
 
 async function importConsents(req, res) {
     try {
@@ -58,7 +60,7 @@ async function importConsents(req, res) {
             });
         }));
 
-        if(data.length) {
+        if (data.length) {
             const importRecord = await HcpConsentImportRecord.create({
                 consent_id: consent.id,
                 consent_locale: req.body.consent_locale,
@@ -91,7 +93,7 @@ async function importConsents(req, res) {
     }
 }
 
-async function getConsentImportRecord(req, res) {
+async function getConsentImportRecords(req, res) {
     try {
         const records = await HcpConsentImportRecord.findAll({
             include: [
@@ -136,6 +138,66 @@ async function getDownloadUrl(req, res) {
     }
 }
 
+async function exportRecords(req, res) {
+    try {
+        const id = req.params.id;
+
+        const record = await HcpConsentImportRecord.findOne({
+            where: { id },
+            include: [
+                {
+                    model: User,
+                    as: 'createdByUser',
+                    attributes: ['first_name', 'last_name']
+                },
+                {
+                    model: Consent,
+                    as: 'consent',
+                    attributes: ['preference'],
+                    include: [{
+                        model: ConsentCategory,
+                        attributes: ['title']
+                    }]
+                }
+            ]
+        });
+
+        if (!record) return res.status(404).send(`No record found.`);
+
+        const consentLocale = await ConsentLocale.findOne({
+            where: {
+                consent_id: record.consent_id,
+                locale: {
+                    [Op.iLike]: record.consent_locale
+                }
+            }
+        });
+
+        const exportData = record.data.map(item => ({
+            'Individual OneKeyId': item.onekey_id,
+            'Email': item.email,
+            'Consent Preference': record.consent.preference,
+            'Consent Locale': record.consent_locale,
+            'Localized  Consent Text': consentLocale.rich_text,
+            'Multichannel Consent ID': item.multichannel_consent_id,
+            'Opt-in Date': item.captured_date
+        }));
+
+        const sheetName = 'Imported Consent Records';
+        const fileBuffer = ExportService.exportToExcel(exportData, sheetName);
+
+        res.writeHead(200, {
+            'Content-Disposition': `attachment;filename=${sheetName.replace(' ', '_')}.xlsx`,
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+        res.end(fileBuffer);
+    } catch (error) {
+        logger.error(error);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.importConsents = importConsents;
-exports.getConsentImportRecord = getConsentImportRecord;
+exports.getConsentImportRecords = getConsentImportRecords;
 exports.getDownloadUrl = getDownloadUrl;
+exports.exportRecords = exportRecords;
