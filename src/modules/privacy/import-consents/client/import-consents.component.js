@@ -386,10 +386,11 @@ export default function ImportConsentsDashboard() {
                                 </div>
                                 <div className="col-12">
                                     <h4 className="mb-0 font-weight-bold-light">Rich Text</h4>
+                                    {details.consent.preference}
                                     <div className="text-muted cdp-light-bg p-3 mb-3">
                                         {parse(getRichText(details.consent_id, details.consent_locale))}
                                     </div>
-                                    <button type="button" className="btn cdp-btn-primary btn-block my-3 py-2 text-white shadow" onClick={() => DownloadFile(details.id)}>Download</button>
+                                    <button type="button" className="btn cdp-btn-primary btn-block my-3 py-2 text-white shadow" onClick={() => DownloadFile(details.id)}>Download the original file</button>
                                 </div>
                             </div>
                         }
