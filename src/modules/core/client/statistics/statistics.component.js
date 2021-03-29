@@ -65,6 +65,7 @@ export default function HotStatistic() {
                         <Select
                             defaultValue={[]}
                             isMulti={true}
+                            closeMenuOnSelect={false}
                             name="countries"
                             components={{ Option: CustomOption }}
                             hideSelectedOptions={false}

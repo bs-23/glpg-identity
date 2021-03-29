@@ -13,7 +13,7 @@ const isPhoneMaxLengthValid = (parent) => {
 
 const isPhoneNumberValid = (parent) => {
     const { country_code, phone} = parent;
-    if(!phone) return true;
+    if(!phone ) return true;
     const pn = PhoneNumber(phone, country_code);
     return pn.isValid();
 
