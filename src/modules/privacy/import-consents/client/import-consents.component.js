@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { useToasts } from 'react-toast-notifications';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
-
+import parse from 'html-react-parser';
 import Faq from '../../../platform/faq/client/faq.component';
 import { getConsentImportRecords } from './import-consents.actions';
 import { ImportConsentsSchema } from './import-consents.schema';
@@ -56,7 +56,6 @@ export default function ImportConsentsDashboard() {
                 temp_locales.push(item);
             });
         });
-
         setConsentLocales([...new Map(temp_locales.map(item => [item['id'], item])).values()]);
     };
 
@@ -187,6 +186,16 @@ export default function ImportConsentsDashboard() {
                                                                     )}
                                                                 </Field>
                                                                 <div className="invalid-feedback"><ErrorMessage name="consent_locale" /></div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-12">
+                                                            {
+                                                                formikProps.values.consent_locale && formikProps.values.consent_locale !== '' &&
+                                                                <label className="font-weight-bold" htmlFor="rich-text">Richtext Preview</label>
+                                                            }
+                                                            <div>
+                                                                {parse(consentLocales.filter(x => (x.consent_id === formikProps.values.consent_id) && (x.locale === formikProps.values.consent_locale))[0] ?
+                                                                    consentLocales.filter(x => (x.consent_id === formikProps.values.consent_id) && (x.locale === formikProps.values.consent_locale))[0].rich_text : '')}
                                                             </div>
                                                         </div>
                                                         <div className="col-12">
