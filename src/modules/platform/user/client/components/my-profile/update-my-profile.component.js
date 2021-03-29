@@ -12,6 +12,7 @@ const UpdateMyProfile = () => {
     const myProfileInfo = useSelector(state => state.userReducer.loggedInUser);
     const countries = useSelector(state => state.countryReducer.countries);
     const [phoneFieldRef, setPhoneFieldRef] = useState(null);
+    const [countryInfo, setcountryInfo] = useState(null);
     const { addToast } = useToasts();
     const dispatch = useDispatch();
     const desiredCountryList = useSelector(state => state.phoneExtensionReducer.phone_extensions);
@@ -69,20 +70,18 @@ const UpdateMyProfile = () => {
     }
 
     const onChangePhonefield = (formicProps) => {
-        const { values , setFieldValue } = formicProps;
+        const { values } = formicProps;
         const phoneNumber = values.phone;
-        if (!phoneNumber) return;
-            const phoneNumberCountryISO = new PhoneNumber(phoneNumber).getRegionCode();
-            let selectedCountry = desiredCountryList.find(country => country.countryCode === phoneNumberCountryISO);
-        if (selectedCountry === undefined) { setFieldValue('phone', ''); phoneFieldRef !== null ? phoneFieldRef.disabled = true : ''}
-        else {
-            selectedCountry.flag = generateCountryIconPath(selectedCountry.countryNameEn);
-            if (phoneFieldRef !== null) {
-                phoneFieldRef.disabled = false;
-            }
+        const phoneNumberCountryISO = new PhoneNumber(phoneNumber).getRegionCode();
+        let selectedCountry = desiredCountryList.find(country => country.countryCode === phoneNumberCountryISO);
+        if (selectedCountry === undefined) {
+            setcountryInfo(null);
         }
-
-        return selectedCountry === undefined ? null : selectedCountry;
+        else{
+            selectedCountry.flag = generateCountryIconPath(selectedCountry.countryNameEn);
+        }
+        selectedCountry === undefined ? null : setcountryInfo(selectedCountry);
+        return countryInfo;
     };
 
     const formSubmitHandler = async (values, actions) => {
@@ -200,13 +199,12 @@ const UpdateMyProfile = () => {
                                                         {desiredCountryList.map((country, index) => {
                                                             return (
                                                                 <Dropdown.Toggle key={index} variant="" className="p-1 pt-2 px-2 pr-0 d-flex align-items-center rounded-0">
-                                                                    {
-                                                                        onChangePhonefield(formikProps) === null || onChangePhonefield(formikProps) === undefined ?
-                                                                            <span height="20" width="20">Select</span> :
-                                                                            <img className="mr-2" height="20" width="20" src={onChangePhonefield(formikProps) === null || onChangePhonefield(formikProps) === undefined ? '' : onChangePhonefield(formikProps).flag} />
+                                                                   {
+                                                                    onChangePhonefield(formikProps) === null  ? <span height="20" width="20">Select</span> :
+                                                                    <img className="mr-2" height="20" width="20" src={countryInfo !== null ? countryInfo.flag : ''} />
                                                                     }
                                                                     <span className="country-phone-code">
-                                                                        {onChangePhonefield(formikProps) === null || onChangePhonefield(formikProps) === undefined ? "" : onChangePhonefield(formikProps).countryCode}
+                                                                     {countryInfo !== null ? countryInfo.countryCode : ''}
                                                                     </span>
                                                                 </Dropdown.Toggle> );
                                                         })}
