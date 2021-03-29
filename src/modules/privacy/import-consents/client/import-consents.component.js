@@ -23,6 +23,8 @@ export default function ImportConsentsDashboard() {
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);
     const [showForm, setShowForm] = useState(false);
+    const [showDetail, setShowDetail] = useState(false);
+    const [details, setDetails] = useState(null);
     const [localizations, setLocalizations] = useState([]);
     const [consentLocales, setConsentLocales] = useState(false);
     const [mappedConsentRecords, setMappedConsentRecords] = useState([]);
@@ -36,6 +38,15 @@ export default function ImportConsentsDashboard() {
     const showRecords = (records, isSynced) => {
         setSelectedImport(records);
         setRecordsModalTitle(isSynced ? 'Successful Synced Records' : 'Unsuccessful Synced Records');
+    };
+
+    const getRichText = (consent_id, locale) => {
+        const consent_locale = consentLocales.filter(x => (x.consent_id === consent_id) &&
+            (x.locale === locale));
+
+        if (consent_locale && consent_locale[0] && consent_locale[0].rich_text) return consent_locale[0].rich_text;
+        return '';
+
     };
 
     useEffect(() => {
@@ -244,8 +255,7 @@ export default function ImportConsentsDashboard() {
                                                                 <div className="form-group richtext-preview">
                                                                     <label className="font-weight-bold" htmlFor="rich-text">Richtext Preview</label>
                                                                     <div className="text-muted cdp-light-bg p-3 mb-3">
-                                                                        {parse(consentLocales.filter(x => (x.consent_id === formikProps.values.consent_id) && (x.locale === formikProps.values.consent_locale))[0] ?
-                                                                            consentLocales.filter(x => (x.consent_id === formikProps.values.consent_id) && (x.locale === formikProps.values.consent_locale))[0].rich_text : '')}
+                                                                        {parse(getRichText(formikProps.values.consent_id, formikProps.values.consent_locale))}
                                                                     </div>
                                                                 </div>
                                                             }
@@ -313,7 +323,7 @@ export default function ImportConsentsDashboard() {
                                                     <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle">
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
-                                                        <Dropdown.Item onClick={() => DownloadFile(row.id)}>Download</Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => { setShowDetail(true); setDetails(row); }}>Details</Dropdown.Item>
                                                         <Dropdown.Item onClick={() => exportRecords(row.id)}>Export</Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
@@ -369,6 +379,45 @@ export default function ImportConsentsDashboard() {
                                     ))}
                                 </tbody>
                             </table>
+                        }
+                    </Modal.Body>
+                </Modal>
+
+                <Modal
+                    size="lg"
+                    centered
+                    show={showDetail}
+                    onHide={() => { setShowDetail(false); setDetails(null); }}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Imported Hcp Details</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {details &&
+                            <div className="row">
+                                <div className="col-6">
+                                    <h4 className="mb-0 font-weight-bold-light">Consent Preference</h4>
+                                    <p>{details.consent.preference}</p>
+                                    <h4 className="mb-0 font-weight-bold-light">Consent Category</h4>
+                                    <p>{details.consent.consent_category.title}</p>
+                                    <h4 className="mb-0 font-weight-bold-light">Consent Locale</h4>
+                                    <p>{details.consent_locale}</p>
+                                </div>
+                                <div className="col-6">
+                                    <h4 className="mb-0 font-weight-bold-light">Successful Synced Records</h4>
+                                    <p>{details.successfulSyncedRecords.length}</p>
+                                    <h4 className="mb-0 font-weight-bold-light">Unsuccessful Synced Records</h4>
+                                    <p>{details.unsuccessfulSyncedRecords.length}</p>
+                                    <h4 className="mb-0 font-weight-bold-light">Execution Date</h4>
+                                    <p>{(new Date(details.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</p>
+                                </div>
+                                <div className="col-12">
+                                    <h4 className="mb-0 font-weight-bold-light">Rich Text</h4>
+                                    <div className="text-muted cdp-light-bg p-3 mb-3">
+                                        {parse(getRichText(details.consent_id, details.consent_locale))}
+                                    </div>
+                                    <button type="button" className="btn cdp-btn-primary btn-block my-3 py-2 text-white shadow" onClick={() => DownloadFile(details.id)}>Download</button>
+                                </div>
+                            </div>
                         }
                     </Modal.Body>
                 </Modal>
