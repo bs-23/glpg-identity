@@ -46,14 +46,9 @@ export default function UserForm() {
         let selectedCountry = desiredCountryList.find(country => country.countryCode === phoneNumberCountryISO);
         if (selectedCountry === undefined) {
             setcountryInfo(null);
-            phoneFieldRef !== null ? phoneFieldRef.disabled = true : '';
-            setFieldValue('phone', '');
         }
         else{
             selectedCountry.flag = generateCountryIconPath(selectedCountry.countryNameEn);
-            if(phoneFieldRef !== null){
-                phoneFieldRef.disabled = false ;
-            }
         }
         selectedCountry === undefined ? null : setcountryInfo(selectedCountry);
         return countryInfo;
@@ -162,7 +157,7 @@ export default function UserForm() {
                                                                                     </Dropdown.Menu>
                                                                                 </Dropdown>
                                                                             </span>
-                                                                        <Field innerRef={(ele) => setPhoneFieldRef(ele)} data-testid="phone" className="form-control rounded" type="text" name="phone"/>
+                                                                        <Field innerRef={(ele) => setPhoneFieldRef(ele)} data-testid="phone" className="form-control rounded" type="text" name="phone" />
                                                                         </div>
                                                                     </div>
                                                                     <div className="invalid-feedback">
