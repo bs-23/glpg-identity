@@ -28,7 +28,7 @@ describe('Users component', () => {
             "first_name":"FirstName",
             "last_name":"LastName",
             "email":"email@gmail.com",
-            "phone":"+3201674737282",
+            // "phone":"+3201674737282",
             "type":"basic",
             "status":"active",
             "roles":[
@@ -64,7 +64,7 @@ describe('Users component', () => {
     );
 
     it('Should render my profile component', async () => {
-        const { container, getAllByText, getByText } = render(wrapperComponent());
+        const { container, getByText } = render(wrapperComponent());
 
         const first_name_input = container.querySelector('input[name="first_name"]');
         const update_button = getByText('Update');
@@ -78,7 +78,6 @@ describe('Users component', () => {
 
         await waitFor(() =>{
             const allNameInstances = screen.getAllByText('NewFirstName LastName');
-            debug(allNameInstances);
             expect(allNameInstances).toBeTruthy();
         });
     });
