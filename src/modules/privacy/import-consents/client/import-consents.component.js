@@ -40,13 +40,10 @@ export default function ImportConsentsDashboard() {
         setRecordsModalTitle(isSynced ? 'Successful Synced Records' : 'Unsuccessful Synced Records');
     };
 
-    const getRichText = (consent_id, locale) => {
-        const consent_locale = consentLocales.filter(x => (x.consent_id === consent_id) &&
-            (x.locale === locale));
+    const getLegalText = (consent_id, locale) => {
+        const consent_locale = consentLocales.find(x => x.consent_id === consent_id && x.locale === locale);
 
-        if (consent_locale && consent_locale[0] && consent_locale[0].rich_text) return consent_locale[0].rich_text;
-        return '';
-
+        return parse(consent_locale.rich_text);
     };
 
     useEffect(() => {
@@ -169,12 +166,12 @@ export default function ImportConsentsDashboard() {
                             <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">Import HCP Consents </h4>
                             <div class="d-flex justify-content-between align-items-center">
                                 <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
-                                    <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Import consents</span>
+                                    <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Upload consents in VeevaCRM</span>
                                 </button>
-                                <Modal dialogClassName="" size="lg" centered show={showForm} onHide={() => setShowForm(false)}>
+                                <Modal dialogClassName size="lg" centered show={showForm} onHide={() => setShowForm(false)}>
                                     <Modal.Header closeButton>
                                         <Modal.Title>
-                                            Import Consents
+                                            Import Consents Into VeevaCRM
                                         </Modal.Title>
                                     </Modal.Header>
                                     <Modal.Body>
@@ -200,7 +197,7 @@ export default function ImportConsentsDashboard() {
                                                 }).then(() => addToast('Consents imported successfully', {
                                                     appearance: 'success',
                                                     autoDismiss: true
-                                                })).catch(err => addToast('Could not import consents', {
+                                                })).catch(err => addToast('An error occurred!', {
                                                     appearance: 'error',
                                                     autoDismiss: true
                                                 })).finally(() => dispatch(getConsentImportRecords()));
@@ -215,9 +212,9 @@ export default function ImportConsentsDashboard() {
                                                     <div className="row">
                                                         <div className="col-12">
                                                             <div className="form-group">
-                                                                <label className="font-weight-bold" htmlFor="consent_category">Select Consent Category <span className="text-danger">*</span></label>
+                                                                <label className="font-weight-bold" htmlFor="consent_category">Consent Category <span className="text-danger">*</span></label>
                                                                 <Field data-testid="consent_category" as="select" name="consent_category" className="form-control">
-                                                                    <option key="select-consent-category" value="" disabled>Select Consent Category</option>
+                                                                    <option key="select-consent-category" value="" disabled>--Select--</option>
                                                                     {consent_categories.map(category => {
                                                                         return <option key={category.id} value={category.id}>{category.title}</option>
                                                                     })}
@@ -227,9 +224,9 @@ export default function ImportConsentsDashboard() {
                                                         </div>
                                                         <div className="col-12">
                                                             <div className="form-group">
-                                                                <label className="font-weight-bold" htmlFor="consent_id">Select Consent <span className="text-danger">*</span></label>
+                                                                <label className="font-weight-bold" htmlFor="consent_id">Preference <span className="text-danger">*</span></label>
                                                                 <Field data-testid="consent" as="select" name="consent_id" className="form-control">
-                                                                    <option key="select-consent" value="" disabled>Select Consent</option>
+                                                                    <option key="select-consent" value="" disabled>--Select--</option>
                                                                     {cdp_consents.map(item => formikProps.values.consent_category === item.category_id &&
                                                                         <option key={item.id} value={item.id}>{item.preference}</option>
                                                                     )}
@@ -239,9 +236,9 @@ export default function ImportConsentsDashboard() {
                                                         </div>
                                                         <div className="col-12">
                                                             <div className="form-group">
-                                                                <label className="font-weight-bold" htmlFor="consent_locale">Select Localization <span className="text-danger">*</span></label>
+                                                                <label className="font-weight-bold" htmlFor="consent_locale">Localization <span className="text-danger">*</span></label>
                                                                 <Field data-testid="locale" as="select" name="consent_locale" className="form-control">
-                                                                    <option key="select-locale" value="" disabled>Select Consent Locale</option>
+                                                                    <option key="select-locale" value="" disabled>--Select--</option>
                                                                     {consentLocales.map(item => formikProps.values.consent_id === item.consent_id &&
                                                                         <option key={item.id} value={item.locale_detail.locale}>{`${item.locale_detail.language_variant} ( ${item.locale_detail.locale} )`}</option>
                                                                     )}
@@ -253,9 +250,9 @@ export default function ImportConsentsDashboard() {
                                                             {
                                                                 formikProps.values.consent_locale && formikProps.values.consent_locale !== '' &&
                                                                 <div className="form-group richtext-preview">
-                                                                    <label className="font-weight-bold" htmlFor="rich-text">Richtext Preview</label>
+                                                                    <label className="font-weight-bold" htmlFor="rich-text">Legal Text</label>
                                                                     <div className="text-muted cdp-light-bg p-3 mb-3">
-                                                                        {parse(getRichText(formikProps.values.consent_id, formikProps.values.consent_locale))}
+                                                                        {getLegalText(formikProps.values.consent_id, formikProps.values.consent_locale)}
                                                                     </div>
                                                                 </div>
                                                             }
@@ -270,7 +267,7 @@ export default function ImportConsentsDashboard() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <button type="submit" className="btn cdp-btn-primary btn-block my-3 py-2 text-white shadow">Save Changes</button>
+                                                    <button type="submit" className="btn cdp-btn-primary btn-block my-3 py-2 text-white shadow">Upload to VeevaCRM</button>
                                                 </Form>
                                             )}
                                         </Formik>
@@ -286,8 +283,8 @@ export default function ImportConsentsDashboard() {
                                             <th width="15%">Consent Preference</th>
                                             <th width="15%">Consent Category</th>
                                             <th width="15%">Consent Locale</th>
-                                            <th width="15%">Successful Synced Records</th>
-                                            <th width="15%">Unsuccessful Synced Records</th>
+                                            <th width="15%">Successful Records</th>
+                                            <th width="15%">Unsuccessful Records</th>
                                             <th width="15%">Executed By</th>
                                             <th width="15%">Execution Date</th>
                                             <th width="10%">Action</th>
@@ -324,7 +321,7 @@ export default function ImportConsentsDashboard() {
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item onClick={() => { setShowDetail(true); setDetails(row); }}>Details</Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => exportRecords(row.id)}>Export</Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => exportRecords(row.id)}>Export the report</Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
                                             </tr>
@@ -411,12 +408,11 @@ export default function ImportConsentsDashboard() {
                                     <p>{(new Date(details.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</p>
                                 </div>
                                 <div className="col-12">
-                                    <h4 className="mb-0 font-weight-bold-light">Rich Text</h4>
-                                    {details.consent.preference}
+                                    <h4 className="mb-0 font-weight-bold-light">Legal Text</h4>
                                     <div className="text-muted cdp-light-bg p-3 mb-3">
-                                        {parse(getRichText(details.consent_id, details.consent_locale))}
+                                        {getLegalText(details.consent_id, details.consent_locale)}
                                     </div>
-                                    <button type="button" className="btn cdp-btn-primary btn-block my-3 py-2 text-white shadow" onClick={() => DownloadFile(details.id)}>Download the original file</button>
+                                    <button type="button" className="btn cdp-btn-primary my-3 py-2 text-white shadow" onClick={() => DownloadFile(details.id)}>Download the original file</button>
                                 </div>
                             </div>
                         }

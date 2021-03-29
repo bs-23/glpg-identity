@@ -1,6 +1,7 @@
 const path = require('path');
 const XLSX = require('xlsx');
 const { Op } = require('sequelize');
+const parse = require('html-react-parser');
 
 const HcpConsentImportRecord = require(path.join(process.cwd(), 'src/modules/privacy/import-consents/server/hcp-consent-import-record.model'));
 const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
@@ -50,7 +51,12 @@ async function importConsents(req, res) {
             const email = row['Emailaddress'];
             consent.captured_date = row['Opt-In Date'];
 
-            const multichannel_consent = await veevaService.createMultiChannelConsent(onekey_id, email.toLowerCase(), consent);
+            let multichannel_consent = null;
+            const isEmailDifferent = await veevaService.isEmailDifferent(onekey_id, email.toLowerCase());
+
+            if(!isEmailDifferent) {
+                multichannel_consent = await veevaService.createMultiChannelConsent(onekey_id, email.toLowerCase(), consent);
+            }
 
             data.push({
                 onekey_id,
@@ -88,6 +94,7 @@ async function importConsents(req, res) {
 
         res.sendStatus(200);
     } catch (err) {
+        console.error(err);
         logger.error(err);
         res.status(500).send('Internal server error');
     }
@@ -140,10 +147,8 @@ async function getDownloadUrl(req, res) {
 
 async function exportRecords(req, res) {
     try {
-        const id = req.params.id;
-
         const record = await HcpConsentImportRecord.findOne({
-            where: { id },
+            where: { id: req.params.id },
             include: [
                 {
                     model: User,
@@ -178,9 +183,9 @@ async function exportRecords(req, res) {
             'Email': item.email,
             'Consent Preference': record.consent.preference,
             'Consent Locale': record.consent_locale,
-            'Localized  Consent Text': consentLocale.rich_text,
-            'Multichannel Consent ID': item.multichannel_consent_id,
-            'Opt-in Date': item.captured_date
+            'Legal Text': parse(consentLocale.rich_text).replace(/(<\/?(?:a)[^>]*>)|<[^>]+>/ig, '$1'),
+            'Multichannel Consent Id': item.multichannel_consent_id,
+            'Opt-In Date': item.captured_date
         }));
 
         const sheetName = 'Imported Consent Records';
@@ -190,10 +195,11 @@ async function exportRecords(req, res) {
             'Content-Disposition': `attachment;filename=${sheetName.replace(' ', '_')}.xlsx`,
             'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         });
+
         res.end(fileBuffer);
-    } catch (error) {
-        logger.error(error);
-        res.status(500).send('Internal server error');
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send(err);
     }
 }
 
