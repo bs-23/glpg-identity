@@ -23,6 +23,7 @@ export default function ImportConsentsDashboard() {
     const [showForm, setShowForm] = useState(false);
     const [localizations, setLocalizations] = useState([]);
     const [consentLocales, setConsentLocales] = useState(false);
+    const [selectedRecords, setSelectedImport] = useState(null);
     const consent_categories = useSelector(state => state.consentCategoryReducer.consent_categories);
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const country_consents = useSelector(state => state.consentCountryReducer.country_consents);
@@ -137,12 +138,12 @@ export default function ImportConsentsDashboard() {
                                                 axios.post(`/api/consent-import`, data, {
                                                     headers: { 'Content-Type': 'multipart/form-data' }
                                                 }).then(() => addToast('Consents imported successfully', {
-                                                        appearance: 'success',
-                                                        autoDismiss: true
-                                                    })).catch(err => addToast('Could not import consents', {
-                                                        appearance: 'error',
-                                                        autoDismiss: true
-                                                    })).finally(() => dispatch(getConsentImportRecords()));
+                                                    appearance: 'success',
+                                                    autoDismiss: true
+                                                })).catch(err => addToast('Could not import consents', {
+                                                    appearance: 'error',
+                                                    autoDismiss: true
+                                                })).finally(() => dispatch(getConsentImportRecords()));
 
                                                 actions.setSubmitting(false);
                                                 actions.resetForm();
@@ -226,7 +227,11 @@ export default function ImportConsentsDashboard() {
                                                 <td data-for="Category" className="text-break">{row.consent.preference}</td>
                                                 <td data-for="Category" className="text-break">{row.consent.consent_category.title}</td>
                                                 <td data-for="Locale" className="text-break">{row.consent_locale}</td>
-                                                <td data-for="Total Records" className="text-break">{row.data.length}</td>
+                                                <td data-for="Total Records" className="text-break">
+                                                    <a className="link-with-underline cursor-pointer" onClick={() => setSelectedImport(row.data)}>
+                                                        {row.data.length}
+                                                    </a>
+                                                </td>
                                                 <td data-for="Created By" className="text-break">{`${row.createdByUser.first_name} ${row.createdByUser.last_name}`}</td>
                                                 <td data-for="Created On" className="text-break">{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                 <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
@@ -252,6 +257,45 @@ export default function ImportConsentsDashboard() {
                         }
                     </div>
                 </div>
+
+                <Modal
+                    size="lg"
+                    centered
+                    show={!!selectedRecords}
+                    onHide={() => setSelectedImport(null)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Imported Consent Records</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {selectedRecords && selectedRecords.length &&
+                            <table className="table table-hover table-sm mb-0 cdp-table mb-0 cdp-table__responsive">
+                                <thead className="cdp-bg-primary text-white cdp-table__header">
+                                    <tr>
+                                        <th width="15%">OneKey ID Individual</th>
+                                        <th width="15%">Email</th>
+                                        <th width="15%">Multichannel Consent ID</th>
+                                        <th width="15%">Opt-In Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="cdp-table__body bg-white">
+                                    {selectedRecords.map((item, index) => (
+                                        <tr key={'item-' + index}>
+                                            <td className="text-break">{item.onekey_id || '--'}</td>
+                                            <td className="text-break">{item.email || '--'}</td>
+                                            <td className="text-break">{item.multichannel_consent_id || '--'}</td>
+                                            <td className="text-break">
+                                                {item.captured_date
+                                                    ? (new Date(item.captured_date)).toLocaleDateString('en-GB').replace(/\//g, '.')
+                                                    : '--'
+                                                }
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        }
+                    </Modal.Body>
+                </Modal>
             </div>
         </main>
     )
