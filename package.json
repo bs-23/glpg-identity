@@ -5,7 +5,7 @@
     "author": "Brain Station 23 Limited",
     "scripts": {
         "start": "run-p webpack:development pm2:development",
-        "pm2:development": "cross-env NODE_ENV=development pm2 start server.js --watch  --no-daemon --name cdp",
+        "pm2:development": "cross-env NODE_ENV=development pm2 start server.js --watch --ignore-watch='newrelic_agent.log' --no-daemon --name cdp",
         "webpack:development": "cross-env NODE_ENV=development webpack --progress --watch --stats-error-details",
         "pm2:production": "cross-env NODE_ENV=production pm2 start server.js --name cdp",
         "webpack:production": "cross-env NODE_ENV=production webpack",
