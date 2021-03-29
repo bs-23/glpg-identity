@@ -394,7 +394,6 @@ a {
     visibility: hidden;
 }
 
-
 .fa-1_5x {
     font-size: 1.5rem;
 }
@@ -402,5 +401,14 @@ a {
 .cursor {
     &-pointer {
         cursor: pointer;
+    }
+}
+
+.richtext-preview {
+    a {
+        color: $secondary-color;
+    }
+    p {
+        margin-bottom: 0px;
     }
 }

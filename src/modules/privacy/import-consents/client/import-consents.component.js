@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { useToasts } from 'react-toast-notifications';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
-
+import parse from 'html-react-parser';
 import Faq from '../../../platform/faq/client/faq.component';
 import { getConsentImportRecords } from './import-consents.actions';
 import { ImportConsentsSchema } from './import-consents.schema';
@@ -56,7 +56,6 @@ export default function ImportConsentsDashboard() {
                 temp_locales.push(item);
             });
         });
-
         setConsentLocales([...new Map(temp_locales.map(item => [item['id'], item])).values()]);
     };
 
@@ -111,7 +110,7 @@ export default function ImportConsentsDashboard() {
                                 <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Import consents</span>
                                 </button>
-                                <Modal dialogClassName="modal-90w modal-customize" centered show={showForm} onHide={() => setShowForm(false)}>
+                                <Modal dialogClassName="" size="lg" centered show={showForm} onHide={() => setShowForm(false)}>
                                     <Modal.Header closeButton>
                                         <Modal.Title>
                                             Import Consents
@@ -190,6 +189,18 @@ export default function ImportConsentsDashboard() {
                                                             </div>
                                                         </div>
                                                         <div className="col-12">
+                                                            {
+                                                                formikProps.values.consent_locale && formikProps.values.consent_locale !== '' &&
+                                                                <div className="form-group richtext-preview">
+                                                                    <label className="font-weight-bold" htmlFor="rich-text">Richtext Preview</label>
+                                                                    <div className="text-muted cdp-light-bg p-3 mb-3">
+                                                                        {parse(consentLocales.filter(x => (x.consent_id === formikProps.values.consent_id) && (x.locale === formikProps.values.consent_locale))[0] ?
+                                                                            consentLocales.filter(x => (x.consent_id === formikProps.values.consent_id) && (x.locale === formikProps.values.consent_locale))[0].rich_text : '')}
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                        <div className="col-12">
                                                             <div className="form-group">
                                                                 <label className="font-weight-bold d-block" htmlFor="file">File <span className="text-danger">*</span></label>
                                                                 <input id="file" name="file" type="file" onChange={(event) => {
@@ -197,9 +208,10 @@ export default function ImportConsentsDashboard() {
                                                                 }} />
                                                                 <div className="invalid-feedback"><ErrorMessage name="file" /></div>
                                                             </div>
+                                                           
                                                         </div>
                                                     </div>
-                                                    <button type="submit" className="btn cdp-btn-primary btn-block my-2 text-white shadow-sm">Save Changes</button>
+                                                    <button type="submit" className="btn cdp-btn-primary btn-block my-3 py-2 text-white shadow">Save Changes</button>
                                                 </Form>
                                             )}
                                         </Formik>
