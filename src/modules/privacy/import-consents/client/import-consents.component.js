@@ -23,11 +23,18 @@ export default function ImportConsentsDashboard() {
     const [showForm, setShowForm] = useState(false);
     const [localizations, setLocalizations] = useState([]);
     const [consentLocales, setConsentLocales] = useState(false);
-    const [selectedRecords, setSelectedImport] = useState(null);
+    const [mappedConsentRecords, setMappedConsentRecords] = useState([]);
+    const [selectedImport, setSelectedImport] = useState(null);
+    const [recordsModalTitle, setRecordsModalTitle] = useState('');
     const consent_categories = useSelector(state => state.consentCategoryReducer.consent_categories);
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const country_consents = useSelector(state => state.consentCountryReducer.country_consents);
-    const consent_import_records = useSelector(state => state.consentImportReducer.consent_import_records);
+    const consentImportRecords = useSelector(state => state.consentImportReducer.consent_import_records);
+
+    const showRecords = (records, isSynced) => {
+        setSelectedImport(records);
+        setRecordsModalTitle(isSynced ? 'Successful Synced Records' : 'Unsuccessful Synced Records');
+    };
 
     useEffect(() => {
         async function getLocalizations() {
@@ -43,13 +50,30 @@ export default function ImportConsentsDashboard() {
     }, []);
 
     useEffect(() => {
-        consentMapping();
+        mapConsentLocales();
     }, [cdp_consents, country_consents, localizations]);
 
-    const consentMapping = () => {
-        const consent_locale_list = country_consents.map(x => x.consent);
+    useEffect(() => {
+        if (consentImportRecords && consentImportRecords.length) {
+            const mappedRecords = consentImportRecords.map(c => {
+                const record = { ...c };
+                record.successfulSyncedRecords = record.data && record.data.length
+                    ? record.data.filter(d => d.multichannel_consent_id)
+                    : [];
+                record.unsuccessfulSyncedRecords = record.data && record.data.length
+                    ? record.data.filter(d => !d.multichannel_consent_id)
+                    : [];
+                delete record.data;
+                return record;
+            });
+            setMappedConsentRecords(mappedRecords);
+        }
+    }, [consentImportRecords]);
+
+    const mapConsentLocales = () => {
+        const consentLocaleList = country_consents.map(x => x.consent);
         const temp_locales = [];
-        consent_locale_list.forEach(elem => {
+        consentLocaleList.forEach(elem => {
             elem.translations.forEach(item => {
                 item.locale_detail = localizations.filter(x => x.locale === item.locale)[0];
                 item.consent_id = elem.id;
@@ -217,30 +241,44 @@ export default function ImportConsentsDashboard() {
                             </div>
                         </div>
                         <div className="d-flex justify-content-between align-items-center cdp-table__responsive-wrapper">
-                            {consent_import_records && consent_import_records.length > 0 &&
+                            {mappedConsentRecords && mappedConsentRecords.length > 0 &&
                                 <table className="table table-hover table-sm mb-0 cdp-table mb-0 cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
                                             <th width="15%">Consent Preference</th>
                                             <th width="15%">Consent Category</th>
                                             <th width="15%">Consent Locale</th>
-                                            <th width="15%">Total Records</th>
+                                            <th width="15%">Successful Synced Records</th>
+                                            <th width="15%">Unsuccessful Synced Records</th>
                                             <th width="15%">Executed By</th>
                                             <th width="15%">Execution Date</th>
                                             <th width="10%">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
-                                        {consent_import_records.map(row => (
+                                        {mappedConsentRecords.map(row => (
                                             <tr key={row.id}>
                                                 <td data-for="Category" className="text-break">{row.consent.preference}</td>
                                                 <td data-for="Category" className="text-break">{row.consent.consent_category.title}</td>
                                                 <td data-for="Locale" className="text-break">{row.consent_locale}</td>
-                                                <td data-for="Total Records" className="text-break">
-                                                    <a className="link-with-underline cursor-pointer" onClick={() => setSelectedImport(row.data)}>
-                                                        {row.data.length}
-                                                    </a>
+                                                <td data-for="Successful Synced Records" className="text-break">
+                                                    {row.successfulSyncedRecords.length ?
+                                                        <a className="link-with-underline cursor-pointer" onClick={() => showRecords(row.successfulSyncedRecords, true)}>
+                                                            {row.successfulSyncedRecords.length}
+                                                        </a>
+                                                        : 0
+                                                    }
                                                 </td>
+
+                                                <td data-for="Unsuccessful Synced Records" className="text-break">
+                                                    {row.unsuccessfulSyncedRecords.length ?
+                                                        <a className="link-with-underline cursor-pointer" onClick={() => showRecords(row.unsuccessfulSyncedRecords, false)}>
+                                                            {row.unsuccessfulSyncedRecords.length}
+                                                        </a>
+                                                        : 0
+                                                    }
+                                                </td>
+
                                                 <td data-for="Created By" className="text-break">{`${row.createdByUser.first_name} ${row.createdByUser.last_name}`}</td>
                                                 <td data-for="Created On" className="text-break">{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                 <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
@@ -256,7 +294,7 @@ export default function ImportConsentsDashboard() {
                                 </table>
                             }
                         </div>
-                        {consent_import_records && consent_import_records.length === 0 &&
+                        {mappedConsentRecords && mappedConsentRecords.length === 0 &&
                             <div className="row justify-content-center mt-5 pt-5 mb-3">
                                 <div className="col-12 col-sm-6 py-4 bg-white shadow-sm rounded text-center">
                                     <i class="icon icon-team icon-6x cdp-text-secondary"></i>
@@ -270,34 +308,34 @@ export default function ImportConsentsDashboard() {
                 <Modal
                     size="lg"
                     centered
-                    show={!!selectedRecords}
+                    show={!!selectedImport}
                     onHide={() => setSelectedImport(null)}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Imported Consent Records</Modal.Title>
+                        <Modal.Title>{recordsModalTitle}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        {selectedRecords && selectedRecords.length &&
+                        {selectedImport && selectedImport.length &&
                             <table className="table table-hover table-sm mb-0 cdp-table mb-0 cdp-table__responsive">
                                 <thead className="cdp-bg-primary text-white cdp-table__header">
                                     <tr>
-                                        <th width="15%">OneKey ID Individual</th>
+                                        <th width="15%">Individual OneKeyId</th>
                                         <th width="15%">Email</th>
-                                        <th width="15%">Multichannel Consent ID</th>
                                         <th width="15%">Opt-In Date</th>
+                                        <th width="15%">Multichannel Consent ID</th>
                                     </tr>
                                 </thead>
                                 <tbody className="cdp-table__body bg-white">
-                                    {selectedRecords.map((item, index) => (
+                                    {selectedImport.map((item, index) => (
                                         <tr key={'item-' + index}>
                                             <td className="text-break">{item.onekey_id || '--'}</td>
                                             <td className="text-break">{item.email || '--'}</td>
-                                            <td className="text-break">{item.multichannel_consent_id || '--'}</td>
                                             <td className="text-break">
                                                 {item.captured_date
                                                     ? (new Date(item.captured_date)).toLocaleDateString('en-GB').replace(/\//g, '.')
                                                     : '--'
                                                 }
                                             </td>
+                                            <td className="text-break">{item.multichannel_consent_id || '--'}</td>
                                         </tr>
                                     ))}
                                 </tbody>
