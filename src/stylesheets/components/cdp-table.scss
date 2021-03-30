@@ -164,6 +164,8 @@
     td {
         color: #202020;
         font-size: 14px;
+        word-break: break-word !important;
+        word-wrap: break-word !important;
     }
 
     &-consent {
