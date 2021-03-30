@@ -36,8 +36,8 @@ async function getAuthorizationHeader() {
 async function getAccountByOneKeyId(oneKeyId) {
     try {
         const headers = await getAuthorizationHeader();
-        const query = `SELECT + Id, Name, PersonEmail, Secondary_Email__c,
-            (SELECT + Id + FROM + Multichannel_Consent_vod__r) +
+        const query = `SELECT + Id, PersonEmail, Secondary_Email__c,
+            (SELECT + Id, Consent_Type_vod__c, Channel_Value_vod__c, Opt_Expiration_Date_vod__c + FROM + Multichannel_Consent_vod__r) +
             FROM + Account + WHERE + QIDC__OneKeyId_IMS__c = '${oneKeyId}'`;
         const account_response = await axios.get(`${serviceUrl}/data/v48.0/query?q=${query}`, { headers });
         const account = account_response.data.totalSize ? account_response.data.records[0] : null;
@@ -80,59 +80,54 @@ async function syncHcpConsentsInVeeva(hcp, actor) {
 
             if(!account) return;
 
-            let channel_source = 'Account.Secondary_Email__C';
+            const isEmailDifferent = await isEmailDifferent(onekey_id, hcp.email);
 
-            if(account.PersonEmail && account.PersonEmail.toLowerCase() === hcp.email) {
-                channel_source = 'Account.PersonEmail';
-            } else {
-                await axios.patch(`${serviceUrl}/data/v48.0/sobjects/Account/${account.Id}`, { Secondary_Email__c: hcp.email }, { headers });
+            if(isEmailDifferent) return;
+
+            if(!account.PersonEmail) {
+                await axios.patch(`${serviceUrl}/data/v48.0/sobjects/Account/${account.Id}`, { PersonEmail: hcp.email }, { headers });
             }
 
-            const account_multichannel_consents = account.Multichannel_Consent_vod__r?.records;
+            const multichannel_consents = account.Multichannel_Consent_vod__r?.records;
 
             await Promise.all(hcp_consents.map(async hcp_consent => {
                 const locale = hcp_consent.consent.consent_locales.find(x => x.locale === hcp.locale);
 
                 if(hcp_consent.consent.consent_category.veeva_content_type_id && locale.dataValues.veeva_consent_type_id) {
-                    const multichannel_consent = account_multichannel_consents && account_multichannel_consents.find(x => x.Id === hcp_consent.veeva_multichannel_consent_id);
+                    const multichannel_consent = multichannel_consents && multichannel_consents.find(x => x.Consent_Type_vod__c === locale.dataValues.veeva_consent_type_id && !x.Opt_Expiration_Date_vod__c);
 
-                    if(!multichannel_consent) {
-                        const { data } = await axios.post(`${serviceUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
-                            Account_vod__c: account.Id,
-                            RecordTypeId: '0124J000000ouUlQAI',
-                            Capture_Datetime_vod__c: hcp_consent.created_at,
-                            Channel_Value_vod__c: hcp.email,
-                            Channel_Source_vod__c: channel_source,
-                            Opt_Type_vod__c: hcp_consent.opt_type === 'opt-out' ? 'Opt_Out_vod' : 'Opt_In_vod',
-                            Content_Type_vod__c: hcp_consent.consent.consent_category.veeva_content_type_id,
-                            GLPG_Consent_Source__c: hcp_consent.consent_source,
-                            CDP_Consent_ID__c: hcp_consent.consent_id,
-                            Consent_Type_vod__c: locale.dataValues.veeva_consent_type_id,
-                            Default_Consent_Text_vod__c: parser(locale.dataValues.rich_text).replace(/(<\/?(?:a)[^>]*>)|<[^>]+>/ig, '$1')
-                        }, { headers });
-
-                        const hcpConsent = await HcpConsents.findOne({ where: { id: hcp_consent.id }});
-                        const previousConsentValue = {...hcpConsent.dataValues};
-
-                        await hcpConsent.update({ veeva_multichannel_consent_id: data.id });
-
-                        const updatesInConsent = auditService.difference(hcpConsent.dataValues, previousConsentValue);
-
-                        auditService.log({
-                            event_type: 'UPDATE',
-                            object_id: hcp.id,
-                            table_name: 'hcp_consents',
-                            actor: actor.id,
-                            changes: updatesInConsent
-                        });
-
-                        if(hcpConsent.opt_type === 'opt-out') {
-                            const multichannel_consents = account_multichannel_consents && account_multichannel_consents.find(x => x.CDP_Consent_ID__c === hcp_consent.id);
-                            await Promise.all(multichannel_consents.map(async multichannel_consent => {
-                                await axios.patch(`${serviceUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c/${multichannel_consent.Id}`, { Opt_Expiration_Date_vod__c: new Date(Date.now()) }, { headers });
-                            }));
-                        }
+                    if(multichannel_consent) {
+                        await axios.patch(`${serviceUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c/${multichannel_consent.Id}`, { Opt_Expiration_Date_vod__c: new Date(Date.now()) }, { headers });
                     }
+
+                    const { data } = await axios.post(`${serviceUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
+                        Account_vod__c: account.Id,
+                        RecordTypeId: '0124J000000ouUlQAI',
+                        Capture_Datetime_vod__c: hcp_consent.created_at,
+                        Channel_Value_vod__c: hcp.email,
+                        Channel_Source_vod__c: 'Account.PersonEmail',
+                        Opt_Type_vod__c: hcp_consent.opt_type === 'opt-out' ? 'Opt_Out_vod' : 'Opt_In_vod',
+                        Content_Type_vod__c: hcp_consent.consent.consent_category.veeva_content_type_id,
+                        GLPG_Consent_Source__c: hcp_consent.consent_source,
+                        CDP_Consent_ID__c: hcp_consent.consent_id,
+                        Consent_Type_vod__c: locale.dataValues.veeva_consent_type_id,
+                        Default_Consent_Text_vod__c: parser(locale.dataValues.rich_text).replace(/(<\/?(?:a)[^>]*>)|<[^>]+>/ig, '$1')
+                    }, { headers });
+
+                    const hcpConsent = await HcpConsents.findOne({ where: { id: hcp_consent.id }});
+                    const previousConsentValue = {...hcpConsent.dataValues};
+
+                    await hcpConsent.update({ veeva_multichannel_consent_id: data.id });
+
+                    const updatesInConsent = auditService.difference(hcpConsent.dataValues, previousConsentValue);
+
+                    auditService.log({
+                        event_type: 'UPDATE',
+                        object_id: hcp.id,
+                        table_name: 'hcp_consents',
+                        actor: actor.id,
+                        changes: updatesInConsent
+                    });
                 }
             }));
         }
@@ -154,8 +149,11 @@ async function createMultiChannelConsent(oneKeyId, email, consent) {
 
             if(!account) return;
 
+            const multichannel_consents = account.Multichannel_Consent_vod__r?.records;
+            const multichannel_consent = multichannel_consents && multichannel_consents.find(x => x.Consent_Type_vod__c === consent.consent_locales[0].veeva_consent_type_id && !x.Opt_Expiration_Date_vod__c);
+
             if(!account.PersonEmail) {
-                await axios.patch(`${serviceUrl}/data/v48.0/sobjects/Account/${account.Id}`, { PersonEmail: email.toLowerCase()}, { headers });
+                await axios.patch(`${serviceUrl}/data/v48.0/sobjects/Account/${account.Id}`, { PersonEmail: email.toLowerCase() }, { headers });
             }
 
             const { data } = await axios.post(`${serviceUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
@@ -171,6 +169,10 @@ async function createMultiChannelConsent(oneKeyId, email, consent) {
                 Consent_Type_vod__c: consent.consent_locales[0].veeva_consent_type_id,
                 Default_Consent_Text_vod__c: parser(consent.consent_locales[0].rich_text).replace(/(<\/?(?:a)[^>]*>)|<[^>]+>/ig, '$1')
             }, { headers });
+
+            if(multichannel_consent) {
+                await axios.patch(`${serviceUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c/${multichannel_consent.Id}`, { Opt_Expiration_Date_vod__c: new Date(Date.now()) }, { headers });
+            }
 
             return data;
         }
