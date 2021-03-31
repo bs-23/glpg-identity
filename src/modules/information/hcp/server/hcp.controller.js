@@ -1322,13 +1322,33 @@ async function resetPassword(req, res) {
 
 async function forgetPassword(req, res) {
     const response = new Response({}, []);
-    const { email } = req.body;
+    const { email, uuid } = req.body;
 
     try {
-        const doc = await Hcp.findOne({
-            where: where(fn('lower', col('email')), fn('lower', email))
+        // const doc = await Hcp.findOne({
+        //     where: where(fn('lower', col('email')), fn('lower', email))
+        // });
+        const doc = uuid ? await Hcp.findOne({
+            where: {
+              [Op.and]: [{
+                        email: {
+                            [Op.iLike]: email
+                        }
+                    },
+                    {
+                        uuid: {
+                            [Op.like]: uuid
+                        }
+                    }
+                ]
+            }
+        }): await Hcp.findOne({
+            where: {
+                email: {
+                   [Op.iLike]: email
+                }
+            }
         });
-
         if (!doc) {
             response.data = {
                 message: 'Successfully sent password reset email.'

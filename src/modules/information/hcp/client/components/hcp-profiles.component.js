@@ -247,6 +247,7 @@ export default function hcpUsers() {
     };
 
     const urlChange = (pageNo, codBase, status, orderColumn, pageChange = false) => {
+        console.log("hello---")
         if (Array.isArray(status)) status = 'self_verified,manually_verified';
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');
@@ -335,7 +336,7 @@ export default function hcpUsers() {
             });
     }
 
-    const generateSortHandler = (columnName) => () => urlChange(1, hcps.codBase, params.get('status'), columnName);
+    const generateSortHandler = (columnName) => () => {urlChange(1, hcps.codBase, params.get('status'), columnName)};
 
     const renderStatus = ({ value: status, row }) => {
         return status === 'self_verified'
@@ -592,7 +593,13 @@ export default function hcpUsers() {
                                             <Accordion.Toggle eventKey="0" className="btn btn-sm px-3 mr-2 cdp-btn-outline-primary rounded shadow-0 mb-0 p-2"><i className="fas fa-sort cdp-text-primary"></i></Accordion.Toggle>
                                             <Accordion.Collapse eventKey="0" className="cdp-table__responsive-accordion-body">
                                                 <div className="cdp-bg-primary p-2 text-white">
-                                                </div>
+                                                <span className={sort.value === 'created_at' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => { generateSortHandler('created_at')}}>Date of Registration<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                <span className={sort.value === 'email' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() =>  generateSortHandler('email')}>Email<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                <span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => generateSortHandler('first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                <span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() =>generateSortHandler('last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                <span className={sort.value === 'status' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => generateSortHandler('status')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                                <span className={sort.value === 'uuid' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => generateSortHandler('uuid')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                            </div>
                                             </Accordion.Collapse>
                                         </Accordion>
                                     }
