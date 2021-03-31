@@ -72,7 +72,7 @@ const ConsentManagement = () => {
                                             <i className="fas fa-file-upload fa-3x cdp-list-group__icon"></i>
                                             <span>
                                                 <strong className="mb-2 h4 d-block cdp-list-group__link-title">Mange Consent Import Job</strong>
-                                                <span className="d-block cdp-list-group__link-description">Create, start, cancel new job to import consents into VeevaCRM.</span>
+                                                <span className="d-block cdp-list-group__link-description">Create, start, cancel jobs to import consents from different events into VeevaCRM.</span>
                                                 <span className="d-block cdp-list-group__link-activity">within 15 minutes</span>
                                             </span>
                                         </NavLink>
