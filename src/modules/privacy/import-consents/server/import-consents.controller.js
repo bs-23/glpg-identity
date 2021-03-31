@@ -13,6 +13,7 @@ const storageService = require(path.join(process.cwd(), 'src/modules/core/server
 const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 const veevaService = require(path.join(process.cwd(), 'src/modules/information/hcp/server/services/veeva.service'));
 const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
+const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 
 async function createConsentImportJob(req, res) {
     try {
@@ -92,6 +93,14 @@ async function createConsentImportJob(req, res) {
             table_name: 'consent_import_jobs'
         });
 
+        await logService.log({
+            event_type: 'CREATE',
+            object_id: importJob.id,
+            table_name: 'consent_import_jobs',
+            actor: req.user.id,
+            changes: importJob.dataValues
+        });
+
         res.sendStatus(200);
     } catch (err) {
         logger.error(err);
@@ -138,7 +147,21 @@ async function startConsentImportJob(req, res) {
             row.multichannel_consent_id = multichannel_consent ? multichannel_consent.id : null;
         }));
 
+        const previousJob = { ...job.dataValues };
+
         await job.update({ status: 'completed', data: job.data, updated_by: req.user.id });
+
+        const updatesInJob = logService.difference(job.dataValues, previousJob);
+
+        if (updatesInJob) {
+            await logService.log({
+                event_type: 'UPDATE',
+                object_id: job.id,
+                table_name: 'consent_import_jobs',
+                actor: req.user.id,
+                changes: updatesInJob
+            });
+        }
 
         res.sendStatus(200);
     } catch (err) {
@@ -185,7 +208,21 @@ async function cancelConsentImportJob(req, res) {
 
         if (job.status === 'completed' || job.status === 'cancelled') return res.status(400).send('Invalid request! Job is already completed or cancelled.');
 
+        const previousJob = { ...job.dataValues };
+
         await job.update({ status: 'cancelled' });
+
+        const updatesInJob = logService.difference(job.dataValues, previousJob);
+
+        if (updatesInJob) {
+            await logService.log({
+                event_type: 'UPDATE',
+                object_id: job.id,
+                table_name: 'consent_import_jobs',
+                actor: req.user.id,
+                changes: updatesInJob
+            });
+        }
 
         res.sendStatus(200);
     } catch (err) {

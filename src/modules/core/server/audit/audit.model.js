@@ -28,7 +28,7 @@ const Audit = sequelize.cdpConnector.define('audits', {
         values: [
             'users', 'hcp_profiles', 'consents', 'faq', 'applications',
             'permission_sets', 'roles', 'consent_countries', 'consent_categories',
-            'consent_locales', 'archive', 'partner_requests', 'hcp_consents'
+            'consent_locales', 'archive', 'partner_requests', 'hcp_consents', 'consent_import_jobs'
         ]
     },
     actor: {
