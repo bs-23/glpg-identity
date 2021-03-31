@@ -10,7 +10,7 @@ import parse from 'html-react-parser';
 import fileDownload from 'js-file-download';
 
 import Faq from '../../../platform/faq/client/faq.component';
-import { getConsentImportJobs, deleteConsentImportJob } from './import-consents.actions';
+import { getConsentImportJobs, cancelConsentImportJob } from './import-consents.actions';
 import { ImportConsentsSchema } from './import-consents.schema';
 import { getCdpConsents } from '../../../privacy/manage-consent/client/consent.actions';
 import { getCountryConsents } from '../../consent-country/client/consent-country.actions';
@@ -134,13 +134,13 @@ export default function ImportConsentsDashboard() {
     };
 
     const cancelJob = (id) => {
-        dispatch(deleteConsentImportJob(id)).then(() => {
-            addToast('Job cancelled successfully', {
+        dispatch(cancelConsentImportJob(id)).then(() => {
+            addToast('Job is successfully cancelled.', {
                 appearance: 'success',
                 autoDismiss: true
             });
         }).catch(err => {
-            addToast('Job cancel failed', {
+            addToast('Unable to perform the requset. Please try again.', {
                 appearance: 'error',
                 autoDismiss: true
             });

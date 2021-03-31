@@ -11,11 +11,11 @@ export function getConsentImportJobs() {
     };
 }
 
-export function deleteConsentImportJob(id) {
+export function cancelConsentImportJob(id) {
     return {
-        type: Types.DELETE_CONSENT_IMPORT_JOB,
+        type: Types.CANCEL_CONSENT_IMPORT_JOB,
         payload: axios({
-            method: 'delete',
+            method: 'put',
             url: `/api/consent-import-jobs/${id}`
         })
     };
