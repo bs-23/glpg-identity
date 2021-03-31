@@ -14,9 +14,12 @@ module.exports = app => {
     app.route('/api/consent-import-jobs/:id/start')
         .post(CDPAuthStrategy, ServiceGuard([Services.IMPORT_CONSENTS]), controller.startConsentImportJob);
 
-    app.route('/api/consent-import/records/:id/download')
+    app.route('/api/consent-import-jobs/:id/download')
         .get(CDPAuthStrategy, ServiceGuard([Services.IMPORT_CONSENTS]), controller.getDownloadUrl);
 
-    app.route('/api/consent-import/records/:id/export')
+    app.route('/api/consent-import-jobs/:id/export')
         .get(CDPAuthStrategy, ServiceGuard([Services.IMPORT_CONSENTS]), controller.exportRecords);
+
+    app.route('/api/consent-import-jobs/:id')
+        .delete(CDPAuthStrategy, ServiceGuard([Services.IMPORT_CONSENTS]), controller.deleteConsentImportJob);
 };

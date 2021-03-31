@@ -39,7 +39,7 @@ async function createConsentImportJob(req, res) {
             data.push({
                 onekey_id,
                 email,
-                opt_type: 'single-opt-in',
+                opt_type: req.body.opt_type,
                 consent_source: 'Website',
                 captured_date: captured_date
             });
@@ -81,7 +81,7 @@ async function createConsentImportJob(req, res) {
 
 async function startConsentImportJob(req, res) {
     try {
-        const job = await ConsentImportJob.findOne({ where: { id: req.query.id } });
+        const job = await ConsentImportJob.findOne({ where: { id: req.params.id } });
 
         if(!job || job.status !== 'ready') return;
 
@@ -154,6 +154,25 @@ async function getConsentImportJobs(req, res) {
     }
 }
 
+async function deleteConsentImportJob(req, res) {
+    try {
+        const job = await ConsentImportJob.findOne({
+            where: { id: req.params.id }
+        });
+
+        if (!job) return res.status(404).send('No job found');
+
+        if (job.status === 'completed') return res.status(400).send('Invalid sattus. Job already completed.');
+
+        await job.destroy();
+
+        res.sendStatus(200);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 async function getDownloadUrl(req, res) {
     try {
         const file = await File.findOne({
@@ -173,7 +192,7 @@ async function getDownloadUrl(req, res) {
 
 async function exportRecords(req, res) {
     try {
-        const record = await HcpConsentImportRecord.findOne({
+        const record = await ConsentImportJob.findOne({
             where: { id: req.params.id },
             include: [
                 {
@@ -234,3 +253,4 @@ exports.startConsentImportJob = startConsentImportJob;
 exports.getConsentImportJobs = getConsentImportJobs;
 exports.getDownloadUrl = getDownloadUrl;
 exports.exportRecords = exportRecords;
+exports.deleteConsentImportJob = deleteConsentImportJob;
