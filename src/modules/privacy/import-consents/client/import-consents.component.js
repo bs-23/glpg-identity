@@ -290,9 +290,9 @@ export default function ImportConsentsDashboard() {
                                                         <div className="col-12">
                                                             {
                                                                 formikProps.values.consent_locale && formikProps.values.consent_locale !== '' &&
-                                                                <div className="form-group richtext-preview">
-                                                                    <label className="font-weight-bold" htmlFor="rich-text">Legal Text</label>
-                                                                    <div className="text-muted cdp-light-bg p-3 mb-3">
+                                                                <div className="form-group richtext-preview rounded shadow-sm p-0">
+                                                                    <label className="px-3 py-2 font-weight-bold mb-0 cdp-light-bg d-block" htmlFor="rich-text">Legal Text</label>
+                                                                    <div className="text-muted p-3 mb-3 richtext-preview">
                                                                         {getLegalText(formikProps.values.consent_id, formikProps.values.consent_locale)}
                                                                     </div>
                                                                 </div>
@@ -393,14 +393,14 @@ export default function ImportConsentsDashboard() {
                 </div>
 
                 <Modal
-                    size="lg"
+                    size="xl"
                     centered
                     show={!!selectedImport}
                     onHide={() => setSelectedImport(null)}>
                     <Modal.Header closeButton>
                         <Modal.Title>Total Records</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>
+                    <Modal.Body className="modal-body__mh-500">
                         {selectedImport && selectedImport.length &&
                             <table className="table table-hover table-sm mb-0 cdp-table mb-0 cdp-table__responsive">
                                 <thead className="cdp-bg-primary text-white cdp-table__header">
@@ -460,15 +460,15 @@ export default function ImportConsentsDashboard() {
                                 </div>
                                 <div className="col-12">
                                     <div className="rounded shadow-sm p-0">
-                                        <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Legal Text</h4>
+                                        <label className="px-3 py-2 font-weight-bold mb-0 cdp-light-bg d-block">Legal Text</label>
                                         <div className="text-muted p-3 mb-3 richtext-preview">
                                             {getLegalText(details.consent_id, details.consent_locale)}
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="col-12">
-                                    <button type="button" className="btn cdp-btn-primary my-3 py-2 text-white shadow" onClick={() => DownloadFile(details.id)}>Download the original file</button>
+                            <div className="col-12">
+                                <button type="button" className="btn cdp-btn-primary my-3 py-2 text-white shadow" onClick={() => DownloadFile(details.id)}><i className="fas fa-download mr-2"></i> Download the original file</button>
                                     {details.status === 'completed' &&
                                         <button type="button" className="btn cdp-btn-primary my-3 py-2 text-white shadow ml-3" onClick={() => exportRecords(details.id)}>Download Job Report</button>
                                     }
