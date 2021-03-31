@@ -3,7 +3,7 @@ const XLSX = require('xlsx');
 const { Op } = require('sequelize');
 const parse = require('html-react-parser');
 
-const HcpConsentImportRecord = require(path.join(process.cwd(), 'src/modules/privacy/import-consents/server/hcp-consent-import-record.model'));
+const ConsentImportJob = require(path.join(process.cwd(), 'src/modules/privacy/import-consents/server/consent-import-job.model'));
 const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
 const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model'));
 const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model'));
@@ -14,7 +14,7 @@ const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/f
 const veevaService = require(path.join(process.cwd(), 'src/modules/information/hcp/server/services/veeva.service'));
 const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
 
-async function importConsents(req, res) {
+async function createConsentImportJob(req, res) {
     try {
         const file = req.files[0];
         const workbook = XLSX.read(file['buffer'], { type: 'buffer' });
@@ -26,83 +26,109 @@ async function importConsents(req, res) {
                 id: req.body.consent_id,
                 is_active: true
             },
-            attributes: ['id'],
-            include: [
-                {
-                    model: ConsentCategory,
-                    where: { id: req.body.consent_category },
-                    attributes: ['veeva_content_type_id']
-                },
-                {
-                    model: ConsentLocale,
-                    where: { consent_id: req.body.consent_id, locale: req.body.consent_locale },
-                    attributes: ['locale', 'rich_text', 'veeva_consent_type_id']
-                }
-            ]
+            attributes: ['id']
         });
-
-        consent.opt_type = 'single-opt-in';
-        consent.consent_source = 'Website';
 
         const data = [];
 
-        await Promise.all(rows.map(async row => {
+        rows.map(row => {
             const onekey_id = row['OneKey ID Individual'];
             const email = row['Emailaddress'];
-            consent.captured_date = row['Opt-In Date'];
-
-            let multichannel_consent = null;
-            const isEmailDifferent = await veevaService.isEmailDifferent(onekey_id, email.toLowerCase());
-
-            if(!isEmailDifferent) {
-                multichannel_consent = await veevaService.createMultiChannelConsent(onekey_id, email.toLowerCase(), consent);
-            }
+            const captured_date = row['Opt-In Date'];
 
             data.push({
                 onekey_id,
                 email,
-                captured_date: consent.captured_date,
-                multichannel_consent_id: multichannel_consent ? multichannel_consent.id : null
+                opt_type: 'single-opt-in',
+                consent_source: 'Website',
+                captured_date: captured_date
             });
-        }));
+        });
 
-        if (data.length) {
-            const importRecord = await HcpConsentImportRecord.create({
-                consent_id: consent.id,
-                consent_locale: req.body.consent_locale,
-                data,
-                created_by: req.user.id
-            });
+        const importJob = await ConsentImportJob.create({
+            consent_id: consent.id,
+            consent_category: req.body.consent_category,
+            consent_locale: req.body.consent_locale,
+            data,
+            status: data.length ? 'ready' : 'not-ready',
+            created_by: req.user.id,
+            updated_by: req.user.id
+        });
 
-            const bucketName = 'cdp-development';
+        const bucketName = 'cdp-development';
 
-            const response = await storageService.upload({
-                bucket: bucketName,
-                folder: `captured-consents-for-import/`,
-                fileName: importRecord.id + '.xlsx',
-                fileContent: file.buffer
-            });
+        const response = await storageService.upload({
+            bucket: bucketName,
+            folder: `consent-import-jobs/`,
+            fileName: importJob.id + '.xlsx',
+            fileContent: file.buffer
+        });
 
-            await File.create({
-                name: file.originalname,
-                bucket_name: bucketName,
-                key: response.key,
-                owner_id: importRecord.id,
-                table_name: 'hcp_consents_import_records'
-            });
-        }
+        await File.create({
+            name: file.originalname,
+            bucket_name: bucketName,
+            key: response.key,
+            owner_id: importJob.id,
+            table_name: 'consent_import_jobs'
+        });
 
         res.sendStatus(200);
     } catch (err) {
-        console.error(err);
         logger.error(err);
         res.status(500).send('Internal server error');
     }
 }
 
-async function getConsentImportRecords(req, res) {
+async function startConsentImportJob(req, res) {
     try {
-        const records = await HcpConsentImportRecord.findAll({
+        const job = await ConsentImportJob.findOne({ where: { id: req.query.id } });
+
+        if(!job || job.status !== 'ready') return;
+
+        const consent = await Consent.findOne({
+            where: {
+                id: job.consent_id,
+                is_active: true
+            },
+            attributes: ['id'],
+            include: [
+                {
+                    model: ConsentCategory,
+                    where: { id: job.consent_category },
+                    attributes: ['veeva_content_type_id']
+                },
+                {
+                    model: ConsentLocale,
+                    where: { consent_id: job.consent_id, locale: job.consent_locale },
+                    attributes: ['locale', 'rich_text', 'veeva_consent_type_id']
+                }
+            ]
+        });
+
+        if(!consent) return;
+
+        await Promise.all(job.data.forEach(async row => {
+            const isEmailDifferent = await veevaService.isEmailDifferent(row.onekey_id, row.email.toLowerCase());
+
+            if(!isEmailDifferent) {
+                multichannel_consent = await veevaService.createMultiChannelConsent(row.onekey_id, row.email.toLowerCase(), row.opt_type, row.consent_source, consent);
+            }
+
+            row.multichannel_consent_id = multichannel_consent ? multichannel_consent.id : null;
+        }));
+
+        await job.update({ status: 'completed', data: job.data, updated_by: req.user.id });
+
+        res.sendStatus(200);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getConsentImportJobs(req, res) {
+    try {
+        const jobs = await ConsentImportJob.findAll({
             include: [
                 {
                     model: User,
@@ -121,7 +147,7 @@ async function getConsentImportRecords(req, res) {
             ]
         });
 
-        res.json(records);
+        res.json(jobs);
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
@@ -203,7 +229,8 @@ async function exportRecords(req, res) {
     }
 }
 
-exports.importConsents = importConsents;
-exports.getConsentImportRecords = getConsentImportRecords;
+exports.createConsentImportJob = createConsentImportJob;
+exports.startConsentImportJob = startConsentImportJob;
+exports.getConsentImportJobs = getConsentImportJobs;
 exports.getDownloadUrl = getDownloadUrl;
 exports.exportRecords = exportRecords;
