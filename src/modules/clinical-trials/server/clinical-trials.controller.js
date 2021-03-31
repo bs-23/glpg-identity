@@ -16,6 +16,7 @@ const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston')
 
 var seed = 1;
 var API_KEY = nodecache.getValue('GOOGLE_MAP_API_KEY');
+var all_statuses = ['Recruiting', 'Not yet recruiting', 'Enrolling by invitation', 'Active, not recruiting', 'Suspended', 'Terminated', 'Completed', 'Withdrawn'];
 var countriesWithISO = [
     {'code':'AR','name':'Argentina'
     },
@@ -269,7 +270,7 @@ function statusInputTextMapping(status){
         }
     }) : null;
     if( status && status.includes('All')){
-        status = ['Recruiting', 'Not yet recruiting', 'Enrolling by invitation', 'Active, not recruiting', 'Suspended', 'Terminated', 'Completed', 'Withdrawn']
+        status = all_statuses;
     }
     return status;
 }
@@ -731,7 +732,15 @@ async function getTrials(req, res) {
     }).filter(x=>x!=='');
     
     search_result = search_result.filter(x=>x.distance_value).length ? search_result.sort(function(a, b) {return a.distance_value - b.distance_value}) 
-                    : search_result.sort((a,b)=>['Recruiting'].includes(b.trial_status)? 1:-1);
+                    : search_result.sort((a, b)=>{
+                        if( all_statuses.indexOf(a.trial_status) > all_statuses.indexOf(b.trial_status)){
+                            return 1;
+                        }
+                        if( all_statuses.indexOf(a.trial_status) < all_statuses.indexOf(b.trial_status)){
+                            return -1;
+                        }
+                        return 0;
+                    });
 
     let freetext_search_result = search_result.filter(x=>{
         try{
