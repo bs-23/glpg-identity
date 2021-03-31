@@ -175,7 +175,7 @@ async function getConsentImportJobs(req, res) {
     }
 }
 
-async function deleteConsentImportJob(req, res) {
+async function cancelConsentImportJob(req, res) {
     try {
         const job = await ConsentImportJob.findOne({
             where: { id: req.params.id }
@@ -183,24 +183,9 @@ async function deleteConsentImportJob(req, res) {
 
         if (!job) return res.status(404).send('No job found!');
 
-        if (job.status === 'completed') return res.status(400).send('Invalid request. Job already completed.');
+        if (job.status === 'completed' || job.status === 'cancelled') return res.status(400).send('Invalid request! Job is already completed or cancelled.');
 
-        const file = await File.findOne({
-            where: { owner_id: req.params.id }
-        });
-
-        if (file) {
-            const deleteParam = {
-                Bucket: 'cdp-development',
-                Delete: {
-                    Objects: [{ Key: file.key }]
-                }
-            };
-
-            await storageService.deleteFiles(deleteParam);
-        }
-
-        await job.destroy();
+        await job.update({ status: cancelled });
 
         res.sendStatus(200);
     } catch (err) {
@@ -289,4 +274,4 @@ exports.startConsentImportJob = startConsentImportJob;
 exports.getConsentImportJobs = getConsentImportJobs;
 exports.getDownloadUrl = getDownloadUrl;
 exports.exportRecords = exportRecords;
-exports.deleteConsentImportJob = deleteConsentImportJob;
+exports.cancelConsentImportJob = cancelConsentImportJob;

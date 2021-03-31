@@ -30,7 +30,7 @@ const ConsentImportJob = sequelize.cdpConnector.define('consent_import_jobs', {
     status: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['not-ready', 'ready', 'completed']
+        values: ['not-ready', 'ready', 'completed', 'cancelled']
     },
     created_by: {
         type: DataTypes.UUID

@@ -12,14 +12,6 @@ export default function reducer(state = initialState, action) {
                 consent_import_jobs: action.payload.data
             };
         }
-
-        case Types.DELETE_CONSENT_IMPORT_JOB_FULFILLED: {
-            const id = action.payload.config.url.split("/api/consent-import-jobs/")[1];
-            return {
-                ...state,
-                consent_import_jobs: state.consent_import_jobs.filter(x => x.id !== id)
-            }
-        }
     }
     return state;
 }
