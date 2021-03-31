@@ -152,7 +152,7 @@ async function createMultiChannelConsent(oneKeyId, email, opt_type, consent_sour
             const veeva_content_type_id = consent.consent_category.veeva_content_type_id;
             const veeva_consent_type_id = consent.consent_locales[0].veeva_consent_type_id;
 
-            const multichannel_consents = account.Multichannel_Consent_vod__r?.records;
+            let multichannel_consents = account.Multichannel_Consent_vod__r?.records;
             multichannel_consents = multichannel_consents && multichannel_consents.filter(x => x.Consent_Type_vod__c === veeva_consent_type_id && !x.Opt_Expiration_Date_vod__c);
 
             if(!account.PersonEmail) {
@@ -160,7 +160,7 @@ async function createMultiChannelConsent(oneKeyId, email, opt_type, consent_sour
             }
 
             if(multichannel_consents) {
-                await Promise.all(multichannel_consents.forEach(async mc => {
+                await Promise.all(multichannel_consents.map(async mc => {
                     await axios.patch(`${serviceUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c/${mc.Id}`, { Opt_Expiration_Date_vod__c: new Date(Date.now()) }, { headers });
                 }));
             }

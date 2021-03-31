@@ -136,7 +136,7 @@ async function startConsentImportJob(req, res) {
 
         if(!consent) return res.status(400).send('Consent not found.');
 
-        await Promise.all(job.data.forEach(async row => {
+        await Promise.all(job.data.map(async row => {
             let multichannel_consent;
             const isEmailDifferent = await veevaService.isEmailDifferent(row.onekey_id, row.email);
 
