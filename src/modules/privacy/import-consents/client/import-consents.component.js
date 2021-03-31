@@ -314,14 +314,14 @@ export default function ImportConsentsDashboard() {
                                 <table className="table table-hover table-sm mb-0 cdp-table mb-0 cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
-                                            <th width="15%">Consent Preference</th>
-                                            <th width="15%">Consent Category</th>
-                                            <th width="15%">Consent Locale</th>
-                                            <th width="15%">Total Records</th>
-                                            <th width="15%">Status</th>
-                                            <th width="15%">Executed By</th>
-                                            <th width="15%">Execution Date</th>
-                                            <th width="10%">Action</th>
+                                            <th width="14%">Consent Preference</th>
+                                            <th width="14%">Consent Category</th>
+                                            <th width="12%">Consent Locale</th>
+                                            <th width="12%">Total Records</th>
+                                            <th width="12%">Status</th>
+                                            <th width="12%">Executed By</th>
+                                            <th width="12%">Execution Date</th>
+                                            <th width="12%">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
@@ -332,7 +332,7 @@ export default function ImportConsentsDashboard() {
                                                 <td data-for="Locale" className="text-break">{row.consent_locale}</td>
                                                 <td data-for="Total Records" className="text-break">
                                                     {row.data.length ?
-                                                        <a className="link-with-underline cursor-pointer" onClick={() => setSelectedImport(row.data)}>
+                                                        <a className="link-with-underline cursor-pointer font-weight-bold-light" onClick={() => setSelectedImport(row.data)}>
                                                             {row.data.length}
                                                         </a>
                                                         : 0
@@ -393,15 +393,15 @@ export default function ImportConsentsDashboard() {
                                 <tbody className="cdp-table__body bg-white">
                                     {selectedImport.map((item, index) => (
                                         <tr key={'item-' + index}>
-                                            <td className="text-break">{item.onekey_id || '--'}</td>
-                                            <td className="text-break">{item.email || '--'}</td>
-                                            <td className="text-break">
+                                            <td data-for="Individual OneKeyId" className="text-break">{item.onekey_id || '--'}</td>
+                                            <td data-for="Email" className="text-break">{item.email || '--'}</td>
+                                            <td data-for="Opt-In Date" className="text-break">
                                                 {item.captured_date
                                                     ? (new Date(item.captured_date)).toLocaleDateString('en-GB').replace(/\//g, '.')
                                                     : '--'
                                                 }
                                             </td>
-                                            <td className="text-break">{item.multichannel_consent_id || '--'}</td>
+                                            <td data-for="Multichannel Consent ID" className="text-break">{item.multichannel_consent_id || '--'}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -421,24 +421,26 @@ export default function ImportConsentsDashboard() {
                     <Modal.Body>
                         {details &&
                             <div className="row">
-                                <div className="col-6">
-                                    <h4 className="mb-0 font-weight-bold-light">Consent Preference</h4>
+                                <div className="col-6 col-sm-6">
+                                    <div className="mb-0 font-weight-bold-light">Consent Preference</div>
                                     <p>{details.consent.preference}</p>
-                                    <h4 className="mb-0 font-weight-bold-light">Consent Category</h4>
+                                    <div className="mb-0 font-weight-bold-light">Consent Category</div>
                                     <p>{details.consent.consent_category.title}</p>
-                                    <h4 className="mb-0 font-weight-bold-light">Consent Locale</h4>
+                                    <div className="mb-0 font-weight-bold-light">Consent Locale</div>
                                     <p>{details.consent_locale}</p>
                                 </div>
-                                <div className="col-6">
-                                    <h4 className="mb-0 font-weight-bold-light">Total Records</h4>
+                                <div className="col-6 col-sm-6">
+                                    <div className="mb-0 font-weight-bold-light">Total Records</div>
                                     <p>{details.data.length}</p>
-                                    <h4 className="mb-0 font-weight-bold-light">Execution Date</h4>
+                                    <div className="mb-0 font-weight-bold-light">Execution Date</div>
                                     <p>{(new Date(details.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</p>
                                 </div>
                                 <div className="col-12">
-                                    <h4 className="mb-0 font-weight-bold-light">Legal Text</h4>
-                                    <div className="text-muted cdp-light-bg p-3 mb-3">
-                                        {getLegalText(details.consent_id, details.consent_locale)}
+                                    <div className="rounded shadow-sm p-0">
+                                        <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Legal Text</h4>
+                                        <div className="text-muted p-3 mb-3 richtext-preview">
+                                            {getLegalText(details.consent_id, details.consent_locale)}
+                                        </div>
                                     </div>
                                 </div>
 
