@@ -937,7 +937,7 @@ async function getCountryList(req, res) {
     const response = new Response({}, []);
     res.set({ 'content-type': 'application/json; charset=utf-8' });
     try {
-        response.data = countriesWithISO;
+        response.data = countriesWithISO.sort((a,b)=>a.name.localeCompare(b.name));
         res.json(response);
     } catch (err) {
         logger.error(err);
