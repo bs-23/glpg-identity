@@ -164,6 +164,21 @@ async function deleteConsentImportJob(req, res) {
 
         if (job.status === 'completed') return res.status(400).send('Invalid sattus. Job already completed.');
 
+        const file = await File.findOne({
+            where: { owner_id: req.params.id }
+        });
+
+        if (file) {
+            const deleteParam = {
+                Bucket: 'cdp-development',
+                Delete: {
+                    Objects: [{ Key: file.key }]
+                }
+            };
+
+            await storageService.deleteFiles(deleteParam);
+        }
+
         await job.destroy();
 
         res.sendStatus(200);

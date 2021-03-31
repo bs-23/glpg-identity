@@ -10,3 +10,13 @@ export function getConsentImportJobs() {
         })
     };
 }
+
+export function deleteConsentImportJob(id) {
+    return {
+        type: Types.DELETE_CONSENT_IMPORT_JOB,
+        payload: axios({
+            method: 'delete',
+            url: `/api/consent-import-jobs/${id}`
+        })
+    };
+}

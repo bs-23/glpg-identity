@@ -10,7 +10,7 @@ import parse from 'html-react-parser';
 import fileDownload from 'js-file-download';
 
 import Faq from '../../../platform/faq/client/faq.component';
-import { getConsentImportJobs } from './import-consents.actions';
+import { getConsentImportJobs, deleteConsentImportJob } from './import-consents.actions';
 import { ImportConsentsSchema } from './import-consents.schema';
 import { getCdpConsents } from '../../../privacy/manage-consent/client/consent.actions';
 import { getCountryConsents } from '../../consent-country/client/consent-country.actions';
@@ -134,13 +134,13 @@ export default function ImportConsentsDashboard() {
     };
 
     const cancelJob = (id) => {
-        axios.delete(`/api/consent-import-jobs/${id}`).then(response => {
+        dispatch(deleteConsentImportJob(id)).then(() => {
             addToast('Job cancelled successfully', {
                 appearance: 'success',
                 autoDismiss: true
             });
         }).catch(err => {
-            addToast('Job cacel failed', {
+            addToast('Job cancel failed', {
                 appearance: 'error',
                 autoDismiss: true
             });
@@ -189,7 +189,7 @@ export default function ImportConsentsDashboard() {
                                 <Modal dialogClassName size="lg" centered show={showForm} onHide={() => setShowForm(false)}>
                                     <Modal.Header closeButton>
                                         <Modal.Title>
-                                            Import Consents Into VeevaCRM
+                                            Create New Job
                                         </Modal.Title>
                                     </Modal.Header>
                                     <Modal.Body>
@@ -301,7 +301,7 @@ export default function ImportConsentsDashboard() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <button type="submit" className="btn cdp-btn-primary btn-block my-3 py-2 text-white shadow">Upload to VeevaCRM</button>
+                                                    <button type="submit" className="btn cdp-btn-primary btn-block my-3 py-2 text-white shadow">Save changes</button>
                                                 </Form>
                                             )}
                                         </Formik>
