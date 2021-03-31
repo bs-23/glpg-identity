@@ -348,9 +348,9 @@ export default function ImportConsentsDashboard() {
                                     <tbody className="cdp-table__body bg-white">
                                         {consentImportJobs.map(row => (
                                             <tr key={row.id}>
-                                                <td data-for="Category" className="text-break">{row.consent.preference}</td>
-                                                <td data-for="Category" className="text-break">{row.consent.consent_category.title}</td>
-                                                <td data-for="Locale" className="text-break">{row.consent_locale}</td>
+                                                <td data-for="Consent Preference" className="text-break">{row.consent.preference}</td>
+                                                <td data-for="Consent Category" className="text-break">{row.consent.consent_category.title}</td>
+                                                <td data-for="Consent Locale" className="text-break">{row.consent_locale}</td>
                                                 <td data-for="Total Records" className="text-break">
                                                     {row.data.length ?
                                                         <a className="link-with-underline cursor-pointer font-weight-bold-light" onClick={() => setSelectedImport(row.data)}>
@@ -359,9 +359,23 @@ export default function ImportConsentsDashboard() {
                                                         : 0
                                                     }
                                                 </td>
-                                                <td data-for="Status" class="text-capitalize">{row.status.split('-').join(' ')}</td>
+                                                <td data-for="Status" class="text-capitalize">
+                                                    {row.status === 'not-ready' &&
+                                                        <i className="fa fa-xs fa-circle text-secondary pr-2 hcp-status-icon"></i>
+                                                    }
+                                                    {row.status === 'ready' &&
+                                                        <i className="fa fa-xs fa-circle text-warning pr-2 hcp-status-icon"></i>
+                                                    }
+                                                    {row.status === 'completed' &&
+                                                        <i className="fa fa-xs fa-circle text-success pr-2 hcp-status-icon"></i>
+                                                    }
+                                                    {row.status === 'cancelled' &&
+                                                        <i className="fa fa-xs fa-circle text-danger pr-2 hcp-status-icon"></i>
+                                                    }
+                                                    {row.status.split('-').join(' ')}
+                                                </td>
                                                 <td data-for="Created By" className="text-break">{`${row.createdByUser.first_name} ${row.createdByUser.last_name}`}</td>
-                                                <td data-for="Created On" className="text-break">{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
+                                                <td data-for="Created At" className="text-break">{(new Date(row.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                 <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle">
                                                     </Dropdown.Toggle>
@@ -444,7 +458,7 @@ export default function ImportConsentsDashboard() {
                     <Modal.Body>
                         {details &&
                             <div className="row">
-                                <div className="col-6 col-sm-6">
+                                <div className="col-12 col-sm-6">
                                     <div className="mb-0 font-weight-bold-light">Consent Preference</div>
                                     <p>{details.consent.preference}</p>
                                     <div className="mb-0 font-weight-bold-light">Consent Category</div>
@@ -452,7 +466,7 @@ export default function ImportConsentsDashboard() {
                                     <div className="mb-0 font-weight-bold-light">Consent Locale</div>
                                     <p>{details.consent_locale}</p>
                                 </div>
-                                <div className="col-6 col-sm-6">
+                                <div className="col-12 col-sm-6">
                                     <div className="mb-0 font-weight-bold-light">Total Records</div>
                                     <p>{details.data.length}</p>
                                     <div className="mb-0 font-weight-bold-light">Execution Date</div>
@@ -468,9 +482,9 @@ export default function ImportConsentsDashboard() {
                                 </div>
 
                             <div className="col-12">
-                                <button type="button" className="btn cdp-btn-primary my-3 py-2 text-white shadow" onClick={() => DownloadFile(details.id)}><i className="fas fa-download mr-2"></i> Download the original file</button>
+                                    <button type="button" className="btn cdp-btn-primary my-3 py-2 text-white shadow" onClick={() => DownloadFile(details.id)}><i className="fas fa-download mr-2"></i> Download the original file</button>
                                     {details.status === 'completed' &&
-                                        <button type="button" className="btn cdp-btn-primary my-3 py-2 text-white shadow ml-3" onClick={() => exportRecords(details.id)}><i className="fas fa-download mr-2"></i> Download Job Report</button>
+                                        <button type="button" className="btn cdp-btn-primary my-3 py-2 text-white shadow ml-2" onClick={() => exportRecords(details.id)}><i className="fas fa-download mr-2"></i> Download Job Report</button>
                                     }
                                 </div>
                             </div>
