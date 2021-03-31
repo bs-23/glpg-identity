@@ -28,6 +28,7 @@ export default function ImportConsentsDashboard() {
     const [localizations, setLocalizations] = useState([]);
     const [consentLocales, setConsentLocales] = useState(false);
     const [selectedImport, setSelectedImport] = useState(null);
+    const [actionToPerform, setActionToPerform] = useState({});
     const consent_categories = useSelector(state => state.consentCategoryReducer.consent_categories);
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const country_consents = useSelector(state => state.consentCountryReducer.country_consents);
@@ -127,11 +128,13 @@ export default function ImportConsentsDashboard() {
 
     const startJob = (id) => {
         axios.post(`/api/consent-import-jobs/${id}/start`).then(response => {
+            setActionToPerform({});
             addToast('Successfully completed job', {
                 appearance: 'success',
                 autoDismiss: true
             });
         }).catch(err => {
+            setActionToPerform({});
             addToast('Job failed', {
                 appearance: 'error',
                 autoDismiss: true
@@ -141,16 +144,28 @@ export default function ImportConsentsDashboard() {
 
     const cancelJob = (id) => {
         dispatch(cancelConsentImportJob(id)).then(() => {
+            setActionToPerform({});
             addToast('Job is successfully cancelled.', {
                 appearance: 'success',
                 autoDismiss: true
             });
         }).catch(err => {
+            setActionToPerform({});
             addToast('Unable to perform the requset. Please try again.', {
                 appearance: 'error',
                 autoDismiss: true
             });
         });
+    };
+
+    const confirmAction = () => {
+        if (actionToPerform.action === 'start' && actionToPerform.id) {
+            startJob(actionToPerform.id);
+        }
+
+        if (actionToPerform.action === 'cancel' && actionToPerform.id) {
+            cancelJob(actionToPerform.id);
+        }
     };
 
     return (
@@ -162,7 +177,7 @@ export default function ImportConsentsDashboard() {
                             <ol className="rounded-0 m-0 p-0 d-none d-sm-flex">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/consent">Data Privacy & Consent Management</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Consent Import Jobs</span></li>
+                                <li className="breadcrumb-item active"><span>Manage Consent Import Jobs</span></li>
                             </ol>
                             <Dropdown className="dropdown-customize breadcrumb__dropdown d-block d-sm-none ml-2">
                                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center border-0">
@@ -171,7 +186,7 @@ export default function ImportConsentsDashboard() {
                                 <Dropdown.Menu>
                                     <Dropdown.Item className="px-2" href="/"><i className="fas fa-link mr-2"></i> Dashboard</Dropdown.Item>
                                     <Dropdown.Item className="px-2" href="/consent"><i className="fas fa-link mr-2"></i> Data Privacy & Consent Management</Dropdown.Item>
-                                    <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Consent Import Jobs</Dropdown.Item>
+                                    <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Manage Consent Import Jobs</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                             <span className="ml-auto mr-3"><i onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary cursor-pointer"></i></span>
@@ -353,10 +368,10 @@ export default function ImportConsentsDashboard() {
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item onClick={() => { setShowDetail(true); setDetails(row); }}>Details</Dropdown.Item>
                                                         {row.status === 'ready' &&
-                                                            <Dropdown.Item onClick={() => startJob(row.id)}>Start</Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => setActionToPerform({ action: 'start', id: row.id })}>Start</Dropdown.Item>
                                                         }
-                                                        {row.status !== 'completed' &&
-                                                            <Dropdown.Item className="text-danger" onClick={() => cancelJob(row.id)}>Cancel</Dropdown.Item>
+                                                        {row.status !== 'cancelled' && row.status !== 'completed' &&
+                                                            <Dropdown.Item className="text-danger" onClick={() => setActionToPerform({ action: 'cancel', id: row.id })}>Cancel</Dropdown.Item>
                                                         }
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
@@ -461,6 +476,26 @@ export default function ImportConsentsDashboard() {
                             </div>
                         }
                     </Modal.Body>
+                </Modal>
+
+                <Modal
+                    centered
+                    show={!!actionToPerform.action}
+                    onHide={() => setActionToPerform({})}>
+                    <Modal.Header closeButton>
+                        <Modal.Title className="modal-title_small text-capitalize">{actionToPerform.action} Job</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {actionToPerform.action && actionToPerform.id ? (
+                            <div>
+                                Are you sure you want to {actionToPerform.action} this job?
+                            </div>
+                        ) : null}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button className="btn cdp-btn-outline-primary" onClick={() => setActionToPerform({})}>Cancel</button>
+                        <button className="ml-2 btn cdp-btn-secondary text-white" onClick={() => confirmAction()}>Confirm</button>
+                    </Modal.Footer>
                 </Modal>
             </div>
         </main>

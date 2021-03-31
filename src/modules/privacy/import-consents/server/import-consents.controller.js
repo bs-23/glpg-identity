@@ -185,7 +185,7 @@ async function cancelConsentImportJob(req, res) {
 
         if (job.status === 'completed' || job.status === 'cancelled') return res.status(400).send('Invalid request! Job is already completed or cancelled.');
 
-        await job.update({ status: cancelled });
+        await job.update({ status: 'cancelled' });
 
         res.sendStatus(200);
     } catch (err) {
