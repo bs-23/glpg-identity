@@ -10,7 +10,7 @@ import parse from 'html-react-parser';
 import fileDownload from 'js-file-download';
 
 import Faq from '../../../platform/faq/client/faq.component';
-import { getConsentImportRecords } from './import-consents.actions';
+import { getConsentImportJobs } from './import-consents.actions';
 import { ImportConsentsSchema } from './import-consents.schema';
 import { getCdpConsents } from '../../../privacy/manage-consent/client/consent.actions';
 import { getCountryConsents } from '../../consent-country/client/consent-country.actions';
@@ -33,7 +33,7 @@ export default function ImportConsentsDashboard() {
     const consent_categories = useSelector(state => state.consentCategoryReducer.consent_categories);
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const country_consents = useSelector(state => state.consentCountryReducer.country_consents);
-    const consentImportRecords = useSelector(state => state.consentImportReducer.consent_import_records);
+    const consentImportRecords = useSelector(state => state.consentImportReducer.consent_import_jobs);
     const optTypes = [
         {
             text: 'Single Opt-in',
@@ -68,7 +68,7 @@ export default function ImportConsentsDashboard() {
 
         getLocalizations();
         dispatch(getConsentCategories());
-        dispatch(getConsentImportRecords());
+        dispatch(getConsentImportJobs());
         dispatch(getCdpConsents());
         dispatch(getCountryConsents());
     }, []);
@@ -208,7 +208,7 @@ export default function ImportConsentsDashboard() {
                                                 data.append('opt_type', values.opt_type);
                                                 data.append('file', values.file);
 
-                                                axios.post(`/api/consent-import`, data, {
+                                                axios.post(`/api/consent-import-job`, data, {
                                                     headers: { 'Content-Type': 'multipart/form-data' }
                                                 }).then(() => addToast('Consents imported successfully', {
                                                     appearance: 'success',
@@ -216,7 +216,7 @@ export default function ImportConsentsDashboard() {
                                                 })).catch(err => addToast('An error occurred!', {
                                                     appearance: 'error',
                                                     autoDismiss: true
-                                                })).finally(() => dispatch(getConsentImportRecords()));
+                                                })).finally(() => dispatch(getConsentImportJobs()));
 
                                                 actions.setSubmitting(false);
                                                 actions.resetForm();

@@ -136,7 +136,7 @@ async function syncHcpConsentsInVeeva(hcp, actor) {
     }
 }
 
-async function createMultiChannelConsent(oneKeyId, email, consent) {
+async function createMultiChannelConsent(oneKeyId, email, opt_type, consent_source, consent) {
     try {
         if(oneKeyId && email && consent &&
             consent.consent_category &&
@@ -162,9 +162,9 @@ async function createMultiChannelConsent(oneKeyId, email, consent) {
                 Capture_Datetime_vod__c: new Date(consent.captured_date),
                 Channel_Value_vod__c: email.toLowerCase(),
                 Channel_Source_vod__c: 'Account.PersonEmail',
-                Opt_Type_vod__c: consent.opt_type === 'opt-out' ? 'Opt_Out_vod' : 'Opt_In_vod',
+                Opt_Type_vod__c: opt_type === 'opt-out' ? 'Opt_Out_vod' : 'Opt_In_vod',
                 Content_Type_vod__c: consent.consent_category.veeva_content_type_id,
-                GLPG_Consent_Source__c: consent.consent_source,
+                GLPG_Consent_Source__c: consent_source,
                 CDP_Consent_ID__c: consent.id,
                 Consent_Type_vod__c: consent.consent_locales[0].veeva_consent_type_id,
                 Default_Consent_Text_vod__c: parser(consent.consent_locales[0].rich_text).replace(/(<\/?(?:a)[^>]*>)|<[^>]+>/ig, '$1')
