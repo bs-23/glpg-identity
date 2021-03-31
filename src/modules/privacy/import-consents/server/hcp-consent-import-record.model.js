@@ -5,7 +5,7 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model'));
 const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
 
-const HcpConsentsImportRecord = sequelize.cdpConnector.define('hcp_consents_import_records', {
+const HcpConsentImportRecord = sequelize.cdpConnector.define('hcp_consent_import_records', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -18,9 +18,9 @@ const HcpConsentsImportRecord = sequelize.cdpConnector.define('hcp_consents_impo
     },
     consent_locale: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(6)
     },
-    result: {
+    data: {
         type: DataTypes.JSON
     },
     created_by: {
@@ -28,13 +28,13 @@ const HcpConsentsImportRecord = sequelize.cdpConnector.define('hcp_consents_impo
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,
-    tableName: 'hcp_consents_import_records',
+    tableName: 'hcp_consent_import_records',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-HcpConsentsImportRecord.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
-HcpConsentsImportRecord.belongsTo(Consent, { as: 'consent', foreignKey: 'consent_id' });
+HcpConsentImportRecord.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
+HcpConsentImportRecord.belongsTo(Consent, { as: 'consent', foreignKey: 'consent_id' });
 
-module.exports = HcpConsentsImportRecord;
+module.exports = HcpConsentImportRecord;

@@ -1,13 +1,12 @@
 import axios from 'axios';
 import Types from './import-consents.types';
 
-export function getImportedConsents() {
+export function getConsentImportRecords() {
     return {
-        type: Types.GET_IMPORTED_CONSENT_DATA,
+        type: Types.GET_CONSENT_IMPORT_RECORDS,
         payload: axios({
             method: 'get',
-            url: `/api/consent/imported-hcp-consents`
+            url: `/api/consent-import/records`
         })
     };
 }
-

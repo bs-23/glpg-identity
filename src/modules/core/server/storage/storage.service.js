@@ -1,16 +1,15 @@
-const fs = require('fs');
 const path = require('path');
 var AWS = require('aws-sdk');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 const S3 = new AWS.S3({
+    region: nodecache.getValue('AWS_REGION'),
     accessKeyId: nodecache.getValue('AWS_ACCESS_KEY_ID'),
-    secretAccessKey: nodecache.getValue('AWS_SECRET_ACCESS_KEY'),
-    region: nodecache.getValue('AWS_REGION')
+    secretAccessKey: nodecache.getValue('AWS_SECRET_ACCESS_KEY')
 });
+
 const SIGNED_URL_EXPIRATION_TIME = 60 * 30; // seconds
 
-// options: { bucket, folder, fileName, fileContent }
 async function upload(options) {
     const params = {
         Bucket: options.bucket,
@@ -26,7 +25,6 @@ async function deleteFiles(options) {
     const response = await S3.deleteObjects(options).promise();
     return response;
 }
-
 
 function getSignedUrl(bucket, key) {
     const url = S3.getSignedUrl('getObject', {

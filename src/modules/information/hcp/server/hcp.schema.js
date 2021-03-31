@@ -30,10 +30,12 @@ const hcpProfile = object().shape({
         .max(5, 'This field must be at most 5 characters long.')
         .required('This field must not be empty.'),
     country_iso2: string()
+        .min(2, 'This field must be at least 2 characters long.')
         .max(2, 'This field must be at most 2 characters long.')
         .required('This field must not be empty.'),
     language_code: string()
-        .max(2, 'This field must be at most 2 characters long.')
+        .min(2, 'This field must be at least 2 characters long.')
+        .max(3, 'This field must be at most 3 characters long.')
         .required('This field must not be empty.'),
     specialty_onekey: string()
         .required('This field must not be empty.')

@@ -41,7 +41,7 @@ const HcpConsents = sequelize.cdpConnector.define('hcp_consents', {
     },
     consent_locale: {
         allowNull: false,
-        type: DataTypes.STRING(5)
+        type: DataTypes.STRING(6)
     },
     created_by: {
         type: DataTypes.UUID
@@ -59,8 +59,8 @@ const HcpConsents = sequelize.cdpConnector.define('hcp_consents', {
     consent_source: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['website'],
-        defaultValue: 'website'
+        values: ['Website'],
+        defaultValue: 'Website'
     }
 }, {
     schema: `${nodecache.getValue('POSTGRES_CDP_SCHEMA')}`,

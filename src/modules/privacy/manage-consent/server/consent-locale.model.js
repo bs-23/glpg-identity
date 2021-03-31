@@ -1,9 +1,9 @@
 const path = require('path');
+const validator = require('validator');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
-const validator = require('validator');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
 
 const ConsentLanguage = sequelize.cdpConnector.define('consent_locales', {
     id: {
@@ -24,7 +24,8 @@ const ConsentLanguage = sequelize.cdpConnector.define('consent_locales', {
         }
     },
     locale: {
-        type: DataTypes.STRING
+        allowNull: false,
+        type: DataTypes.STRING(6)
     },
     veeva_consent_type_id: {
         unique: true,
