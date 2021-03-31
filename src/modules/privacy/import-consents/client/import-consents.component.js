@@ -356,7 +356,7 @@ export default function ImportConsentsDashboard() {
                                                             <Dropdown.Item onClick={() => startJob(row.id)}>Start</Dropdown.Item>
                                                         }
                                                         {row.status !== 'completed' &&
-                                                            <Dropdown.Item onClick={() => cancelJob(row.id)}>Cancel</Dropdown.Item>
+                                                            <Dropdown.Item className="text-danger" onClick={() => cancelJob(row.id)}>Cancel</Dropdown.Item>
                                                         }
                                                     </Dropdown.Menu>
                                                 </Dropdown></td>
