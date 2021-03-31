@@ -111,7 +111,7 @@ export default function ImportConsentsDashboard() {
             var date = new Date();
             const timestamp = date.getFullYear().toString() + pad2(date.getMonth() + 1) + pad2(date.getDate()) + pad2(date.getHours()) + pad2(date.getMinutes()) + pad2(date.getSeconds());
 
-            fileDownload(res.data, `Job_reports_${timestamp}.xlsx`);
+            fileDownload(res.data, `Job_report_${timestamp}.xlsx`);
         }).catch(error => {
             /**
              * the error response is a blob because of the responseType option.
@@ -470,7 +470,7 @@ export default function ImportConsentsDashboard() {
                             <div className="col-12">
                                 <button type="button" className="btn cdp-btn-primary my-3 py-2 text-white shadow" onClick={() => DownloadFile(details.id)}><i className="fas fa-download mr-2"></i> Download the original file</button>
                                     {details.status === 'completed' &&
-                                        <button type="button" className="btn cdp-btn-primary my-3 py-2 text-white shadow ml-3" onClick={() => exportRecords(details.id)}>Download Job Report</button>
+                                        <button type="button" className="btn cdp-btn-primary my-3 py-2 text-white shadow ml-3" onClick={() => exportRecords(details.id)}><i className="fas fa-download mr-2"></i> Download Job Report</button>
                                     }
                                 </div>
                             </div>

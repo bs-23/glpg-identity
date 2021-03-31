@@ -288,6 +288,7 @@ async function exportRecords(req, res) {
             'Consent Locale': record.consent_locale,
             'Legal Text': parse(consentLocale.rich_text).replace(/(<\/?(?:a)[^>]*>)|<[^>]+>/ig, '$1'),
             'Multichannel Consent Id': item.multichannel_consent_id,
+            'Opt Type': item.opt_type,
             'Opt-In Date': item.captured_date
         }));
 
