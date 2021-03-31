@@ -453,7 +453,7 @@ export default function ImportConsentsDashboard() {
                     show={showDetail}
                     onHide={() => { setShowDetail(false); setDetails(null); }}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Imported Hcp Details</Modal.Title>
+                        <Modal.Title>Job Details</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         {details &&
@@ -481,7 +481,7 @@ export default function ImportConsentsDashboard() {
                                     </div>
                                 </div>
 
-                            <div className="col-12">
+                                <div className="col-12">
                                     <button type="button" className="btn cdp-btn-primary my-3 py-2 text-white shadow" onClick={() => DownloadFile(details.id)}><i className="fas fa-download mr-2"></i> Download the original file</button>
                                     {details.status === 'completed' &&
                                         <button type="button" className="btn cdp-btn-primary my-3 py-2 text-white shadow ml-2" onClick={() => exportRecords(details.id)}><i className="fas fa-download mr-2"></i> Download Job Report</button>
