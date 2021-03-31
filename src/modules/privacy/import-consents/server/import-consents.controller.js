@@ -59,7 +59,7 @@ async function createConsentImportJob(req, res) {
 
             data.push({
                 onekey_id,
-                email,
+                email: email.toLowerCase(),
                 opt_type: req.body.opt_type,
                 consent_source: 'Website',
                 captured_date: captured_date
@@ -134,14 +134,14 @@ async function startConsentImportJob(req, res) {
             ]
         });
 
-        if(!consent) return res.status(400).send('Consent not found.');;
+        if(!consent) return res.status(400).send('Consent not found.');
 
         await Promise.all(job.data.forEach(async row => {
             let multichannel_consent;
-            const isEmailDifferent = await veevaService.isEmailDifferent(row.onekey_id, row.email.toLowerCase());
+            const isEmailDifferent = await veevaService.isEmailDifferent(row.onekey_id, row.email);
 
             if(!isEmailDifferent) {
-                multichannel_consent = await veevaService.createMultiChannelConsent(row.onekey_id, row.email.toLowerCase(), row.opt_type, row.consent_source, consent);
+                multichannel_consent = await veevaService.createMultiChannelConsent(row.onekey_id, row.email, row.opt_type, row.consent_source, consent);
             }
 
             row.multichannel_consent_id = multichannel_consent ? multichannel_consent.id : null;

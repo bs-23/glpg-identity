@@ -453,7 +453,7 @@ export default function ImportConsentsDashboard() {
                     show={showDetail}
                     onHide={() => { setShowDetail(false); setDetails(null); }}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Imported Hcp Details</Modal.Title>
+                        <Modal.Title>Job Details</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         {details &&
