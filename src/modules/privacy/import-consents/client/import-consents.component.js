@@ -34,6 +34,20 @@ export default function ImportConsentsDashboard() {
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const country_consents = useSelector(state => state.consentCountryReducer.country_consents);
     const consentImportRecords = useSelector(state => state.consentImportReducer.consent_import_records);
+    const optTypes = [
+        {
+            text: 'Single Opt-in',
+            value: 'single-opt-in'
+        },
+        {
+            text: 'Double Opt-in',
+            value: 'double-opt-in'
+        },
+        {
+            text: 'Opt-out',
+            value: 'opt-out'
+        }
+    ];
 
     const showRecords = (records, isSynced) => {
         setSelectedImport(records);
@@ -180,6 +194,7 @@ export default function ImportConsentsDashboard() {
                                                 consent_category: '',
                                                 consent_id: '',
                                                 consent_locale: '',
+                                                opt_type: '',
                                                 file: ''
                                             }}
                                             displayName="ConsentImport"
@@ -190,6 +205,7 @@ export default function ImportConsentsDashboard() {
                                                 data.append('consent_category', values.consent_category);
                                                 data.append('consent_id', values.consent_id);
                                                 data.append('consent_locale', values.consent_locale);
+                                                data.append('opt_type', values.opt_type);
                                                 data.append('file', values.file);
 
                                                 axios.post(`/api/consent-import`, data, {
@@ -257,6 +273,20 @@ export default function ImportConsentsDashboard() {
                                                                 </div>
                                                             }
                                                         </div>
+
+                                                        <div className="col-12">
+                                                            <div className="form-group">
+                                                                <label className="font-weight-bold" htmlFor="opt_type">Opt Type<span className="text-danger">*</span></label>
+                                                                <Field data-testid="opt_type" as="select" name="opt_type" className="form-control">
+                                                                    <option key="select-opt-type" value="" disabled>--Select--</option>
+                                                                    {optTypes.map(optType => {
+                                                                        return <option key={optType.value} value={optType.value}>{optType.text}</option>
+                                                                    })}
+                                                                </Field>
+                                                                <div className="invalid-feedback"><ErrorMessage name="opt_type" /></div>
+                                                            </div>
+                                                        </div>
+
                                                         <div className="col-12">
                                                             <div className="form-group">
                                                                 <label className="font-weight-bold d-block" htmlFor="file">File <span className="text-danger">*</span></label>
