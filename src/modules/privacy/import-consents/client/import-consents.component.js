@@ -353,7 +353,7 @@ export default function ImportConsentsDashboard() {
                                                 <td data-for="Consent Locale" className="text-break">{row.consent_locale}</td>
                                                 <td data-for="Total Records" className="text-break">
                                                     {row.data.length ?
-                                                        <a className="link-with-underline cursor-pointer font-weight-bold-light" onClick={() => setSelectedImport(row.data)}>
+                                                        <a className="link-with-underline cursor-pointer font-weight-bold-light d-block h6" onClick={() => setSelectedImport(row.data)}>
                                                             {row.data.length}
                                                         </a>
                                                         : 0
