@@ -1,0 +1,25 @@
+.hot-statistics {
+    &__box {
+
+        &-wrap {
+            background-color: $light-bg-color;
+        }
+    }
+
+    &__icon {
+        color: $gray-ccc;
+        font-size: 18px;
+    }
+
+    &__title {
+        font-size: 14px;
+        font-weight: 600;
+        color: $primary-color;
+    }
+
+    &__amount {
+        font-size: 32px;
+        font-weight: 600;
+        color: $primary-color;
+    }
+}

@@ -16,5 +16,5 @@ module.exports = app => {
         .delete(CDPAuthStrategy, ServiceGuard([Services.MANAGE_VENDOR_REQUEST, Services.MANAGE_ENTITY_REQUEST]), controller.deletePartnerRequest);
 
     app.route('/api/partner-requests/:id/send-form')
-        .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_VENDOR_REQUEST, Services.MANAGE_ENTITY_REQUEST]), controller.sendForm);
+        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_VENDOR_REQUEST, Services.MANAGE_ENTITY_REQUEST]), controller.sendForm);
 };

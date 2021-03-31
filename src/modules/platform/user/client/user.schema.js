@@ -1,13 +1,22 @@
 import { string, object, ref } from 'yup';
 import XRegExp from 'xregexp';
+import PhoneNumber from 'awesome-phonenumber';
 
 const PHONE_MAX_LENGTH = 25;
 
 const isPhoneMaxLengthValid = (parent) => {
-    const { country_code, phone } = parent;
-    if (!phone || !country_code) return true;
-    const phonenumberWithCountryCode = country_code + phone;
+    const { country_callingCode, phone } = parent;
+    if (!phone || !country_callingCode) return true;
+    const phonenumberWithCountryCode = country_callingCode + phone;
     return phonenumberWithCountryCode.length <= PHONE_MAX_LENGTH;
+}
+
+const isPhoneNumberValid = (parent) => {
+    const { country_code, phone} = parent;
+    if(!phone) return true;
+    const pn = PhoneNumber(phone, country_code);
+    return pn.isValid();
+
 }
 
 function validatePassword(password) {
@@ -71,10 +80,13 @@ export const registerSchema = object().shape({
     email: cdpUserSchema.email,
     phone: string()
         .matches(/^[0-9\+]*$/, 'This field only contains digits')
-        .min(4, 'This field must be at least 4 characters long')
         .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`,
             function () {
                 return isPhoneMaxLengthValid(this.parent);
+            })
+        .test('is-phoneNumber-valid', `This field must contain a valid phone number`,
+            function () {
+                return isPhoneNumberValid(this.parent);
             }),
     profile: string()
         .required('Must select at least one profile'),
@@ -123,18 +135,15 @@ export const updateMyProfileSchema = object().shape({
     first_name: cdpUserSchema.first_name,
     last_name: cdpUserSchema.last_name,
     email: cdpUserSchema.email,
-    phone: string().when('isCountryFlagActive', {
-        is: true,
-        then: string().matches(/^[0-9]*$/, 'This field only contains digits')
-            .min(4, 'This field must be at least 4 characters long')
-            .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`,
-            function() {
+    phone: string()
+        .nullable()
+        .matches(/^[0-9\+]*$/, 'This field only contains digits')
+        .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`,
+            function () {
                 return isPhoneMaxLengthValid(this.parent);
-            }),
-        otherwise: string().matches(/^[+0-9]*$/, 'This field only contains digits or plus')
-            .min(7, 'This field must be at least 7 characters long')
-            .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`, phone => {
-                return !phone || phone.length <= PHONE_MAX_LENGTH;
             })
-    })
+        .test('is-phoneNumber-valid', `This field must contain a valid phone number`,
+            function () {
+                return isPhoneNumberValid(this.parent);
+            })
 });

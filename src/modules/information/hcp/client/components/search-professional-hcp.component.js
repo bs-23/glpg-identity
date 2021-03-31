@@ -224,6 +224,23 @@ const SearchProfessionalHcp = (props) => {
         );
     };
 
+    const hcpListInfo = (
+        <Popover id="hcpListInfo" className="shadow-lg">
+            <Popover.Content className="px-3">
+                <ul className="list-unstyled mb-0">
+                    <li className="pl-0 pb-0 font-weight-bold cdp-text-primary">Name</li>
+                    <li className="pl-0 pb-0"><i className="fas fa-circle mr-1 cdp-text-primary"></i> In my contract</li>
+                    <li className="pl-0 pb-0"><i className="fas fa-circle mr-1 cdp-text-secondary"></i> Not In my contract</li>
+                    <li className="pl-0 pt-3 font-weight-bold cdp-text-primary">Workplace</li>
+                    <li className="pl-0 pb-0"><i className="fas fa-check mr-1 cdp-text-primary"></i> Valid</li>
+                    <li className="pl-0 pb-0"><i className="fas fa-times mr-1 cdp-text-secondary"></i> Invalid </li>
+                    <li className="pl-0 pt-3 font-weight-bold cdp-text-primary">Activity Onekey ID</li>
+                    <li className="pl-0 pb-0">HCP Professional Engagement</li>
+                </ul>
+            </Popover.Content>
+        </Popover>
+    );
+
     const nameHintPopup = (
         <Popover id="popover-basic" className="shadow-lg">
             <Popover.Content className="px-3">
@@ -309,7 +326,7 @@ const SearchProfessionalHcp = (props) => {
                 <div className="row">
                     <div className="col-12 px-0 px-sm-3">
                         <div className="shadow-sm bg-light pb-3">
-                            <div className="d-flex justify-content-between align-items-center p-3">
+                            <div className="d-flex justify-content-between align-items-center p-3 mx-0 cdp-table__responsive-sticky-panel bg-light">
                                 <h4 className="cdp-text-primary font-weight-bold mb-0 mr-sm-4 mr-1">OKLA Search</h4>
                                 <div className="d-flex align-items-center pl-3">
                                     <div>
@@ -413,7 +430,7 @@ const SearchProfessionalHcp = (props) => {
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="col-12 col-sm-6 col-lg-4 pt-3">
+                                                <div className="col-12 col-sm-6 col-lg-4 pb-3 pb-sm-0 pt-sm-3">
                                                     <div className="custom-control custom-checkbox custom-control-inline my-1 mr-sm-4">
                                                         <input
                                                             type="checkbox"
@@ -461,7 +478,7 @@ const SearchProfessionalHcp = (props) => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <h5 className="border-bottom pt-5 pb-2 "><i className="far fa-user cdp-text-secondary mr-2"></i>Individual</h5>
+                                            <h5 className="border-bottom pt-sm-4 pb-2 "><i className="far fa-user cdp-text-secondary mr-2"></i>Individual</h5>
                                             <div className="row">
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group">
@@ -570,85 +587,85 @@ const SearchProfessionalHcp = (props) => {
                     <div className="row" id="search-result">
                         <div className="col-12">
                             <div className="my-3">
-                                <div className="d-sm-flex justify-content-between align-items-center mb-3 mt-4">
-                                    <h4 className="cdp-text-primary font-weight-bold mb-3 mb-sm-0">Search Result</h4>
-                                    <div className="d-flex justify-content-between align-items-center">
-
+                                <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel-title cdp-light-bg">
+                                    <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0">Search Result</h4>
+                                    <div className="d-block d-sm-none">
+                                        <OverlayTrigger trigger="click" rootClose placement="left" overlay={hcpListInfo}>
+                                            <i className="fas fa-info-circle ml-1 " role="button"></i>
+                                        </OverlayTrigger>
                                     </div>
                                 </div>
-
-
-                                <div className="table-responsive shadow-sm bg-white">
-                                    <table className="table table-hover table-sm mb-0 cdp-table">
-                                        <thead className="cdp-bg-primary text-white cdp-table__header">
-                                            <tr>
-                                                <th>Name <OverlayTrigger trigger="click" rootClose placement="right" overlay={nameHintPopup}>
-                                                    <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
-                                                </OverlayTrigger></th>
-                                                <th>Specialty</th>
-                                                <th>Workplace <OverlayTrigger trigger="click" rootClose placement="right" overlay={workplaceHintPopup}>
-                                                    <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
-                                                </OverlayTrigger></th>
-                                                <th>Activity Onekey ID <OverlayTrigger trigger="click" rootClose placement="top" overlay={activityOnekeyIDListHintPopup}>
-                                                    <i className="fas fa-info-circle ml-1 text-white" role="button"></i></OverlayTrigger></th>
-                                                <th>Individual Onekey ID</th>
-                                                <th>Country</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="cdp-table__body bg-white">
-                                            {
-                                                users.results.map((user, idx) => (
-                                                    <tr key={idx}>
-                                                        <td>{user.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>} {`${user.firstName} ${user.lastName}`}</td>
-                                                        <td>{(user.specialties || ['--']).join(', ')}</td>
-                                                        <td>
-                                                            {
-                                                                user.workplaces.map((item, idxOfWorkPlace) => (
-                                                                    <div key={idxOfWorkPlace} className="currentWorkplace">
-                                                                        <span className="okla-search__workplace-icons position-relative">
-                                                                            {
-                                                                                item.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>
-                                                                            }
-                                                                            {
-                                                                                item.isValid ? <i className="fas fa-check cdp-text-primary border-left"></i> : <i className="fas fa-times cdp-text-secondary border-left"></i>
-                                                                            }
-                                                                        </span>
-                                                                        {[item.name, item.address, item.city].filter(i => i).join(', ')}
-                                                                    </div>
-                                                                ))
-                                                            }
-                                                        </td>
-                                                        <td>
-                                                            {
-                                                                user.onekeyEidList.map((item, idxOfEid) => (<div key={idxOfEid}>{item}</div>))
-                                                            }
-                                                        </td>
-                                                        <td>{user.individualEid}</td>
-                                                        <td>{getCountryName(user.countryIso2)}</td>
-                                                        <td>
-                                                            <Dropdown>
-                                                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle btn">
-                                                                </Dropdown.Toggle>
-                                                                <Dropdown.Menu>
-                                                                    <Dropdown.Item onClick={() => setSelectedIndividual({ id: user.individualEid, codbase: user.codbase })}>Details</Dropdown.Item>
-                                                                </Dropdown.Menu>
-                                                            </Dropdown>
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            }
-                                        </tbody>
-                                    </table>
-                                    {
-                                        (Math.ceil(users.totalNumberOfResults / users.resultSize) >= 1) &&
-                                        <div className="pagination justify-content-end align-items-center border-top p-3">
-                                            <span className="cdp-text-primary font-weight-bold">{`Page ${currentPage} of ${Math.ceil(users.totalNumberOfResults / users.resultSize)}`}</span>
-                                            <span className="pagination-btn" onClick={() => pageLeft()} disabled={currentPage === 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
-                                            <span className="pagination-btn" onClick={() => pageRight()} disabled={Math.ceil(users.totalNumberOfResults / users.resultSize) === currentPage}><i className="icon icon-arrow-down ml-2 next"></i></span>
-                                        </div>
-                                    }
-                                </div>
+                                <div className="table-responsive shadow-sm bg-white cdp-table__responsive-wrapper">
+                                    <table className="table table-hover table-sm mb-0 cdp-table cdp-table cdp-table__responsive">
+                                            <thead className="cdp-bg-primary text-white cdp-table__header">
+                                                <tr>
+                                                    <th>Name <OverlayTrigger trigger="click" rootClose placement="right" overlay={nameHintPopup}>
+                                                        <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
+                                                    </OverlayTrigger></th>
+                                                    <th>Specialty</th>
+                                                    <th>Workplace <OverlayTrigger trigger="click" rootClose placement="right" overlay={workplaceHintPopup}>
+                                                        <i className="fas fa-info-circle ml-1 text-white" role="button"></i>
+                                                    </OverlayTrigger></th>
+                                                    <th>Activity Onekey ID <OverlayTrigger trigger="click" rootClose placement="top" overlay={activityOnekeyIDListHintPopup}>
+                                                        <i className="fas fa-info-circle ml-1 text-white" role="button"></i></OverlayTrigger></th>
+                                                    <th>Individual Onekey ID</th>
+                                                    <th>Country</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="cdp-table__body bg-white">
+                                                {
+                                                    users.results.map((user, idx) => (
+                                                        <tr key={idx}>
+                                                            <td data-for="Name">{user.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>} {`${user.firstName} ${user.lastName}`}</td>
+                                                            <td data-for="Specialty">{(user.specialties || ['--']).join(', ')}</td>
+                                                            <td data-for="Workplace">
+                                                                {
+                                                                    user.workplaces.map((item, idxOfWorkPlace) => (
+                                                                        <div key={idxOfWorkPlace} className="currentWorkplace">
+                                                                            <span className="okla-search__workplace-icons position-relative">
+                                                                                {
+                                                                                    item.isInContract ? <i className="fas fa-circle mr-1 cdp-text-primary" title="In my contract"></i> : <i className="fas fa-circle mr-1 cdp-text-secondary" title="Not in my contract"></i>
+                                                                                }
+                                                                                {
+                                                                                    item.isValid ? <i className="fas fa-check cdp-text-primary border-left"></i> : <i className="fas fa-times cdp-text-secondary border-left"></i>
+                                                                                }
+                                                                            </span>
+                                                                            {[item.name, item.address, item.city].filter(i => i).join(', ')}
+                                                                        </div>
+                                                                    ))
+                                                                }
+                                                            </td>
+                                                            <td data-for="Activity Onekey ID">
+                                                                {
+                                                                    user.onekeyEidList.map((item, idxOfEid) => (<div key={idxOfEid}>{item}</div>))
+                                                                }
+                                                            </td>
+                                                            <td data-for="Individual Onekey ID">{user.individualEid}</td>
+                                                            <td data-for="Country">{getCountryName(user.countryIso2)}</td>
+                                                            <td data-for="Action">
+                                                                <Dropdown>
+                                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle btn">
+                                                                    </Dropdown.Toggle>
+                                                                    <Dropdown.Menu>
+                                                                        <Dropdown.Item onClick={() => setSelectedIndividual({ id: user.individualEid, codbase: user.codbase })}>Details</Dropdown.Item>
+                                                                    </Dropdown.Menu>
+                                                                </Dropdown>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                }
+                                            </tbody>
+                                        </table>
+                                        {
+                                            (Math.ceil(users.totalNumberOfResults / users.resultSize) >= 1) &&
+                                            <div className="pagination justify-content-end align-items-center border-top p-3">
+                                                <span className="cdp-text-primary font-weight-bold">{`Page ${currentPage} of ${Math.ceil(users.totalNumberOfResults / users.resultSize)}`}</span>
+                                                <span className="pagination-btn" onClick={() => pageLeft()} disabled={currentPage === 1}><i className="icon icon-arrow-down ml-2 prev"></i></span>
+                                                <span className="pagination-btn" onClick={() => pageRight()} disabled={Math.ceil(users.totalNumberOfResults / users.resultSize) === currentPage}><i className="icon icon-arrow-down ml-2 next"></i></span>
+                                            </div>
+                                        }
+                                    </div>
                             </div>
                         </div>
                     </div>

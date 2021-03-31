@@ -59,6 +59,7 @@ async function createConsentCategory(req, res) {
             },
             defaults: {
                 title: req.body.title.trim(),
+                legal_title: req.body.legal_title ? req.body.legal_title.trim() : null,
                 slug: convertToSlug(req.body.title.trim()),
                 created_by: req.user.id,
                 updated_by: req.user.id
@@ -87,7 +88,7 @@ async function createConsentCategory(req, res) {
 
 async function updateConsentCategory(req, res) {
     try {
-        const { title } = req.body;
+        const { title, legal_title } = req.body;
 
         const consentCategory = await ConsentCategory.findOne({ where: { id: req.params.id } });
         if (!consentCategory) return res.status(404).send('The consent category does not exist');
@@ -105,7 +106,11 @@ async function updateConsentCategory(req, res) {
 
         const consentCategoryBeforeUpdate = {...consentCategory.dataValues};
 
-        const data = await consentCategory.update({ title: title.trim(), updated_by: req.user.id });
+        const data = await consentCategory.update({
+            title: title.trim(),
+            legal_title: legal_title ? legal_title.trim() : null,
+            updated_by: req.user.id
+        });
 
         const updatesInCategory = logService.difference(data.dataValues, consentCategoryBeforeUpdate);
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import StatusupdateModal from './statusUpdateModal.component';
@@ -29,13 +29,13 @@ export default function Inbox() {
         const reqBody = {
             ...filterSetting,
             fields: ['id', 'first_name', 'last_name', 'email', 'created_at']
-        }
-        dispatch(getHcpProfiles('?limit=5', reqBody))
-            .catch(err => {
-                if (err.response.status === 403) {
-                    setIsUnauthorized(true);
-                }
-            });
+        };
+
+        dispatch(getHcpProfiles('?limit=5', reqBody)).catch(err => {
+            if (err.response.status === 403) {
+                setIsUnauthorized(true);
+            }
+        });
     };
 
     let hcps = useSelector(state => state.hcpReducer.hcps);

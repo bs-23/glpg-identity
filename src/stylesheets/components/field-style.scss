@@ -136,8 +136,8 @@ textarea.form-control {
             padding-top: 5px !important;
             padding-bottom: 5px !important;
             border-right: 1px solid #ced4da;
-            min-width: 90px;
-            max-width: 100px;
+            width: 85px;
+            /*max-width: 100px;*/
 
             &:focus {
                 box-shadow: none;
@@ -175,7 +175,7 @@ textarea.form-control {
     }
 
     .form-control {
-        padding-left: 105px;
+        padding-left: 95px;
     }
 }
 

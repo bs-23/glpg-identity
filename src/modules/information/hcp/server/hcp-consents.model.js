@@ -6,6 +6,7 @@ const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodeca
 const validator = require('validator');
 
 const HcpConsents = sequelize.cdpConnector.define("hcp_consents", {
+
     id: {
         allowNull: false,
         primaryKey: true,
@@ -61,5 +62,8 @@ HcpConsents.belongsTo(Consent, {
     foreignKey: 'consent_id'
 });
 
+Consent.hasMany(HcpConsents, {
+    foreignKey: 'consent_id'
+});
 
 module.exports = HcpConsents;

@@ -1,9 +1,13 @@
 const path = require('path');
 const { Op, QueryTypes } = require('sequelize');
 const validator = require('validator');
+const jwt = require('jsonwebtoken');
+const axios = require('axios');
 
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const Partner = require('./partner.model');
+const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
+const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
+const Partners = require('./partner.model');
 const PartnerVendors = require('./partner-vendor.model');
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const PartnerRequest = require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model'));
@@ -16,7 +20,7 @@ const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/f
 const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
-async function uploadDucuments(owner, type, files) {
+async function uploadDucuments(owner, type, files = []) {
     const bucketName = 'cdp-development';
     for (const file of files) {
         const uploadOptions = {
@@ -82,7 +86,7 @@ async function getPartners(req, res) {
 
         if (orderBy !== 'created_at') order.push(['created_at', 'DESC']);
 
-        const hcpPartners = await Partner.findAll({
+        const hcpPartners = await Partners.findAll({
             where: { entity_type: type },
             offset,
             limit,
@@ -90,7 +94,7 @@ async function getPartners(req, res) {
             attributes: ['id', 'onekey_id', 'uuid', 'first_name', 'last_name', 'address', 'city', 'country_iso2', 'locale', 'status']
         });
 
-        const total = await Partner.count({ where: { entity_type: type }, });
+        const total = await Partners.count({ where: { entity_type: type }, });
 
         const responseData = {
             partners: hcpPartners,
@@ -134,9 +138,9 @@ async function registrationLookup(req, res) {
 
 async function getPartnerHcp(req, res) {
     try {
-        const partnerHcp = await Partner.findOne({
+        const partnerHcp = await Partners.findOne({
             where: { id: req.params.id },
-            attributes: { exclude: ['entity_type', 'organization_name', 'organization_type'] }
+            attributes: { exclude: ['organization_name', 'organization_type'] }
         });
 
         if (!partnerHcp) return res.status(404).send('The partner does not exist');
@@ -200,12 +204,17 @@ async function createPartner(req, res) {
         }
         data.onekey_id = partnerRequest.onekey_id;
 
-        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+        const countries = await Country.findAll({
+            order: [
+                ['codbase_desc', 'ASC'],
+                ['countryname', 'ASC']
+            ]
+        });
 
         let hasDoubleOptIn = false;
         let consentArr = [];
 
-        const consents = JSON.parse('[' + req.body.consents + ']');
+        const consents = JSON.parse('[' + (req.body.consents || '') + ']');
 
         if (consents && consents.length) {
             await Promise.all(consents.map(async consent => {
@@ -284,7 +293,7 @@ async function createPartner(req, res) {
             }));
         }
 
-        const [partnerHcx, created] = await Partner.findOrCreate({
+        const [partnerHcx, created] = await Partners.findOrCreate({
             where: { request_id: request_id },
             defaults: data
         });
@@ -346,7 +355,7 @@ async function updatePartner(req, res) {
 
         const { type, first_name, last_name, organization_name, address, city, post_code, email, telephone, individual_type, organization_type, country_iso2, locale, registration_number, uuid, is_italian_hcp, should_report_hco, beneficiary_category, iban, bank_name, bank_account_no, currency, swift_code, routing, remove_files } = req.body;
 
-        const partner = await Partner.findOne({
+        const partner = await Partners.findOne({
             where: {
                 id: req.params.id,
                 entity_type: type
@@ -358,9 +367,14 @@ async function updatePartner(req, res) {
             return res.status(400).send(response);
         }
 
-        const countries = await sequelize.datasyncConnector.query('SELECT * FROM ciam.vwcountry ORDER BY codbase_desc, countryname;', { type: QueryTypes.SELECT });
+        const countries = await Country.findAll({
+            order: [
+                ['codbase_desc', 'ASC'],
+                ['countryname', 'ASC']
+            ]
+        });
         let consentArr = [];
-        const consents = JSON.parse('[' + req.body.consents + ']');
+        const consents = JSON.parse('[' + (req.body.consents || '') + ']');
 
         if (consents && consents.length) {
             await Promise.all(consents.map(async x => {
@@ -531,9 +545,9 @@ async function updatePartner(req, res) {
 
 async function getPartnerHco(req, res) {
     try {
-        const partnerHco = await Partner.findOne({
+        const partnerHco = await Partners.findOne({
             where: { id: req.params.id },
-            attributes: { exclude: ['entity_type', 'is_italian_hcp', 'should_report_hco', 'beneficiary_category'] }
+            attributes: { exclude: ['is_italian_hcp', 'should_report_hco', 'beneficiary_category'] }
         });
 
         if (!partnerHco) return res.status(404).send('The partner does not exist');
@@ -616,8 +630,7 @@ async function getPartnerWholesalers(req, res) {
 async function getNonHealthcarePartner(req, res) {
     try {
         const partnerVendor = await PartnerVendors.findOne({
-            where: { id: req.params.id },
-            attributes: { exclude: ['entity_type'] }
+            where: { id: req.params.id }
         });
 
         if (!partnerVendor) return res.status(404).send('The partner does not exist');
@@ -668,6 +681,95 @@ async function createPartnerVendor(req, res) {
 
         data.entity_type = type;
 
+        const countries = await Country.findAll({
+            order: [
+                ['codbase_desc', 'ASC'],
+                ['countryname', 'ASC']
+            ]
+        });
+
+        let hasDoubleOptIn = false;
+        let consentArr = [];
+
+        const consents = JSON.parse('[' + (req.body.consents || '') + ']');
+
+        if (consents && consents.length) {
+            await Promise.all(consents.map(async consent => {
+                const consentId = Object.keys(consent)[0];
+                const consentResponse = Object.values(consent)[0];
+                const language_code = locale.split('_')[0];
+                let richTextLocale = `${language_code}_${country_iso2.toUpperCase()}`;
+
+                if (!consentResponse) return;
+
+                const consentDetails = await Consent.findOne({ where: { id: consentId } });
+
+                if (!consentDetails) {
+                    response.errors.push(new CustomError('Invalid consents.', 400));
+                    return;
+                };
+
+                const currentCountry = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                const baseCountry = countries.find(c => c.countryname === currentCountry.codbase_desc);
+
+                const consentCountry = await ConsentCountry.findOne({
+                    where: {
+                        country_iso2: {
+                            [Op.iLike]: baseCountry.country_iso2
+                        },
+                        consent_id: consentDetails.id
+                    }
+                });
+
+                if (!consentCountry) {
+                    response.errors.push(new CustomError('Invalid consent country.', 400));
+                    return;
+                }
+
+                let consentLocale = await ConsentLocale.findOne({
+                    where: {
+                        consent_id: consentId,
+                        locale: { [Op.iLike]: `${language_code}_${country_iso2}` }
+                    }
+                });
+
+                if (!consentLocale) {
+                    const codbaseCountry = countries.filter(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                    const localeUsingParentCountryISO = `${language_code}_${(codbaseCountry[0].country_iso2 || '').toUpperCase()}`;
+
+                    consentLocale = await ConsentLocale.findOne({
+                        where: {
+                            consent_id: consentId,
+                            locale: { [Op.iLike]: localeUsingParentCountryISO }
+                        }
+                    });
+
+                    richTextLocale = localeUsingParentCountryISO;
+                }
+
+                if (!consentLocale) {
+                    response.errors.push(new CustomError('Invalid consent locale.', 400));
+                    return;
+                }
+
+                if (consentCountry.opt_type === 'double-opt-in') {
+                    hasDoubleOptIn = true;
+                }
+
+                consentArr.push({
+                    consent_id: consentDetails.id,
+                    consent_confirmed: hasDoubleOptIn ? false : true,
+                    opt_type: consentCountry.opt_type,
+                    rich_text: validator.unescape(consentLocale.rich_text),
+                    consent_locale: richTextLocale,
+                    created_by: req.user.id,
+                    updated_by: req.user.id
+                });
+            }));
+        }
+
         const [partnerVendor, created] = await PartnerVendors.findOrCreate({
             where: {
                 [Op.or]: [
@@ -692,6 +794,17 @@ async function createPartnerVendor(req, res) {
 
         await uploadDucuments(partnerVendor, type, files);
 
+        if (consentArr.length) {
+            consentArr = consentArr.map(c => {
+                c.user_id = partnerVendor.id
+                return c;
+            });
+            await PartnerConsent.bulkCreate(consentArr, {
+                returning: true,
+                ignoreDuplicates: false
+            });
+        }
+
         delete partnerVendor.dataValues.created_at;
         delete partnerVendor.dataValues.updated_at;
 
@@ -714,13 +827,106 @@ async function updatePartnerVendor(req, res) {
 
         const partner = await PartnerVendors.findOne({
             where: {
-                id: req.params.id
+                id: req.params.id,
+                entity_type: type
             }
         });
 
         if (!partner) {
             response.errors.push(new CustomError('Partner not found.', 400));
             return res.status(400).send(response);
+        }
+
+        const countries = await Country.findAll({
+            order: [
+                ['codbase_desc', 'ASC'],
+                ['countryname', 'ASC']
+            ]
+        });
+        let consentArr = [];
+        const consents = JSON.parse('[' + (req.body.consents || '') + ']');
+
+        if (consents && consents.length) {
+            await Promise.all(consents.map(async x => {
+                const consentId = Object.keys(x)[0];
+                const consentResponse = Object.values(x)[0];
+
+                const partnerConsent = await PartnerConsent.findOne({ where: { user_id: partner.id, consent_id: consentId } });
+
+                if (partnerConsent) {
+                    await partnerConsent.update({
+                        opt_type: consentResponse ? 'single-opt-in' : 'opt-out',
+                        consent_confirmed: consentResponse
+                    });
+                } else {
+                    const language_code = locale.split('_')[0];
+                    let richTextLocale = `${language_code}_${country_iso2.toUpperCase()}`;
+
+                    if (!consentResponse) return;
+
+                    const consentDetails = await Consent.findOne({ where: { id: consentId } });
+
+                    if (!consentDetails) {
+                        response.errors.push(new CustomError('Invalid consents.', 400));
+                        return;
+                    };
+
+                    const currentCountry = countries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                    const baseCountry = countries.find(c => c.countryname === currentCountry.codbase_desc);
+
+                    const consentCountry = await ConsentCountry.findOne({
+                        where: {
+                            country_iso2: {
+                                [Op.iLike]: baseCountry.country_iso2
+                            },
+                            consent_id: consentDetails.id
+                        }
+                    });
+
+                    if (!consentCountry) {
+                        response.errors.push(new CustomError('Invalid consent country.', 400));
+                        return;
+                    }
+
+                    let consentLocale = await ConsentLocale.findOne({
+                        where: {
+                            consent_id: consentId,
+                            locale: { [Op.iLike]: `${language_code}_${country_iso2}` }
+                        }
+                    });
+
+                    if (!consentLocale) {
+                        const codbaseCountry = countries.filter(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
+
+                        const localeUsingParentCountryISO = `${language_code}_${(codbaseCountry[0].country_iso2 || '').toUpperCase()}`;
+
+                        consentLocale = await ConsentLocale.findOne({
+                            where: {
+                                consent_id: consentId,
+                                locale: { [Op.iLike]: localeUsingParentCountryISO }
+                            }
+                        });
+
+                        richTextLocale = localeUsingParentCountryISO;
+                    }
+
+                    if (!consentLocale) {
+                        response.errors.push(new CustomError('Invalid consent locale.', 400));
+                        return;
+                    }
+
+                    consentArr.push({
+                        consent_id: consentDetails.id,
+                        consent_confirmed: true,
+                        opt_type: consentCountry.opt_type,
+                        rich_text: validator.unescape(consentLocale.rich_text),
+                        consent_locale: richTextLocale,
+                        created_by: req.user.id,
+                        updated_by: req.user.id
+                    });
+                }
+            }));
         }
 
         const data = {
@@ -757,11 +963,20 @@ async function updatePartnerVendor(req, res) {
 
         }
 
-
-
         const updated_data = await partner.update(data);
 
         await uploadDucuments(partner, updated_data.dataValues.entity_type, files);
+
+        if (consentArr.length) {
+            consentArr = consentArr.map(c => {
+                c.user_id = updated_data.id
+                return c;
+            });
+            await PartnerConsent.bulkCreate(consentArr, {
+                returning: true,
+                ignoreDuplicates: false
+            });
+        }
 
         delete updated_data.dataValues.created_at;
         delete updated_data.dataValues.updated_at;
@@ -805,7 +1020,7 @@ async function approvePartner(req, res) {
         const entityType = entityMap[req.params.entityType];
 
         const PartnerModel = entityType === 'hcp' || entityType === 'hco'
-            ? Partner
+            ? Partners
             : PartnerVendors;
 
         const partner = await PartnerModel.findOne({
@@ -932,7 +1147,7 @@ async function exportApprovedPartners(req, res) {
         if (!entityType) return res.status(404).send(`No ${req.params.entityType} partners found`);
 
         const PartnerModel = entityType === 'hcp' || entityType === 'hco'
-            ? Partner
+            ? Partners
             : PartnerVendors;
 
         const partners = await PartnerModel.findAll({
@@ -969,13 +1184,17 @@ async function exportApprovedPartners(req, res) {
 
 
 async function getPartnerVendorById(req, res) {
+    const response = new Response({}, []);
     try {
         const partnerVendor = await PartnerVendors.findOne({
             where: { id: req.params.id },
             attributes: { exclude: ['entity_type', 'created_at', 'updated_at'] }
         });
 
-        if (!partnerVendor) return res.status(404).send('The partner vendor does not exist');
+        if (!partnerVendor) {
+            response.errors.push(new CustomError('The partner does not exist.', 404));
+            return res.status(404).send(response);
+        }
 
         partnerVendor.dataValues.type = partnerVendor.dataValues.individual_type;
         delete partnerVendor.dataValues.individual_type;
@@ -987,7 +1206,22 @@ async function getPartnerVendorById(req, res) {
             id: d.dataValues.id
         }));
 
-        res.json(partnerVendor);
+        const consents = await PartnerConsent.findAll({ where: { user_id: partnerVendor.id } });
+
+        partnerVendor.dataValues.consents = consents.map(c => {
+            return {
+                rich_text: c.rich_text,
+                id: c.id,
+                consent_id: c.consnet_id,
+                consent_confirmed: c.consent_confirmed,
+                opt_type: c.opt_type,
+                consent_locale: c.consent_locale
+            };
+        });
+
+        response.data = partnerVendor;
+
+        res.json(response);
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
@@ -995,13 +1229,17 @@ async function getPartnerVendorById(req, res) {
 }
 
 async function getPartnerById(req, res) {
+    const response = new Response({}, []);
     try {
-        const partner = await Partner.findOne({
+        const partner = await Partners.findOne({
             where: { id: req.params.id },
             attributes: { exclude: ['created_at', 'updated_at'] }
         });
 
-        if (!partner) return res.status(404).send('The partner does not exist');
+        if (!partner) {
+            response.errors.push(new CustomError('The partner does not exist.', 404));
+            return res.status(404).send(response);
+        }
 
         if (partner.dataValues.entity_type === 'hcp') {
             delete partner.dataValues.organization_name;
@@ -1025,7 +1263,21 @@ async function getPartnerById(req, res) {
             id: d.dataValues.id
         }));
 
-        res.json(partner);
+        const consents = await PartnerConsent.findAll({ where: { user_id: partner.id } });
+
+        partner.dataValues.consents = consents.map(c => {
+            return {
+                rich_text: c.rich_text,
+                id: c.id,
+                consent_id: c.consnet_id,
+                consent_confirmed: c.consent_confirmed,
+                opt_type: c.opt_type,
+                consent_locale: c.consent_locale
+            };
+        });
+
+        response.data = partner;
+        res.json(response);
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
@@ -1045,12 +1297,82 @@ async function getPartnerInformation(req, res) {
     }
 }
 
+async function resendForm(req, res) {
+    try {
+        const { id } = req.params;
+
+        const entityMap = {
+            hcps: 'hcp',
+            hcos: 'hco',
+            vendors: 'vendor',
+            wholesalers: 'wholesaler'
+        };
+        const entityType = entityMap[req.params.entityType];
+
+        let partner;
+        if (entityType === 'hcp' || entityType === 'hco') {
+            partner = await Partners.findOne({ where: { id } })
+        } else {
+            partner = await PartnerVendors.findOne({ where: { id } })
+        }
+
+        if (!partner) return res.status(400).send('Partner not found.');
+
+        const { request_id } = partner.dataValues;
+        const partnerRequest = await PartnerRequest.findOne({ where: { id: request_id } });
+
+        if (!partnerRequest) return res.status(400).send('Partner Request not found.');
+
+        const {
+            application_id,
+            first_name,
+            last_name,
+            email,
+            partner_type,
+            country_iso2,
+            locale
+        } = partnerRequest.dataValues;
+
+        const userApplication = await Application.findOne({ where: { id: application_id } });
+        const jwt_token = jwt.sign({
+            partner_id: id,
+            status: 'update'
+        }, userApplication.auth_secret, {
+            expiresIn: '1h'
+        });
+
+        const payload = {
+            jwt_token,
+            first_name,
+            last_name,
+            email,
+            partner_type: partner_type ? partner_type.toLowerCase() : undefined,
+            country_iso2: country_iso2.toLowerCase(),
+            locale: locale
+        };
+
+        const metaData = await Application.findAll({
+            where: { id: application_id },
+            attributes: ['metadata']
+        });
+
+        const resendFormLink = metaData[0].dataValues.metadata.request_notification_link;
+
+        await axios.post(resendFormLink, payload);
+        res.json('Form resent successfully.');
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
+
 exports.getPartners = getPartners;
 exports.getPartnerById = getPartnerById;
 exports.createPartner = createPartner;
 exports.updatePartner = updatePartner;
 
 exports.getPartnerVendors = getPartnerVendors;
+exports.getPartnerVendorById = getPartnerVendorById;
 exports.getPartnerWholesalers = getPartnerWholesalers;
 exports.createPartnerVendor = createPartnerVendor;
 exports.updatePartnerVendor = updatePartnerVendor;
@@ -1060,4 +1382,4 @@ exports.registrationLookup = registrationLookup;
 exports.approvePartner = approvePartner;
 exports.exportApprovedPartners = exportApprovedPartners;
 exports.getPartnerInformation = getPartnerInformation;
-exports.getPartnerVendorById = getPartnerVendorById;
+exports.resendForm = resendForm;

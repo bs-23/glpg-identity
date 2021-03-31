@@ -1,6 +1,7 @@
 .cdp-table {
 
     &-inline-editing {
+
         .inline-editing {
             &__field-wrap {
                 position: relative;
@@ -62,11 +63,38 @@
             }
         }
 
-
-
         &__save-btn {
             position: sticky;
             bottom: 0px;
+        }
+
+        @media (max-width: $screen-phone) {
+            &__edit-icon {
+                visibility: visible;
+            }
+
+            .search-in-okla,
+            .inline-editing__edit-icon {
+                visibility: visible;
+            }
+
+            .inline-editing {
+                &__edit-icon {
+                    color: $gray-999;
+                }
+
+                &__btn-wrap {
+                    width: 100%;
+                    /*background: #F8FFB5;
+                    justify-content: center;
+                    box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 15%);*/
+                    i {
+                        border: 1px solid;
+                        padding: 0px 10px;
+                        border-radius: 3px;
+                    }
+                }
+            }
         }
     }
 
@@ -266,6 +294,13 @@
                     top: 0px;
                     z-index: 100;
                 }
+
+                button:active,
+                button:focus {
+                    .fa-sort {
+                        color: $white-color;
+                    }
+                }
             }
 
             &-wrapper {
@@ -351,14 +386,14 @@
     }
 }
 
-@media (min-width: $screen-desktop) {
-    .table-responsive {
-        overflow: visible;
+    @media (min-width: $screen-desktop) {
+        .table-responsive {
+            overflow: visible;
+        }
     }
-}
 
 
 
-.search-in-okla {
-    visibility: hidden;
-}
+    .search-in-okla {
+        visibility: hidden;
+    }
