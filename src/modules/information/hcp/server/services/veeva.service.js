@@ -136,18 +136,15 @@ async function syncHcpConsentsInVeeva(hcp, actor) {
     }
 }
 
-async function createMultiChannelConsent(oneKeyId, email, opt_type, consent_source, consent) {
+async function createMultiChannelConsent(account, email, opt_type, consent_source, consent) {
     try {
-        if(oneKeyId && email && consent &&
+        if(account && email && consent &&
             consent.consent_category &&
             consent.consent_category.veeva_content_type_id &&
             consent.consent_locales &&
             consent.consent_locales[0].veeva_consent_type_id) {
 
             const headers = await getAuthorizationHeader();
-            const account = await getAccountByOneKeyId(oneKeyId);
-
-            if(!account) return;
 
             const veeva_content_type_id = consent.consent_category.veeva_content_type_id;
             const veeva_consent_type_id = consent.consent_locales[0].veeva_consent_type_id;
@@ -176,6 +173,7 @@ async function createMultiChannelConsent(oneKeyId, email, opt_type, consent_sour
                 GLPG_Consent_Source__c: consent_source,
                 CDP_Consent_ID__c: consent.id,
                 Consent_Type_vod__c: veeva_consent_type_id,
+                Opt_Expiration_Date_vod__c: opt_type === 'opt-out' ? new Date(Date.now()) : null,
                 Default_Consent_Text_vod__c: parser(consent.consent_locales[0].rich_text).replace(/(<\/?(?:a)[^>]*>)|<[^>]+>/ig, '$1')
             }, { headers });
 
@@ -186,10 +184,9 @@ async function createMultiChannelConsent(oneKeyId, email, opt_type, consent_sour
     }
 }
 
-async function isEmailDifferent(oneKeyId, email) {
+async function isEmailDifferent(account, email) {
     try {
         email = email.toLowerCase();
-        const account = await getAccountByOneKeyId(oneKeyId);
 
         if(account.PersonEmail && account.PersonEmail.toLowerCase() !== email) return true;
         if(account.Secondary_Email__c && account.Secondary_Email__c.toLowerCase() !== email) return true;

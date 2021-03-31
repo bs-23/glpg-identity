@@ -18,7 +18,7 @@ module.exports = app => {
         .get(CDPAuthStrategy, ServiceGuard([Services.IMPORT_CONSENTS]), controller.getDownloadUrl);
 
     app.route('/api/consent-import-jobs/:id/export')
-        .get(CDPAuthStrategy, ServiceGuard([Services.IMPORT_CONSENTS]), controller.exportRecords);
+        .get(CDPAuthStrategy, ServiceGuard([Services.IMPORT_CONSENTS]), controller.exportJobReport);
 
     app.route('/api/consent-import-jobs/:id')
         .put(CDPAuthStrategy, ServiceGuard([Services.IMPORT_CONSENTS]), controller.cancelConsentImportJob);
