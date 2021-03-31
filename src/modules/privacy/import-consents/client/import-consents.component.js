@@ -53,6 +53,12 @@ export default function ImportConsentsDashboard() {
         return parse(consent_locale.rich_text);
     };
 
+    const getOptTypeText = (itemOptType) => {
+        if (!itemOptType) return '--';
+        const optType = optTypes.find(o => o.value === itemOptType);
+        return optType ? optType.text : '--';
+    };
+
     useEffect(() => {
         async function getLocalizations() {
             const { data } = await axios.get('/api/localizations');
@@ -104,7 +110,7 @@ export default function ImportConsentsDashboard() {
             var date = new Date();
             const timestamp = date.getFullYear().toString() + pad2(date.getMonth() + 1) + pad2(date.getDate()) + pad2(date.getHours()) + pad2(date.getMinutes()) + pad2(date.getSeconds());
 
-            fileDownload(res.data, `Imported_Consent_Records_${timestamp}.xlsx`);
+            fileDownload(res.data, `Job_reports_${timestamp}.xlsx`);
         }).catch(error => {
             /**
              * the error response is a blob because of the responseType option.
@@ -156,7 +162,7 @@ export default function ImportConsentsDashboard() {
                             <ol className="rounded-0 m-0 p-0 d-none d-sm-flex">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/consent">Data Privacy & Consent Management</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Import HCP Consents</span></li>
+                                <li className="breadcrumb-item active"><span>Consent Import Jobs</span></li>
                             </ol>
                             <Dropdown className="dropdown-customize breadcrumb__dropdown d-block d-sm-none ml-2">
                                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center border-0">
@@ -165,7 +171,7 @@ export default function ImportConsentsDashboard() {
                                 <Dropdown.Menu>
                                     <Dropdown.Item className="px-2" href="/"><i className="fas fa-link mr-2"></i> Dashboard</Dropdown.Item>
                                     <Dropdown.Item className="px-2" href="/consent"><i className="fas fa-link mr-2"></i> Data Privacy & Consent Management</Dropdown.Item>
-                                    <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Import HCP Consents</Dropdown.Item>
+                                    <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Consent Import Jobs</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                             <span className="ml-auto mr-3"><i onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary cursor-pointer"></i></span>
@@ -181,7 +187,7 @@ export default function ImportConsentsDashboard() {
                 <div className="row">
                     <div className="col-12">
                         <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel">
-                            <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">Import HCP Consents </h4>
+                            <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">Consent Import Jobs</h4>
                             <div class="d-flex justify-content-between align-items-center">
                                 <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Create New Job</span>
@@ -235,7 +241,7 @@ export default function ImportConsentsDashboard() {
                                                                 <label className="font-weight-bold" htmlFor="consent_category">Consent Category <span className="text-danger">*</span></label>
                                                                 <Field data-testid="consent_category" as="select" name="consent_category" className="form-control">
                                                                     <option key="select-consent-category" value="" disabled>--Select--</option>
-                                                                    {consent_categories.map(category => {
+                                                                    {consent_categories.filter(c => !!c.veeva_content_type_id).map(category => {
                                                                         return <option key={category.id} value={category.id}>{category.title}</option>
                                                                     })}
                                                                 </Field>
@@ -319,8 +325,8 @@ export default function ImportConsentsDashboard() {
                                             <th width="12%">Consent Locale</th>
                                             <th width="12%">Total Records</th>
                                             <th width="12%">Status</th>
-                                            <th width="12%">Executed By</th>
-                                            <th width="12%">Execution Date</th>
+                                            <th width="12%">Created By</th>
+                                            <th width="12%">Created At</th>
                                             <th width="12%">Action</th>
                                         </tr>
                                     </thead>
@@ -377,7 +383,7 @@ export default function ImportConsentsDashboard() {
                     show={!!selectedImport}
                     onHide={() => setSelectedImport(null)}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Imported Consent Records</Modal.Title>
+                        <Modal.Title>Total Records</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         {selectedImport && selectedImport.length &&
@@ -387,6 +393,7 @@ export default function ImportConsentsDashboard() {
                                         <th width="15%">Individual OneKeyId</th>
                                         <th width="15%">Email</th>
                                         <th width="15%">Opt-In Date</th>
+                                        <th width="15%">Opt Type</th>
                                         <th width="15%">Multichannel Consent ID</th>
                                     </tr>
                                 </thead>
@@ -401,6 +408,7 @@ export default function ImportConsentsDashboard() {
                                                     : '--'
                                                 }
                                             </td>
+                                            <td data-for="Opt Type" className="text-break">{getOptTypeText(item.opt_type)}</td>
                                             <td data-for="Multichannel Consent ID" className="text-break">{item.multichannel_consent_id || '--'}</td>
                                         </tr>
                                     ))}
@@ -447,7 +455,7 @@ export default function ImportConsentsDashboard() {
                                 <div className="col-12">
                                     <button type="button" className="btn cdp-btn-primary my-3 py-2 text-white shadow" onClick={() => DownloadFile(details.id)}>Download the original file</button>
                                     {details.status === 'completed' &&
-                                        <button type="button" className="btn cdp-btn-primary my-3 py-2 text-white shadow ml-3" onClick={() => exportRecords(details.id)}>Export the report</button>
+                                        <button type="button" className="btn cdp-btn-primary my-3 py-2 text-white shadow ml-3" onClick={() => exportRecords(details.id)}>Download Job Report</button>
                                     }
                                 </div>
                             </div>

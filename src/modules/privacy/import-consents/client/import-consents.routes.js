@@ -9,7 +9,7 @@ export default function ClientRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute path={`${path}/import-hcp-consents`} component={ImportConsentsDashboard} />
+            <PrivateRoute path={`${path}/consent-import-jobs`} component={ImportConsentsDashboard} />
         </Switch>
     );
 }
