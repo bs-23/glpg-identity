@@ -1325,9 +1325,6 @@ async function forgetPassword(req, res) {
     const { email, uuid } = req.body;
 
     try {
-        // const doc = await Hcp.findOne({
-        //     where: where(fn('lower', col('email')), fn('lower', email))
-        // });
         const doc = uuid ? await Hcp.findOne({
             where: {
               [Op.and]: [{
@@ -1336,9 +1333,7 @@ async function forgetPassword(req, res) {
                         }
                     },
                     {
-                        uuid: {
-                            [Op.like]: uuid
-                        }
+                        uuid: uuid
                     }
                 ]
             }
