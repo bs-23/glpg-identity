@@ -26,8 +26,28 @@ async function createConsentImportJob(req, res) {
                 id: req.body.consent_id,
                 is_active: true
             },
-            attributes: ['id']
+            attributes: ['id'],
+            include: [
+                {
+                    model: ConsentCategory,
+                    where: { id: req.body.consent_category },
+                    attributes: ['veeva_content_type_id']
+                },
+                {
+                    model: ConsentLocale,
+                    where: { consent_id: req.body.consent_id, locale: req.body.consent_locale },
+                    attributes: ['veeva_consent_type_id']
+                }
+            ]
         });
+
+        if(!consent ||
+            !consent.consent_category ||
+            !consent.consent_category.veeva_content_type_id ||
+            !consent.consent_locales ||
+            !consent.consent_locales[0].veeva_consent_type_id) {
+            return res.status(400).send('Consent not found!');
+        }
 
         const data = [];
 
@@ -83,7 +103,7 @@ async function startConsentImportJob(req, res) {
     try {
         const job = await ConsentImportJob.findOne({ where: { id: req.params.id } });
 
-        if(!job || job.status !== 'ready') return;
+        if(!job || job.status !== 'ready') return res.status(400).send('Job is not ready yet.');
 
         const consent = await Consent.findOne({
             where: {
@@ -105,9 +125,10 @@ async function startConsentImportJob(req, res) {
             ]
         });
 
-        if(!consent) return;
+        if(!consent) return res.status(400).send('Consent not found.');;
 
         await Promise.all(job.data.forEach(async row => {
+            let multichannel_consent;
             const isEmailDifferent = await veevaService.isEmailDifferent(row.onekey_id, row.email.toLowerCase());
 
             if(!isEmailDifferent) {
@@ -160,9 +181,9 @@ async function deleteConsentImportJob(req, res) {
             where: { id: req.params.id }
         });
 
-        if (!job) return res.status(404).send('No job found');
+        if (!job) return res.status(404).send('No job found!');
 
-        if (job.status === 'completed') return res.status(400).send('Invalid sattus. Job already completed.');
+        if (job.status === 'completed') return res.status(400).send('Invalid request. Job already completed.');
 
         const file = await File.findOne({
             where: { owner_id: req.params.id }
