@@ -61,7 +61,7 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner.model'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-consents.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
-    require(path.join(process.cwd(), 'src/modules/privacy/import-consents/server/consent-import-job.model'));
+    require(path.join(process.cwd(), 'src/modules/privacy/consent-import/server/consent-import-job.model'));
 
     await sequelize.cdpConnector.sync();
 
