@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Select, { components } from 'react-select';
 import { getStatistics, clearStatistics } from './statistics.actions';
+import axios from 'axios';
+import fileDownload from 'js-file-download';
 
 export default function HotStatistic() {
     const dispatch = useDispatch();
@@ -51,12 +53,41 @@ export default function HotStatistic() {
         }
     }, [selectedCountries]);
 
+    const exportExcelFile = () => {
+        const selectedCountryCodes = selectedCountries.map(sc => sc.value);
+        const query = new URLSearchParams('');
+        selectedCountryCodes.forEach(sc => query.append('country', sc));
+
+        axios.get(`/api/export-hot-statistics?${query.toString()}`, {
+            responseType: 'blob',
+        }).then(res => {
+            const pad2 = (n) => (n < 10 ? '0' + n : n);
+
+            var date = new Date();
+            const timestamp = date.getFullYear().toString() + pad2(date.getMonth() + 1) + pad2(date.getDate()) + pad2(date.getHours()) + pad2(date.getMinutes()) + pad2(date.getSeconds());
+
+            fileDownload(res.data, `hot_statistics_${timestamp}.xlsx`);
+        }).catch(error => {
+            /**
+             * the error response is a blob because of the responseType option.
+             * text() converts it back to string
+             */
+            console.log(error);
+
+            // addToast(error, {
+            //     appearance: 'warning',
+            //     autoDismiss: true
+            // });
+        });
+    };
+
     return (
         <div className={`hot-statistics shadow-sm bg-white ${show ? "cdp-inbox__expand" : ""}`}>
             <h5 className="p-3 cdp-text-primary font-weight-bold mb-0 d-flex justify-content-between cdp-inbox__header">
                 Hot Statistics
                 {/*<i onClick={() => setShow(true)} class="icon icon-expand cdp-inbox__icon-expand cdp-inbox__icon-toggle d-none d-lg-block cursor-pointer"></i>
                 <i class="icon icon-minimize cdp-inbox__icon-minimize cdp-inbox__icon-toggle cursor-pointer" onClick={() => setShow(false)}></i>*/}
+                <button className="btn cdp-btn-outline-primary mr-2" onClick={() => exportExcelFile()}><i className="fas fa-download"></i> <span className="d-none d-lg-inline-block pl-1">Export</span></button>
                 <i className="fas fa-chart-line"></i>
             </h5>
             <div className="px-3 pt-3 shadow-sm hot-statistics__box-wrap">
