@@ -14,7 +14,7 @@ import { ConsentImportJobSchema } from './consent-import-job.schema';
 import { getCdpConsents } from '../../manage-consent/client/consent.actions';
 import { getConsentCategories } from '../../consent-category/client/category.actions';
 import { getCountryConsents } from '../../consent-country/client/consent-country.actions';
-import { getConsentImportJobs, cancelConsentImportJob } from './consent-import-job.actions';
+import { getConsentImportJobs, startConsentImportJob, cancelConsentImportJob } from './consent-import-job.actions';
 
 export default function ConsentImportJobsComponent() {
     const dispatch = useDispatch();
@@ -129,7 +129,7 @@ export default function ConsentImportJobsComponent() {
     };
 
     const startJob = (id) => {
-        axios.post(`/api/consent-import-jobs/${id}/start`).then(response => {
+        dispatch(startConsentImportJob(id)).then(() => {
             setActionToPerform({});
             addToast('Successfully completed job', {
                 appearance: 'success',
@@ -319,7 +319,7 @@ export default function ConsentImportJobsComponent() {
                                                                 <label className="font-weight-bold d-block" htmlFor="file">File <span className="text-danger">*</span></label>
                                                                 <input id="file" name="file" type="file" onChange={(event) => {
                                                                     formikProps.setFieldValue("file", event.currentTarget.files[0]);
-                                                                }} />
+                                                                }} accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"/>
                                                                 <div className="invalid-feedback"><ErrorMessage name="file" /></div>
                                                             </div>
                                                         </div>

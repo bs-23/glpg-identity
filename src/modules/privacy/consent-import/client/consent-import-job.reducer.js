@@ -13,6 +13,23 @@ export default function reducer(state = initialState, action) {
             };
         }
 
+        case Types.START_CONSENT_IMPORT_JOB_FULFILLED: {
+            const urlIdPart = action.payload.config.url.split('/api/consent-import-jobs/')[1];
+            const id = urlIdPart.split('/start')[0];
+
+            const jobs = state.consent_import_jobs.map(job => {
+                return {
+                    ...job,
+                    status: job.id === id ? 'completed' : job.status
+                };
+            });
+
+            return {
+                ...state,
+                consent_import_jobs: jobs
+            }
+        }
+
         case Types.CANCEL_CONSENT_IMPORT_JOB_FULFILLED: {
             const id = action.payload.config.url.split('/api/consent-import-jobs/')[1];
 

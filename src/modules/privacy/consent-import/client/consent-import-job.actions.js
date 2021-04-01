@@ -11,6 +11,16 @@ export function getConsentImportJobs() {
     };
 }
 
+export function startConsentImportJob(id) {
+    return {
+        type: Types.START_CONSENT_IMPORT_JOB,
+        payload: axios({
+            method: 'post',
+            url: `/api/consent-import-jobs/${id}/start`
+        })
+    };
+}
+
 export function cancelConsentImportJob(id) {
     return {
         type: Types.CANCEL_CONSENT_IMPORT_JOB,

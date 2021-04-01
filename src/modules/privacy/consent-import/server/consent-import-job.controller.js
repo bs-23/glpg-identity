@@ -137,22 +137,23 @@ async function startConsentImportJob(req, res) {
         if(!consent) return res.status(400).send('Consent not found.');
 
         const data = await Promise.all(job.data.map(async row => {
+            const newRow = { ...row };
             let multichannel_consent;
             const account = await veevaService.getAccountByOneKeyId(row.onekey_id);
             const isEmailDifferent = await veevaService.isEmailDifferent(account, row.email);
 
-            if(!isEmailDifferent) {
+            if (!isEmailDifferent) {
                 multichannel_consent = await veevaService.createMultiChannelConsent(account, row.email, row.opt_type, row.consent_source, consent);
             }
 
-            row.multichannel_consent_id = multichannel_consent ? multichannel_consent.id : null;
+            newRow.multichannel_consent_id = multichannel_consent ? multichannel_consent.id : null;
 
-            return row;
+            return newRow;
         }));
 
         const previousJob = { ...job.dataValues };
 
-        await job.update({ status: 'completed', data, updated_by: req.user.id });
+        await job.update({ status: 'completed', data: data, updated_by: req.user.id });
 
         const updatesInJob = logService.difference(job.dataValues, previousJob);
 
