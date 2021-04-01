@@ -513,19 +513,25 @@ async function init() {
                     rich_text: "<p>Je consens à ce que Galapagos m'envoie des informations promotionnelles et environnementales concernant tous les produits et services de Galapagos à l'adresse mail que j'ai fournie. <br> <br> Pour obtenir de plus amples informations sur la manière dont nous traitons vos données à caractère personnel, veuillez vous référer à notre <a href='https://www.glpg.com/belgique/fr-politique-de-confidentialite' target='_blank'>Déclaration de confidentialité</a>.</p>",
                     consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                     locale: 'fr_BE',
-                    veeva_consent_type_id: 'a3w0C0000008jqgQAA'
+                    veeva_consent_type_id: 'a3w0C0000008jPw'
                 },
                 {
                     rich_text: "<p>Ik ontvang graag informatieve en promotionele communicatie via e-mail over de producten, diensten en andere ontwikkelingen van Galapagos. <br> <br> Raadpleeg onze <a href='https://www.glpg.com/belgie/privacyverklaring' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
                     consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                     locale: 'nl_BE',
-                    veeva_consent_type_id: 'a3w0C0000008jqWQAQ'
+                    veeva_consent_type_id: 'a3w4J000000bzys'
                 },
                 {
                     rich_text: "<p>Ik ontvang graag informatieve en promotionele communicatie via e-mail over de producten, diensten en andere ontwikkelingen van Galapagos. <br> <br> Raadpleeg onze <a href='https://www.glpg.com/nederland/privacyverklaring' target='_blank'>privacyverklaring</a> voor meer informatie over hoe we met uw persoonsgegevens omgaan.</p>",
                     consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                     locale: 'nl_NL',
-                    veeva_consent_type_id: 'a3w0C0000008jqMQAQ'
+                    veeva_consent_type_id: 'a3w4J000000bzyY'
+                },
+                {
+                    rich_text: "<p>Ich möchte per E-Mail Informations- und Werbemitteilungen über die Produkte, Dienstleistungen und andere Entwicklungen von Galapagos erhalten. Weitere Informationen über den Umgang mit Ihren persönlichen Daten finden Sie in unserer Datenschutzerklärung. Ich kann diese Einwilligung jederzeit unter xxxxxxx@xxxxxxxxxxx widerrufen.</p>",
+                    consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
+                    locale: 'de_DE',
+                    veeva_consent_type_id: 'a3w0C0000008jK7'
                 },
                 {
                     rich_text: "<p>Vous déclarez que les données saisies sont vos données personnelles et que les informations sont complètes et exactes. En aucun cas, vos données ne peuvent être partagées avec des tiers pour permettre à ces tiers d'accéder au présent site. Vous devez immédiatement informer Galapagos de toute utilisation non autorisée connue ou soupçonnée de vos informations personnelles dans le cadre de l'accès à ce site.</p>",

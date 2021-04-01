@@ -240,7 +240,7 @@ export default function ConsentImportJobsComponent() {
                                                 }).then(() => addToast('Consents imported successfully', {
                                                     appearance: 'success',
                                                     autoDismiss: true
-                                                })).catch(err => addToast('An error occurred!', {
+                                                })).catch(err => addToast('An error occurred! Please try again.', {
                                                     appearance: 'error',
                                                     autoDismiss: true
                                                 })).finally(() => dispatch(getConsentImportJobs()));
