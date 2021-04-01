@@ -68,12 +68,12 @@ const ConsentManagement = () => {
                                                 <span className="d-block cdp-list-group__link-activity">within 2 - 5 minutes</span>
                                             </span>
                                         </NavLink>
-                                        <NavLink to="/consent/import-hcp-consents" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
+                                        <NavLink to="/consent/consent-import-jobs" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
                                             <i className="fas fa-file-upload fa-3x cdp-list-group__icon"></i>
                                             <span>
-                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Import Consents from 3rd Party events</strong>
-                                                <span className="d-block cdp-list-group__link-description">Import Consents from 3rd Party events</span>
-                                                <span className="d-block cdp-list-group__link-activity">within 2 - 5 minutes</span>
+                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Mange Consent Import Job</strong>
+                                                <span className="d-block cdp-list-group__link-description">Create, start, cancel jobs to import consents from different events into VeevaCRM.</span>
+                                                <span className="d-block cdp-list-group__link-activity">within 15 minutes</span>
                                             </span>
                                         </NavLink>
                                         <NavLink to="#" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link disabled">

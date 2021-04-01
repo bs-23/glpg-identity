@@ -8,6 +8,11 @@
 
     &-body {
         word-break: break-word;
+
+        &__mh-500 {
+            max-height: 500px;
+            overflow-y: auto;
+        }
     }
 
     &-title {
@@ -57,15 +62,15 @@
 
     @media (max-width: $screen-phone) {
         &-header {
-            padding: 15px 30px;
+            padding: 12px 15px;
         }
 
         &-title {
-            font-size: 24px !important;
+            font-size: 22px !important;
             font-weight: 600 !important;
 
             &_small {
-                font-size: 20px !important;
+                font-size: 18px !important;
             }
         }
     }

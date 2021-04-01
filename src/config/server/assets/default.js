@@ -23,7 +23,7 @@ module.exports = {
             "src/modules/privacy/consent-country/server/**/*.routes.js",
             "src/modules/privacy/consent-category/server/**/*.routes.js",
             "src/modules/privacy/consent-performance/server/**/*.routes.js",
-            "src/modules/privacy/import-consents/server/**/*.routes.js",
+            "src/modules/privacy/consent-import/server/**/*.routes.js",
             "src/modules/core/server/**/*.routes.js",
             "src/config/server/lib/swagger/swagger.controller.js"
         ],

@@ -136,24 +136,30 @@ async function syncHcpConsentsInVeeva(hcp, actor) {
     }
 }
 
-async function createMultiChannelConsent(oneKeyId, email, consent) {
+async function createMultiChannelConsent(account, email, opt_type, consent_source, consent) {
     try {
-        if(oneKeyId && email && consent &&
+        if(account && email && consent &&
             consent.consent_category &&
             consent.consent_category.veeva_content_type_id &&
             consent.consent_locales &&
             consent.consent_locales[0].veeva_consent_type_id) {
 
             const headers = await getAuthorizationHeader();
-            const account = await getAccountByOneKeyId(oneKeyId);
 
-            if(!account) return;
+            const veeva_content_type_id = consent.consent_category.veeva_content_type_id;
+            const veeva_consent_type_id = consent.consent_locales[0].veeva_consent_type_id;
 
-            const multichannel_consents = account.Multichannel_Consent_vod__r?.records;
-            const multichannel_consent = multichannel_consents && multichannel_consents.find(x => x.Consent_Type_vod__c === consent.consent_locales[0].veeva_consent_type_id && !x.Opt_Expiration_Date_vod__c);
+            let multichannel_consents = account.Multichannel_Consent_vod__r?.records;
+            multichannel_consents = multichannel_consents && multichannel_consents.filter(x => x.Consent_Type_vod__c === veeva_consent_type_id && !x.Opt_Expiration_Date_vod__c);
 
             if(!account.PersonEmail) {
                 await axios.patch(`${serviceUrl}/data/v48.0/sobjects/Account/${account.Id}`, { PersonEmail: email.toLowerCase() }, { headers });
+            }
+
+            if(multichannel_consents) {
+                await Promise.all(multichannel_consents.map(async mc => {
+                    await axios.patch(`${serviceUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c/${mc.Id}`, { Opt_Expiration_Date_vod__c: new Date(Date.now()) }, { headers });
+                }));
             }
 
             const { data } = await axios.post(`${serviceUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
@@ -162,17 +168,14 @@ async function createMultiChannelConsent(oneKeyId, email, consent) {
                 Capture_Datetime_vod__c: new Date(consent.captured_date),
                 Channel_Value_vod__c: email.toLowerCase(),
                 Channel_Source_vod__c: 'Account.PersonEmail',
-                Opt_Type_vod__c: consent.opt_type === 'opt-out' ? 'Opt_Out_vod' : 'Opt_In_vod',
-                Content_Type_vod__c: consent.consent_category.veeva_content_type_id,
-                GLPG_Consent_Source__c: consent.consent_source,
+                Opt_Type_vod__c: opt_type === 'opt-out' ? 'Opt_Out_vod' : 'Opt_In_vod',
+                Content_Type_vod__c: veeva_content_type_id,
+                GLPG_Consent_Source__c: consent_source,
                 CDP_Consent_ID__c: consent.id,
-                Consent_Type_vod__c: consent.consent_locales[0].veeva_consent_type_id,
+                Consent_Type_vod__c: veeva_consent_type_id,
+                Opt_Expiration_Date_vod__c: opt_type === 'opt-out' ? new Date(Date.now()) : null,
                 Default_Consent_Text_vod__c: parser(consent.consent_locales[0].rich_text).replace(/(<\/?(?:a)[^>]*>)|<[^>]+>/ig, '$1')
             }, { headers });
-
-            if(multichannel_consent) {
-                await axios.patch(`${serviceUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c/${multichannel_consent.Id}`, { Opt_Expiration_Date_vod__c: new Date(Date.now()) }, { headers });
-            }
 
             return data;
         }
@@ -181,21 +184,24 @@ async function createMultiChannelConsent(oneKeyId, email, consent) {
     }
 }
 
-async function isEmailDifferent(oneKeyId, email) {
-    email = email.toLowerCase();
-    const account = await getAccountByOneKeyId(oneKeyId);
+async function isEmailDifferent(account, email) {
+    try {
+        email = email.toLowerCase();
 
-    if(account.PersonEmail && account.PersonEmail.toLowerCase() !== email) return true;
-    if(account.Secondary_Email__c && account.Secondary_Email__c.toLowerCase() !== email) return true;
+        if(account.PersonEmail && account.PersonEmail.toLowerCase() !== email) return true;
+        if(account.Secondary_Email__c && account.Secondary_Email__c.toLowerCase() !== email) return true;
 
-    if(!account.Multichannel_Consent_vod__r) return false;
+        if(!account.Multichannel_Consent_vod__r) return false;
 
-    let result = false;
-    account.Multichannel_Consent_vod__r.records.forEach(mc => {
-        if(mc.Channel_Value_vod__c && mc.Channel_Value_vod__c.toLowerCase() !== email) { result = true; }
-    });
+        let result = false;
+        account.Multichannel_Consent_vod__r.records.forEach(mc => {
+            if(mc.Channel_Value_vod__c && mc.Channel_Value_vod__c.toLowerCase() !== email) { result = true; }
+        });
 
-    return result;
+        return result;
+    } catch(err) {
+        logger.error(err);
+    }
 }
 
 exports.syncHcpConsentsInVeeva = syncHcpConsentsInVeeva;
