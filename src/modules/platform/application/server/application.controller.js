@@ -52,7 +52,6 @@ async function getToken(req, res) {
             }
 
             if (!application || !application.validPassword(password)) {
-                console.log(application)
                 if (application) {
                     await application.update({
                         failed_auth_attempt: application.failed_auth_attempt + 1,
@@ -99,6 +98,8 @@ async function getToken(req, res) {
 
         if (response.errors.length) return res.status(400).send(response);
 
+        await application.update({failed_auth_attempt: 0});
+
         response.data = {
             ...response.data,
             token_type: 'bearer',
@@ -139,8 +140,6 @@ async function getApplications(req, res) {
             order.splice(0, 0, [{ model: User, as: 'createdByUser' }, 'first_name', orderType]);
             order.splice(1, 0, [{ model: User, as: 'createdByUser' }, 'last_name', orderType]);
         }
-
-        console.log(order)
 
         const applications = await Application.findAll({
             include: [
@@ -246,8 +245,6 @@ async function createApplication(req, res) {
 
         await application.update({ logo_url: `logo${path.extname(logo.originalname)}` });
 
-        console.log(storageServiceResponse);
-
         res.json(application);
     } catch (err) {
         logger.error(err);
@@ -340,8 +337,6 @@ async function updateApplication(req, res) {
             }
 
             await application.update({ logo_url: `logo${path.extname(logo.originalname)}` });
-
-            console.log(storageServiceResponse);
         }
 
         res.json(application);
