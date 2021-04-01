@@ -43,7 +43,10 @@ const  Partners = sequelize.cdpConnector.define('partners', {
     },
     email: {
         allowNull: false,
-        type: DataTypes.STRING(100)
+        type: DataTypes.STRING(100),
+        set(value){
+            this.setDataValue('email', value.toLowerCase());
+        }
     },
     telephone: {
         type: DataTypes.STRING(25)

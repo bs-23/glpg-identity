@@ -41,7 +41,10 @@ const HcpProfile = sequelize.cdpConnector.define('hcp_profiles', {
     email: {
         unique: true,
         allowNull: false,
-        type: DataTypes.STRING(100)
+        type: DataTypes.STRING(100),
+        set(value){
+            this.setDataValue('email', value.toLowerCase());
+        }
     },
     password: {
         type: DataTypes.STRING,

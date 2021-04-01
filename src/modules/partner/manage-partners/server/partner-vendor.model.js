@@ -42,10 +42,16 @@ const PartnerVendors = sequelize.cdpConnector.define('partner_vendors', {
         type: DataTypes.STRING,
     },
     requestor_email: {
-        type: DataTypes.STRING(100)
+        type: DataTypes.STRING(100),
+        set(value){
+            this.setDataValue('requestor_email', value.toLowerCase());
+        }
     },
     procurement_contact: {
-        type: DataTypes.STRING(100)
+        type: DataTypes.STRING(100),
+        set(value){
+            this.setDataValue('procurement_contact', value.toLowerCase());
+        }
     },
     name: {
         allowNull: false,
@@ -82,7 +88,10 @@ const PartnerVendors = sequelize.cdpConnector.define('partner_vendors', {
         type: DataTypes.STRING
     },
     invoice_email: {
-        type: DataTypes.STRING(100)
+        type: DataTypes.STRING(100),
+        set(value){
+            this.setDataValue('invoice_email', value.toLowerCase());
+        }
     },
     invoice_telephone: {
         type: DataTypes.STRING(25)
@@ -100,7 +109,10 @@ const PartnerVendors = sequelize.cdpConnector.define('partner_vendors', {
         type: DataTypes.STRING
     },
     commercial_email: {
-        type: DataTypes.STRING(100)
+        type: DataTypes.STRING(100),
+        set(value){
+            this.setDataValue('commercial_email', value.toLowerCase());
+        }
     },
     commercial_telephone: {
         type: DataTypes.STRING(25)
@@ -110,7 +122,10 @@ const PartnerVendors = sequelize.cdpConnector.define('partner_vendors', {
     },
     ordering_email: {
         allowNull: false,
-        type: DataTypes.STRING(100)
+        type: DataTypes.STRING(100),
+        set(value){
+            this.setDataValue('ordering_email', value.toLowerCase());
+        }
     },
     ordering_telephone: {
         type: DataTypes.STRING(25)

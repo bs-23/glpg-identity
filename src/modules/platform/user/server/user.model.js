@@ -41,6 +41,9 @@ const User = sequelize.cdpConnector.define('users', {
         type: DataTypes.STRING(100),
         validate: {
             isEmail: true
+        },
+        set(value){
+            this.setDataValue('email', value.toLowerCase());
         }
     },
     password: {

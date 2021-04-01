@@ -29,7 +29,10 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
     },
     email: {
         allowNull: false,
-        type: DataTypes.STRING(100)
+        type: DataTypes.STRING(100),
+        set(value){
+            this.setDataValue('email', value.toLowerCase());
+        }
     },
     mdr_id: {
         allowNull: false,
@@ -50,7 +53,10 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
         type: DataTypes.BOOLEAN
     },
     procurement_contact: {
-        type: DataTypes.STRING(100)
+        type: DataTypes.STRING(100),
+        set(value){
+            this.setDataValue('procurement_contact', value.toLowerCase());
+        }
     },
     partner_type: {
         type: DataTypes.STRING

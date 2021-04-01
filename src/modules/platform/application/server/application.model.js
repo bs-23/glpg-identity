@@ -32,6 +32,9 @@ const Application = sequelize.cdpConnector.define('applications', {
         type: DataTypes.STRING,
         validate: {
             isEmail: true
+        },
+        set(value){
+            this.setDataValue('email', value.toLowerCase());
         }
     },
     description: {
