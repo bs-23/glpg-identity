@@ -1,8 +1,9 @@
 .hot-statistics {
     &__box {
+        background: #F4F4F5;
 
         &-wrap {
-            background-color: $light-bg-color;
+            background-color: #F8F8F8;
         }
 
         @media (max-width: $screen-phone) {
@@ -11,9 +12,9 @@
     }
 
     &__icon {
-        color: $gray-ccc;
-        font-size: 24px;
-        height: 26px;
+        color: $primary-color;
+        font-size: 32px;
+        height: 42px;
         display: block;
     }
 
@@ -25,17 +26,32 @@
 
     &__title {
         font-size: 14px;
-        font-weight: normal;
+        font-weight: 600;
         color: $primary-color;
     }
 
     .multiselect__control {
-        box-shadow: 0 0 0 0.2rem rgb(20 77 67 / 25%) !important;
+        /* box-shadow: 0 0 0 0.2rem rgb(20 77 67 / 25%) !important;*/
 
         &:focus,
         &:hover,
         &:active {
-            border-color: $primary-color-lighter !important;
+            box-shadow: 0 0 0 0.2rem rgb(20 77 67 / 25%) !important;
+        }
+    }
+
+    @media (max-width: $screen-phone) {
+        &__icon {
+            font-size: 28px;
+            height: 36px;
+        }
+
+        &__amount {
+            font-size: 32px;
+        }
+
+        &__title {
+            font-size: 14px;
         }
     }
 }

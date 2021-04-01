@@ -80,27 +80,27 @@ export default function HotStatistic() {
                             }}
                         />
                     </div>
-                    <div className="col-6 col-sm-4 hot-statistics__box py-3 border-top border-right border-bottom bg-white">
+                    <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i className="fas fa-user-md hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">{statistics.hcps_count || 0}</div>
                         <div className="hot-statistics__title">Total HCP Users</div>
                     </div>
-                    <div className="col-6 col-sm-4 hot-statistics__box py-3 border-top border-right border-bottom bg-white">
+                    <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i class="icon icon-data-consent-management hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">{statistics.consents_count || 0}</div>
                         <div className="hot-statistics__title">Total Consents</div>
                     </div>
-                    <div className="col-6 col-sm-4 hot-statistics__box py-3 border-top border-bottom bg-white">
+                    <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i class="icon icon-accept hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">{statistics.captured_consents_count || 0}</div>
                         <div className="hot-statistics__title"> Total Captured Consents</div>
                     </div>
-                    <div className="col-6 col-sm-4 hot-statistics__box py-3 border-right bg-white">
+                    <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i class="icon icon-partner hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">{statistics.business_partner_count || 0}</div>
                         <div className="hot-statistics__title"> Total Busniess Partners</div>
                     </div>
-                    <div className="col-6 col-sm-4 hot-statistics__box py-3 border-right bg-white">
+                    <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i class="icon icon-marketing-promotion hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">0</div>
                         <div className="hot-statistics__title">Total Campaigns</div>
