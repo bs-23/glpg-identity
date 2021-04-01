@@ -235,7 +235,7 @@ export default function CrdlpHcpProfiles() {
 
                         {hcpUsers['users'] && hcpUsers['users'].length > 0 &&
                             <React.Fragment>
-                            <div className="table-responsive shadow-sm bg-white cdp-table__responsive-wrapper">
+                            <div className="table-responsive shadow-sm bg-white cdp-table__responsive-wrapper mb-3">
                                 <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                         <thead className="cdp-bg-primary text-white cdp-table__header">
                                             <tr>
@@ -247,15 +247,15 @@ export default function CrdlpHcpProfiles() {
 
                                                 <th width="7%"><span className={sort.value === 'ind_status_desc' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'ind_status_desc')}>Status<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                <th width="15%"><span className={sort.value === 'uuid_1' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'uuid_1')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="13%"><span className={sort.value === 'uuid_1' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'uuid_1')}>UUID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
                                                 <th width="8%"><span className={sort.value === 'country_iso2' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'country_iso2')}>Country<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
-                                                <th width="15%">Specialty</th>
+                                                <th width="10%">Specialty</th>
 
                                                 <th width="10%">Phone</th>
 
-                                                <th width="15%"><span className={sort.value === 'individual_id_onekey' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'individual_id_onekey')}>OneKeyID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
+                                                <th width="12%"><span className={sort.value === 'individual_id_onekey' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : "cdp-table__col-sorting"} onClick={() => urlChange(1, codBase, 'individual_id_onekey')}>OneKeyID<i className="icon icon-sort cdp-table__icon-sorting"></i></span></th>
 
                                                 <th width="10%">Action</th>
                                             </tr>
