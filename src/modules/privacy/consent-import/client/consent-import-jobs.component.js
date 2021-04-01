@@ -1,22 +1,22 @@
 import axios from 'axios';
+import parse from 'html-react-parser';
 import Modal from 'react-bootstrap/Modal';
 import { NavLink } from 'react-router-dom';
+import fileDownload from 'js-file-download';
 import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useEffect, useState } from 'react';
 import { useToasts } from 'react-toast-notifications';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
-import parse from 'html-react-parser';
-import fileDownload from 'js-file-download';
 
 import Faq from '../../../platform/faq/client/faq.component';
-import { getConsentImportJobs, cancelConsentImportJob } from './import-consents.actions';
-import { ImportConsentsSchema } from './import-consents.schema';
-import { getCdpConsents } from '../../../privacy/manage-consent/client/consent.actions';
+import { ConsentImportJobSchema } from './consent-import-job.schema';
+import { getCdpConsents } from '../../manage-consent/client/consent.actions';
+import { getConsentCategories } from '../../consent-category/client/category.actions';
 import { getCountryConsents } from '../../consent-country/client/consent-country.actions';
-import { getConsentCategories } from '../../../privacy/consent-category/client/category.actions';
+import { getConsentImportJobs, cancelConsentImportJob } from './consent-import-job.actions';
 
-export default function ImportConsentsDashboard() {
+export default function ConsentImportJobsComponent() {
     const dispatch = useDispatch();
     const { addToast } = useToasts();
     const [showFaq, setShowFaq] = useState(false);
@@ -29,10 +29,12 @@ export default function ImportConsentsDashboard() {
     const [consentLocales, setConsentLocales] = useState(false);
     const [selectedImport, setSelectedImport] = useState(null);
     const [actionToPerform, setActionToPerform] = useState({});
+
     const consent_categories = useSelector(state => state.consentCategoryReducer.consent_categories);
     const cdp_consents = useSelector(state => state.consentReducer.cdp_consents);
     const country_consents = useSelector(state => state.consentCountryReducer.country_consents);
-    const consentImportJobs = useSelector(state => state.consentImportReducer.consent_import_jobs);
+    const consentImportJobs = useSelector(state => state.consentImportJobReducer.consent_import_jobs);
+
     const optTypes = [
         {
             text: 'Single Opt-in',
@@ -222,9 +224,9 @@ export default function ImportConsentsDashboard() {
                                                 opt_type: '',
                                                 file: ''
                                             }}
-                                            displayName="ConsentImport"
+                                            displayName="ConsentImportJobForm"
                                             enableReinitialize={true}
-                                            validationSchema={ImportConsentsSchema}
+                                            validationSchema={ConsentImportJobSchema}
                                             onSubmit={(values, actions) => {
                                                 const data = new FormData();
                                                 data.append('consent_category', values.consent_category);

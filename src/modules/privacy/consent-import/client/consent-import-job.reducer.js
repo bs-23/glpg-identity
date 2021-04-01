@@ -1,4 +1,4 @@
-import Types from './import-consents.types';
+import Types from './consent-import-job.types';
 
 const initialState = {
     consent_import_jobs: []

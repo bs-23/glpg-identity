@@ -3,7 +3,7 @@ const XLSX = require('xlsx');
 const { Op } = require('sequelize');
 const parse = require('html-react-parser');
 
-const ConsentImportJob = require(path.join(process.cwd(), 'src/modules/privacy/import-consents/server/consent-import-job.model'));
+const ConsentImportJob = require(path.join(process.cwd(), 'src/modules/privacy/consent-import/server/consent-import-job.model'));
 const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
 const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model'));
 const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model'));

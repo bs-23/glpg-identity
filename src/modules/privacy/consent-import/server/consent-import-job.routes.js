@@ -1,10 +1,10 @@
 const path = require('path');
-const controller = require('./import-consents.controller');
-const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware'));
+const controller = require('./consent-import-job.controller');
+const { validateFile } = require('./consent-import-job.schema');
+const multer = require(path.join(process.cwd(), 'src/modules/privacy/consent-import/server/multer'));
 const { Services } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
 const { ServiceGuard } = require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.middleware'));
-const multer = require(path.join(process.cwd(), 'src/modules/privacy/import-consents/server/multer'));
-const { validateFile } = require('./import-consents.schema');
+const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware'));
 
 module.exports = app => {
     app.route('/api/consent-import-jobs')
