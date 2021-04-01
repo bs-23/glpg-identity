@@ -170,7 +170,12 @@ const WholesalerPartnerRequests = () => {
     useEffect(() => {
         if (formData) {
             dispatch(sendForm(formData.id)).then(() => {
-                dispatch(updatePartnerRequest(formData.id, { ...formData, status: 'email_sent' }));
+                dispatch(updatePartnerRequest(formData.id, { ...formData, status: 'email_sent' })).then(() => {
+                    addToast('Form sent successfully.', {
+                        appearance: 'success',
+                        autoDismiss: true
+                    });
+                });
             }).catch(() => {
                 addToast('An error occured. Please try again.', {
                     appearance: 'error',
@@ -477,7 +482,7 @@ const WholesalerPartnerRequests = () => {
                                                 }}
                                             >
                                                 <option key="select-country" value="" disabled>--Select Country--</option>
-                                                {countries.filter(c => userCountries.includes(c.country_iso2)).map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
+                                                {countries.filter(c => userCountries.includes(c.country_iso2)).map((item, countryIdx) => <option key={countryIdx} value={item.country_iso2}>{item.codbase_desc}</option>)}
                                             </Field>
                                             <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
                                         </div>

@@ -151,7 +151,7 @@ async function sendForm(req, res) {
             first_name,
             last_name,
             email,
-            partner_type,
+            entity_type,
             country_iso2,
             locale
         } = partnerRequest.dataValues;
@@ -169,7 +169,7 @@ async function sendForm(req, res) {
             first_name,
             last_name,
             email,
-            partner_type: partner_type ? partner_type.toLowerCase() : undefined,
+            partner_type: entity_type ? entity_type.toLowerCase() : undefined,
             country_iso2: country_iso2.toLowerCase(),
             locale: locale
         };

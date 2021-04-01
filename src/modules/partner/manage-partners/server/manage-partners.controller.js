@@ -19,9 +19,10 @@ const storageService = require(path.join(process.cwd(), 'src/modules/core/server
 const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 async function uploadDucuments(owner, type, files = []) {
-    const bucketName = 'cdp-development';
+    const bucketName = nodecache.getValue('S3_BUCKET_NAME');
     for (const file of files) {
         const uploadOptions = {
             bucket: bucketName,
@@ -49,9 +50,8 @@ async function uploadDucuments(owner, type, files = []) {
 }
 
 async function removeDocuments(fileKeys) {
-    const bucketName = 'cdp-development';
     const deleteParam = {
-        Bucket: bucketName,
+        Bucket: nodecache.getValue('S3_BUCKET_NAME'),
         Delete: {
             Objects: fileKeys.map((key) => ({ Key: key }))
         }
