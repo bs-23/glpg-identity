@@ -337,14 +337,14 @@ export default function ConsentImportJobsComponent() {
                                 <table className="table table-hover table-sm mb-0 cdp-table mb-0 cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
-                                            <th width="14%">Consent Preference</th>
+                                            <th width="16%">Consent Preference</th>
                                             <th width="14%">Consent Category</th>
                                             <th width="12%">Consent Locale</th>
                                             <th width="12%">Total Records</th>
                                             <th width="12%">Status</th>
                                             <th width="12%">Created By</th>
                                             <th width="12%">Created At</th>
-                                            <th width="12%">Action</th>
+                                            <th width="10%">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
