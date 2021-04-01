@@ -167,7 +167,7 @@ async function startConsentImportJob(req, res) {
             });
         }
 
-        res.sendStatus(200);
+        res.json(job);
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
