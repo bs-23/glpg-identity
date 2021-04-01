@@ -247,7 +247,6 @@ export default function hcpUsers() {
     };
 
     const urlChange = (pageNo, codBase, status, orderColumn, pageChange = false) => {
-        console.log("hello---")
         if (Array.isArray(status)) status = 'self_verified,manually_verified';
         let orderType = params.get('orderType');
         const orderBy = params.get('orderBy');

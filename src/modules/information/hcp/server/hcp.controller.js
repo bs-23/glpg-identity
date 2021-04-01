@@ -1323,7 +1323,10 @@ async function resetPassword(req, res) {
 async function forgetPassword(req, res) {
     const response = new Response({}, []);
     const { email, uuid } = req.body;
-
+    const uuidWithoutSpecialCharacter = uuid && uuid.replace(/[-/]/gi, '');
+    const hcpByEmail =  await Hcp.findOne({where: {email: {[Op.iLike]: email}}});
+    const getUUIDbyMail = hcpByEmail && hcpByEmail.dataValues.uuid;
+    const uuidToMatch = getUUIDbyMail &&  getUUIDbyMail.replace(/[-/]/gi, '') === uuidWithoutSpecialCharacter && getUUIDbyMail;
     try {
         const doc = uuid ? await Hcp.findOne({
             where: {
@@ -1333,17 +1336,12 @@ async function forgetPassword(req, res) {
                         }
                     },
                     {
-                        uuid: uuid
+                        uuid: uuidToMatch
                     }
                 ]
             }
-        }): await Hcp.findOne({
-            where: {
-                email: {
-                   [Op.iLike]: email
-                }
-            }
-        });
+        }): hcpByEmail;
+
         if (!doc) {
             response.data = {
                 message: 'Successfully sent password reset email.'
