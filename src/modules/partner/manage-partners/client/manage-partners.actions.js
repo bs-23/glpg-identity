@@ -63,12 +63,13 @@ export function approveBusinessPartner(id, type) {
     };
 }
 
-export function resendFormForCorrection(id, type) {
+export function resendFormForCorrection(id, type,data) {
     return {
         type: Types.RESEND_FORM,
         payload: axios({
-            method: 'get',
-            url: `/api/partners/${type}/${id}/resend-form`
+            method: 'put',
+            url: `/api/partners/${type}/${id}/resend-form`,
+            data
         })
     };
 }
