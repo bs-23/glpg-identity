@@ -4,6 +4,8 @@ import { getPartnerById, approveBusinessPartner, resendFormForCorrection } from 
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import { useToasts } from 'react-toast-notifications';
+import { Form, Formik, Field,ErrorMessage} from 'formik';
+import { partnerSchema } from '../manage-partners.schema';
 
 const PartnerStatusManage = (props) => {
     const [, setStatusShow] = useState(false);
@@ -51,8 +53,8 @@ const PartnerStatusManage = (props) => {
         handleClose();
     }
 
-    const resendForm = () => {
-        dispatch(resendFormForCorrection(props.partnerInfo.id, props.detailType)).then(() => {
+    const resendForm = (values) => {
+        dispatch(resendFormForCorrection(props.partnerInfo.id, props.detailType,values)).then(() => {
             addToast('Form sent for correction', {
                 appearance: 'success',
                 autoDismiss: true
@@ -65,14 +67,6 @@ const PartnerStatusManage = (props) => {
         });
 
         handleClose();
-    }
-
-    const confirmStatus = () => {
-        if (statusAction === 'approve') {
-            approvePartner();
-        } else if(statusAction === 'resend-form') {
-            resendForm();
-        }
     }
 
     return (
@@ -123,17 +117,44 @@ const PartnerStatusManage = (props) => {
                             </div>
 
                         </div>
-                        <div className="col-12 d-flex">
-                            <button onClick={() => setStatusAction("approve")} className={statusAction === 'approve' ? "btn btn-block mr-2 cdp-btn-primary mt-4 p-2 font-weight-bold text-white" : "btn btn-block mr-2 cdp-btn-outline-primary mt-4 p-2 font-weight-bold"}>Approve User</button>
+                        <Formik
+                            initialValues={{
+                                reason_for_correction: "",
+                            }}
+                            validationSchema={partnerSchema}
+                            displayName="Partner Status Change"
+                            onSubmit={(values, actions) => {
+                                if (statusAction === 'approve') {
+                                    approvePartner();
+                                } else if (statusAction === 'resend-form') {
+                                    resendForm(values);
+                                }
+                            }}
+                        >
+                        {formikProps => (
+                                    <Form onSubmit={formikProps.handleSubmit}>
+                                        <div className="col-12 d-flex">
+                                            <button type="button" onClick={() => { setStatusAction("approve"); formikProps.setFieldValue('reason_for_correction', 'approve');}} className={statusAction === 'approve' ? "btn btn-block mr-2 cdp-btn-primary mt-4 p-2 font-weight-bold text-white" : "btn btn-block mr-2 cdp-btn-outline-primary mt-4 p-2 font-weight-bold"}>Approve User</button>
 
-                            <button onClick={() => setStatusAction("resend-form")}
-                            className={statusAction === 'resend-form' ? "btn btn-block ml-2 btn-danger mt-4 p-2 font-weight-bold" : "btn btn-block ml-2 btn-outline-danger mt-4 p-2 font-weight-bold"}>Correction Required</button>
-                        </div>
-                        <div className="col-12">
-                            <button disabled={!statusAction} onClick={() => confirmStatus()} className="btn btn-block btn-secondary mt-4 p-2 font-weight-bold">Confirm</button>
-                        </div>
+                                            <button type="button" onClick={() => { setStatusAction("resend-form");formikProps.setFieldValue('reason_for_correction', '');formikProps.setFieldTouched('reason_for_correction',false);}}
+                                                className={statusAction === 'resend-form' ? "btn btn-block ml-2 btn-danger mt-4 p-2 font-weight-bold" : "btn btn-block ml-2 btn-outline-danger mt-4 p-2 font-weight-bold"}>Correction Required</button>
+                                        </div>
+                                        <div className="col-12">
+                                        {statusAction === 'resend-form' &&
+                                            <div>
+                                                <label className="label-style">Reason for correction <span className="text-danger">*</span></label>
+                                                <Field className="form-control" type="text" as="textarea" name="reason_for_correction" />
+                                                <div className="invalid-feedback col-12"><ErrorMessage name="reason_for_correction" /></div>
+                                            </div>
+                                        }
+                                        <button type="submit" disabled={!statusAction} className="btn btn-block btn-secondary mt-4 p-2 font-weight-bold">{statusAction === 'approve' ? 'Confirm And Request SAP Report' : 'Confirm And Resend For Correction'}</button>
+                                        </div>
+                                    
+                                    </Form>
+                                )}
+                        </Formik>
                     </div>
-                }
+                }       
             </Modal.Body>
 
         </Modal >

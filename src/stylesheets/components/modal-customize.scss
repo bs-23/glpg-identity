@@ -60,6 +60,12 @@
         }
     }
 
+    @media (min-width: $screen-phone) {
+        &-okla-width {
+            width: 90%;
+            max-width: 90%;
+        }
+    }
     @media (max-width: $screen-phone) {
         &-header {
             padding: 12px 15px;
@@ -74,4 +80,4 @@
             }
         }
     }
-}
+    }

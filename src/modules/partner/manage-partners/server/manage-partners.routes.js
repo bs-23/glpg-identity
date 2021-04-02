@@ -44,5 +44,5 @@ module.exports = app => {
         .put(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(updatePartnerSchema), controller.updatePartner);
 
     app.route('/api/partners/:entityType/:id/resend-form')
-        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER, Services.MANAGE_ENTITY_REQUEST]), controller.resendForm);
+        .put(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER, Services.MANAGE_ENTITY_REQUEST]), controller.resendForm);
 };

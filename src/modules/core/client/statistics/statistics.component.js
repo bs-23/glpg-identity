@@ -85,10 +85,10 @@ export default function HotStatistic() {
         <div className={`hot-statistics shadow-sm bg-white ${show ? "cdp-inbox__expand" : ""}`}>
             <h5 className="p-3 cdp-text-primary font-weight-bold mb-0 d-flex justify-content-between cdp-inbox__header">
                 Hot Statistics
-                {/*<i onClick={() => setShow(true)} class="icon icon-expand cdp-inbox__icon-expand cdp-inbox__icon-toggle d-none d-lg-block cursor-pointer"></i>
-                <i class="icon icon-minimize cdp-inbox__icon-minimize cdp-inbox__icon-toggle cursor-pointer" onClick={() => setShow(false)}></i>*/}
-                <button className="btn cdp-btn-outline-primary mr-2" onClick={() => exportExcelFile()}><i className="fas fa-download"></i> <span className="d-none d-lg-inline-block pl-1">Export</span></button>
-                <i className="fas fa-chart-line"></i>
+                <i onClick={() => setShow(true)} className="icon icon-expand cdp-inbox__icon-expand cdp-inbox__icon-toggle d-none d-lg-block cursor-pointer"></i>
+                <i className="icon icon-minimize cdp-inbox__icon-minimize cdp-inbox__icon-toggle cursor-pointer" onClick={() => setShow(false)}></i>
+                
+                <i className="fas fa-chart-line d-block d-lg-none"></i>
             </h5>
             <div className="px-3 pt-3 shadow-sm hot-statistics__box-wrap">
                 <div className="row">
@@ -112,7 +112,7 @@ export default function HotStatistic() {
                         />
                     </div>
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
-                        <i className="fas fa-user-md hot-statistics__icon"></i>
+                        <i className="far fa-user hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">{statistics.hcps_count || 0}</div>
                         <div className="hot-statistics__title">Total HCP Users</div>
                     </div>
@@ -138,7 +138,9 @@ export default function HotStatistic() {
                     </div>
                 </div>
             </div>
-
+            <div className="bg-white">
+                <div className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-btn-link-secondary cursor-pointer" onClick={() => exportExcelFile()}><i className="fas fa-download pr-2"></i> Export Statistics</div>
+            </div>
         </div>
     )
 }

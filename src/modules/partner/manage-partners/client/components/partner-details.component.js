@@ -104,7 +104,7 @@ const PartnerDetails = (props) => {
                                             </li>
                                             <li className="pb-3">
                                                 <strong className="h6 font-weight-bold-light d-block">Postcode & City</strong>
-                                                <span className="h6 d-block text-secondary">{partner.post_code + ' ' + partner.city}</span>
+                                                <span className="h6 d-block text-secondary">{partner.post_code && partner.city ? partner.post_code + ' ' + partner.city : ''}</span>
                                             </li>
                                             <li className="pb-3">
                                                 <strong className="h6 font-weight-bold-light d-block">Country</strong>

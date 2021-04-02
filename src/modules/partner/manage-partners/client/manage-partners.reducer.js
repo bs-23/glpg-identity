@@ -35,6 +35,22 @@ export default function reducer(state = initialState, action) {
 
             };
         }
+        case Types.RESEND_FORM_FULFILLED: {
+            const userId = ((action.payload.config.url).split('/'))[4];
+            const partners = state.partnersData.partners;
+            const idx = partners.findIndex(item => item.id === userId);
+            const updatedRow = partners[idx];
+            updatedRow.status = "correction_pending";
+            partners.splice(idx, 1, updatedRow);
+            return {
+                ...state,
+                partnersData: {
+                    metadata: state.partnersData.metadata,
+                    partners: partners
+                }
+
+            };
+        }
         case Types.POST_PARTNER_FULFILLED: {
             return {
                 ...state,

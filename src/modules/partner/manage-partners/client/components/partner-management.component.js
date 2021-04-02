@@ -198,7 +198,7 @@ const PartnerManagement = () => {
                                                     {(detailType === 'vendors' || detailType === 'wholesalers') && <td data-for="Name"> {item.name}</td>}
                                                     <td data-for="Status" class="text-capitalize">
                                                         <span>
-                                                            <i className={`fa fa-xs fa-circle text-${item.status === 'approved' ? 'success' : 'warning'} pr-2 hcp-status-icon`}></i>
+                                                            <i className={`fa fa-xs fa-circle text-${item.status === 'approved' ? 'success' : (item.status === 'not_approved') ? 'warning' : 'danger'} pr-2 hcp-status-icon`}></i>
                                                             {item.status.split('_').join(' ')}
                                                         </span>
                                                     </td>

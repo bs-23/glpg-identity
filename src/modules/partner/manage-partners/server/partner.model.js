@@ -3,7 +3,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
-const  Partners = sequelize.cdpConnector.define('partners', {
+const Partners = sequelize.cdpConnector.define('partners', {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -107,7 +107,7 @@ const  Partners = sequelize.cdpConnector.define('partners', {
     status: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['not_approved', 'approved'],
+        values: ['not_approved', 'approved', 'correction_pending'],
         defaultValue: 'not_approved'
     }
 }, {

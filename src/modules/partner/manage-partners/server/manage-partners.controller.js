@@ -20,6 +20,7 @@ const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/f
 const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
+const auditService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
 
 async function uploadDucuments(owner, type, files = []) {
     const bucketName = nodecache.getValue('S3_BUCKET_NAME');
@@ -1300,6 +1301,7 @@ async function getPartnerInformation(req, res) {
 async function resendForm(req, res) {
     try {
         const { id } = req.params;
+        const { reason_for_correction } = req.body;
 
         const entityMap = {
             hcps: 'hcp',
@@ -1328,7 +1330,7 @@ async function resendForm(req, res) {
             first_name,
             last_name,
             email,
-            partner_type,
+            entity_type,
             country_iso2,
             locale
         } = partnerRequest.dataValues;
@@ -1346,7 +1348,7 @@ async function resendForm(req, res) {
             first_name,
             last_name,
             email,
-            partner_type: partner_type ? partner_type.toLowerCase() : undefined,
+            partner_type: entity_type ? entity_type.toLowerCase() : undefined,
             country_iso2: country_iso2.toLowerCase(),
             locale: locale
         };
@@ -1359,6 +1361,17 @@ async function resendForm(req, res) {
         const resendFormLink = metaData[0].dataValues.metadata.request_notification_link;
 
         await axios.post(resendFormLink, payload);
+
+        await partner.update({ status: 'correction_pending' });
+
+        await auditService.log({
+            event_type: 'UPDATE',
+            object_id: partner.id,
+            table_name: (entityType === 'hcp' || entityType === 'hco') ? 'partners' : 'partner_vendors',
+            actor: req.user.id,
+            remarks: reason_for_correction
+        });
+
         res.json('Form resent successfully.');
     } catch (err) {
         logger.error(err);

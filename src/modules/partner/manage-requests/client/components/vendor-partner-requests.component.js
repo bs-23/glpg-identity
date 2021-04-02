@@ -230,13 +230,11 @@ const VendorPartnerRequests = () => {
 
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-flex justify-content-between align-items-end mb-0 mt-3">
+                        <h4 className="cdp-text-primary font-weight-bold mb-0 mt-2">Manage Vendors Request</h4>
+                        <div className="d-flex justify-content-between align-items-end py-2 py-sm-0 mb-0 mt-2 mt-sm-3 cdp-table__responsive-sticky-panel">
                             <div>
-                                <h4 className="cdp-text-primary font-weight-bold mb-0">Manage Vendors Request</h4>
-                                <div className="pt-3">
-                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/vendors"><i className="fas fa-hospital-user fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">General Vendors</span></NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/wholesalers"><i className="fas fa-dolly fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Wholesalers</span></NavLink>
-                                </div>
+                                <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/vendors"><i className="fas fa-hospital-user fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">General Vendors</span></NavLink>
+                                <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/wholesalers"><i className="fas fa-dolly fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Wholesalers</span></NavLink>
                             </div>
                             <div className="d-flex justify-content-between align-items-center mb-2">
                                 <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
@@ -245,21 +243,19 @@ const VendorPartnerRequests = () => {
                             </div>
                         </div>
 
-
-
                         {requestData['partnerRequests'] && requestData['partnerRequests'].length > 0 ?
                             <div className="table-responsive shadow-sm mb-3 cdp-table__responsive-wrapper mb-3">
                                 <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-table__header  cdp-bg-primary text-white">
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Status</th>
-                                            <th>Company Code</th>
-                                            <th>Partner Type</th>
-                                            <th>Email Address</th>
-                                            <th>Procurement Contact</th>
-                                            <th>Country</th>
-                                            <th>Action</th>
+                                            <th width="15%">Name</th>
+                                            <th width="10%">Status</th>
+                                            <th width="10%">Company Code</th>
+                                            <th width="13%">Partner Type</th>
+                                            <th width="15%">Email Address</th>
+                                            <th width="15%">Procurement Contact</th>
+                                            <th width="12%">Country</th>
+                                            <th width="10%">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
