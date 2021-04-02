@@ -248,14 +248,14 @@ const VendorPartnerRequests = () => {
                                 <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-table__header  cdp-bg-primary text-white">
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Status</th>
-                                            <th>Company Code</th>
-                                            <th>Partner Type</th>
-                                            <th>Email Address</th>
-                                            <th>Procurement Contact</th>
-                                            <th>Country</th>
-                                            <th>Action</th>
+                                            <th width="15%">Name</th>
+                                            <th width="10%">Status</th>
+                                            <th width="10%">Company Code</th>
+                                            <th width="13%">Partner Type</th>
+                                            <th width="15%">Email Address</th>
+                                            <th width="15%">Procurement Contact</th>
+                                            <th width="12%">Country</th>
+                                            <th width="10%">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
