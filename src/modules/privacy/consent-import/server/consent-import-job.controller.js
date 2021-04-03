@@ -55,7 +55,7 @@ async function createConsentImportJob(req, res) {
         rows.map(row => {
             const onekey_id = row['OneKey ID Individual'];
             const email = row['Emailaddress'];
-            const captured_date = row['Opt-In Date'];
+            const captured_date = new Date((row['Opt-In Date'] - (25567 + 2))*86400*1000);
 
             data.push({
                 onekey_id,
