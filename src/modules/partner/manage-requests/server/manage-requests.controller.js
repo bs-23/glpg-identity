@@ -144,7 +144,7 @@ async function sendForm(req, res) {
 
         const partnerRequest = await PartnerRequest.findOne({ where: { id } })
 
-        if (!partnerRequest) return res.status(400).send('Partner Request not found.');
+        if (!partnerRequest) return res.status(404).send('Partner Request not found.');
 
         const {
             application_id,
