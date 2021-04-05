@@ -136,7 +136,7 @@ async function syncHcpConsentsInVeeva(hcp, actor) {
     }
 }
 
-async function createMultiChannelConsent(account, email, opt_type, consent_source, consent) {
+async function createMultiChannelConsent(account, email, opt_type, consent_source, consent, captured_date) {
     try {
         if(account && email && consent &&
             consent.consent_category &&
@@ -165,7 +165,7 @@ async function createMultiChannelConsent(account, email, opt_type, consent_sourc
             const { data } = await axios.post(`${serviceUrl}/data/v48.0/sobjects/Multichannel_Consent_vod__c`, {
                 Account_vod__c: account.Id,
                 RecordTypeId: '0124J000000ouUlQAI',
-                Capture_Datetime_vod__c: new Date(consent.captured_date),
+                Capture_Datetime_vod__c: new Date(captured_date),
                 Channel_Value_vod__c: email.toLowerCase(),
                 Channel_Source_vod__c: 'Account.PersonEmail',
                 Opt_Type_vod__c: opt_type === 'opt-out' ? 'Opt_Out_vod' : 'Opt_In_vod',

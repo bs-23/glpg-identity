@@ -155,7 +155,7 @@ async function startConsentImportJob(req, res) {
                 if (isEmailDifferent) {
                     newRow.email_is_different_in_veeva = true;
                 } else {
-                    multichannel_consent = await veevaService.createMultiChannelConsent(account, row.email, row.opt_type, row.consent_source, consent);
+                    multichannel_consent = await veevaService.createMultiChannelConsent(account, row.email, row.opt_type, row.consent_source, consent, row.captured_date);
                 }
 
                 newRow.multichannel_consent_id = multichannel_consent ? multichannel_consent.id : null;
