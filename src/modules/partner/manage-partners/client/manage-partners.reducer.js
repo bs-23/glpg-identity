@@ -27,7 +27,7 @@ export default function reducer(state = initialState, action) {
         }
         case Types.GET_USER_APPROVE_FULFILLED: {
             const userId = (action.payload.config.url).split('/').pop();
-            const partners = state.partnersData.partners;
+            const partners = state.partnersData.partners && state.partnersData.partners;
             const idx = partners.findIndex(item => item.id === userId);
             const updatedRow = partners[idx];
             updatedRow.status = "approved";

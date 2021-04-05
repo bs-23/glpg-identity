@@ -46,6 +46,7 @@ const PartnerStatusManage = (props) => {
             });
 
         }).catch(error => {
+            console.log("error.response: ",error.response)
             addToast(error.response.data, {
                 appearance: 'error',
                 autoDismiss: true
