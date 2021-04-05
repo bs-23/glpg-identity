@@ -70,7 +70,7 @@ const PartnerStatusManage = (props) => {
     }
 
     return (
-        <Modal size="" centered show={props.statusShow} onHide={handleClose}>
+        <Modal size="lg" centered show={props.statusShow} onHide={handleClose}>
             <Modal.Header className="p-3 p-sm-4" closeButton>
                 <Modal.Title className="modal-title_small">
                     Status Update
