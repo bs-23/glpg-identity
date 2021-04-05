@@ -44,6 +44,7 @@ export const partnerRequestSchemaForHcps = object().shape({
         .max(20, 'This field must be at most 20 characters long.')
         .required('This field must be selected'),
     mdr_id: string()
+        .max(25, 'This field must be at most 25 characters long.')
         .required('This field must be selected'),
     partner_type: string()
         .required('This field must be selected'),
@@ -81,6 +82,7 @@ export const partnerRequestSchemaForHcos = object().shape({
         .max(20, 'This field must be at most 20 characters long.')
         .required('This field must be selected'),
     mdr_id: string()
+        .max(25, 'This field must be at most 25 characters long.')
         .required('This field must be selected'),
     workplace_name: string()
         .required('This field must be selected'),
@@ -113,6 +115,7 @@ export const partnerRequestSchemaForVendors = object().shape({
         .required('This field must not be empty')
         .oneOf([ref('email'), null], 'Email must match'),
     mdr_id: string()
+        .max(25, 'This field must be at most 25 characters long.')
         .required('This field must be selected'),
     procurement_contact: string()
         .email('This field should be a valid email address')
@@ -151,6 +154,7 @@ export const partnerRequestSchemaForWholesalers = object().shape({
         .required('This field must not be empty')
         .oneOf([ref('email'), null], 'Email must match'),
     mdr_id: string()
+        .max(25, 'This field must be at most 25 characters long.')
         .required('This field must be selected'),
     iqvia_wholesaler_id: string()
         .required('This field must be selected'),

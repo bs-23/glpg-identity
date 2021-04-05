@@ -33,7 +33,7 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
     },
     mdr_id: {
         allowNull: false,
-        type: DataTypes.STRING(100)
+        type: DataTypes.STRING(25)
     },
     country_iso2: {
         allowNull: false,
