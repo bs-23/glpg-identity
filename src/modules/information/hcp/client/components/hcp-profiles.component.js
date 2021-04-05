@@ -335,10 +335,7 @@ export default function hcpUsers() {
             });
     }
 
-    const generateSortHandler = columnName => {
-        console.log(hcps.codBase, params.get('status'), columnName);
-        urlChange(1, hcps.codBase, params.get('status'), columnName)
-    }
+    const generateSortHandler = columnName => urlChange(1, hcps.codBase, params.get('status'), columnName);
 
     const renderStatus = ({ value: status, row }) => {
         return status === 'self_verified'
