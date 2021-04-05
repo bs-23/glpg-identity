@@ -19,7 +19,7 @@ const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/per
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const { getRequestingUserPermissions, getPermissionsFromPermissionSet, getUserWithPermissionRelations } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
-const filterService = require(path.join(process.cwd(), 'src/modules/platform/user/server/filter.js'));
+const filterService = require(path.join(process.cwd(), 'src/modules/core/server/filter/filter.service'));
 const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
