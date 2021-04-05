@@ -240,7 +240,7 @@ export default function ConsentImportJobsComponent() {
                                                 }).then(() => addToast('Consents imported successfully', {
                                                     appearance: 'success',
                                                     autoDismiss: true
-                                                })).catch(err => addToast('An error occurred! Please try again.', {
+                                                })).catch(err => addToast(err.response.data, {
                                                     appearance: 'error',
                                                     autoDismiss: true
                                                 })).finally(() => dispatch(getConsentImportJobs()));
@@ -426,6 +426,7 @@ export default function ConsentImportJobsComponent() {
                                         <th width="15%">Opt-In Date</th>
                                         <th width="15%">Opt Type</th>
                                         <th width="15%">Multichannel Consent ID</th>
+                                        <th width="15%">Remarks</th>
                                     </tr>
                                 </thead>
                                 <tbody className="cdp-table__body bg-white">
@@ -441,6 +442,9 @@ export default function ConsentImportJobsComponent() {
                                             </td>
                                             <td data-for="Opt Type" className="text-break">{getOptTypeText(item.opt_type)}</td>
                                             <td data-for="Multichannel Consent ID" className="text-break">{item.multichannel_consent_id || '--'}</td>
+                                            <td data-for="Remarks" className="text-break">
+                                                {item.invalid_onekeyid ? 'OneKeyId is not found.' : item.email_is_different_in_veeva ? 'Email address is different in Veeva CRM' : '--'}
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>

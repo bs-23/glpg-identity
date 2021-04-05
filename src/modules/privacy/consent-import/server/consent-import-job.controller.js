@@ -1,6 +1,7 @@
 const path = require('path');
 const XLSX = require('xlsx');
 const { Op } = require('sequelize');
+const validator = require('validator');
 const parse = require('html-react-parser');
 
 const ConsentImportJob = require(path.join(process.cwd(), 'src/modules/privacy/consent-import/server/consent-import-job.model'));
@@ -51,20 +52,27 @@ async function createConsentImportJob(req, res) {
         }
 
         const data = [];
+        let valid_file = true;
 
         rows.map(row => {
             const onekey_id = row['OneKey ID Individual'];
             const email = row['Emailaddress'];
             const captured_date = new Date((row['Opt-In Date'] - (25567 + 2))*86400*1000);
 
-            data.push({
-                onekey_id,
-                email: email.toLowerCase(),
-                opt_type: req.body.opt_type,
-                consent_source: 'Website',
-                captured_date: captured_date
-            });
+            if(!onekey_id || !email || !validator.isEmail(email) || !row['Opt-In Date']) {
+                valid_file = false;
+            } else {
+                data.push({
+                    onekey_id,
+                    email: email.toLowerCase(),
+                    opt_type: req.body.opt_type,
+                    consent_source: 'Website',
+                    captured_date: captured_date
+                });
+            }
         });
+
+        if(!valid_file) return res.status(400).send('File contents are not valid. Please recheck and try again.');
 
         const importJob = await ConsentImportJob.create({
             consent_id: consent.id,
@@ -140,13 +148,20 @@ async function startConsentImportJob(req, res) {
             const newRow = { ...row };
             let multichannel_consent;
             const account = await veevaService.getAccountByOneKeyId(row.onekey_id);
-            const isEmailDifferent = await veevaService.isEmailDifferent(account, row.email);
 
-            if (!isEmailDifferent) {
-                multichannel_consent = await veevaService.createMultiChannelConsent(account, row.email, row.opt_type, row.consent_source, consent);
+            if(account) {
+                const isEmailDifferent = await veevaService.isEmailDifferent(account, row.email);
+
+                if (isEmailDifferent) {
+                    newRow.email_is_different_in_veeva = true;
+                } else {
+                    multichannel_consent = await veevaService.createMultiChannelConsent(account, row.email, row.opt_type, row.consent_source, consent);
+                }
+
+                newRow.multichannel_consent_id = multichannel_consent ? multichannel_consent.id : null;
+            } else {
+                newRow.invalid_onekeyid = true;
             }
-
-            newRow.multichannel_consent_id = multichannel_consent ? multichannel_consent.id : null;
 
             return newRow;
         }));
@@ -293,10 +308,11 @@ async function exportJobReport(req, res) {
             'Legal Text': parse(consentLocale.rich_text).replace(/(<\/?(?:a)[^>]*>)|<[^>]+>/ig, '$1'),
             'Multichannel Consent Id': item.multichannel_consent_id,
             'Opt Type': item.opt_type,
-            'Opt-In Date': item.captured_date
+            'Opt-In Date': item.captured_date,
+            'Remarks': item.invalid_onekeyid ? 'OneKeyId is not found.' : item.email_is_different_in_veeva ? 'Email address is different in Veeva CRM' : 'N/A'
         }));
 
-        const sheetName = 'Imported Consent Records';
+        const sheetName = 'Consent Records';
         const fileBuffer = ExportService.exportToExcel(exportData, sheetName);
 
         res.writeHead(200, {

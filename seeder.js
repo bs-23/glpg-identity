@@ -528,7 +528,7 @@ async function init() {
                     veeva_consent_type_id: 'a3w4J000000bzyYQAQ'
                 },
                 {
-                    rich_text: "<p>Ich möchte per E-Mail Informations- und Werbemitteilungen über die Produkte, Dienstleistungen und andere Entwicklungen von Galapagos erhalten. Weitere Informationen über den Umgang mit Ihren persönlichen Daten finden Sie in unserer Datenschutzerklärung. Ich kann diese Einwilligung jederzeit unter xxxxxxx@xxxxxxxxxxx widerrufen.</p>",
+                    rich_text: "<p>Ich möchte per E-Mail Informations- und Werbemitteilungen über die Produkte, Dienstleistungen und andere Entwicklungen von Galapagos erhalten. Weitere Informationen über den Umgang mit Ihren persönlichen Daten finden Sie in unserer Datenschutzerklärung. Ich kann diese Einwilligung jederzeit unter de-opt-out@glpg.com widerrufen.</p>",
                     consent_id: '01cfab4f-9fdd-4975-9a90-bbde78785109',
                     locale: 'de_DE',
                     veeva_consent_type_id: 'a3w0C0000008jK7QAI'
