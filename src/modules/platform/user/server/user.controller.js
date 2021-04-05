@@ -1,10 +1,8 @@
 const path = require('path');
 const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
 const validator = require('validator');
-const _ = require('lodash');
 const axios = require("axios");
-const { QueryTypes, Op, where, col, fn, literal } = require('sequelize');
+const { Op, where, col, fn, literal } = require('sequelize');
 
 const User = require('./user.model');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
@@ -17,184 +15,10 @@ const Role_PermissionSet = require(path.join(process.cwd(), "src/modules/platfor
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/server/role.model"));
 const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model"));
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
-const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
-const { getRequestingUserPermissions, getPermissionsFromPermissionSet, getUserWithPermissionRelations } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
+const { getRequestingUserPermissions, getUserWithPermissionRelations } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
 const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 const userService = require('./user.service');
-
-function generateAccessToken(doc) {
-    return jwt.sign({
-        id: doc.id
-    }, nodecache.getValue('CDP_TOKEN_SECRET'), {
-        expiresIn: '1h',
-        issuer: doc.id.toString()
-    });
-}
-
-function generateRefreshToken(doc) {
-    return jwt.sign({
-        id: doc.id,
-    }, nodecache.getValue('CDP_REFRESH_SECRET'), {
-        expiresIn: '1d',
-        issuer: doc.id.toString()
-    });
-}
-
-async function getProfilePermissions(user) {
-    let services = [];
-    const permissionSets = [];
-    const userProfile = user.userProfile;
-    let applications = [];
-    let countries = [];
-
-    if (userProfile) {
-        for (const userProPermSet of userProfile.up_ps) {
-            const permissions = await getPermissionsFromPermissionSet(userProPermSet.ps);
-
-            applications = permissions[0];
-            countries = permissions[1];
-            services = permissions[2];
-
-            permissionSets.push({
-                services: services.map(sc => ({ id: sc.id, title: sc.title, slug: sc.slug, parent_id: sc.parent_id })),
-                application: applications.length > 0 ? applications : null,
-                countries: countries
-            });
-        }
-
-        const profile = {
-            title: userProfile.title,
-            slug: userProfile.slug,
-            permissionSets: permissionSets
-        }
-
-        return profile;
-    }
-}
-
-async function getRolePermissions(user) {
-    let services = [];
-    const permissionSets = [];
-    let applications = [];
-    let countries = [];
-    const userRole = user.userRole;
-
-    if (userRole) {
-        for (const rolePermSet of userRole.role_ps) {
-            const permissions = await getPermissionsFromPermissionSet(rolePermSet.ps);
-
-            applications = permissions[0];
-            countries = permissions[1];
-            services = permissions[2];
-
-            permissionSets.push({
-                services: services.map(sc => ({ id: sc.id, title: sc.title, slug: sc.slug, parent_id: sc.parent_id })),
-                application: applications.length > 0 ? applications : null,
-                countries: countries
-            });
-        }
-
-        return {
-            title: userRole.title,
-            permissionSets: permissionSets
-        }
-    }
-
-    return null;
-}
-
-async function getCommaSeparatedAppCountryPermissions(user) {
-    let all_applications = [];
-    let all_countries = [];
-    let role_applications = [];
-    let profile_applications = [];
-    let role_countries = [];
-    let profile_countries = [];
-    let profile_ps = [];
-    let role_ps = [];
-    let all_ps = [];
-
-    if (user.userRole) {
-        for (const rolePermSet of user.userRole.role_ps) {
-            const applicationsCountries = await getPermissionsFromPermissionSet(rolePermSet.ps);
-            role_applications = role_applications.concat(applicationsCountries[0]);
-            role_countries = role_countries.concat(applicationsCountries[1])
-            role_ps.push({
-                id: rolePermSet.ps.id,
-                title: rolePermSet.ps.title,
-                type: rolePermSet.ps.type,
-            });
-        }
-    }
-
-    if (user.userProfile) {
-        const profilePermissionSets = user.userProfile.up_ps;
-        for (const userProPermSet of profilePermissionSets) {
-
-            const applicationsCountries = await getPermissionsFromPermissionSet(userProPermSet.ps);
-            profile_applications = profile_applications.concat(applicationsCountries[0]);
-            profile_countries = profile_countries.concat(applicationsCountries[1]);
-            profile_ps.push({
-                id: userProPermSet.ps.id,
-                title: userProPermSet.ps.title,
-                type: userProPermSet.ps.type,
-            });
-        }
-    }
-
-
-    all_countries = [...new Set(role_countries.concat(profile_countries))];
-    all_applications = role_applications.concat(profile_applications);
-    all_ps = role_ps.concat(profile_ps);
-    all_ps = _.uniqBy(all_ps, ps => ps.id);
-    let apps = [...new Set(all_applications.length > 0 ? all_applications.map(app => app.name) : [])];
-
-    apps = apps.join();
-
-    return [apps, all_countries, all_ps];
-
-
-}
-
-async function formatProfile(user) {
-    const data = {
-        id: user.id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        phone: user.phone,
-        // type: user.type,
-        profile: await getProfilePermissions(user),
-        role: await getRolePermissions(user),
-        status: user.status,
-        last_login: user.last_login,
-        expiry_date: user.expiry_date,
-    };
-    return data;
-}
-
-async function formatProfileDetail(user) {
-    const appCounPermissionFormatted = await getCommaSeparatedAppCountryPermissions(user);
-    const profile = {
-        id: user.id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        // type: user.type,
-        status: user.status,
-        phone: user.phone,
-        last_login: user.last_login,
-        expiry_date: user.expiry_date,
-        profiles: { title: user.userProfile.title, slug: user.userProfile.slug },
-        application: appCounPermissionFormatted[0],
-        countries: appCounPermissionFormatted[1],
-        role: user.userRole && { id: user.userRole.id, title: user.userRole.title },
-        permissionSets: appCounPermissionFormatted[2]
-    };
-
-    return profile;
-}
 
 var trimRequestBody = function(reqBody){
     Object.keys(reqBody).forEach(key => {
@@ -206,7 +30,7 @@ var trimRequestBody = function(reqBody){
 
 async function getSignedInUserProfile(req, res) {
     try {
-        res.json(await formatProfile(req.user));
+        res.json(await userService.formatProfile(req.user));
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
@@ -270,10 +94,10 @@ async function login(req, res) {
                 return res.status(401).send('Password has been expired. Please reset the password.');
             }
 
-            await user.update({ refresh_token: generateRefreshToken(user) });
+            await user.update({ refresh_token: userService.generateRefreshToken(user) });
         }
 
-        res.cookie('access_token', generateAccessToken(user), { httpOnly: true, sameSite: true, signed: true });
+        res.cookie('access_token', userService.generateAccessToken(user), { httpOnly: true, sameSite: true, signed: true });
         res.cookie('refresh_token', user.refresh_token, { httpOnly: true, sameSite: true, signed: true });
 
         await user.update({
@@ -288,7 +112,7 @@ async function login(req, res) {
             actor: user.id
         });
 
-        res.json(await formatProfile(user));
+        res.json(await userService.formatProfile(user));
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
@@ -411,7 +235,7 @@ async function getUsers(req, res) {
 
         const codbase = req.query.codbase === 'null' ? null : req.query.codbase;
 
-        const signedInId = (await formatProfile(req.user)).id;
+        const signedInId = (await userService.formatProfile(req.user)).id;
 
         const [, userCountries,] = await getRequestingUserPermissions(req.user);
 
@@ -615,7 +439,7 @@ async function getUser(req, res) {
 
         if (!user) return res.status(404).send("User is not found or may be removed");
 
-        const formattedUser = await formatProfileDetail(user);
+        const formattedUser = await userService.formatProfileDetail(user);
 
         res.json(formattedUser);
     }
@@ -680,7 +504,7 @@ async function updateSignedInUserProfile(req, res) {
             await emailService.send(options);
         }
 
-        res.json(await formatProfile(signedInUser));
+        res.json(await userService.formatProfile(signedInUser));
     }catch(err){
         logger.error(err);
         res.status(500).send('Internal server error');
@@ -732,7 +556,7 @@ async function updateUserDetails(req, res) {
             remarks: logMessage
         });
 
-        res.json(formatProfile(user));
+        res.json(userService.formatProfile(user));
     }
     catch (err) {
         logger.error(err);
@@ -851,7 +675,7 @@ async function changePassword(req, res) {
             remarks: 'Change of password'
         });
 
-        res.json(await formatProfile(user));
+        res.json(await userService.formatProfile(user));
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
@@ -980,4 +804,3 @@ exports.sendPasswordResetLink = sendPasswordResetLink;
 exports.resetPassword = resetPassword;
 exports.updateUserDetails = updateUserDetails;
 exports.updateSignedInUserProfile = updateSignedInUserProfile;
-exports.generateAccessToken = generateAccessToken;
