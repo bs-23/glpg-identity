@@ -27,7 +27,6 @@ const PartnerManagement = () => {
 
     const partnersData = useSelector(state => state.managePartnerReducer.partnersData);
 
-
     const [showFaq, setShowFaq] = useState(false);
     const handleCloseFaq = () => setShowFaq(false);
     const handleShowFaq = () => setShowFaq(true);

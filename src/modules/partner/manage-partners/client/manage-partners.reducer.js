@@ -13,6 +13,12 @@ export default function reducer(state = initialState, action) {
                 partnersData: action.payload.data
             };
         }
+        case Types.GET_PARTNER_APPROVAL_FULFILLED: {
+            return {
+                ...state,
+                partnersTobeApproved: action.payload.data
+            };
+        }
         case Types.GET_PARTNER_BY_ID_FULFILLED: {
             return {
                 ...state,

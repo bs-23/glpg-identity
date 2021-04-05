@@ -12,6 +12,8 @@ module.exports = app => {
     app.route('/api/partners')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getPartners)
         .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(createPartnerSchema), controller.createPartner);
+    app.route('/api/partners/partnerApproval')
+        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getPartnerApproval);
 
     app.route('/api/partners/wholesalers')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getPartnerWholesalers);

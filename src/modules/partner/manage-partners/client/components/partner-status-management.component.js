@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useToasts } from 'react-toast-notifications';
 import { Form, Formik, Field,ErrorMessage} from 'formik';
 import { partnerSchema } from '../manage-partners.schema';
+import { getPartnersToBeApproved } from '../../client/manage-partners.actions';
 
 const PartnerStatusManage = (props) => {
     const [, setStatusShow] = useState(false);
@@ -18,7 +19,6 @@ const PartnerStatusManage = (props) => {
         setStatusShow(false);
         props.changeStatusShow(false);
     };
-
     useEffect(() => {
         if (props.statusShow) dispatch(getPartnerById(props.partnerInfo.id, props.detailType));
     }, [props.statusShow]);
@@ -39,10 +39,12 @@ const PartnerStatusManage = (props) => {
 
     const approvePartner = () => {
         dispatch(approveBusinessPartner(props.partnerInfo.id, props.detailType)).then(() => {
+            dispatch(getPartnersToBeApproved('?status=not_approved&limit=5'));
             addToast('User approved', {
                 appearance: 'success',
                 autoDismiss: true
             });
+
         }).catch(error => {
             addToast(error.response.data, {
                 appearance: 'error',
@@ -155,9 +157,9 @@ const PartnerStatusManage = (props) => {
                             )}
                         </Formik>
                     </div>
-                        
+
                     </div>
-                }       
+                }
             </Modal.Body>
 
         </Modal >

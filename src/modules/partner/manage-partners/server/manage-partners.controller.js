@@ -115,6 +115,7 @@ async function getPartners(req, res) {
     }
 }
 
+
 async function registrationLookup(req, res) {
     const response = new Response({}, []);
 
@@ -574,6 +575,7 @@ async function getNonHealthcarePartners(req, res, type) {
     try {
         const page = req.query.page ? +req.query.page - 1 : 0;
         const limit = req.query.limit ? +req.query.limit : 15;
+        const status = req.query.status;
         const offset = page * limit;
 
         const orderBy = req.query.orderBy === 'null'
@@ -591,9 +593,9 @@ async function getNonHealthcarePartners(req, res, type) {
         }
 
         if (orderBy !== 'created_at') order.push(['created_at', 'DESC']);
-
+        const filterLitaral = status ? { entity_type: type, status : status} : { entity_type: type };
         const partnerVendors = await PartnerVendors.findAll({
-            where: { entity_type: type },
+            where: filterLitaral,
             offset,
             limit,
             order,
@@ -619,7 +621,58 @@ async function getNonHealthcarePartners(req, res, type) {
         res.status(500).send('Internal server error');
     }
 }
+async function getPartnerApproval(req, res){
+     try {
+        const page = req.query.page ? +req.query.page - 1 : 0;
+        const limit = req.query.limit ? +req.query.limit : 15;
+        const status = req.query.status;
+        const offset = page * limit;
 
+        const hcpPartners = await Partners.findAll({
+            where: { status: status },
+            offset,
+            limit,
+            order: [
+               ['created_at', 'DESC']
+            ],
+            attributes: ['id', 'first_name', 'last_name', 'address','locale', 'email', 'created_at', 'entity_type' ]
+        });
+
+        const totalHcpPartner = await Partners.count({ where: { status: status } });
+
+        const partnerVendors = await PartnerVendors.findAll({
+            where: { status : status } ,
+            offset,
+            limit,
+            order: [
+               ['created_at', 'DESC']
+            ],
+            attributes: ['id', 'name', 'locale', 'address', ['ordering_email', 'email'],'created_at','entity_type']
+        });
+
+        const totalVendors = await PartnerVendors.count({ where: { status: status } });
+        const partners = hcpPartners.concat(partnerVendors);
+
+        const totalPartners = totalHcpPartner + totalVendors;
+
+        const responseData = {
+            partners: partners.slice(0,5),
+            metadata: {
+                page: page + 1,
+                limit,
+                totalPartners,
+                start: limit * page + 1,
+                end: offset + limit > totalPartners ? parseInt(totalPartners) : parseInt(offset + limit)
+            }
+        };
+        res.json(responseData);
+
+    }
+    catch (err) {
+        logger.error(err);
+        res.status(500).send('Internal server error');
+    }
+}
 async function getPartnerVendors(req, res) {
     await getNonHealthcarePartners(req, res, 'vendor');
 }
@@ -1389,6 +1442,7 @@ exports.getPartnerVendorById = getPartnerVendorById;
 exports.getPartnerWholesalers = getPartnerWholesalers;
 exports.createPartnerVendor = createPartnerVendor;
 exports.updatePartnerVendor = updatePartnerVendor;
+exports.getPartnerApproval = getPartnerApproval;
 
 exports.getDownloadUrl = getDownloadUrl;
 exports.registrationLookup = registrationLookup;
