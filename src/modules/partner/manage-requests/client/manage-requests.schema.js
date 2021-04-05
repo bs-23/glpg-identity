@@ -41,6 +41,7 @@ export const partnerRequestSchemaForHcps = object().shape({
         .min(1, 'This field must be selected')
         .required('This field must be selected'),
     uuid: string()
+        .max(20, 'This field must be at most 20 characters long.')
         .required('This field must be selected'),
     mdr_id: string()
         .required('This field must be selected'),
@@ -77,6 +78,7 @@ export const partnerRequestSchemaForHcos = object().shape({
         .min(1, 'This field must be selected')
         .required('This field must be selected'),
     uuid: string()
+        .max(20, 'This field must be at most 20 characters long.')
         .required('This field must be selected'),
     mdr_id: string()
         .required('This field must be selected'),
