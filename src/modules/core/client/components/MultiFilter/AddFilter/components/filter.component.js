@@ -4,6 +4,10 @@ import Input from './input.component';
 import Select from 'react-select';
 import { WithContext as ReactTags } from 'react-tag-input';
 
+const selectStyles = {
+    menuPortal: base => ({ ...base, zIndex: 9999 }),
+    menu: provided => ({ ...provided, zIndex: "9999 !important" })
+};
 const Filter = (props) => {
     const {
         title,
@@ -119,6 +123,7 @@ const Filter = (props) => {
                         className="multiselect"
                         classNamePrefix="multiselect"
                         closeMenuOnScroll={false}
+                        styles={selectStyles}
                         menuPortalTarget={document.body}
                         value={getSelectedOptions()}
                         onChange={selectedOption => {
