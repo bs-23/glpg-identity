@@ -1322,12 +1322,25 @@ async function resetPassword(req, res) {
 
 async function forgetPassword(req, res) {
     const response = new Response({}, []);
-    const { email } = req.body;
-
+    const { email, uuid } = req.body;
+    const uuidWithoutSpecialCharacter = uuid && uuid.replace(/[-/]/gi, '');
+    const hcpByEmail =  await Hcp.findOne({where: {email: {[Op.iLike]: email}}});
+    const getUUIDbyMail = hcpByEmail && hcpByEmail.dataValues.uuid;
+    const uuidToMatch = getUUIDbyMail &&  getUUIDbyMail.replace(/[-/]/gi, '') === uuidWithoutSpecialCharacter && getUUIDbyMail;
     try {
-        const doc = await Hcp.findOne({
-            where: where(fn('lower', col('email')), fn('lower', email))
-        });
+        const doc = uuid ? await Hcp.findOne({
+            where: {
+              [Op.and]: [{
+                        email: {
+                            [Op.iLike]: email
+                        }
+                    },
+                    {
+                        uuid: uuidToMatch
+                    }
+                ]
+            }
+        }): hcpByEmail;
 
         if (!doc) {
             response.data = {
