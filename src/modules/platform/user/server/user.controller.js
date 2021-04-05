@@ -19,9 +19,9 @@ const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/per
 const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/server/password/password-policies.js"));
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const { getRequestingUserPermissions, getPermissionsFromPermissionSet, getUserWithPermissionRelations } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
-const filterService = require(path.join(process.cwd(), 'src/modules/core/server/filter/filter.service'));
 const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
+const userService = require('./user.service');
 
 function generateAccessToken(doc) {
     return jwt.sign({
@@ -155,10 +155,6 @@ async function getCommaSeparatedAppCountryPermissions(user) {
     return [apps, all_countries, all_ps];
 
 
-}
-
-function ignoreCaseArray(str) {
-    return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
 }
 
 async function formatProfile(user) {
@@ -405,92 +401,6 @@ async function createUser(req, res) {
     }
 }
 
-function generateFilterOptions(currentFilter, defaultFilter, countries) {
-    if (!currentFilter || !currentFilter.filters || currentFilter.filter === 0)
-        return defaultFilter;
-
-    const getFilterQuery = (filter) => {
-        if(filter.fieldName === 'country') {
-            const country_iso2_list_for_codbase = countries
-                .filter(c => filter.value.some(f => f === c.codbase))
-                .map(c => c.country_iso2);
-
-            const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase
-                .map(i => ignoreCaseArray(i)));
-
-            const countries_ignorecase_for_codbase_formatted = '{' + countries_ignorecase_for_codbase.join(", ") + '}';
-
-            return {
-                [Op.or]: [
-                    { '$role->role_ps->ps.countries$': { [Op.overlap]: countries_ignorecase_for_codbase_formatted } },
-                    { '$userProfile->up_ps->ps.countries$': { [Op.overlap]: countries_ignorecase_for_codbase_formatted } }
-                ]
-            }
-        }
-        return filterService.getFilterQuery(filter, "users");
-    }
-
-    let customFilter = { ...defaultFilter };
-
-    const nodes = currentFilter.logic
-        ? currentFilter.logic.split(" ")
-        : ['1'];
-
-    let prevOperator;
-    const groupedQueries = [];
-    for (let index = 0; index < nodes.length; index++) {
-        const node = nodes[index];
-        const prev = index > 0 ? nodes[index - 1] : null;
-        const next = index < nodes.length - 1 ? nodes[index + 1] : null;
-
-        const findFilter = (name) => {
-            return currentFilter.filters.find(f => f.name === name);
-        };
-
-        if (node === "and" && prevOperator === "and") {
-            const filter = findFilter(next);
-            const query = getFilterQuery(filter);
-            const currentParent = groupedQueries[groupedQueries.length - 1];
-            currentParent.values.push(query);
-        } else if (node === "and") {
-            const leftFilter = findFilter(prev);
-            const rightFilter = findFilter(next);
-            const group = {
-                operator: "and",
-                values: [
-                    getFilterQuery(leftFilter),
-                    getFilterQuery(rightFilter)
-                ]
-            };
-            groupedQueries.push(group);
-        } else if (node !== "or" && prev !== "and" && next !== "and") {
-            const filter = findFilter(node);
-            const query = getFilterQuery(filter);
-            groupedQueries.push(query);
-        }
-
-        prevOperator = node === "and" || node === "or" ? node : prevOperator;
-    }
-
-    if (groupedQueries.length > 1) {
-        customFilter[Op.or] = groupedQueries.map(q => {
-            if (q.operator === 'and') {
-                return { [Op.and]: q.values };
-            }
-            return q;
-        });
-    } else {
-        const query = groupedQueries[0];
-        if (query.operator === 'and') {
-            customFilter[Op.and] = query.values;
-        } else {
-            customFilter = { ...customFilter, ...query };
-        }
-    }
-
-    return customFilter;
-}
-
 async function getUsers(req, res) {
     try {
         const page = req.query.page ? req.query.page - 1 : 0;
@@ -515,10 +425,10 @@ async function getUsers(req, res) {
         const country_iso2_list_for_codbase = countries.filter(c => c.codbase === codbase).map(c => c.country_iso2);
 
         const countries_ignorecase_for_codbase = [].concat.apply([], country_iso2_list_for_codbase
-            .map(i => ignoreCaseArray(i)));
+            .map(i => userService.ignoreCaseArray(i)));
 
         const user_countries_ignorecase = [].concat.apply([], userCountries
-            .map(i => ignoreCaseArray(i)));
+            .map(i => userService.ignoreCaseArray(i)));
 
         let countries_ignorecase_for_codbase_formatted = '{' + countries_ignorecase_for_codbase.join(", ") + '}';
 
@@ -556,7 +466,7 @@ async function getUsers(req, res) {
 
         const currentFilter = req.body;
 
-        const filterOptions = generateFilterOptions(currentFilter, defaultFilter, countries);
+        const filterOptions = userService.generateFilterOptions(currentFilter, defaultFilter, countries);
 
         const {count: countByUser, rows: users} = await User.findAndCountAll({
             where: filterOptions,
