@@ -1,4 +1,5 @@
 const path = require('path');
+const validator = require('validator');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
@@ -23,6 +24,13 @@ const ConsentImportJob = sequelize.cdpConnector.define('consent_import_jobs', {
     consent_locale: {
         allowNull: false,
         type: DataTypes.STRING(6)
+    },
+    rich_text: {
+        allowNull: false,
+        type: DataTypes.STRING(1000),
+        set(value) {
+            this.setDataValue('rich_text', validator.escape(value));
+        }
     },
     data: {
         type: DataTypes.JSON

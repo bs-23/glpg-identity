@@ -482,7 +482,7 @@ export default function ConsentImportJobsComponent() {
                                     <div className="rounded shadow-sm p-0">
                                         <label className="px-3 py-2 font-weight-bold mb-0 cdp-light-bg d-block">Legal Text</label>
                                         <div className="text-muted p-3 mb-3 richtext-preview">
-                                            {getLegalText(details.consent_id, details.consent_locale)}
+                                            {parse(details.rich_text)}
                                         </div>
                                     </div>
                                 </div>

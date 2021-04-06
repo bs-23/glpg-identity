@@ -38,7 +38,7 @@ async function createConsentImportJob(req, res) {
                 {
                     model: ConsentLocale,
                     where: { consent_id: req.body.consent_id, locale: req.body.consent_locale },
-                    attributes: ['veeva_consent_type_id']
+                    attributes: ['rich_text', 'veeva_consent_type_id']
                 }
             ]
         });
@@ -47,7 +47,8 @@ async function createConsentImportJob(req, res) {
             !consent.consent_category ||
             !consent.consent_category.veeva_content_type_id ||
             !consent.consent_locales ||
-            !consent.consent_locales[0].veeva_consent_type_id) {
+            !consent.consent_locales[0].veeva_consent_type_id ||
+            !consent.consent_locales[0].rich_text) {
             return res.status(400).send('Consent not found!');
         }
 
@@ -79,6 +80,7 @@ async function createConsentImportJob(req, res) {
             consent_category: req.body.consent_category,
             consent_locale: req.body.consent_locale,
             data,
+            rich_text: validator.unescape(consent.consent_locales[0].rich_text),
             status: data.length ? 'ready' : 'not-ready',
             created_by: req.user.id,
             updated_by: req.user.id
@@ -210,7 +212,15 @@ async function getConsentImportJobs(req, res) {
             ]
         });
 
-        res.json(jobs);
+        const data = jobs.map(j => {
+            const legalText = validator.unescape(j.rich_text);
+            return {
+                ...j.dataValues,
+                rich_text: legalText
+            }
+        })
+
+        res.json(data);
     } catch (err) {
         logger.error(err);
         res.status(500).send('Internal server error');
