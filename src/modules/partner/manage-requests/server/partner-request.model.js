@@ -62,7 +62,7 @@ const PartnerRequest = sequelize.cdpConnector.define('partner_requests', {
         type: DataTypes.STRING
     },
     company_codes: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
+        type: DataTypes.ARRAY(DataTypes.STRING(25)),
     },
     workplace_name: {
         type: DataTypes.STRING

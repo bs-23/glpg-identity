@@ -123,6 +123,7 @@ const WholesalerPartnerRequests = () => {
                         </label>
                         <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId} />
                         {showError && !item.company_code && <div className="invalid-feedback">This field must not be empty.</div>}
+                        {showError && item.company_code.length > 25 && <div className="invalid-feedback">This field must be at most 25 characters long.</div>}
                     </div>
                 </div>
             </React.Fragment>
@@ -348,7 +349,7 @@ const WholesalerPartnerRequests = () => {
                         onSubmit={(values, actions) => {
                             values.company_codes = companyCodes.map(i => i.company_code);
 
-                            const validCompanyCodes = companyCodes.filter(item => item.company_code);
+                            const validCompanyCodes = companyCodes.filter(item => item.company_code && item.company_code.length <= 25);
                             if (companyCodes.length !== validCompanyCodes.length) {
                                 setShowError(true);
                                 return;
