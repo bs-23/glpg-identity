@@ -45,18 +45,24 @@ function invalidEmail(email) {
     return true;
 }
 
-function invalidName(name) {
+function invalidPhone(phone) {
+    if (phone === '+') {
+        return false;
+    }
+    return true;
+}
+
+function invalidName(first_name) {
     const invalidChars = ["É", "Ë", "Ï", "Ó", "Ö", "Ü", "é", "ë", "ï", "ó", "ö", "ü",
         "À", "È", "É", "Ì", "Ò", "Ó", "Ù", "à", "è", "é", "ì", "ò", "ó", "ù",
         "Ä", "Ö", "Ü", "ẞ", "ä", "ö", "ü", "ß",
         "À", "Â", "Æ", "Ç", "É", "È", "Ê", "Ë", "Ï", "Î", "Ô", "Œ", "Ù", "Û", "Ü", "Ÿ",
-        "à", "â", "æ", "ç", "é", "è", "ê", "ë", "ï", "î", "ô", "œ", "ù", "û", "ü", "ÿ"
+        "à", "â", "æ", "ç", "è", "ê", "ë", "ï", "î", "ô", "œ", "ù", "û", "ü", "ÿ"
 
     ];
-    if (name) {
-        if (new RegExp(invalidChars.join("|")).test(name)) {
-            return false;
-        }
+
+    if (invalidChars.some(v => first_name.includes(v))) {
+        return false;
     }
     return true;
 }
@@ -66,9 +72,9 @@ export const HcpInlineEditSchema = object().shape({
         .matches(XRegExp('^[\\pL.-]+(?:\\s[\\pL.]+)*$'), 'This field only contains letters')
         .min(2, 'This field must be at least 2 characters long.')
         .max(50, 'This field must be at most 50 characters long.')
-        .test('invalid-email', 'Special character is not allowed)',
-            name => invalidName(name))
-        .required('This field must not be empty.'),
+        .required('This field must not be empty.')
+        .test('invalid-name', 'Special character is not allowed',
+            first_name => invalidName(first_name)),
     last_name: string()
         .matches(XRegExp('^[\\pL.-]+(?:\\s[\\pL.]+)*$'), 'This field only contains letters')
         .min(2, 'This field must be at least 2 characters long.')
@@ -94,4 +100,6 @@ export const HcpInlineEditSchema = object().shape({
         .matches(/^(?:[+]?[0-9]*|[0-9]{2,3}[\/]?[0-9]*)$/, 'Must be a valid phone number')
         .max(25, 'This field must be at most 25 characters long')
         .nullable()
+        .test('invalid-phone', 'Must be a valid phone number',
+            phone => invalidPhone(phone))
 });
