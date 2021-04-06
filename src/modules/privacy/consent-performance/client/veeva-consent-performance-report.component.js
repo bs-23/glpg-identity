@@ -356,7 +356,7 @@ const ConsentPerformanceReport = () => {
                                                                 <Card.Body className="">
                                                                     <div>{parse(consent.rich_text)}</div>
                                                                     <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Opt Type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
-                                                                    <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{(new Date(consent.given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
+                                                                    <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{consent.given_time ? (new Date(consent.given_time)).toLocaleDateString('en-GB').replace(/\//g, '.') : 'Not available'}</div>
                                                                 </Card.Body>
                                                             </Accordion.Collapse>
                                                             <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
