@@ -218,12 +218,6 @@ const HcpPartnerRequests = () => {
         }
     }, [request.company_codes]);
 
-    // useEffect(() => {
-    //     if (formData) {
-
-    //     }
-    // }, [formData]);
-
     const confirmSendForm = (formData) => {
         dispatch(sendForm(formData.id)).then(() => {
             dispatch(updatePartnerRequest(formData.id, { ...formData, status: 'email_sent' })).then(() => {
@@ -624,7 +618,7 @@ const HcpPartnerRequests = () => {
                 show={!!formData}
                 onHide={() => setFormData(undefined)}>
                 <Modal.Header closeButton>
-                    <Modal.Title className="modal-title_small">Remove Request</Modal.Title>
+                    <Modal.Title className="modal-title_small">Send Form</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {formData ? (
