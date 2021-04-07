@@ -320,18 +320,15 @@ const HcpPartnerRequests = () => {
                                                 <td data-for="Procurement Contact">{row.procurement_contact}</td>
                                                 <td data-for="Country">{getCountryName(row.country_iso2)}</td>
                                                 <td data-for="Action">
-                                                    {row.status === 'new_request' ?
-                                                        <Dropdown className="ml-auto dropdown-customize">
-                                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
-                                                            </Dropdown.Toggle>
-                                                            <Dropdown.Menu>
-                                                                <Dropdown.Item onClick={() => showSendFormConfirmation(row)}> Send Form </Dropdown.Item>
-                                                                <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                                <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
-                                                            </Dropdown.Menu>
-                                                        </Dropdown>
-                                                        : '--'
-                                                    }
+                                                    <Dropdown className="ml-auto dropdown-customize">
+                                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu>
+                                                            <Dropdown.Item onClick={() => showSendFormConfirmation(row)}> Send Form </Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
+                                                            <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
                                                 </td>
                                             </tr>
                                         ))}
