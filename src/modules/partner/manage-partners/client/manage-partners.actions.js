@@ -12,8 +12,8 @@ export function getHcpPartners(query = '') {
     };
 }
 
-export function getPartnersToBeApproved(query = ''){
-      return {
+export function getPartnersToBeApproved(query = '') {
+    return {
         type: Types.GET_PARTNER_APPROVAL,
         payload: axios({
             method: 'get',

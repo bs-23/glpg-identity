@@ -28,7 +28,10 @@ export default function reducer(state = initialState, action) {
         case Types.GET_USER_APPROVE_FULFILLED: {
             const userId = (action.payload.config.url).split('/').pop();
             const partners = state.partnersData.partners && state.partnersData.partners;
-            const idx = partners.findIndex(item => item.id === userId);
+            const idx = (partners || []).findIndex(item => item.id === userId);
+
+            if (idx === -1) return { ...state };
+
             const updatedRow = partners[idx];
             updatedRow.status = "approved";
             partners.splice(idx, 1, updatedRow);
@@ -44,7 +47,10 @@ export default function reducer(state = initialState, action) {
         case Types.RESEND_FORM_FULFILLED: {
             const userId = ((action.payload.config.url).split('/'))[4];
             const partners = state.partnersData.partners;
-            const idx = partners.findIndex(item => item.id === userId);
+            const idx = (partners || []).findIndex(item => item.id === userId);
+
+            if (idx === -1) return { ...state };
+
             const updatedRow = partners[idx];
             updatedRow.status = "correction_pending";
             partners.splice(idx, 1, updatedRow);

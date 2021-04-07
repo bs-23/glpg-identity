@@ -4,7 +4,7 @@ import { getPartnerById, approveBusinessPartner, resendFormForCorrection } from 
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import { useToasts } from 'react-toast-notifications';
-import { Form, Formik, Field,ErrorMessage} from 'formik';
+import { Form, Formik, Field, ErrorMessage } from 'formik';
 import { partnerSchema } from '../manage-partners.schema';
 import { getPartnersToBeApproved } from '../../client/manage-partners.actions';
 
@@ -39,37 +39,34 @@ const PartnerStatusManage = (props) => {
 
     const approvePartner = () => {
         dispatch(approveBusinessPartner(props.partnerInfo.id, props.detailType)).then(() => {
-            dispatch(getPartnersToBeApproved('?status=not_approved&limit=5'));
-            addToast('User approved', {
-                appearance: 'success',
-                autoDismiss: true
+            dispatch(getPartnersToBeApproved('?status=not_approved&limit=5')).then(() => {
+                addToast('User approved', {
+                    appearance: 'success',
+                    autoDismiss: true
+                });
             });
-
         }).catch(error => {
-            console.log("error.response: ",error.response)
-            addToast(error.response.data, {
+            addToast((error.response || {}).data || 'Operation Failed', {
                 appearance: 'error',
                 autoDismiss: true
             });
-        });
-
-        handleClose();
+        }).then(() => handleClose());
     }
 
     const resendForm = (values) => {
-        dispatch(resendFormForCorrection(props.partnerInfo.id, props.detailType,values)).then(() => {
-            addToast('Form sent for correction', {
-                appearance: 'success',
-                autoDismiss: true
+        dispatch(resendFormForCorrection(props.partnerInfo.id, props.detailType, values)).then(() => {
+            dispatch(getPartnersToBeApproved('?status=not_approved&limit=5')).then(() => {
+                addToast('Form sent for correction', {
+                    appearance: 'success',
+                    autoDismiss: true
+                });
             });
         }).catch(error => {
-            addToast(error.response.data, {
+            addToast((error.response || {}).data || 'Operation Failed', {
                 appearance: 'error',
                 autoDismiss: true
             });
-        });
-
-        handleClose();
+        }).then(() => handleClose());
     }
 
     return (
@@ -119,45 +116,54 @@ const PartnerStatusManage = (props) => {
                                 }
                             </div>
 
-                    </div>
-                    <div className="col-12">
-                        <Formik
-                            initialValues={{
-                                reason_for_correction: "",
-                            }}
-                            validationSchema={partnerSchema}
-                            displayName="Partner Status Change"
-                            onSubmit={(values, actions) => {
-                                if (statusAction === 'approve') {
-                                    approvePartner();
-                                } else if (statusAction === 'resend-form') {
-                                    resendForm(values);
-                                }
-                            }}
-                        >
-                            {formikProps => (
-                                <Form onSubmit={formikProps.handleSubmit} className="row">
-                                    <div className="col-12 d-flex">
-                                        <button type="button" onClick={() => { setStatusAction("approve"); formikProps.setFieldValue('reason_for_correction', 'approve'); }} className={statusAction === 'approve' ? "btn btn-block mr-2 cdp-btn-primary p-2 mt-0 font-weight-bold text-white" : "btn btn-block mr-2 cdp-btn-outline-primary p-2 font-weight-bold mt-0"}>Approve User</button>
+                        </div>
+                        <div className="col-12">
+                            <Formik
+                                initialValues={{
+                                    reason_for_correction: "",
+                                }}
+                                validationSchema={partnerSchema}
+                                displayName="Partner Status Change"
+                                onSubmit={(values, actions) => {
+                                    if (statusAction === 'approve') {
+                                        approvePartner();
+                                    } else if (statusAction === 'resend-form') {
+                                        resendForm(values);
+                                    }
+                                }}
+                            >
+                                {formikProps => (
+                                    <Form onSubmit={formikProps.handleSubmit} className="row">
+                                        <div className="col-12 d-flex">
+                                            <button type="button" onClick={() => { setStatusAction("approve"); formikProps.setFieldValue('reason_for_correction', 'approve'); }} className={statusAction === 'approve' ? "btn btn-block mr-2 cdp-btn-primary p-2 mt-0 font-weight-bold text-white" : "btn btn-block mr-2 cdp-btn-outline-primary p-2 font-weight-bold mt-0"}>Approve User</button>
 
-                                        <button type="button" onClick={() => { setStatusAction("resend-form"); formikProps.setFieldValue('reason_for_correction', ''); formikProps.setFieldTouched('reason_for_correction', false); }}
-                                            className={statusAction === 'resend-form' ? "btn btn-block ml-2 btn-danger p-2 font-weight-bold mt-0" : "btn btn-block ml-2 btn-outline-danger p-2 font-weight-bold mt-0"}>Correction Required</button>
-                                    </div>
-                                    <div className="col-12">
-                                        {statusAction === 'resend-form' &&
-                                            <div className="mt-4">
-                                                <label className="label-style">Reason for correction <span className="text-danger">*</span></label>
-                                                <Field className="form-control" type="text" as="textarea" name="reason_for_correction" />
-                                                <div className="invalid-feedback col-12"><ErrorMessage name="reason_for_correction" /></div>
-                                            </div>
-                                        }
-                                        <button type="submit" disabled={!statusAction} className="btn btn-block btn-secondary mt-4 p-2 font-weight-bold">{statusAction === 'approve' ? 'Confirm And Request SAP Report' : 'Confirm And Resend For Correction'}</button>
-                                    </div>
+                                            <button type="button" onClick={() => { setStatusAction("resend-form"); formikProps.setFieldValue('reason_for_correction', ''); formikProps.setFieldTouched('reason_for_correction', false); }}
+                                                className={statusAction === 'resend-form' ? "btn btn-block ml-2 btn-danger p-2 font-weight-bold mt-0" : "btn btn-block ml-2 btn-outline-danger p-2 font-weight-bold mt-0"}>Correction Required</button>
+                                        </div>
+                                        <div className="col-12">
+                                            {statusAction === 'resend-form' &&
+                                                <div className="mt-4">
+                                                    <label className="label-style">Reason for correction <span className="text-danger">*</span></label>
+                                                    <Field className="form-control" type="text" as="textarea" name="reason_for_correction" />
+                                                    <div className="invalid-feedback col-12"><ErrorMessage name="reason_for_correction" /></div>
+                                                </div>
+                                            }
+                                            {statusAction &&
+                                                <button
+                                                    type="submit"
+                                                    disabled={!statusAction}
+                                                    className="btn btn-block btn-secondary mt-4 p-2 font-weight-bold">
+                                                    {statusAction === 'approve'
+                                                        ? 'Confirm And Request SAP Report'
+                                                        : 'Confirm And Resend For Correction'}
+                                                </button>
+                                            }
+                                        </div>
 
-                                </Form>
-                            )}
-                        </Formik>
-                    </div>
+                                    </Form>
+                                )}
+                            </Formik>
+                        </div>
 
                     </div>
                 }
