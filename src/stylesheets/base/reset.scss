@@ -343,6 +343,11 @@ a {
             font-weight: normal;
         }
     }
+
+    @media (max-width: $screen-phone) {
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+    }
 }
 
 .react-toast-notifications__container {
