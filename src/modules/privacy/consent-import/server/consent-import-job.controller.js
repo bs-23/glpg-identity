@@ -67,7 +67,7 @@ async function createConsentImportJob(req, res) {
                     onekey_id,
                     email: email.toLowerCase(),
                     opt_type: req.body.opt_type,
-                    consent_source: 'Website',
+                    consent_source: 'VeevaCRM',
                     captured_date: captured_date
                 });
             }
