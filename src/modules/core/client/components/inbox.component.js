@@ -15,7 +15,7 @@ export default function Inbox() {
     const [isUnauthorized, setIsUnauthorized] = useState(false);
     const [statusShow, setStatusShow] = useState(false);
     const [statusModalId, setStatusModalId] = useState(false);
-    const [partner, setPartner] = useState(null);
+
     const filterSetting = {
         filters: [
             {
@@ -45,6 +45,7 @@ export default function Inbox() {
     let hcps = useSelector(state => state.hcpReducer.hcps);
     const partnersToBeApproved = useSelector(state => state.managePartnerReducer.partnersTobeApproved);
     const partners = partnersToBeApproved !== undefined ? partnersToBeApproved.partners : null;
+    const totalPartners = partnersToBeApproved !== undefined ? partnersToBeApproved.totalPartners : null;
 
     useEffect(() => {
         getHcps();
@@ -105,7 +106,7 @@ export default function Inbox() {
                         <Panel>
                             {
                                 <div className="cdp-inbox__tab-detail">
-                                    { partners !== null ? partners.map((partner, key) => {
+                                    { partners !== null && partners.length !== 0 ? partners.map((partner, key) => {
                                            return <ul key={key} className="cdp-inbox__list p-0 m-0">
                                             <li key={key} className="cdp-inbox__list-item d-flex justify-content-between  align-items-center border-bottom p-2 p-lg-3">
                                                 <span className="cdp-inbox__list-item-col large cdp-text-primary font-weight-bold text-break">{partner.email}</span>
@@ -113,21 +114,20 @@ export default function Inbox() {
                                                     day: 'numeric', month: 'short', year: 'numeric'
                                                 }).replace(/ /g, ' ')}</span>
                                                 <span className="cdp-inbox__list-item-col small text-break">
-                                                    <button className="btn cdp-btn-secondary btn-sm text-white" onClick={() => { setStatusModalId(key); setStatusShow(true); setPartner(partner) }}><i className="fas fa-user-edit d-block d-sm-none"></i><span className="d-none d-sm-inline-block">Update Status</span></button>
+                                                    <button className="btn cdp-btn-secondary btn-sm text-white" onClick={() => { setStatusModalId(key); setStatusShow(true)}}><i className="fas fa-user-edit d-block d-sm-none"></i><span className="d-none d-sm-inline-block">Update Status</span></button>
                                                 </span>
                                             </li>
                                             {(statusShow && statusModalId === key) && <PartnerStatusManage partnerInfo={partner} detailType={`${partner.entity_type}s`} changeStatusShow={(val) => setStatusShow(val)} statusShow={statusShow} from={'Inbox'}></PartnerStatusManage>}
                                         </ul>
                                        }
 
-                                    ): <div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5></div>}
+                                    ): <h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5>}
 
-                                    {hcps.users !== undefined && hcps.users.length !== 0 ?
-                                        <Link to={{ pathname: "/information/list/cdp",  state: { filterSetting } }} className="d-inline-block p-2 p-lg-3 text-uppercase cdp-text-secondary active small font-weight-bold">
-                                            {hcps.total > 5 && 'More Pending'}
+                                    {/* {totalPartners > 5 &&
+                                        <Link to={{ pathname: "/business-partner/partner-management/vendors",  state: { PartnerFilterSetting } }} className="d-inline-block p-2 p-lg-3 text-uppercase cdp-text-secondary active small font-weight-bold">
+                                            More Pending
                                         </Link>
-                                        : <h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5>
-                                    }
+                                    } */}
                                 </div>}
                                 </Panel>
                         <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5></div></Panel>

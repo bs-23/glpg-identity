@@ -657,13 +657,8 @@ async function getPartnerApproval(req, res){
 
         const responseData = {
             partners: partners.slice(0,5),
-            metadata: {
-                page: page + 1,
-                limit,
-                totalPartners,
-                start: limit * page + 1,
-                end: offset + limit > totalPartners ? parseInt(totalPartners) : parseInt(offset + limit)
-            }
+            totalPartners,
+
         };
         res.json(responseData);
 
