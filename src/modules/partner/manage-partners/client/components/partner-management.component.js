@@ -144,15 +144,13 @@ const PartnerManagement = () => {
 
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-flex justify-content-between align-items-end mb-0 mt-4">
+                        <h4 className="cdp-text-primary font-weight-bold mb-2 mb-sm-4">Business Partner Lists</h4>
+                        <div className="d-flex justify-content-between align-items-center py-2 py-sm-0 mb-0 cdp-table__responsive-sticky-panel">
                             <div>
-                                <h4 className="cdp-text-primary font-weight-bold mb-4">Business Partner Lists</h4>
-                                <div>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/hcps"><i className="fas fa-user-md fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Health Care Professionals</span></NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/hcos"><i className="fas fa-hospital fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Health Care Organizations</span></NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/vendors"><i className="fas fa-hospital-user fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">General Vendors</span></NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/wholesalers"><i className="fas fa-dolly fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Wholesalers</span></NavLink>
-                                </div>
+                                <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/hcps"><i className="fas fa-user-md fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Health Care Professionals</span></NavLink>
+                                <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/hcos"><i className="fas fa-hospital fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Health Care Organizations</span></NavLink>
+                                <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/vendors"><i className="fas fa-hospital-user fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">General Vendors</span></NavLink>
+                                <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/wholesalers"><i className="fas fa-dolly fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Wholesalers</span></NavLink>
                             </div>
                             <div className="d-flex justify-content-between align-items-center mb-2">
                                 <button onClick={() => exportApprovedList()} className="btn cdp-btn-secondary text-white ml-2">
