@@ -4,6 +4,7 @@ import { Faq } from '../../../../platform';
 import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector, useDispatch } from 'react-redux';
+import Accordion from 'react-bootstrap/Accordion';
 import axios from 'axios';
 import fileDownload from 'js-file-download';
 import { useToasts } from 'react-toast-notifications';
@@ -152,7 +153,20 @@ const PartnerManagement = () => {
                                 <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/vendors"><i className="fas fa-hospital-user fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">General Vendors</span></NavLink>
                                 <NavLink className="custom-tab px-3 py-3 cdp-border-primary font-weight-normal" to="/business-partner/partner-management/wholesalers"><i className="fas fa-dolly fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Wholesalers</span></NavLink>
                             </div>
-                            <div className="d-flex justify-content-between align-items-center mb-2">
+                            <div className="d-flex align-items-start pt-2 pt-sm-0">
+                                <Accordion className="cdp-table__responsive-accordion d-block d-sm-none">
+                                    <Accordion.Toggle eventKey="0" className="btn btn-sm px-3 cdp-btn-outline-primary rounded shadow-0 mb-0 p-2"><i className="fas fa-sort cdp-text-primary"></i></Accordion.Toggle>
+                                    <Accordion.Collapse eventKey="0" className="cdp-table__responsive-accordion-body">
+                                        <div className="cdp-bg-primary p-2 text-white">
+                                            {(detailType === 'hcps' || detailType === 'hcos') && <span className={sort.value === 'first_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'first_name')}>First Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span>}
+                                            {(detailType === 'hcps' || detailType === 'hcos') && <span className={sort.value === 'last_name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'last_name')}>Last Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span>}
+                                            {(detailType === 'vendors' || detailType === 'wholesalers') && <span className={sort.value === 'name' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'name')}>Name<i className="icon icon-sort cdp-table__icon-sorting"></i></span>}
+                                            <span className={sort.value === 'locale' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'locale')}>Locale<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                            <span className={sort.value === 'city' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'city')}>City<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                            <span className={sort.value === 'country_iso2' ? `cdp-table__col-sorting sorted ${sort.type.toLowerCase()}` : `cdp-table__col-sorting`} onClick={() => urlChange(1, 'country_iso2')}>Country<i className="icon icon-sort cdp-table__icon-sorting"></i></span>
+                                        </div>
+                                    </Accordion.Collapse>
+                                </Accordion>
                                 <button onClick={() => exportApprovedList()} className="btn cdp-btn-secondary text-white ml-2">
                                     <i className="fas fa-download"></i> <span className="d-none d-sm-inline-block pl-1">Export Approved List for SAP</span>
                                 </button>
