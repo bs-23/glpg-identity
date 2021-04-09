@@ -390,7 +390,7 @@ async function getNonHealthcarePartners(req, res, type) {
         }
 
         if (orderBy !== 'created_at') order.push(['created_at', 'DESC']);
-        const filterLitaral = status ? { entity_type: type, status : status} : { entity_type: type };
+        const filterLitaral = status ? { entity_type: type, status: status } : { entity_type: type };
         const partnerVendors = await PartnerVendors.findAll({
             where: filterLitaral,
             offset,
@@ -419,11 +419,11 @@ async function getNonHealthcarePartners(req, res, type) {
     }
 }
 
-async function getPartnerApproval(req, res) {
+async function getAllPartners(req, res) {
     try {
         const page = req.query.page ? +req.query.page - 1 : 0;
         const limit = req.query.limit ? +req.query.limit : 15;
-        const status = req.query.status;
+        const status = req.query.status || ['not_approved', 'approved', 'correction_pending'];
         const offset = page * limit;
 
         const hcpPartners = await Partners.findAll({
@@ -454,12 +454,12 @@ async function getPartnerApproval(req, res) {
         const totalPartners = totalHcpPartner + totalVendors;
 
         const responseData = {
-            partners: partners.slice(0, 5),
+            partners: partners.slice(0, limit),
             totalPartners,
 
         };
-        res.json(responseData);
 
+        res.json(responseData);
     }
     catch (err) {
         logger.error(err);
@@ -1014,7 +1014,7 @@ exports.getPartnerVendorById = getPartnerVendorById;
 exports.getPartnerWholesalers = getPartnerWholesalers;
 exports.createPartnerVendor = createPartnerVendor;
 exports.updatePartnerVendor = updatePartnerVendor;
-exports.getPartnerApproval = getPartnerApproval;
+exports.getAllPartners = getAllPartners;
 
 exports.getDownloadUrl = getDownloadUrl;
 exports.registrationLookup = registrationLookup;
