@@ -119,8 +119,15 @@ async function registrationLookup(req, res) {
 
         const partnerRequest = await PartnerRequest.findOne({
             where: { id: req.query.request_id },
-            attributes: ["id", "entity_type", "first_name", "last_name", "email", "procurement_contact", "partner_type", "uuid", "company_codes", "country_iso2", "locale"]
+            attributes: ['id', 'entity_type', 'first_name', 'last_name', 'email', 'procurement_contact', 'partner_type', 'uuid', 'company_codes', 'country_iso2', 'locale', 'workplace_name', 'workplace_type']
         });
+
+        if (partnerRequest.dataValues.entity_type === 'hco') {
+            partnerRequest.dataValues.organization_name = partnerRequest.dataValues.workplace_name;
+            partnerRequest.dataValues.organization_type = partnerRequest.dataValues.workplace_type;
+        }
+        delete partnerRequest.dataValues.workplace_name;
+        delete partnerRequest.dataValues.workplace_type;
 
         response.data = partnerRequest;
 
