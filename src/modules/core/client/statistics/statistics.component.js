@@ -129,7 +129,7 @@ export default function HotStatistic() {
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i class="icon icon-partner hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">{statistics.business_partner_count || 0}</div>
-                        <div className="hot-statistics__title"> Total Busniess Partners</div>
+                        <div className="hot-statistics__title"> Total Business Partners</div>
                     </div>
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i class="icon icon-marketing-promotion hot-statistics__icon"></i>
