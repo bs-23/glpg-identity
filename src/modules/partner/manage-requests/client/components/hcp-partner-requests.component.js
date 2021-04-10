@@ -324,8 +324,12 @@ const HcpPartnerRequests = () => {
                                                         <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
-                                                            <Dropdown.Item onClick={() => showSendFormConfirmation(row)}> Send Form </Dropdown.Item>
-                                                            <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
+                                                            {row.status !== 'request_processed' &&
+                                                                <Dropdown.Item onClick={() => showSendFormConfirmation(row)}> Send Form </Dropdown.Item>
+                                                            }
+                                                            {row.status !== 'request_processed' &&
+                                                                <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
+                                                            }
                                                             <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
                                                         </Dropdown.Menu>
                                                     </Dropdown>

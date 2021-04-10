@@ -123,11 +123,11 @@ export default function Inbox() {
 
                                     ): <h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5>}
 
-                                    {/* {totalPartners > 5 &&
-                                        <Link to={{ pathname: "/business-partner/partner-management/vendors",  state: { PartnerFilterSetting } }} className="d-inline-block p-2 p-lg-3 text-uppercase cdp-text-secondary active small font-weight-bold">
+                                    {totalPartners > 5 &&
+                                        <Link to={{ pathname: `/business-partner/partner-management/${partners[0].entity_type}s` }} className="d-inline-block p-2 p-lg-3 text-uppercase cdp-text-secondary active small font-weight-bold">
                                             More Pending
                                         </Link>
-                                    } */}
+                                    }
                                 </div>}
                                 </Panel>
                         <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5></div></Panel>

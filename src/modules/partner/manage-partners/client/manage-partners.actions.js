@@ -17,7 +17,7 @@ export function getPartnersToBeApproved(query = '') {
         type: Types.GET_PARTNER_APPROVAL,
         payload: axios({
             method: 'get',
-            url: `/api/partners/partnerApproval${query}`
+            url: `/api/partners/all${query}`
         })
     };
 }
