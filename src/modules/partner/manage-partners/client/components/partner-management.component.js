@@ -222,7 +222,7 @@ const PartnerManagement = () => {
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <Dropdown.Item onClick={() => { setDetailShow(true); setPartner(item); }}>Profile</Dropdown.Item>
-                                                            {item.status === 'not_approved' &&
+                                                            {item.status !== 'approved' &&
                                                                 <>
                                                                     <Dropdown.Item onClick={() => { setStatusShow(true); setPartner(item); }}>Manage Status</Dropdown.Item>
                                                                 </>
