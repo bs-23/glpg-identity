@@ -4,11 +4,18 @@ const axios = require('axios');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
-const searchUrl = nodecache.getValue('OKLA_SEARCH_URL');
+// const searchUrl = nodecache.getValue('OKLA_SEARCH_URL');
+const searchUrl = "https://okws.ok.imshealth.com/ok/search/3486";
+// const auth = {
+//     username: nodecache.getValue('OKLA_USERNAME'),
+//     password: nodecache.getValue('OKLA_PASSWORD')
+// };
+
 const auth = {
-    username: nodecache.getValue('OKLA_USERNAME'),
-    password: nodecache.getValue('OKLA_PASSWORD')
+    username: "3486_GALAPAGOSAPPRD",
+    password: "27SB45I5"
 };
+
 
 async function searchOkla(queryObj) {
     const { data } = await axios.post(searchUrl, queryObj, { auth });
