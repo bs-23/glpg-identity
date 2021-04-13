@@ -393,8 +393,11 @@ const ClinicalTrials = (props) => {
                                                     <td className="text-break" >{'--'}</td>
                                                     <td className="text-break" >{'--'}</td>
                                     
-                                                    <td data-for="Action"><Dropdown className="ml-auto dropdown-customize">
+                                                    <td data-for="Action">
+                                                <div style={{display:'none'}}>
+                                                <Dropdown className="ml-auto dropdown-customize">
                                                     <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle"></Dropdown.Toggle>
+                                                    
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item onClick={() => { setShow(true); setAddMode(true); setStory(row.story_telling); selectedUnmarkedTrial(row.trial_fixed_id)}}>
                                                             Edit Story
@@ -404,7 +407,7 @@ const ClinicalTrials = (props) => {
                                                         </Dropdown.Item>
                                                         <Dropdown.Item className="text-danger bg-white" onClick={() => { setShowDelete(true); setDeleteId(row.id); }}>Delete</Dropdown.Item> */}
                                                     </Dropdown.Menu>
-                                                </Dropdown></td>
+                                                </Dropdown></div></td>
 
                                                 </tr>
                                             ): null })}
@@ -563,7 +566,7 @@ const ClinicalTrials = (props) => {
                     tableName="crdlp-hcp-profiles"
                     selectedScopeKey={'scope-hcp'}
                 /> */}
-                <div>
+                <div className='experimental-buttons'>
                     <button onClick={dumpData}>Dump Data</button>
                     <button onClick={showAllVersions}>Show All Versions</button>
                     <button onClick={mergeProcessData}>Merge</button>
