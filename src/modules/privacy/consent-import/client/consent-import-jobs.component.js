@@ -37,15 +37,11 @@ export default function ConsentImportJobsComponent() {
 
     const optTypes = [
         {
-            text: 'Single Opt-in',
-            value: 'single-opt-in'
+            text: 'Opt In',
+            value: 'opt-in'
         },
         {
-            text: 'Double Opt-in',
-            value: 'double-opt-in'
-        },
-        {
-            text: 'Opt-out',
+            text: 'Opt Out',
             value: 'opt-out'
         }
     ];
