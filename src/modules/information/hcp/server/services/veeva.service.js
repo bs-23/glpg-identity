@@ -174,7 +174,6 @@ async function createMultiChannelConsent(account, email, opt_type, consent_sourc
                 GLPG_Consent_Source__c: consent_source,
                 CDP_Consent_ID__c: consent.id,
                 Consent_Type_vod__c: veeva_consent_type_id,
-                Opt_Expiration_Date_vod__c: opt_type === 'opt-out' ? new Date(Date.now()) : null,
                 Default_Consent_Text_vod__c: parser(legalText).replace(/(<\/?(?:a)[^>]*>)|<[^>]+>/ig, '$1')
             }, { headers });
 

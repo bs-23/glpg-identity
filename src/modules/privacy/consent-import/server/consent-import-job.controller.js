@@ -15,6 +15,7 @@ const File = require(path.join(process.cwd(), 'src/modules/core/server/storage/f
 const veevaService = require(path.join(process.cwd(), 'src/modules/information/hcp/server/services/veeva.service'));
 const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 
 async function createConsentImportJob(req, res) {
     try {
@@ -67,7 +68,7 @@ async function createConsentImportJob(req, res) {
                     onekey_id,
                     email: email.toLowerCase(),
                     opt_type: req.body.opt_type,
-                    consent_source: 'VeevaCRM',
+                    consent_source: req.body.consent_source,
                     captured_date: captured_date
                 });
             }
@@ -86,7 +87,7 @@ async function createConsentImportJob(req, res) {
             updated_by: req.user.id
         });
 
-        const bucketName = 'cdp-development';
+        const bucketName = nodecache.getValue('S3_BUCKET_NAME');
 
         const response = await storageService.upload({
             bucket: bucketName,
