@@ -581,6 +581,22 @@ async function mergeProcessData(req, res) {
         if (previous_data.length){
             previous_data.forEach(itm=>{
                 let in_exact_match_data = data.filter(x=>x.gov_identifier === itm.gov_identifier)[0];
+                if (in_exact_match_data.locations.length === itm.locations.length)
+                {
+                    in_exact_match_data.locations.map((location, index)=>{
+                        let item = itm[index];
+                        if(location.location_status === item.location_status)
+                        if(location.location_facility === item.location_facility)
+                        if(location.location_city === item.location_city)
+                        if(location.location_country === item.location_country)
+                        if(location.location_zip === item.location_zip)
+                        {
+                            location.lat = item.lat;
+                            location.lng = item.lng;
+                        }
+                        return location;
+                    });
+                }
                 itm = Object.assign(itm,in_exact_match_data);
                 itm.save();
             });
