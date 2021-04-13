@@ -50,6 +50,11 @@ export default function ConsentImportJobsComponent() {
         }
     ];
 
+    const consentSources = [
+        'VeevaCRM',
+        'Website'
+    ];
+
     const getLegalText = (consent_id, locale) => {
         const consent_locale = consentLocales.find(x => x.consent_id === consent_id && x.locale === locale);
 
@@ -222,6 +227,7 @@ export default function ConsentImportJobsComponent() {
                                                 consent_id: '',
                                                 consent_locale: '',
                                                 opt_type: '',
+                                                consent_source: '',
                                                 file: ''
                                             }}
                                             displayName="ConsentImportJobForm"
@@ -233,6 +239,7 @@ export default function ConsentImportJobsComponent() {
                                                 data.append('consent_id', values.consent_id);
                                                 data.append('consent_locale', values.consent_locale);
                                                 data.append('opt_type', values.opt_type);
+                                                data.append('consent_source', values.consent_source);
                                                 data.append('file', values.file);
 
                                                 axios.post(`/api/consent-import-jobs`, data, {
@@ -316,10 +323,23 @@ export default function ConsentImportJobsComponent() {
 
                                                         <div className="col-12">
                                                             <div className="form-group">
+                                                                <label className="font-weight-bold" htmlFor="consent_source">Consent Source<span className="text-danger">*</span></label>
+                                                                <Field data-testid="consent_source" as="select" name="consent_source" className="form-control">
+                                                                    <option key="select-consent-source" value="" disabled>--Select--</option>
+                                                                    {consentSources.map((consentSource, index) => {
+                                                                        return <option key={index} value={consentSource}>{consentSource}</option>
+                                                                    })}
+                                                                </Field>
+                                                                <div className="invalid-feedback"><ErrorMessage name="consent_source" /></div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="col-12">
+                                                            <div className="form-group">
                                                                 <label className="font-weight-bold d-block" htmlFor="file">File <span className="text-danger">*</span></label>
                                                                 <input id="file" name="file" type="file" onChange={(event) => {
                                                                     formikProps.setFieldValue("file", event.currentTarget.files[0]);
-                                                                }} accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"/>
+                                                                }} accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
                                                                 <div className="invalid-feedback"><ErrorMessage name="file" /></div>
                                                             </div>
                                                         </div>
