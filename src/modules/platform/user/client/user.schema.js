@@ -7,7 +7,7 @@ const PHONE_MAX_LENGTH = 25;
 const isPhoneMaxLengthValid = (parent) => {
     const { country_callingCode, phone } = parent;
     if (!phone || !country_callingCode) return true;
-    const phonenumberWithCountryCode = country_callingCode + phone;
+    const phonenumberWithCountryCode = phone;
     return phonenumberWithCountryCode.length <= PHONE_MAX_LENGTH;
 }
 
@@ -80,10 +80,6 @@ export const registerSchema = object().shape({
     email: cdpUserSchema.email,
     phone: string()
         .matches(/^[0-9\+]*$/, 'This field only contains digits')
-        .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`,
-            function () {
-                return isPhoneMaxLengthValid(this.parent);
-            })
         .test('is-phoneNumber-valid', `This field must contain a valid phone number`,
             function () {
                 return isPhoneNumberValid(this.parent);
@@ -135,13 +131,9 @@ export const updateMyProfileSchema = object().shape({
     first_name: cdpUserSchema.first_name,
     last_name: cdpUserSchema.last_name,
     email: cdpUserSchema.email,
-    phone: string()
+     phone: string()
         .nullable()
         .matches(/^[0-9\+]*$/, 'This field only contains digits')
-        .test('is-length-valid', `This field must be at most ${PHONE_MAX_LENGTH} characters long`,
-            function () {
-                return isPhoneMaxLengthValid(this.parent);
-            })
         .test('is-phoneNumber-valid', `This field must contain a valid phone number`,
             function () {
                 return isPhoneNumberValid(this.parent);

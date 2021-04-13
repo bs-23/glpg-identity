@@ -93,7 +93,7 @@ const PartnerStatusManage = (props) => {
                                         <h5 className="font-weight-bold-light mb-0">Legal Contracts</h5>
                                         <div className="py-3">
                                             {partner.documents && partner.documents.length > 0 && partner.documents.map(doc => (
-                                                <a type="button" key={doc.id} onClick={() => downloadFile(doc.id)} className="cdp-text-primary small font-weight-bold-light mb-2 text-break d-flex align-items-baseline">
+                                                <a key={doc.id} onClick={() => downloadFile(doc.id)} className="cdp-text-primary small font-weight-bold-light mb-2 text-break d-flex align-items-baseline cursor-pointer">
                                                     <i className="fas fa-paperclip cdp-text-primary mr-2"></i> {doc.name}
                                                 </a>
                                             ))

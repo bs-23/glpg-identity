@@ -151,7 +151,7 @@ const HcpPartnerRequests = () => {
                         <label className="font-weight-bold d-flex align-items-center justify-content-between" htmlFor={companyCodeId}>
                             <span>{`Company Code ${idx + 1}`} <span className="text-danger">*</span></span>
                             {
-                                len === 1 ? null : <i className="fas fa-minus-circle text-danger hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
+                                len === 1 ? null : <i className="fas fa-minus-circle text-danger hover-opacity ml-auto cursor-pointer" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
                             }
                         </label>
                         <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId} />
@@ -257,7 +257,7 @@ const HcpPartnerRequests = () => {
                                     <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Business Partner Requests</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
-                            <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
+                            <span className="ml-auto mr-3"><i onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary cursor-pointer"></i></span>
                         </nav>
                         <Modal show={showFaq} onHide={handleCloseFaq} size="xl" centered>
                             <Modal.Header closeButton>
@@ -481,7 +481,7 @@ const HcpPartnerRequests = () => {
                                             <label className="font-weight-bold" htmlFor="uuid">UUID <span className="text-danger">*</span></label>
                                             <div className="d-flex align-items-center">
                                                 <Field className="form-control" type="text" name="uuid" />
-                                                <i title="OKLA Search" type="button" className="fas fa-search ml-2 cdp-text-primary" onClick={() => openSearch(formikProps.values)}></i>
+                                                <i title="OKLA Search" className="fas fa-search ml-2 cdp-text-primary cursor-pointer" onClick={() => openSearch(formikProps.values)}></i>
                                             </div>
                                             <div className="invalid-feedback"><ErrorMessage name="uuid" /></div>
                                         </div>
@@ -545,7 +545,7 @@ const HcpPartnerRequests = () => {
                                                 <label>
                                                     &#160;
                                                 </label>
-                                                <div className="d-flex align-items-center hover-opacity" type="button" onClick={addNewCompanyCode}>
+                                                <div className="d-flex align-items-center hover-opacity cursor-pointer" onClick={addNewCompanyCode}>
                                                     <i className="fas fa-plus cdp-text-secondary mr-2" ></i>
                                                     <span className="cdp-text-secondary mb-0">Add Company Code</span>
                                                 </div>
