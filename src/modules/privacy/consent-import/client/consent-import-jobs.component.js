@@ -89,9 +89,11 @@ export default function ConsentImportJobsComponent() {
         const temp_locales = [];
         consentLocaleList.forEach(elem => {
             elem.translations.forEach(item => {
-                item.locale_detail = localizations.filter(x => x.locale === item.locale)[0];
-                item.consent_id = elem.id;
-                temp_locales.push(item);
+                if (item.veeva_consent_type_id) {
+                    item.locale_detail = localizations.filter(x => x.locale === item.locale)[0];
+                    item.consent_id = elem.id;
+                    temp_locales.push(item);
+                }
             });
         });
         setConsentLocales([...new Map(temp_locales.map(item => [item['id'], item])).values()]);
@@ -310,7 +312,7 @@ export default function ConsentImportJobsComponent() {
 
                                                         <div className="col-12">
                                                             <div className="form-group">
-                                                                <label className="font-weight-bold" htmlFor="opt_type">Opt Type<span className="text-danger">*</span></label>
+                                                                <label className="font-weight-bold" htmlFor="opt_type">Opt Type <span className="text-danger">*</span></label>
                                                                 <Field data-testid="opt_type" as="select" name="opt_type" className="form-control">
                                                                     <option key="select-opt-type" value="" disabled>--Select--</option>
                                                                     {optTypes.map(optType => {
@@ -323,7 +325,7 @@ export default function ConsentImportJobsComponent() {
 
                                                         <div className="col-12">
                                                             <div className="form-group">
-                                                                <label className="font-weight-bold" htmlFor="consent_source">Consent Source<span className="text-danger">*</span></label>
+                                                                <label className="font-weight-bold" htmlFor="consent_source">Consent Source <span className="text-danger">*</span></label>
                                                                 <Field data-testid="consent_source" as="select" name="consent_source" className="form-control">
                                                                     <option key="select-consent-source" value="" disabled>--Select--</option>
                                                                     {consentSources.map((consentSource, index) => {

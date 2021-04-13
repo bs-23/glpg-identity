@@ -14,7 +14,8 @@ function getTranslationViewmodels(translations) {
     return translations.map(t => ({
         id: t.id,
         locale: t.locale,
-        rich_text: validator.unescape(t.rich_text)
+        rich_text: validator.unescape(t.rich_text),
+        veeva_consent_type_id: t.veeva_consent_type_id
     }));
 }
 
