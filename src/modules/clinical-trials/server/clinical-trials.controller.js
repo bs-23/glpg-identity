@@ -16,6 +16,7 @@ const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston')
 
 var seed = 1;
 var API_KEY = nodecache.getValue('GOOGLE_MAP_API_KEY');
+var all_statuses = ['Recruiting', 'Not yet recruiting', 'Enrolling by invitation', 'Active, not recruiting', 'Suspended', 'Terminated', 'Completed', 'Withdrawn'];
 var countriesWithISO = [
     {'code':'AR','name':'Argentina'
     },
@@ -132,6 +133,14 @@ var countriesWithISO = [
     {'code':'US','name':'United States'
     }
 ];
+
+function replaceTitleParts(titleText){
+    let newText = titleText;
+    if(newText){
+        newText = titleText.replace('GLPG0634', 'Filgotinib');
+    }
+    return newText;
+}
 
 function calculateDistanceToInteger(distance){
     return parseInt(Math.round(distance*100) / 100);
@@ -269,7 +278,7 @@ function statusInputTextMapping(status){
         }
     }) : null;
     if( status && status.includes('All')){
-        status = ['Recruiting', 'Not yet recruiting', 'Enrolling by invitation', 'Active, not recruiting', 'Suspended', 'Terminated', 'Completed', 'Withdrawn']
+        status = all_statuses;
     }
     return status;
 }
@@ -451,6 +460,7 @@ async function mergeProcessData(req, res) {
     const response = new Response({}, []);
     const { ids } = req.body;
     res.set({ 'content-type': 'application/json; charset=utf-8' });
+    seed = 1;
 
     try {
         let result = await History.findAll({
@@ -487,9 +497,9 @@ async function mergeProcessData(req, res) {
                     'protocol_number': element.Study.ProtocolSection.IdentificationModule.OrgStudyIdInfo.OrgStudyId,
                     'gov_identifier': element.Study.ProtocolSection.IdentificationModule.NCTId,
                     'eudract_number': element.Study.ProtocolSection.IdentificationModule.SecondaryIdInfoList && element.Study.ProtocolSection.IdentificationModule.SecondaryIdInfoList.SecondaryIdInfo.length ? element.Study.ProtocolSection.IdentificationModule.SecondaryIdInfoList.SecondaryIdInfo[0].SecondaryId : null,
-                    'clinical_trial_brief_summary': element.Study.ProtocolSection.DescriptionModule.BriefSummary,
-                    'clinical_trial_brief_title': element.Study.ProtocolSection.IdentificationModule.BriefTitle,
-                    'official_title': element.Study.ProtocolSection.IdentificationModule.OfficialTitle,
+                    'clinical_trial_brief_summary': replaceTitleParts(element.Study.ProtocolSection.DescriptionModule.BriefSummary),
+                    'clinical_trial_brief_title': replaceTitleParts(element.Study.ProtocolSection.IdentificationModule.BriefTitle) + (element.Study.ProtocolSection.IdentificationModule.Acronym? ` (${element.Study.ProtocolSection.IdentificationModule.Acronym})` : ''),
+                    'official_title': replaceTitleParts(element.Study.ProtocolSection.IdentificationModule.OfficialTitle),
                     'gender': element.Study.ProtocolSection.EligibilityModule.Gender,
                     'min_age': element.Study.ProtocolSection.EligibilityModule.MinimumAge? element.Study.ProtocolSection.EligibilityModule.MinimumAge.toLowerCase().replace('years', ' ').trim() : null,
                     'max_age': element.Study.ProtocolSection.EligibilityModule.MaximumAge? element.Study.ProtocolSection.EligibilityModule.MaximumAge.toLowerCase().replace('years', ' ').trim() : null,
@@ -544,7 +554,9 @@ async function mergeProcessData(req, res) {
                         }
                     })(),
                     'type_of_drug': element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList && element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention.length ? properDrugTypeName(element.Study.ProtocolSection.ArmsInterventionsModule.InterventionList.Intervention[0].InterventionName): null,
-                    'story_telling': sponsor.toLowerCase().includes('gilead')? 'This clinical trial is run by Gilead Sciences Inc., a Galapagos partner. The information displayed on this page is strictly based on the information provided by Gilead Sciences Inc. on clinicaltrials.gov, as automatically extracted.' : 'The content displayed below is based on information provided by clinicaltrials.gov. On this page you can review the main details of the clinical trial, including the purpose and main eligibility criteria. You can also identify the closest clinical trial location to you.',
+                    'story_telling': sponsor.toLowerCase().includes('gilead')? 
+                    'This clinical trial is run by Gilead Sciences, a Galapagos partner. The information displayed on this page is strictly based on the information provided by Gilead Sciences on <a class="sc-bHwgHz ezBJcQ" title="http://clinicaltrials.gov" href="http://clinicaltrials.gov/" data-renderer-mark="true"><em data-renderer-mark="true"><strong data-renderer-mark="true">clinicaltrials.gov</strong></em></a>, as automatically extracted.' 
+                    : 'The content displayed below is based on information provided by <a class="sc-bHwgHz ezBJcQ" title="http://clinicaltrials.gov" href="http://clinicaltrials.gov/" data-renderer-mark="true"><em data-renderer-mark="true"><strong data-renderer-mark="true">clinicaltrials.gov</strong></em></a>. On this page you can review the main details of the clinical trial, including the purpose and main eligibility criteria. You can also identify the closest clinical trial location to you.',
                     'trial_start_date': new Date(element.Study.ProtocolSection.StatusModule.StartDateStruct.StartDate),
                     'trial_end_date': element.Study.ProtocolSection.StatusModule.CompletionDateStruct.CompletionDate ? new Date(element.Study.ProtocolSection.StatusModule.CompletionDateStruct.CompletionDate) : null,
                     'locations': locationList? await Promise.all(locationList.Location.map(async (location,index)=> {
@@ -730,40 +742,48 @@ async function getTrials(req, res) {
     }).filter(x=>x!=='');
     
     search_result = search_result.filter(x=>x.distance_value).length ? search_result.sort(function(a, b) {return a.distance_value - b.distance_value}) 
-                    : search_result.sort((a,b)=>['Recruiting'].includes(b.trial_status)? 1:-1);
+                    : search_result.sort((a, b)=>{
+                        if( all_statuses.indexOf(a.trial_status) > all_statuses.indexOf(b.trial_status)){
+                            return 1;
+                        }
+                        if( all_statuses.indexOf(a.trial_status) < all_statuses.indexOf(b.trial_status)){
+                            return -1;
+                        }
+                        return 0;
+                    });
 
     let freetext_search_result = search_result.filter(x=>{
         try{
         if(! free_text_search){
             return true;
         }
-        if(x.indication.toLowerCase().includes(free_text_search)){
-            return true;
-        }
-        if(x.indication_group.toLowerCase().includes(free_text_search)){
-            return true;
-        }
-        if(x.phase.toLowerCase().includes(free_text_search)){
-            return true;
-        }
-        if(x.gender.toLowerCase().includes(free_text_search)){
-            return true;
-        }
-        if(x.std_age.toLowerCase().includes(free_text_search)){
-            return true;
-        }
-        if(x.clinical_trial_brief_title.toLowerCase().includes(free_text_search)){
-            return true;
-        }
-        if(x.official_title.toLowerCase().includes(free_text_search)){
-            return true;
-        }
-        if(x.trial_status.toLowerCase().includes(free_text_search)){
-            return true;
-        }
-        if(String(x.distance).includes(free_text_search)){
-            return true;
-        }
+        let isFound = false;
+
+        [
+            'indication',
+            'indication_group',
+            'phase',
+            'gender',
+            'std_age',
+            'clinical_trial_brief_title',
+            'official_title',
+            'trial_status',
+            'distance',
+            'trial_fixed_id',
+            'protocol_number',
+            'gov_identifier',
+            'eudract_number',
+            'inclusion_criteria',
+            'exclusion_criteria',
+            'note_criteria',
+            'type_of_drug',
+            'story_telling'
+        ].forEach(search_field=>{
+            if(String(x[search_field]).toLowerCase().includes(free_text_search)){
+                isFound = true;
+            }
+        });
+        return isFound;
     } catch(ex){
     }
         return false;
@@ -936,7 +956,7 @@ async function getCountryList(req, res) {
     const response = new Response({}, []);
     res.set({ 'content-type': 'application/json; charset=utf-8' });
     try {
-        response.data = countriesWithISO;
+        response.data = countriesWithISO.sort((a,b)=>a.name.localeCompare(b.name));
         res.json(response);
     } catch (err) {
         logger.error(err);
@@ -972,19 +992,59 @@ async function getConditions(req, res) {
 async function getConditionsWithDetails(req, res) {
     const response = new Response({}, []);
     let conditions = [
-        {indication: 'Ankylosing Spondylitis', description: 'Ankylosing spondylitis is an inflammatory condition that affects the joints of the spine. Pain and stiffness is often experienced, which can lead to loss of flexibility, and can have a significant effect on day-to-day life. There is currently no cure for ankylosing spondylitis; however, there are ways to help manage the symptoms, including improving flexibility through exercise.Although this is a rare disease, which can sometimes feel isolating, it’s thought to affect 1% of US adults (1.7 million people), with global levels varying. Along with support from your doctor, there are also specific patient association websites that can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of others who have the same condition. Galapagos is committed to developing treatments for rare medical conditions with an unmet need, such as ankylosing spondylitis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
-        {indication: 'Atopic Dermatitis', description: 'Atopic dermatitis is common a skin disorder that occurs when the immune system becomes overactive, and results in symptoms including itchy and red skin. It can have a significant impact on day-to-day life, and as symptoms can come and go over time it can be difficult to manage. While the exact cause is unknown and there is currently no cure, symptoms can be reduced or controlled through a range of treatments.  Along with support from your doctor, there are also specific patient association websites that can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition. Galapagos is committed to developing treatments for rare medical conditions with an unmet need, such as atopic dermatitis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
-        {indication: 'Autosomal Dominant Polycystic Kidney Disease', description:  'Autosomal dominant polycystic kidney disease is mainly an inherited condition caused by cells in the kidney not developing properly, which results in the kidney not working properly. It is thought that 1 in 500 to 1 in 2,500 have this medical condition. While the impact of the disease can vary widely from person to person, it can result in difficult-to-manage symptoms, such as back pain, high blood pressure, headaches and kidney stones. There is no cure for autosomal dominant polycystic kidney disease; however, most associated symptoms can be managed with treatments. For some patients, additional treatment, such as dialysis – where a machine replaces kidney function – or a transplant, may be required.  Along with support from your doctor, there are also specific patient association websites that can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition. Galapagos is committed to developing treatments for rare medical conditions with an unmet need, such as autosomal dominant polycystic kidney disease. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
-        {indication: 'Crohn\'s Disease', description:  'Crohn’s disease is a chronic medical condition that affects the bowel and causes inflammation to occur in the digestive tract. It results in a wide range of symptoms including diarrhea, stomach pain, blood in stools, and weight loss. Symptoms can come and go over time, which can have a significant impact on day-to-day life and make it difficult to manage. While the exact cause is unknown and there is currently no cure, symptoms can be reduced or effectively controlled through a range of treatments. Along with support from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as Crohn’s disease. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
-        {indication: 'Idiopathic Pulmonary Fibrosis', description:  'Idiopathic pulmonary fibrosis (IPF) is a rare medical condition in which scar tissue forms on the lungs, resulting in symptoms of breathlessness,chronic dry cough and fatigue that can have a significant impact on day-to-day activities. Although there are currently some treatments available for IPF, there is no cure for this disease; however, understanding the symptoms and how they can be managed can help minimize their impact. Managing life with a rare disease can sometimes feel isolating; however, approximately 5 million people are currently living with IPF worldwide. Along with support from your doctor, there are also specific patient association websites that can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition. The exact cause of IPF is still unknown (“idiopathic” means no known cause), which can make it harder to develop specific treatments. Galapagos is committed to developing treatments for rare medical conditions with a high unmet need, such as IPF. We now have more than 10 years of experience within IPF and are currently enrolling patients onto our clinical trials. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
-        {indication: 'Lupus Erythematosus', description:  'Lupus erythematosus is a chronic medical condition that occurs as a result of the immune system not working as it should and the body attacking healthy cells by mistake, affecting multiple organs. The symptoms can come and go, which can make getting on with day-to-day life difficult; however, individualised management can help with controlling these symptoms. Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of patients and caregivers who have the same condition. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as lupus erythematosus. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
-        {indication: 'Psoriatic Arthritis', description:  'Psoriatic arthritis is a chronic, inflammatory type of arthritis that affects some people with the skin condition psoriasis. It can cause symptoms in the skin, joints and nails. The symptoms can directly impact day-to-day life, which can be made more difficult to manage as symptoms can go away and then come back in a period known as a flare-up; these flare-ups can last for days or months. While there is no cure for psoriatic arthritis, symptoms can be controlled with appropriate management.  Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as psoriatic arthritis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
-        {indication: 'Osteoarthritis', description:'Osteoarthritis is the most common type of arthritis and is caused by wear and tear to your joints. While joints are exposed to low-level impact in everyone, in people with osteoarthritis, joints become particularly stiff and painful. The severity of symptoms experienced varies from person to person, with some people experiencing mild symptoms that come and go and others experiencing much more severe symptoms that can considerably affect day-to-day life. Although there is no cure for osteoarthritis, symptoms don’t necessarily get worse and can often be reduced with appropriate management.  Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patient and caregivers who have the same condition. The exact cause of osteoarthritis is still unknown, which can make it harder to develop specific treatments. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as osteoarthritis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
-        {indication: 'Rheumatoid Arthritis', description:  'Rheumatoid arthritis is a chronic medical condition that occurs as a result of the immune system not working as it should and the body attacking healthy cells by mistake; this causes swelling and pain in the joints. The symptoms can come and go and not knowing when symptoms might appear can be difficult. However, appropriate treatment can result in months or years between flare-ups, which helps in being able to get on with day-to-day life. Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of others who have the same condition. There is currently no cure for rheumatoid arthritis. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as rheumatoid arthritis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
-        {indication: 'Sjogren\'s Syndrome', description:  'Sjogren\'s syndrome is a chronic autoimmune condition in which the immune system becomes overactive and attacks the healthy tissue, in particular the tear and salivary glands. It’s not clear why this happens, meaning it has been difficult to develop specific treatments; however, there are ways in which the symptoms can be controlled. Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as Sjogren\'s Syndrome. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
-        {indication: 'Systemic Sclerosis', description:'Systemic sclerosis is a chronic autoimmune condition in which the immune system becomes overactive and attacks the connective tissue that sits under the skin, which leads to hardened areas forming. The exact symptoms can differ from person to person, with some people experiencing symptoms affecting the internal organs and blood vessels. It’s not clear why this happens to the immune system, meaning it has been difficult to develop specific treatments; however, your doctor can support you on how to best manage the disease.Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of patients and caregivers who have the same condition. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as systemic sclerosis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
-        {indication: 'Ulcerative Colitis', description: 'Ulcerative colitis is a chronic condition that causes inflammation in the digestive tract. Common symptoms include diarrhea, rectal bleeding and weight loss. The exact cause of ulcerative colitis is unknown, but eating healthily and keeping on top of stress has been shown to be beneficial. While there is currently no cure for ulcerative colitis, doctors have lots of experience managing this condition and will develop a management approach to help with symptoms. Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patient and caregivers who have the same condition. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as ulcerative colitis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'},
-        {indication: 'Uveitis', description:  'Uveitis is a medical condition that occurs due to inflammation in part of the eye, resulting in a wide range of symptoms including blurry vision, a red eye or headaches. It can be caused by infection or immune response, and some instances it’s difficult to find the exact cause. Usually the treatment will be similar no matter the cause, apart from in uveitis caused by infection, where treatment that fights the bacteria or virus will be used. Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition. Galapagos is committed to developing treatments for medical conditions such as uveitis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.'}
+        {indication: 'Ankylosing Spondylitis', description: `
+        <p>Ankylosing spondylitis is an inflammatory condition that affects the joints of the spine. Pain and stiffness is often experienced, which can lead to loss of flexibility, and can have a significant effect on day-to-day life. There is currently no cure for ankylosing spondylitis; however, there are ways to help manage the symptoms, including improving flexibility through exercise.</p>
+        <p>Although this is a rare disease, which can sometimes feel isolating, it&rsquo;s thought to affect 1% of US adults (1.7 million people), with global levels varying. Along with support from your doctor, there are also specific patient association websites that can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of others who have the same condition.</p>
+        <p>Galapagos is committed to developing treatments for rare medical conditions with an unmet need, such as ankylosing spondylitis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.</p> `},
+        {indication: 'Atopic Dermatitis', description: `
+        <p>Atopic dermatitis is common a skin disorder that occurs when the immune system becomes overactive, and results in symptoms including itchy and red skin. It can have a significant impact on day-to-day life, and as symptoms can come and go over time it can be difficult to manage. While the exact cause is unknown and there is currently no cure, symptoms can be reduced or controlled through a range of treatments.</p>
+        <p>Along with support from your doctor, there are also specific patient association websites that can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition.</p>
+        <p>Galapagos is committed to developing treatments for rare medical conditions with an unmet need, such as atopic dermatitis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.</p>
+        `},
+        {indication: 'Autosomal Dominant Polycystic Kidney Disease', description:  `
+        <p>Autosomal dominant polycystic kidney disease is mainly an inherited condition caused by cells in the kidney not developing properly, which results in the kidney not working properly. It is thought that 1 in 500 to 1 in 2,500 have this medical condition. While the impact of the disease can vary widely from person to person, it can result in difficult-to-manage symptoms, such as back pain, high blood pressure, headaches and kidney stones. There is no cure for autosomal dominant polycystic kidney disease; however, most associated symptoms can be managed with treatments. For some patients, additional treatment, such as dialysis &ndash; where a machine replaces kidney function &ndash; or a transplant, may be required.</p>
+        <p>Along with support from your doctor, there are also specific patient association websites that can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition.</p>
+        <p>Galapagos is committed to developing treatments for rare medical conditions with an unmet need, such as autosomal dominant polycystic kidney disease. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.</p>`},
+        {indication: 'Crohn\'s Disease', description:  `
+        <p>Crohn&rsquo;s disease is a chronic medical condition that affects the bowel and causes inflammation to occur in the digestive tract. It results in a wide range of symptoms including diarrhea, stomach pain, blood in stools, and weight loss. Symptoms can come and go over time, which can have a significant impact on day-to-day life and make it difficult to manage. While the exact cause is unknown and there is currently no cure, symptoms can be reduced or effectively controlled through a range of treatments.</p>
+        <p>Along with support from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition.</p>
+        <p>Galapagos is committed to developing treatments for medical conditions with an unmet need, such as Crohn&rsquo;s disease. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.</p>`},
+        {indication: 'Idiopathic Pulmonary Fibrosis', description:  `
+        <p>Idiopathic pulmonary fibrosis (IPF) is a rare medical condition in which scar tissue forms on the lungs, resulting in symptoms of breathlessness, chronic dry cough and fatigue that can have a significant impact on day-to-day activities. Although there are currently some treatments available for IPF, there is no cure for this disease; however, understanding the symptoms and how they can be managed can help minimize their impact.</p>
+        <p>Managing life with a rare disease can sometimes feel isolating; however, there are lots of other people currently living with IPF worldwide. Along with support from your doctor, there are also specific patient association websites that can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition.</p>
+        <p>The exact cause of IPF is still unknown (&ldquo;idiopathic&rdquo; means no known cause), which can make it harder to develop specific treatments. Galapagos is committed to developing treatments for rare medical conditions with a high unmet need, such as IPF. We now have more than 10 years of experience within IPF and are currently enrolling patients onto our clinical trials. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.</p>`},
+        {indication: 'Lupus Erythematosus', description:  `
+        <p>Lupus erythematosus is a chronic medical condition that occurs as a result of the immune system not working as it should and the body attacking healthy cells by mistake, affecting multiple organs. The symptoms can come and go, which can make getting on with day-to-day life difficult; however, individualised management can help with controlling these symptoms.</p>
+        <p>Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of patients and caregivers who have the same condition.</p>
+        <p>Galapagos is committed to developing treatments for medical conditions with an unmet need, such as lupus erythematosus. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.</p>`},
+        {indication: 'Psoriatic Arthritis', description:  `
+        <p>Psoriatic arthritis is a chronic, inflammatory type of arthritis that affects some people with the skin condition psoriasis. It can cause symptoms in the skin, joints and nails. The symptoms can directly impact day-to-day life, which can be made more difficult to manage as symptoms can go away and then come back in a period known as a flare-up; these flare-ups can last for days or months. While there is no cure for psoriatic arthritis, symptoms can be controlled with appropriate management.</p>
+        <p>Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition.</p>
+        <p>Galapagos is committed to developing treatments for medical conditions with an unmet need, such as psoriatic arthritis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.</p>`},
+        {indication: 'Osteoarthritis', description:`
+        <p>Osteoarthritis is the most common type of arthritis and is caused by wear and tear to your joints. While joints are exposed to low-level impact in everyone, in people with osteoarthritis, joints become particularly stiff and painful. The severity of symptoms experienced varies from person to person, with some people experiencing mild symptoms that come and go and others experiencing much more severe symptoms that can considerably affect day-to-day life. Although there is no cure for osteoarthritis, symptoms don&rsquo;t necessarily get worse and can often be reduced with appropriate management.</p>
+        <p>Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patient and caregivers who have the same condition.</p>
+        <p>The exact cause of osteoarthritis is still unknown, which can make it harder to develop specific treatments. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as osteoarthritis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.</p>`},
+        {indication: 'Rheumatoid Arthritis', description:  `
+        <p>Rheumatoid arthritis is a chronic medical condition that occurs as a result of the immune system not working as it should and the body attacking healthy cells by mistake; this causes swelling and pain in the joints. The symptoms can come and go and not knowing when symptoms might appear can be difficult. However, appropriate treatment can result in months or years between flare-ups, which helps in being able to get on with day-to-day life.</p>
+        <p>Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of others who have the same condition.</p>
+        <p>There is currently no cure for rheumatoid arthritis. Galapagos is committed to developing treatments for medical conditions with an unmet need, such as rheumatoid arthritis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.</p>`},
+        {indication: 'Sjogren\'s Syndrome', description:  `
+        <p>Sjogren's syndrome is a chronic autoimmune condition in which the immune system becomes overactive and attacks the healthy tissue, in particular the tear and salivary glands. It&rsquo;s not clear why this happens, meaning it has been difficult to develop specific treatments; however, there are ways in which the symptoms can be controlled.</p>
+        <p>Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition.</p>
+        <p>Galapagos is committed to developing treatments for medical conditions with an unmet need, such as Sjogren's Syndrome. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.</p>`},
+        {indication: 'Systemic Sclerosis', description:`
+        <p>Systemic sclerosis is a chronic autoimmune condition in which the immune system becomes overactive and attacks the connective tissue that sits under the skin, which leads to hardened areas forming. The exact symptoms can differ from person to person, with some people experiencing symptoms affecting the internal organs and blood vessels. It&rsquo;s not clear why this happens to the immune system, meaning it has been difficult to develop specific treatments; however, your doctor can support you on how to best manage the disease.</p>
+        <p>Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of patients and caregivers who have the same condition.</p>
+        <p>Galapagos is committed to developing treatments for medical conditions with an unmet need, such as systemic sclerosis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.</p>`},
+        {indication: 'Ulcerative Colitis', description: `
+        <p>Ulcerative colitis is a chronic condition that causes inflammation in the digestive tract. Common symptoms include diarrhea, rectal bleeding and weight loss. The exact cause of ulcerative colitis is unknown, but eating healthily and keeping on top of stress has been shown to be beneficial. While there is currently no cure for ulcerative colitis, doctors have lots of experience managing this condition and will develop a management approach to help with symptoms.</p>
+        <p>Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patient and caregivers who have the same condition.</p>
+        <p>Galapagos is committed to developing treatments for medical conditions with an unmet need, such as ulcerative colitis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.</p>`},
+        {indication: 'Uveitis', description:  `
+        <p>Uveitis is a medical condition that occurs due to inflammation in part of the eye, resulting in a wide range of symptoms including blurry vision, a red eye or headaches. It can be caused by infection or immune response, and some instances it&rsquo;s difficult to find the exact cause. Usually the treatment will be similar no matter the cause, apart from in uveitis caused by infection, where treatment that fights the bacteria or virus will be used.</p>
+        <p>Along with support on treatment and management from your doctor, specific patient association websites can help you understand more about your condition and ideas on how to manage it, and provide you with access to a network of other patients and caregivers who have the same condition.</p>
+        <p>Galapagos is committed to developing treatments for medical conditions such as uveitis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.</p>`}
     ].sort();
     try {
         response.data = conditions;
