@@ -156,6 +156,7 @@ const HcpPartnerRequests = () => {
                         </label>
                         <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId} />
                         {showError && !item.company_code && <div className="invalid-feedback">This field must not be empty.</div>}
+                        {showError && item.company_code.length > 25 && <div className="invalid-feedback">This field must be at most 25 characters long.</div>}
                     </div>
                 </div>
             </React.Fragment>
@@ -216,12 +217,6 @@ const HcpPartnerRequests = () => {
             setCompanyCodes(codes);
         }
     }, [request.company_codes]);
-
-    // useEffect(() => {
-    //     if (formData) {
-
-    //     }
-    // }, [formData]);
 
     const confirmSendForm = (formData) => {
         dispatch(sendForm(formData.id)).then(() => {
@@ -325,18 +320,19 @@ const HcpPartnerRequests = () => {
                                                 <td data-for="Procurement Contact">{row.procurement_contact}</td>
                                                 <td data-for="Country">{getCountryName(row.country_iso2)}</td>
                                                 <td data-for="Action">
-                                                    {row.status === 'new_request' ?
-                                                        <Dropdown className="ml-auto dropdown-customize">
-                                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
-                                                            </Dropdown.Toggle>
-                                                            <Dropdown.Menu>
+                                                    <Dropdown className="ml-auto dropdown-customize">
+                                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu>
+                                                            {row.status !== 'request_processed' &&
                                                                 <Dropdown.Item onClick={() => showSendFormConfirmation(row)}> Send Form </Dropdown.Item>
+                                                            }
+                                                            {row.status !== 'request_processed' &&
                                                                 <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                                <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
-                                                            </Dropdown.Menu>
-                                                        </Dropdown>
-                                                        : '--'
-                                                    }
+                                                            }
+                                                            <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
                                                 </td>
                                             </tr>
                                         ))}
@@ -398,7 +394,7 @@ const HcpPartnerRequests = () => {
                         onSubmit={(values, actions) => {
                             values.company_codes = companyCodes.map(i => i.company_code);
 
-                            const validCompanyCodes = companyCodes.filter(item => item.company_code);
+                            const validCompanyCodes = companyCodes.filter(item => item.company_code && item.company_code.length <= 25);
                             if (companyCodes.length !== validCompanyCodes.length) {
                                 setShowError(true);
                                 return;
@@ -623,7 +619,7 @@ const HcpPartnerRequests = () => {
                 show={!!formData}
                 onHide={() => setFormData(undefined)}>
                 <Modal.Header closeButton>
-                    <Modal.Title className="modal-title_small">Remove Request</Modal.Title>
+                    <Modal.Title className="modal-title_small">Send Form</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {formData ? (

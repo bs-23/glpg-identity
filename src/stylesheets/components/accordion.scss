@@ -73,7 +73,7 @@
 }
 
 .faq {
-  
+
     .faq-icon-minimize {
         display: none;
     }
@@ -162,7 +162,13 @@
     &__list-group {
 
         &--modal-open {
-            display: none;
+            visibility: hidden;
+        }
+
+        @media (max-width: $screen-tablet) {
+            &--modal-open {
+                visibility: visible;
+            }
         }
 
         .list-group-item:hover {
@@ -170,12 +176,13 @@
             cursor: pointer;
 
             .faq__list-group--modal-open {
-                display: block;
+                visibility: visible;
             }
         }
 
         &-icon {
             width: 50px;
+            flex: 0 0 50px;
         }
     }
 }

@@ -18,10 +18,16 @@ async function getPartnerRequests(req, res) {
         const offset = page * limit;
         const entitytype = req.query.entitytype;
 
+        const order = [
+            ['created_at', 'DESC'],
+            ['id', 'DESC']
+        ];
+
         const partnerRequests = await PartnerRequest.findAll({
             where: { entity_type: entitytype },
             offset,
             limit,
+            order,
             subQuery: false
         });
 

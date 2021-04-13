@@ -20,4 +20,10 @@
             border-color: $secondary-color-light !important;
         }
     }
+
+    @media (max-width: $screen-phone) {
+        h1 img {
+            max-height: 72px;
+        }
+    }
 }

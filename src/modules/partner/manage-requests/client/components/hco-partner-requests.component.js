@@ -123,10 +123,6 @@ const HcoPartnerRequests = () => {
         setShowForm(!!id);
     };
 
-    const sendFormHandler = (data) => {
-        setFormData(data);
-    };
-
     async function loadRequests() {
         const searchObj = {};
         const searchParams = location.search.slice(1).split("&");
@@ -136,6 +132,10 @@ const HcoPartnerRequests = () => {
         const query = '?entitytype=hco' + (searchObj.page ? `&page=${searchObj.page}` : '');
         dispatch(getPartnerRequests(query));
     }
+
+    const showSendFormConfirmation = (data) => {
+        setFormData(data);
+    };
 
     const urlChange = (pageNo) => {
         const page = pageNo ? pageNo : (params.get('page') ? params.get('page') : 1);
@@ -180,27 +180,29 @@ const HcoPartnerRequests = () => {
         }
     }, [selectedCountry]);
 
-    useEffect(() => {
-        if (formData) {
-            dispatch(sendForm(formData.id)).then(() => {
-                dispatch(updatePartnerRequest(formData.id, { ...formData, status: 'email_sent' })).then(() => {
-                    addToast('Form sent successfully.', {
-                        appearance: 'success',
-                        autoDismiss: true
-                    });
-                });
-            }).catch(() => {
-                addToast('An error occured. Please try again.', {
-                    appearance: 'error',
-                    autoDismiss: true
-                });
-            });
-        }
-    }, [formData]);
+
 
     useEffect(() => {
         dispatch(getLocalizations());
     }, [])
+
+    const confirmSendForm = (formData) => {
+        dispatch(sendForm(formData.id)).then(() => {
+            dispatch(updatePartnerRequest(formData.id, { ...formData, status: 'email_sent' })).then(() => {
+                setFormData(undefined);
+                addToast('Form sent successfully.', {
+                    appearance: 'success',
+                    autoDismiss: true
+                });
+            });
+        }).catch(() => {
+            setFormData(undefined);
+            addToast('An error occured. Please try again.', {
+                appearance: 'error',
+                autoDismiss: true
+            });
+        });
+    };
 
     return (
         <main className="app__content cdp-light-bg h-100">
@@ -277,18 +279,19 @@ const HcoPartnerRequests = () => {
                                                 <td data-for="Procurement Contact">{row.procurement_contact}</td>
                                                 <td data-for="Country">{getCountryName(row.country_iso2)}</td>
                                                 <td data-for="Action">
-                                                    {row.status === 'new_request' ?
-                                                        <Dropdown className="ml-auto dropdown-customize">
-                                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
-                                                            </Dropdown.Toggle>
-                                                            <Dropdown.Menu>
-                                                                <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
+                                                    <Dropdown className="ml-auto dropdown-customize">
+                                                        <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu>
+                                                            {row.status !== 'request_processed' &&
+                                                                <Dropdown.Item onClick={() => showSendFormConfirmation(row)}> Send Form </Dropdown.Item>
+                                                            }
+                                                            {row.status !== 'request_processed' &&
                                                                 <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                                <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
-                                                            </Dropdown.Menu>
-                                                        </Dropdown>
-                                                        : '--'
-                                                    }
+                                                            }
+                                                            <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
                                                 </td>
                                             </tr>
                                         ))}
@@ -525,6 +528,26 @@ const HcoPartnerRequests = () => {
                 <Modal.Footer>
                     <button className="btn cdp-btn-outline-primary" onClick={() => setRequestToDelete(null)}>Cancel</button>
                     <button className="ml-2 btn cdp-btn-secondary text-white" onClick={() => deleteRequest(requestToDelete)}>Confirm</button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal
+                centered
+                show={!!formData}
+                onHide={() => setFormData(undefined)}>
+                <Modal.Header closeButton>
+                    <Modal.Title className="modal-title_small">Send Form</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {formData ? (
+                        <div>
+                            Are you sure you want to send form for this request?
+                        </div>
+                    ) : null}
+                </Modal.Body>
+                <Modal.Footer>
+                    <button className="btn cdp-btn-outline-primary" onClick={() => setFormData(undefined)}>Cancel</button>
+                    <button className="ml-2 btn cdp-btn-secondary text-white" onClick={() => confirmSendForm(formData)}>Confirm</button>
                 </Modal.Footer>
             </Modal>
         </main>

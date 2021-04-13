@@ -180,7 +180,7 @@
     }
 
     @media (max-width: $screen-phone) {
-        height: 100vh;
+       /* height: 100vh;*/
         position: fixed;
         z-index: 1000;
 

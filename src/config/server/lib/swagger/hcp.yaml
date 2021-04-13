@@ -165,6 +165,8 @@ paths:
                             properties:
                                 email:
                                     type: string
+                                uuid:
+                                    type: string
                             required:
                                 - email
             responses:
