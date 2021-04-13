@@ -225,7 +225,7 @@ const HcoPartnerRequests = () => {
                                     <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Business Partner Requests</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
-                            <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
+                            <span className="ml-auto mr-3"><i onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary cursor-pointer"></i></span>
                         </nav>
 
                         {SearchHcoModal && <SearchHcoModal show={showSearch} resultSelected={resultSelected} searchInput={searchInput}/>}
@@ -394,7 +394,7 @@ const HcoPartnerRequests = () => {
                                             <label className="font-weight-bold" htmlFor="uuid">UUID <span className="text-danger">*</span></label>
                                             <div className="d-flex align-items-center">
                                                 <Field className="form-control" type="text" name="uuid" />
-                                                <i title="OKLA Search" type="button" className="fas fa-search ml-2 cdp-text-primary" onClick={() => openSearch(formikProps.values)}></i>
+                                                <i title="OKLA Search" className="fas fa-search ml-2 cdp-text-primary cursor-pointer" onClick={() => openSearch(formikProps.values)}></i>
                                             </div>
                                             <div className="invalid-feedback"><ErrorMessage name="uuid" /></div>
                                         </div>

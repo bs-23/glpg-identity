@@ -366,7 +366,7 @@ export default function hcpUsers() {
             {hasRowChanged &&
                 <>
                     <div className="d-flex position-absolute inline-editing__btn-wrap">
-                        <i style={isValid ? {} : { pointerEvents: 'none' }} onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps: editProps, formikProps })} disabled={!dirty} className={isValid ? 'fas fa-check mr-3 cdp-text-primary fa-1_5x' : 'fas fa-check mr-3 cdp-text-primary fa-1_5x inline-editing__btn-disable'} title="Save Changes" type="button"></i>
+                        <i style={isValid ? {} : { pointerEvents: 'none' }} onClick={() => onTableRowSave(hcps.users[rowIndex], { rowIndex, editableTableProps: editProps, formikProps })} disabled={!dirty} className={isValid ? 'fas fa-check mr-3 cdp-text-primary fa-1_5x cursor-pointer' : 'fas fa-check mr-3 cdp-text-primary fa-1_5x inline-editing__btn-disable'} title="Save Changes"></i>
                         <i onClick={resetForm} className="fas fa-times text-danger fa-1_5x cursor-pointer" title="Cancel Changes"></i>
                     </div>
                 </>

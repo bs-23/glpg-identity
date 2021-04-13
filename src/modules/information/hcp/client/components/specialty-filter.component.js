@@ -61,7 +61,7 @@ const SpecialtyFilter = (props) => {
     return <div className="pb-3 mb-3 border-bottom">
         <div className="d-flex justify-content-between align-items-center">
             <div className="mr-2 cdp-text-secondary">Filter {title}</div>
-            <i className="fas fa-times mr-2 cdp-text-secondary-lighter" type="button" onClick={() => onRemove(index)} />
+            <i className="fas fa-times mr-2 cdp-text-secondary-lighter cursor-pointer" onClick={() => onRemove(index)} />
         </div>
         <div>
             <label className="pt-2 mb-1 small font-weight-bold" for="field">
