@@ -584,15 +584,15 @@ async function mergeProcessData(req, res) {
                 if (in_exact_match_data.locations.length === itm.locations.length)
                 {
                     in_exact_match_data.locations.map((location, index)=>{
-                        let item = itm[index];
-                        if(location.location_status === item.location_status)
-                        if(location.location_facility === item.location_facility)
-                        if(location.location_city === item.location_city)
-                        if(location.location_country === item.location_country)
-                        if(location.location_zip === item.location_zip)
+                        let item_location = itm.locations[index];
+                        if(location.location_status === item_location.location_status)
+                        if(location.location_facility === item_location.location_facility)
+                        if(location.location_city === item_location.location_city)
+                        if(location.location_country === item_location.location_country)
+                        if(location.location_zip === item_location.location_zip)
                         {
-                            location.lat = item.lat;
-                            location.lng = item.lng;
+                            location.lat = item_location.lat;
+                            location.lng = item_location.lng;
                         }
                         return location;
                     });
