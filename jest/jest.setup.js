@@ -34,7 +34,7 @@ module.exports = async function () {
     const Localization = require(path.join(process.cwd(), 'src/modules/core/server/localization/localization.model.js'));
     const PartnerRequest = require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model.js'));
     const Partner = require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner.model.js'));
-
+    const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
 
     require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model.js'));
     require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model.js'));
@@ -46,12 +46,15 @@ module.exports = async function () {
     require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model.js'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-vendor.model.js'));
     require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
-
+    require(path.join(process.cwd(), "src/modules/platform/role/server/role.model"));
+    require(path.join(process.cwd(), 'src/modules/core/server/authorization/authorization.constants'));
+    require(path.join(process.cwd(), 'src/modules/core/server/filter/filter.model'));
 
     const PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permission-set.model"));
     const ServiceCategory = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/service.model"));
-    const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model.js"));
     const PermissionSetService = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionset-service.model.js"));
+    const PermissionSet_Application = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/permissionSet-application.model"));
+    const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model.js"));
     const UserProfilePermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model.js"));
 
     await sequelize.cdpConnector.sync();
@@ -74,4 +77,5 @@ module.exports = async function () {
     await Localization.bulkCreate(specHelper.localizations, { returning: true, ignoreDuplicates: false });
     await PartnerRequest.create(specHelper.partner_request);
     // await Partner.create(specHelper.partner);
+    await Country.bulkCreate(specHelper.countries, { returning: true, ignoreDuplicates: false });
 };
