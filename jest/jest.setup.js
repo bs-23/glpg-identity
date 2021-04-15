@@ -61,9 +61,10 @@ module.exports = async function () {
     await UserProfile.bulkCreate(specHelper.userProfile, { returning: true, ignoreDuplicates: false });
     await PermissionSetService.bulkCreate(specHelper.permissionSet_service, { returning: true, ignoreDuplicates: false });
     await UserProfilePermissionSet.bulkCreate(specHelper.userProfile_permissionSet, { returning: true, ignoreDuplicates: false });
-    // await Application.bulkCreate([specHelper.defaultApplication, specHelper.partnerRequestApplication], { returning: true, ignoreDuplicates: false });
     await User.create(specHelper.users.defaultAdmin);
     await User.create(specHelper.users.defaultUser);
+    await Application.create(specHelper.defaultApplication);
+    await Application.create(specHelper.partnerRequestApplication);
     await Hcp_profile.create(specHelper.hcp.defaultUser);
     await ConsentCategory.create(specHelper.consent.demoConsentCategory);
     await Consent.create(specHelper.consent.demoConsent);

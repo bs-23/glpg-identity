@@ -49,11 +49,19 @@ function invalidPhone(phone) {
     if (phone === '+') {
         return false;
     }
+    if (phone && (phone.length === 3 || phone.length === 4) && (phone[phone.length - 1] === "/")) {
+        return false;
+    }
     return true;
 }
 
 function invalidName(first_name) {
-    const invalidChars = ["É", "Ë", "Ï", "Ó", "Ö", "Ü", "é", "ë", "ï", "ó", "ö", "ü",
+    const validChars = [
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
+        "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "-", ".",
+        "Ç", "Œ", "Æ", "Ñ", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
+        "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "ch", "ñ",
+        "É", "Ë", "Ï", "Ó", "Ö", "Ü", "é", "ë", "ï", "ó", "ö", "ü",
         "À", "È", "É", "Ì", "Ò", "Ó", "Ù", "à", "è", "é", "ì", "ò", "ó", "ù",
         "Ä", "Ö", "Ü", "ẞ", "ä", "ö", "ü", "ß",
         "À", "Â", "Æ", "Ç", "É", "È", "Ê", "Ë", "Ï", "Î", "Ô", "Œ", "Ù", "Û", "Ü", "Ÿ",
@@ -61,7 +69,13 @@ function invalidName(first_name) {
 
     ];
 
-    if (invalidChars.some(v => first_name.includes(v))) {
+    const invalidChars = ["~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "[", "]",
+        "{", "}", "_", "+", "=", "|", "\\", "/", ":", ";", "\"", "\'", "<", ">", ",", "?"];
+
+    if (first_name && validChars.some(v => first_name.includes(v))) {
+        return true;
+    }
+    if (first_name && invalidChars.some(v => first_name.includes(v))) {
         return false;
     }
     return true;

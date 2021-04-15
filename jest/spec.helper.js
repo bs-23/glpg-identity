@@ -61,20 +61,20 @@ module.exports = {
     }),
     defaultApplication: {
         id: defaultApplicationId,
-        name: 'Jyseleca',
-        slug: 'Jyseleca',
+        name: faker.company.companyName(),
+        slug: 'jyseleca',
         type: 'hcp-portal',
         email: 'jyseleca@glpg.com',
-        password: 'P@ssword123',
+        password: 'strong-password',
         is_active: true,
-        auth_secret: 'd9ce7267-bb4e-4e3f-8901-ff28b8ad7e6a',
         logo_url: 'a',
         metadata: {
-            cache_clearing_url: "https://gwcm-dev.glpg.com/bin/public/glpg-brandx/clear/author-publish-cache",
+            cache_clearing_url: "a",
             approve_user_path: '/bin/public/glpg-brandx/mail/approve-user'
         },
         created_by: defaultAdminId,
         updated_by: defaultAdminId,
+        auth_secret: 'a8cb35f8-7090-4267-83c6-5ed2da1c4e93',
         access_token: jwt.sign({
             id: defaultApplicationId,
             email: 'hcp-portal@glpg.com',
@@ -84,9 +84,9 @@ module.exports = {
         id: partnerRequestApplicationId,
         name: 'Patients Organization',
         slug: 'Patients Organization',
+        type: 'standard',
         email: 'patients-organization@glpg.com',
         password: 'P@ssword123',
-        type: 'standard',
         is_active: true,
         auth_secret: 'b248eaa4-583f-4ecd-9e9c-be8f58ab3c3e',
         created_by: defaultAdminId,
@@ -222,11 +222,10 @@ module.exports = {
             id: demoFaqId,
             question: 'Key Benefits of a CDP',
             answer: '<p>CDPs improve your organization, better your customer relationships, and complement your current software and marketing efforts. Here are a handful of key benefits of having a CDP.</p>',
-            categories: ['general'],
+            topics: ["general-information"],
             created_by: defaultAdminId,
             updated_by: defaultAdminId
         }
-
     },
     okla: {
 
