@@ -108,7 +108,7 @@ const CountryConsentForm = (props) => {
                                             <Field disabled={props.editable ? true : false} data-testid="country_iso2" as="select" name="country_iso2" className="form-control">
                                                 <option key="select-country" value="" disabled>--Select Country--</option>
                                                 {props.editable && props.countries.length === 0 && <option value={country.country_iso2}>{country.codbase_desc}</option>}
-                                                {props.countries.map(item => <option key={item.countryid} value={item.country_iso2}>{props.editable ? country.codbase_desc : item.codbase_desc}</option>)}
+                                                {props.countries.map(item => <option key={item.id} value={item.country_iso2}>{props.editable ? country.codbase_desc : item.codbase_desc}</option>)}
                                             </Field>
                                             <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
                                         </div>
