@@ -59,6 +59,7 @@
         "faker": "^5.1.0",
         "formik": "^2.2.6",
         "glob": "^7.1.6",
+        "hcp-article-module": "^1.0.2",
         "helmet": "^4.4.1",
         "html-react-parser": "^1.2.1",
         "html-to-draftjs": "^1.5.0",

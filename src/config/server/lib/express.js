@@ -19,7 +19,7 @@ module.exports = async function () {
     app.use(
         helmet.contentSecurityPolicy({
             directives: {
-                "default-src": ["'self'"],
+                "default-src": ["'self'",'http://localhost:5000'],
                 "script-src": ["'self'", 'https://www.google.com', "https://www.gstatic.com"],
                 "script-src-elem": ["'self'", "https://www.google.com", "https://www.gstatic.com"],
                 "style-src": ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],

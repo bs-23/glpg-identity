@@ -8,6 +8,7 @@ import { getOklaHcpDetails, setOklaHcpDetails, getHcpArticles, setHcpArticles } 
 import MapView from '../../../../core/client/components/map-view';
 import { Tabs, Tab } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown';
+import Article from 'hcp-article-module';
 
 const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
     const dispatch = useDispatch();
@@ -193,7 +194,7 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                         {hcpArticles.length > 0 && 
                             <Tab eventKey="Articles" title="Articles">
                             <div className="faq shadow-sm bg-white">
-                                <Accordion defaultActiveKey="0"  className='faq__body'>
+                                {/* <Accordion defaultActiveKey="0"  className='faq__body'>
                                     {hcpArticles.map((article,index) => (
                                         <Card key={index}>
                                             <Accordion.Collapse eventKey={index + ""}>
@@ -210,7 +211,8 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                                             </Accordion.Toggle>
                                         </Card>
                                     ))}
-                                </Accordion>
+                                </Accordion> */}
+                                   <Article oneKeyID={hcpDetails.individualEid} uri="http://localhost:5000/graphql"/>
                             </div>
                         </Tab>
                         }
