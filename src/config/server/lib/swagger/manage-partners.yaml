@@ -87,12 +87,6 @@ paths:
                                     items:
                                         type: string
                                         format: binary
-                                consents:
-                                    type: array
-                                    items:
-                                        type: object
-                                        description: Key value pair of consent id and answer
-                                        example: { "id": true }
                             required:
                                 - type
                                 - request_id
@@ -249,12 +243,6 @@ paths:
                                     type: array
                                     items:
                                         type: string
-                                consents:
-                                    type: array
-                                    items:
-                                        type: object
-                                        description: Key value pair of consent id and answer
-                                        example: { "id": true }
                             required:
                                 - type
                                 - first_name
@@ -376,12 +364,6 @@ paths:
                                     items:
                                         type: string
                                         format: binary
-                                consents:
-                                    type: array
-                                    items:
-                                        type: object
-                                        description: Key value pair of consent id and answer
-                                        example: { "id": true }
                             required:
                                 - request_id
                                 - name
@@ -545,12 +527,6 @@ paths:
                                     type: array
                                     items:
                                         type: string
-                                consents:
-                                    type: array
-                                    items:
-                                        type: object
-                                        description: Key value pair of consent id and answer
-                                        example: { "id": true }
                             required:
                                 - name
                                 - registration_number

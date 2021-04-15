@@ -111,6 +111,13 @@ export default function HotStatistic() {
                             }}
                         />
                     </div>
+                    <div className="col-12 mb-3">
+                        {/*<span className="badge badge-secondary mr-1">New</span>*/}
+                        {/*<span className="badge badge-secondary mr-1">New</span>*/}
+                        {/*<span className="badge badge-secondary mr-1">New</span>*/}
+                        {/*<span className="badge badge-secondary mr-1">New</span>*/}
+                        {/*<span className="badge badge-secondary mr-1">New</span>*/}
+                    </div>
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i className="far fa-user hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">{statistics.hcps_count || 0}</div>
@@ -129,7 +136,7 @@ export default function HotStatistic() {
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i class="icon icon-partner hot-statistics__icon"></i>
                         <div className="hot-statistics__amount">{statistics.business_partner_count || 0}</div>
-                        <div className="hot-statistics__title"> Total Busniess Partners</div>
+                        <div className="hot-statistics__title"> Total Business Partners</div>
                     </div>
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i class="icon icon-marketing-promotion hot-statistics__icon"></i>

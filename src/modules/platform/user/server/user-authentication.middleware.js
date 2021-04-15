@@ -2,7 +2,7 @@ const path = require("path");
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-const { generateAccessToken } = require(path.join(process.cwd(), "src/modules/platform/user/server/user.controller.js"));
+const userService = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.service'));
 const { getUserWithPermissionRelations } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 
@@ -29,7 +29,7 @@ const CDPAuthStrategy = (req, res, next) => (
 
                 if(userInstanceFromDB.refresh_token !== refreshTokenFromCookie) throw new Error();
 
-                const updatedAccessToken = generateAccessToken(userInstanceFromDB);
+                const updatedAccessToken = userService.generateAccessToken(userInstanceFromDB);
 
                 req.logIn(userInstanceFromDB, { session: false }, function(error) {
                     if (error) { return next(error); }

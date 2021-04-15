@@ -6,7 +6,6 @@ const app = require(path.join(process.cwd(), 'src/config/server/lib/express'));
 
 const { defaultApplication, partnerRequestApplication } = specHelper;
 const { signCookie } = specHelper;
-const { consent: { demoConsent } } = specHelper;
 const { defaultAdmin, defaultUser } = specHelper.users;
 const { partner_request, partner } = specHelper;
 
