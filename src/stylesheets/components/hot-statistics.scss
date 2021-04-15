@@ -1,14 +1,27 @@
 .hot-statistics {
     &__box {
+        /*background: #F4F4F5;*/
 
         &-wrap {
-            background-color: $light-bg-color;
+            background-color: #F8F8F8;
+        }
+
+        @media (max-width: $screen-phone) {
+            border: 0px !important
         }
     }
 
     &__icon {
-        color: $gray-ccc;
-        font-size: 18px;
+        color: $primary-color;
+        font-size: 42px;
+        height: 52px;
+        display: block;
+    }
+
+    &__amount {
+        font-size: 34px;
+        font-weight: 600;
+        color: $secondary-color;
     }
 
     &__title {
@@ -17,9 +30,28 @@
         color: $primary-color;
     }
 
-    &__amount {
-        font-size: 32px;
-        font-weight: 600;
-        color: $primary-color;
+    .multiselect__control {
+        /* box-shadow: 0 0 0 0.2rem rgb(20 77 67 / 25%) !important;*/
+
+        &:focus,
+        &:hover,
+        &:active {
+            box-shadow: 0 0 0 0.2rem rgb(20 77 67 / 25%) !important;
+        }
+    }
+
+    @media (max-width: $screen-phone) {
+        &__icon {
+            font-size: 32px;
+            height: 36px;
+        }
+
+        &__amount {
+            font-size: 32px;
+        }
+
+        &__title {
+            font-size: 14px;
+        }
     }
 }

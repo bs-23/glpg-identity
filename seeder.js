@@ -59,7 +59,6 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/partner/manage-requests/server/partner-request.model'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-vendor.model'));
     require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner.model'));
-    require(path.join(process.cwd(), 'src/modules/partner/manage-partners/server/partner-consents.model'));
     require(path.join(process.cwd(), 'src/modules/core/server/storage/file.model'));
 
     await sequelize.cdpConnector.sync();
@@ -627,6 +626,7 @@ async function init() {
             { language_family: 'French', language_variant: 'Standard French', country_iso2: 'FR', locale: 'fr_FR' },
             { language_family: 'French', language_variant: 'Luxembourgish French', country_iso2: 'LU', locale: 'fr_LU' },
             { language_family: 'German', language_variant: 'Standard German', country_iso2: 'DE', locale: 'de_DE' },
+            { language_family: 'Italian', language_variant: 'Standard Italian', country_iso2: 'IT', locale: 'it_IT' },
             { language_family: 'Spanish', language_variant: 'Castilian Spanish', country_iso2: 'ES', locale: 'es_ES' },
         ];
 

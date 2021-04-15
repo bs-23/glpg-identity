@@ -18,10 +18,16 @@ async function getPartnerRequests(req, res) {
         const offset = page * limit;
         const entitytype = req.query.entitytype;
 
+        const order = [
+            ['created_at', 'DESC'],
+            ['id', 'DESC']
+        ];
+
         const partnerRequests = await PartnerRequest.findAll({
             where: { entity_type: entitytype },
             offset,
             limit,
+            order,
             subQuery: false
         });
 
@@ -144,14 +150,14 @@ async function sendForm(req, res) {
 
         const partnerRequest = await PartnerRequest.findOne({ where: { id } })
 
-        if (!partnerRequest) return res.status(400).send('Partner Request not found.');
+        if (!partnerRequest) return res.status(404).send('Partner Request not found.');
 
         const {
             application_id,
             first_name,
             last_name,
             email,
-            partner_type,
+            entity_type,
             country_iso2,
             locale
         } = partnerRequest.dataValues;
@@ -169,7 +175,7 @@ async function sendForm(req, res) {
             first_name,
             last_name,
             email,
-            partner_type: partner_type ? partner_type.toLowerCase() : undefined,
+            partner_type: entity_type ? entity_type.toLowerCase() : undefined,
             country_iso2: country_iso2.toLowerCase(),
             locale: locale
         };

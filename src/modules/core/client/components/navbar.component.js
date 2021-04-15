@@ -101,10 +101,10 @@ export default function Navigationbar() {
                             </div>}
                         </div>}
                         <div className="border-bottom mb-2">
-                            <a className="d-flex align-items-center py-2 px-3" onClick={myProfileClickHandler}><i className="icon icon-user-round mr-2 app__header-icon-user "></i> {first_name + " " + last_name}</a>
+                            <a className="d-inline-flex align-items-center py-2 px-3" onClick={myProfileClickHandler}><i className="icon icon-user-round mr-2 app__header-icon-user "></i> {first_name + " " + last_name}</a>
                         </div>
                         <div>
-                            <a className="d-flex align-items-center py-2 px-3" onClick={handleLogOut} href="/api/logout"><i className="icon icon-logout mr-2 app__header-icon-logout"></i> Sign out</a>
+                            <a className="d-inline-flex align-items-center py-2 px-3" onClick={handleLogOut} href="/api/logout"><i className="icon icon-logout mr-2 app__header-icon-logout"></i> Sign out</a>
                         </div>
                     </Navbar.Collapse>
                 </Navbar>

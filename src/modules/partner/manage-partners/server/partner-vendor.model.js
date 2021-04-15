@@ -136,7 +136,7 @@ const PartnerVendors = sequelize.cdpConnector.define('partner_vendors', {
     status: {
         allowNull: false,
         type: DataTypes.ENUM,
-        values: ['not_approved', 'approved'],
+        values: ['not_approved', 'approved', 'correction_pending'],
         defaultValue: 'not_approved'
     }
 }, {

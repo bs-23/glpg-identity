@@ -104,7 +104,7 @@ const PartnerDetails = (props) => {
                                             </li>
                                             <li className="pb-3">
                                                 <strong className="h6 font-weight-bold-light d-block">Postcode & City</strong>
-                                                <span className="h6 d-block text-secondary">{partner.post_code + ' ' + partner.city}</span>
+                                                <span className="h6 d-block text-secondary">{partner.post_code && partner.city ? partner.post_code + ' ' + partner.city : ''}</span>
                                             </li>
                                             <li className="pb-3">
                                                 <strong className="h6 font-weight-bold-light d-block">Country</strong>
@@ -123,7 +123,7 @@ const PartnerDetails = (props) => {
                                     <h6 className="bg-light p-3 font-weight-bold-light rounded-top">Galapagos Contracts</h6>
                                     <div className="p-3">
                                         {partner.documents && partner.documents.map(doc => (
-                                            <a key={doc.id} onClick={() => downloadFile(doc.id)} type="button" className="d-block mb-2 d-flex align-items-baseline cdp-text-primary">
+                                            <a key={doc.id} onClick={() => downloadFile(doc.id)} className="d-block mb-2 d-flex align-items-baseline cdp-text-primary cursor-pointer">
                                                 <i className="fas fa-paperclip mr-2"></i>{doc.name}
                                             </a>
                                         ))

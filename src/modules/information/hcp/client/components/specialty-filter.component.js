@@ -4,6 +4,11 @@ import Select from 'react-select';
 import { useSelector, useDispatch } from 'react-redux';
 import { getHCPSpecialities } from '../hcp.actions';
 
+const selectStyles = {
+    menuPortal: base => ({ ...base, zIndex: 9999 }),
+    menu: provided => ({ ...provided, zIndex: "9999 !important" })
+};
+
 const SpecialtyFilter = (props) => {
     const {
         title,
@@ -56,7 +61,7 @@ const SpecialtyFilter = (props) => {
     return <div className="pb-3 mb-3 border-bottom">
         <div className="d-flex justify-content-between align-items-center">
             <div className="mr-2 cdp-text-secondary">Filter {title}</div>
-            <i className="fas fa-times mr-2 cdp-text-secondary-lighter" type="button" onClick={() => onRemove(index)} />
+            <i className="fas fa-times mr-2 cdp-text-secondary-lighter cursor-pointer" onClick={() => onRemove(index)} />
         </div>
         <div>
             <label className="pt-2 mb-1 small font-weight-bold" for="field">
@@ -109,6 +114,7 @@ const SpecialtyFilter = (props) => {
                     classNamePrefix="multiselect"
                     value={getSelectedCountry()}
                     closeMenuOnScroll={false}
+                    styles={selectStyles}
                     menuPortalTarget={document.body}
                     onChange={({ value }) => {
                         onChange('country', value, index);
@@ -133,6 +139,7 @@ const SpecialtyFilter = (props) => {
                     options={currentFilterOption.getOptions({ country: filter.country })}
                     className="basic-multi-select"
                     classNamePrefix="select"
+                    styles={selectStyles}
                     menuPortalTarget={document.body}
                     value={selectedSpecialties}
                     onChange={selectedOption => {

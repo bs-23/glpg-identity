@@ -121,7 +121,7 @@ const OklaHcpDetails = ({ individual, setSelectedIndividual }) => {
                             <Dropdown>
                                 <Dropdown.Toggle
                                     variant=""
-                                    className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center dropdown-toggle btn">
+                                    className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center okla-search__details-dropdown">
                                     {selectedWorkplace ? selectedWorkplace.name || selectedWorkplace.alternateName : ''}
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>

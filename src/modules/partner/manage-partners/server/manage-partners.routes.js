@@ -13,6 +13,9 @@ module.exports = app => {
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getPartners)
         .post(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(createPartnerSchema), controller.createPartner);
 
+        app.route('/api/partners/all')
+        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getAllPartners);
+
     app.route('/api/partners/wholesalers')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER]), controller.getPartnerWholesalers);
 
@@ -44,5 +47,5 @@ module.exports = app => {
         .put(passport.authenticate('application-jwt', { session: false }), validateFile(multer.array('documents', 5)), validate(updatePartnerSchema), controller.updatePartner);
 
     app.route('/api/partners/:entityType/:id/resend-form')
-        .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER, Services.MANAGE_ENTITY_REQUEST]), controller.resendForm);
+        .put(CDPAuthStrategy, ServiceGuard([Services.MANAGE_BUSINESS_PARTNER, Services.MANAGE_ENTITY_REQUEST]), controller.resendForm);
 };

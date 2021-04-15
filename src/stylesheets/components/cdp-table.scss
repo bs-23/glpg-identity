@@ -81,17 +81,21 @@
             .inline-editing {
                 &__edit-icon {
                     color: $gray-999;
+                    margin-right: 8px;
                 }
 
                 &__btn-wrap {
                     width: 100%;
-                    /*background: #F8FFB5;
-                    justify-content: center;
-                    box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 15%);*/
+                    position: relative !important;
+                   
                     i {
                         border: 1px solid;
-                        padding: 0px 10px;
+                        padding: 5px 10px;
                         border-radius: 3px;
+
+                        &.fa-check {
+                            padding: 5px 7px;
+                        }
                     }
                 }
             }
@@ -164,6 +168,8 @@
     td {
         color: #202020;
         font-size: 14px;
+        word-break: break-word !important;
+        word-wrap: break-word !important;
     }
 
     &-consent {

@@ -54,4 +54,25 @@
             display: none;
         }
     }
-}
+
+    @media (min-width: $screen-phone) {
+        &-okla-width {
+            width: 90%;
+            max-width: 90%;
+        }
+    }
+    @media (max-width: $screen-phone) {
+        &-header {
+            padding: 15px 30px;
+        }
+
+        &-title {
+            font-size: 24px !important;
+            font-weight: 600 !important;
+
+            &_small {
+                font-size: 20px !important;
+            }
+        }
+    }
+    }

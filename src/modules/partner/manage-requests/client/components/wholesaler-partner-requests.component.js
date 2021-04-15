@@ -118,11 +118,12 @@ const WholesalerPartnerRequests = () => {
                                 {`Company Code ${idx + 1}`} <span className="text-danger">*</span>
                             </span>
                             {
-                                len === 1 ? null : <i className="fas fa-minus-circle text-danger hover-opacity ml-auto" type="button" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
+                                len === 1 ? null : <i className="fas fa-minus-circle text-danger hover-opacity ml-auto cursor-pointer" title="Remove" onClick={() => removeCompanyCode(idx)}></i>
                             }
                         </label>
                         <Field className="form-control company_code" type='text' value={item.company_code} onChange={(e) => handleChange(e)} data-id={idx} name={companyCodeId} id={companyCodeId} />
                         {showError && !item.company_code && <div className="invalid-feedback">This field must not be empty.</div>}
+                        {showError && item.company_code.length > 25 && <div className="invalid-feedback">This field must be at most 25 characters long.</div>}
                     </div>
                 </div>
             </React.Fragment>
@@ -139,7 +140,8 @@ const WholesalerPartnerRequests = () => {
         const query = '?entitytype=wholesaler' + (searchObj.page ? `&page=${searchObj.page}` : '');
         dispatch(getPartnerRequests(query));
     }
-    const sendFormHandler = (data) => {
+
+    const showSendFormConfirmation = (data) => {
         setFormData(data);
     };
 
@@ -168,19 +170,6 @@ const WholesalerPartnerRequests = () => {
     }, [partnerRequestId]);
 
     useEffect(() => {
-        if (formData) {
-            dispatch(sendForm(formData.id)).then(() => {
-                dispatch(updatePartnerRequest(formData.id, { ...formData, status: 'email_sent' }));
-            }).catch(() => {
-                addToast('An error occured. Please try again.', {
-                    appearance: 'error',
-                    autoDismiss: true
-                });
-            });
-        }
-    }, [formData]);
-
-    useEffect(() => {
         if (request.company_codes) {
             const codes = request.company_codes.map(company_code => ({ id: Math.random(), company_code }));
             setCompanyCodes(codes);
@@ -190,6 +179,24 @@ const WholesalerPartnerRequests = () => {
     useEffect(() => {
         dispatch(getLocalizations());
     }, []);
+
+    const confirmSendForm = (formData) => {
+        dispatch(sendForm(formData.id)).then(() => {
+            dispatch(updatePartnerRequest(formData.id, { ...formData, status: 'email_sent' })).then(() => {
+                setFormData(undefined);
+                addToast('Form sent successfully.', {
+                    appearance: 'success',
+                    autoDismiss: true
+                });
+            });
+        }).catch(() => {
+            setFormData(undefined);
+            addToast('An error occured. Please try again.', {
+                appearance: 'error',
+                autoDismiss: true
+            });
+        });
+    };
 
     return (
         <main className="app__content cdp-light-bg">
@@ -212,7 +219,7 @@ const WholesalerPartnerRequests = () => {
                                     <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Business Partner Requests</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
-                            <span className="ml-auto mr-3"><i type="button" onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
+                            <span className="ml-auto mr-3"><i onClick={handleShowFaq} className="cursor-pointer icon icon-help breadcrumb__faq-icon cdp-text-secondary"></i></span>
                         </nav>
                         <Modal show={showFaq} onHide={handleCloseFaq} size="xl" centered>
                             <Modal.Header closeButton>
@@ -225,13 +232,11 @@ const WholesalerPartnerRequests = () => {
 
                 <div className="row">
                     <div className="col-12">
-                        <div className="d-flex justify-content-between align-items-end mb-0 mt-3">
+                        <h4 className="cdp-text-primary font-weight-bold mb-0 mt-2">Manage Wholesalers Request</h4>
+                        <div className="d-flex justify-content-between align-items-end py-2 py-sm-0 mb-0 mt-2 mt-sm-3 cdp-table__responsive-sticky-panel">
                             <div>
-                                <h4 className="cdp-text-primary font-weight-bold mb-0">Manage Wholesalers Request</h4>
-                                <div className="pt-3">
-                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/vendors"><i className="fas fa-hospital-user fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">General Vendors</span></NavLink>
-                                    <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/wholesalers"><i className="fas fa-dolly fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Wholesalers</span></NavLink>
-                                </div>
+                                <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/vendors"><i className="fas fa-hospital-user fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">General Vendors</span></NavLink>
+                                <NavLink className="custom-tab px-3 py-3 font-weight-normal cdp-border-primary" to="/business-partner/requests/wholesalers"><i className="fas fa-dolly fa-1_5x"></i><span className="d-none d-sm-inline-block ml-2">Wholesalers</span></NavLink>
                             </div>
                             <div className="d-flex justify-content-between align-items-center mb-2">
                                 <button onClick={() => setShowForm(true)} className="btn cdp-btn-secondary text-white ml-2">
@@ -246,14 +251,14 @@ const WholesalerPartnerRequests = () => {
                                 <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-table__header  cdp-bg-primary text-white">
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Status</th>
-                                            <th>Company Code</th>
-                                            <th>Partner Type</th>
-                                            <th>Email Address</th>
-                                            <th>Procurement Contact</th>
-                                            <th>Country</th>
-                                            <th>Action</th>
+                                            <th width="15%">Name</th>
+                                            <th width="10%">Status</th>
+                                            <th width="10%">Company Code</th>
+                                            <th width="13%">Partner Type</th>
+                                            <th width="15%">Email Address</th>
+                                            <th width="15%">Procurement Contact</th>
+                                            <th width="12%">Country</th>
+                                            <th width="10%">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -275,18 +280,19 @@ const WholesalerPartnerRequests = () => {
                                                     <td data-for="Procurement Contact">{row.procurement_contact}</td>
                                                     <td data-for="Country">{getCountryName(row.country_iso2)}</td>
                                                     <td data-for="Action">
-                                                        {row.status === 'new_request' ?
-                                                            <Dropdown className="ml-auto dropdown-customize">
-                                                                <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
-                                                                </Dropdown.Toggle>
-                                                                <Dropdown.Menu>
-                                                                    <Dropdown.Item onClick={() => sendFormHandler(row)}> Send Form </Dropdown.Item>
+                                                        <Dropdown className="ml-auto dropdown-customize">
+                                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn-sm py-0 px-1 dropdown-toggle ">
+                                                            </Dropdown.Toggle>
+                                                            <Dropdown.Menu>
+                                                                {row.status !== 'request_processed' &&
+                                                                    <Dropdown.Item onClick={() => showSendFormConfirmation(row)}> Send Form </Dropdown.Item>
+                                                                }
+                                                                {row.status !== 'request_processed' &&
                                                                     <Dropdown.Item onClick={() => toggleForm(row.id)}> Edit Request </Dropdown.Item>
-                                                                    <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
-                                                                </Dropdown.Menu>
-                                                            </Dropdown>
-                                                            : '--'
-                                                        }
+                                                                }
+                                                                <Dropdown.Item className="text-danger" onClick={() => setRequestToDelete(row.id)}> Delete </Dropdown.Item>
+                                                            </Dropdown.Menu>
+                                                        </Dropdown>
                                                     </td>
                                                 </tr>
                                             ))
@@ -345,7 +351,7 @@ const WholesalerPartnerRequests = () => {
                         onSubmit={(values, actions) => {
                             values.company_codes = companyCodes.map(i => i.company_code);
 
-                            const validCompanyCodes = companyCodes.filter(item => item.company_code);
+                            const validCompanyCodes = companyCodes.filter(item => item.company_code && item.company_code.length <= 25);
                             if (companyCodes.length !== validCompanyCodes.length) {
                                 setShowError(true);
                                 return;
@@ -455,7 +461,7 @@ const WholesalerPartnerRequests = () => {
                                             <div className="col-12 col-sm-6 col-lg-4">
                                                 <label>&#160;</label>
                                                 <div className="form-group">
-                                                    <div className="d-flex align-items-center hover-opacity" type="button" onClick={addNewCompanyCode}>
+                                                    <div className="d-flex align-items-center hover-opacity cursor-pointer" onClick={addNewCompanyCode}>
                                                         <i className="fas fa-plus cdp-text-secondary mr-2" ></i>
                                                         <span className="cdp-text-secondary mb-0">Add Company Code</span>
                                                     </div>
@@ -477,7 +483,7 @@ const WholesalerPartnerRequests = () => {
                                                 }}
                                             >
                                                 <option key="select-country" value="" disabled>--Select Country--</option>
-                                                {countries.filter(c => userCountries.includes(c.country_iso2)).map(item => <option key={item.countryid} value={item.country_iso2}>{item.codbase_desc}</option>)}
+                                                {countries.filter(c => userCountries.includes(c.country_iso2)).map((item, countryIdx) => <option key={countryIdx} value={item.country_iso2}>{item.codbase_desc}</option>)}
                                             </Field>
                                             <div className="invalid-feedback"><ErrorMessage name="country_iso2" /></div>
                                         </div>
@@ -522,6 +528,26 @@ const WholesalerPartnerRequests = () => {
                 <Modal.Footer>
                     <button className="btn cdp-btn-outline-primary" onClick={() => setRequestToDelete(null)}>Cancel</button>
                     <button className="ml-2 btn cdp-btn-secondary text-white" onClick={() => deleteRequest(requestToDelete)}>Confirm</button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal
+                centered
+                show={!!formData}
+                onHide={() => setFormData(undefined)}>
+                <Modal.Header closeButton>
+                    <Modal.Title className="modal-title_small">Send Form</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {formData ? (
+                        <div>
+                            Are you sure you want to send form for this request?
+                        </div>
+                    ) : null}
+                </Modal.Body>
+                <Modal.Footer>
+                    <button className="btn cdp-btn-outline-primary" onClick={() => setFormData(undefined)}>Cancel</button>
+                    <button className="ml-2 btn cdp-btn-secondary text-white" onClick={() => confirmSendForm(formData)}>Confirm</button>
                 </Modal.Footer>
             </Modal>
         </main >

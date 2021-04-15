@@ -88,6 +88,11 @@
                 font-size: 16px;
             }
 
+            &--dropdown {
+                white-space: normal !important;
+                text-align: left;
+            }
+
             &-workplace-dropdown-item {
                 white-space: normal;
                 border-bottom: 1px solid $gray-F2F2F2;

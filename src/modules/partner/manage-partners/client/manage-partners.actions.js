@@ -12,6 +12,16 @@ export function getHcpPartners(query = '') {
     };
 }
 
+export function getPartnersToBeApproved(query = '') {
+    return {
+        type: Types.GET_PARTNER_APPROVAL,
+        payload: axios({
+            method: 'get',
+            url: `/api/partners/all${query}`
+        })
+    };
+}
+
 export function getHcoPartners(query = '') {
     query = !query ? '?type=hco' : query + '&type=hco';
     return {
@@ -63,12 +73,13 @@ export function approveBusinessPartner(id, type) {
     };
 }
 
-export function resendFormForCorrection(id, type) {
+export function resendFormForCorrection(id, type,data) {
     return {
         type: Types.RESEND_FORM,
         payload: axios({
-            method: 'get',
-            url: `/api/partners/${type}/${id}/resend-form`
+            method: 'put',
+            url: `/api/partners/${type}/${id}/resend-form`,
+            data
         })
     };
 }
