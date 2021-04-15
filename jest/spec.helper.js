@@ -63,18 +63,18 @@ module.exports = {
         id: defaultApplicationId,
         name: faker.company.companyName(),
         slug: 'jyseleca',
+        type: 'hcp-portal',
         email: 'jyseleca@glpg.com',
         password: 'strong-password',
-        consent_confirmation_path: 'a',
-        journey_redirect_path: 'a',
-        reset_password_link: 'a',
-        login_link: 'a',
-        logo_link: 'a',
-        forgot_password_link: '',
+        is_active: true,
+        logo_url: 'a',
+        metadata: {
+            cache_clearing_url: "a",
+            approve_user_path: '/bin/public/glpg-brandx/mail/approve-user'
+        },
         created_by: defaultAdminId,
         updated_by: defaultAdminId,
         auth_secret: 'a8cb35f8-7090-4267-83c6-5ed2da1c4e93',
-        approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
         access_token: jwt.sign({
             id: defaultApplicationId,
             email: 'hcp-portal@glpg.com',
@@ -84,11 +84,11 @@ module.exports = {
         id: partnerRequestApplicationId,
         name: 'Patients Organization',
         slug: 'Patients Organization',
+        type: 'standard',
         email: 'patients-organization@glpg.com',
         password: 'P@ssword123',
-        approve_user_path: '/bin/public/glpg-brandx/mail/approve-user',
+        is_active: true,
         auth_secret: 'b248eaa4-583f-4ecd-9e9c-be8f58ab3c3e',
-        logo_link: 'a',
         created_by: defaultAdminId,
         updated_by: defaultAdminId,
         metadata: JSON.stringify({
@@ -222,11 +222,10 @@ module.exports = {
             id: demoFaqId,
             question: 'Key Benefits of a CDP',
             answer: '<p>CDPs improve your organization, better your customer relationships, and complement your current software and marketing efforts. Here are a handful of key benefits of having a CDP.</p>',
-            categories: ['general'],
+            topics: ["general-information"],
             created_by: defaultAdminId,
             updated_by: defaultAdminId
         }
-
     },
     okla: {
 
