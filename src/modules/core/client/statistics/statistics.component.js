@@ -14,7 +14,7 @@ export default function HotStatistic() {
     const [selectedCountries, setSelectedCountries] = useState([]);
     const [countryOptions, setCountryOptions] = useState([]);
 
-    let getCountryOptions = countries.filter(c => permittedCountries.map(c => c.toLowerCase()).includes(c.country_iso2.toLowerCase())).map(c => ({ value: c.country_iso2.toLowerCase(), label: c.countryname, checked: false}));
+    let getCountryOptions = countries.filter(c => permittedCountries.map(c => c.toLowerCase()).includes(c.country_iso2.toLowerCase())).map(c => ({ value: c.country_iso2.toLowerCase(), label: c.countryname, checked: true}));
 
     const getSelectedCountries = (country,index) => {
         countryOptions.map(countryOption => {
@@ -85,16 +85,17 @@ export default function HotStatistic() {
                 Hot Statistics
                 <i onClick={() => setShow(true)} className="icon icon-expand cdp-inbox__icon-expand cdp-inbox__icon-toggle d-none d-lg-block cursor-pointer"></i>
                 <i className="icon icon-minimize cdp-inbox__icon-minimize cdp-inbox__icon-toggle cursor-pointer" onClick={() => setShow(false)}></i>
-
                 <i className="fas fa-chart-line d-block d-lg-none"></i>
             </h5>
             <div className="px-3 pt-3 shadow-sm hot-statistics__box-wrap">
                 <div className="row">
                     <div className="col-12 mb-3">
-                        {countryOptions.map((country, key) => {
-                            return <span className={country.checked ?"badge badge-success mr-1" : "badge badge-secondary mr-1"} onClick={(e)=> {getSelectedCountries(country, key)}}>{country.label}
-                            </span>
-                        })}
+                        <div className="bg-white border rounded p-2">
+                            {countryOptions.map((country, key) => {
+                                return <span title={country.checked ? "Click to deselect" : "Click to select"} className={country.checked ? "badge hot-statistics__badge-selected text-white mr-2 mb-1 font-weight-normal cursor-pointer hot-statistics__badge" : "badge mr-2 mb-1 font-weight-normal cursor-pointer hot-statistics__badge text-dark"} onClick={(e) => { getSelectedCountries(country, key) }}>{country.label}
+                                </span>
+                            })}
+                        </div>
                     </div>
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i className="far fa-user hot-statistics__icon"></i>
