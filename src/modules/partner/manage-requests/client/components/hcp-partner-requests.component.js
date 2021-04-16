@@ -29,7 +29,7 @@ const HcpPartnerRequests = () => {
     const [formData, setFormData] = useState(undefined);
     const localizations = useSelector(state => state.localizationReducer.localizations);
 
-    const partnerTypes = ['SUPL', 'CUST', 'HCP', 'HCO', 'POR', 'ZVST'];
+    const partnerTypes = ['HCP', 'HCO', 'POR'];
     const [requestToDelete, setRequestToDelete] = useState(null);
 
     const [showFaq, setShowFaq] = useState(false);

@@ -28,7 +28,6 @@ const WholesalerPartnerRequests = () => {
     //     { language_name: 'German', language_code: 'de' },
     //     { language_name: 'Dutch', language_code: 'nl' }
     // ];
-    const partnerTypes = ['SUPL', 'CUST', 'HCP', 'HCO', 'POR', 'ZVST'];
     const [requestToDelete, setRequestToDelete] = useState(null);
 
     const [formData, setFormData] = useState(undefined);
@@ -269,11 +268,11 @@ const WholesalerPartnerRequests = () => {
                                                     <td data-for="Name">{`${row.first_name} ${row.last_name}`}</td>
                                                     <td data-for="Status" class="text-capitalize">{row.status.split('_').join(' ')}</td>
                                                     <td data-for="Company Code">
-                                                    {
-                                                        row.company_codes && row.company_codes.length && row.company_codes.map((companyCode, idx) => (
-                                                            <span className="badge badge-pill badge-light mr-1" key={idx}>{companyCode}</span>
-                                                        ))
-                                                    }
+                                                        {
+                                                            row.company_codes && row.company_codes.length && row.company_codes.map((companyCode, idx) => (
+                                                                <span className="badge badge-pill badge-light mr-1" key={idx}>{companyCode}</span>
+                                                            ))
+                                                        }
                                                     </td>
                                                     <td data-for="Partner Type">{row.partner_type}</td>
                                                     <td data-for="Email Address">{row.email}</td>
@@ -343,7 +342,7 @@ const WholesalerPartnerRequests = () => {
                             company_codes: [],
                             country_iso2: partnerRequestId && Object.keys(request).length ? request.country_iso2 : '',
                             locale: partnerRequestId && Object.keys(request).length ? request.locale : '',
-                            partner_type: partnerRequestId && Object.keys(request).length ? request.partner_type : '',
+                            partner_type: 'CUST',
                         }}
                         displayName="PartnerRequestsForm"
                         validationSchema={partnerRequestSchemaForWholesalers}
@@ -408,16 +407,6 @@ const WholesalerPartnerRequests = () => {
                                             <label className="font-weight-bold" htmlFor="last_name">Last Name <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="last_name" />
                                             <div className="invalid-feedback"><ErrorMessage name="last_name" /></div>
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-6 col-lg-4">
-                                        <div className="form-group">
-                                            <label className="font-weight-bold" htmlFor="partner_type">Business Partner Type <span className="text-danger">*</span></label>
-                                            <Field data-testid="partner_type" as="select" name="partner_type" className="form-control">
-                                                <option key="select-country" value="" disabled>--Select Partner Type--</option>
-                                                {partnerTypes.map((item, typeIdx) => <option key={typeIdx} value={item}>{item}</option>)}
-                                            </Field>
-                                            <div className="invalid-feedback"><ErrorMessage name="partner_type" /></div>
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
