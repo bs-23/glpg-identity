@@ -441,7 +441,7 @@ export default function ConsentImportJobsComponent() {
                                     <tr>
                                         <th width="15%">Individual OneKeyId</th>
                                         <th width="15%">Email</th>
-                                        <th width="15%">Opt-In Date</th>
+                                        <th width="15%">Capture Date</th>
                                         <th width="15%">Opt Type</th>
                                         <th width="15%">Multichannel Consent ID</th>
                                         <th width="15%">Remarks</th>

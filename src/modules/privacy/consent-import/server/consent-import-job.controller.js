@@ -302,15 +302,6 @@ async function exportJobReport(req, res) {
 
         if (!record) return res.status(404).send(`No record found.`);
 
-        const consentLocale = await ConsentLocale.findOne({
-            where: {
-                consent_id: record.consent_id,
-                locale: {
-                    [Op.iLike]: record.consent_locale
-                }
-            }
-        });
-
         const exportData = record.data.map(item => ({
             'Individual OneKeyId': item.onekey_id,
             'Email': item.email,
@@ -319,7 +310,7 @@ async function exportJobReport(req, res) {
             'Legal Text': parse(record.rich_text).replace(/(<\/?(?:a)[^>]*>)|<[^>]+>/ig, '$1'),
             'Multichannel Consent Id': item.multichannel_consent_id,
             'Opt Type': item.opt_type,
-            'Opt-In Date': item.captured_date,
+            'Capture Date': item.captured_date,
             'Remarks': item.invalid_onekeyid ? 'OneKeyId is not found.' : item.email_is_different_in_veeva ? 'Email address is different in Veeva CRM' : 'N/A'
         }));
 
