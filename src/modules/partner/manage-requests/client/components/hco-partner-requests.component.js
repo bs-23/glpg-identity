@@ -52,6 +52,8 @@ const HcoPartnerRequests = () => {
 
     const localizations = useSelector(state => state.localizationReducer.localizations);
 
+    const partnerTypes = ['HCP', 'HCO', 'POR'];
+
     const [showSearch, setShowSearch] = useState(false);
     const [searchInput, setSearchInput] = useState(false);
     const openSearch = (values) => {
@@ -167,16 +169,16 @@ const HcoPartnerRequests = () => {
     }, [partnerRequestId]);
 
     useEffect(() => {
-        if(request.country_iso2){
+        if (request.country_iso2) {
             const country = allCountries.find(i => i.country_iso2 === request.country_iso2);
-            if(country) getSpecialties(country.codbase);
+            if (country) getSpecialties(country.codbase);
         }
     }, [partnerRequestId, request.country_iso2]);
 
     useEffect(() => {
-        if(selectedCountry) {
+        if (selectedCountry) {
             const country = allCountries.find(i => i.country_iso2 === selectedCountry);
-            if(country) getSpecialties(country.codbase);
+            if (country) getSpecialties(country.codbase);
         }
     }, [selectedCountry]);
 
@@ -228,7 +230,7 @@ const HcoPartnerRequests = () => {
                             <span className="ml-auto mr-3"><i onClick={handleShowFaq} className="icon icon-help breadcrumb__faq-icon cdp-text-secondary cursor-pointer"></i></span>
                         </nav>
 
-                        {SearchHcoModal && <SearchHcoModal show={showSearch} resultSelected={resultSelected} searchInput={searchInput}/>}
+                        {SearchHcoModal && <SearchHcoModal show={showSearch} resultSelected={resultSelected} searchInput={searchInput} />}
 
                         <Modal show={showFaq} onHide={handleCloseFaq} size="xl" centered>
                             <Modal.Header closeButton>
@@ -344,6 +346,7 @@ const HcoPartnerRequests = () => {
                             locale: partnerRequestId && Object.keys(request).length ? request.locale : '',
                             uuid: partnerRequestId && Object.keys(request).length ? request.uuid : '',
                             onekey_id: partnerRequestId && Object.keys(request).length ? request.onekey_id : '',
+                            partner_type: partnerRequestId && Object.keys(request).length ? request.partner_type : ''
                         }}
                         innerRef={formikRef}
                         displayName="PartnerRequestsForm"
@@ -411,6 +414,16 @@ const HcoPartnerRequests = () => {
                                             <label className="font-weight-bold" htmlFor="last_name">Contact Last Name <span className="text-danger">*</span></label>
                                             <Field className="form-control" type="text" name="last_name" />
                                             <div className="invalid-feedback"><ErrorMessage name="last_name" /></div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="form-group">
+                                            <label className="font-weight-bold" htmlFor="partner_type">Business Partner Type <span className="text-danger">*</span></label>
+                                            <Field data-testid="partner_type" as="select" name="partner_type" className="form-control">
+                                                <option key="select-country" value="" disabled>--Select Partner Type--</option>
+                                                {partnerTypes.map((item, typeIdx) => <option key={typeIdx} value={item}>{item}</option>)}
+                                            </Field>
+                                            <div className="invalid-feedback"><ErrorMessage name="partner_type" /></div>
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
