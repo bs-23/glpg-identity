@@ -11,6 +11,9 @@ module.exports = app => {
     app.route('/api/hcps')
         .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.getHcps);
 
+    app.route('/api/export-hcps')
+        .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.exportHcps);
+
     app.route('/api/hcps/specialties')
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP, Services.DISCOVER_HCP_HCO, Services.MANAGE_ENTITY_REQUEST]), controller.getSpecialtiesForCdp);
 

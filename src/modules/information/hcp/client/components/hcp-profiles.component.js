@@ -19,6 +19,7 @@ import { HcpInlineEditSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
 import EditableTable from '../../../../core/client/components/EditableTable/EditableTable';
 import { HCPFilter } from "../../../../information";
+import fileDownload from 'js-file-download';
 
 const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     const [comment, setComment] = useState("");
@@ -546,6 +547,43 @@ export default function hcpUsers() {
         }
     }, [location]);
 
+    const exportExcelFile = () => {
+        if(!isFilterEnabled) {
+            addToast("Please, select filter.", {
+                appearance: 'warning',
+                autoDismiss: true
+            });
+            return;
+        }
+
+        const data = {
+            filters: hcpFilterRef.current.multiFilterProps.values.filters,
+            logic: hcpFilterRef.current.multiFilterProps.values.logic
+        };
+
+        axios.post(`/api/export-hcps`, data, {
+            responseType: 'blob',
+        }).then(res => {
+            const pad2 = (n) => (n < 10 ? '0' + n : n);
+
+            var date = new Date();
+            const timestamp = date.getFullYear().toString() + pad2(date.getMonth() + 1) + pad2(date.getDate()) + pad2(date.getHours()) + pad2(date.getMinutes()) + pad2(date.getSeconds());
+
+            fileDownload(res.data, `hcps_${timestamp}.xlsx`);
+        }).catch(error => {
+            /**
+             * the error response is a blob because of the responseType option.
+             * text() converts it back to string
+             */
+            console.log(error);
+
+            // addToast(error, {
+            //     appearance: 'warning',
+            //     autoDismiss: true
+            // });
+        });
+    };
+
     return (
         <main className="app__content cdp-light-bg">
             <div className="container-fluid">
@@ -602,6 +640,9 @@ export default function hcpUsers() {
                                             </Accordion.Collapse>
                                         </Accordion>
                                     }
+                                    <div className="mr-2">
+                                        <div className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-btn-link-secondary cursor-pointer" onClick={() => exportExcelFile()}><i className="fas fa-download pr-2"></i> Export Hcps</div>
+                                    </div>
                                     <div className="mr-2">
                                         <div>
                                             {renderUuidAuthorities()}

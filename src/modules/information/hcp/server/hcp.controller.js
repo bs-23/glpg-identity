@@ -19,7 +19,7 @@ const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/server/password/password-policies'));
 const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions'));
-
+const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
 const { generateFilterOptions } = require('./hcp.service');
@@ -201,6 +201,92 @@ async function getHcps(req, res) {
         logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
+    }
+}
+
+async function exportHcps(req, res) {
+    try {
+        const currentFilter = req.body;
+        const { fields } = req.body;
+
+        const [userPermittedApplications, userPermittedCountries] = await getUserPermissions(req.user.id);
+
+        const getAttributes = () => {
+            const fieldsToExclude = ['hcpConsents', 'origin_url', 'password', 'password_updated_at', 'reset_password_expires', 'reset_password_token', 'failed_auth_attempt', 'created_by', 'updated_by', 'updated_at'];
+
+            let requiredAttributes = fields && fields.length
+                ? fields.filter(field => !fieldsToExclude.includes(field))
+                : null;
+
+            return requiredAttributes ? requiredAttributes : { exclude: fieldsToExclude };
+        }
+
+        const filterOptions = await generateFilterOptions(currentFilter, userPermittedApplications, userPermittedCountries, null, 'hcp_profiles');
+
+        const hcps = await Hcp.findAll({
+            where: filterOptions,
+            include: !fields || fields.includes('hcpConsent')
+                ? [{
+                    model: HcpConsents,
+                    as: 'hcpConsents',
+                    attributes: ['consent_id', 'consent_confirmed', 'opt_type'],
+                }]
+                : null,
+            attributes: getAttributes()
+        });
+
+        if (!fields || !fields.length) {
+            hcps.map(hcp => {
+                const opt_types = new Set();
+
+                hcp['hcpConsents'].map(hcpConsent => {
+                    if (hcpConsent.consent_confirmed || hcpConsent.opt_type === 'opt-out') {
+                        opt_types.add(hcpConsent.opt_type);
+                    }
+                });
+
+                hcp.dataValues.opt_types = [...opt_types];
+                delete hcp.dataValues['hcpConsents'];
+            });
+        }
+
+        if (hcps.length && (!fields || !fields.length || fields.includes('specialty_onekey'))) {
+            const specialties = _.uniq(_.map(hcps, 'specialty_onekey')).join("','");
+
+            const specialty_list = await sequelize.datasyncConnector.query(`
+                SELECT cod_id_onekey, cod_description
+                FROM ciam.vwspecialtymaster
+                WHERE cod_id_onekey IN ('${specialties}') AND cod_locale='en'
+            `, {
+                type: QueryTypes.SELECT
+            });
+
+            hcps.forEach(h => {
+                h.setDataValue('specialty_description', specialty_list.find(x => x.cod_id_onekey === h.specialty_onekey).cod_description);
+            });
+        }
+
+        // const statistics = [{
+        //     'Total HCP Users': hcps_count,
+        //     'Total Consents': consents_count.length,
+        //     'Total Captured Consents': captured_consents_count,
+        //     'Total Busniess Partners': business_partner_count
+        // }];
+        const data = hcps.map(hcp => {
+            return hcp.dataValues;
+        });
+
+        const sheetName = 'HCPS report';
+        const fileBuffer = ExportService.exportToExcel(data, sheetName);
+
+        res.writeHead(200, {
+            'Content-Disposition': `attachment;filename=${sheetName.replace(' ', '_')}.xlsx`,
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+        res.end(fileBuffer);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -1592,3 +1678,4 @@ exports.getSpecialtiesWithEnglishTranslation = getSpecialtiesWithEnglishTranslat
 exports.updateHCPUserConsents = updateHCPUserConsents;
 exports.getSpecialtiesForCdp = getSpecialtiesForCdp;
 exports.getHcpsFromDatasync = getHcpsFromDatasync;
+exports.exportHcps = exportHcps;
