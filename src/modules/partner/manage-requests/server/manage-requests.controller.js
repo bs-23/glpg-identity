@@ -114,7 +114,7 @@ async function createPartnerRequest(req, res) {
         else if (entity_type === 'wholesaler') {
             data.iqvia_wholesaler_id = iqvia_wholesaler_id;
             data.procurement_contact = procurement_contact;
-            data.partner_type = partner_type;
+            data.partner_type = 'CUST';
             data.company_codes = company_codes;
         }
 

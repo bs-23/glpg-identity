@@ -12,25 +12,23 @@ export default function HotStatistic() {
     const permittedCountries = useSelector(state => state.userReducer.loggedInUser.countries) || [];
     const countries = useSelector(state => state.countryReducer.countries);
     const [selectedCountries, setSelectedCountries] = useState([]);
+    const [countryOptions, setCountryOptions] = useState([]);
 
-    const CustomOption = ({ children, ...props1 }) => {
-        return (
-            <components.Option {...props1}>
-                <div className="custom-control custom-checkbox">
-                    <input type="checkbox" className="custom-control-input" checked={props1.isSelected} onChange={() => null} />
-                    <label className="custom-control-label" for="customCheck1">{children}</label>
-                </div>
-            </components.Option>
-        );
-    };
+    let getCountryOptions = countries.filter(c => permittedCountries.map(c => c.toLowerCase()).includes(c.country_iso2.toLowerCase())).map(c => ({ value: c.country_iso2.toLowerCase(), label: c.countryname, checked: true}));
 
-    const getCountriesOptions = () => {
-        return countries
-            .filter(c => permittedCountries.map(c => c.toLowerCase()).includes(c.country_iso2.toLowerCase()))
-            .map(c => ({ value: c.country_iso2.toLowerCase(), label: c.countryname }));
+    const getSelectedCountries = (country) => {
+        countryOptions.map(countryOption => {
+          if(countryOption.value === country.value){
+              countryOption.checked = !countryOption.checked;
+          }
+        });
+        setCountryOptions(countryOptions);
+        let activeCountries = countryOptions.filter(activeCountry =>  activeCountry.checked);
+        setSelectedCountries(activeCountries);
     }
 
     useEffect(() => {
+        setCountryOptions(getCountryOptions);
         if (countries && countries.length) {
             setSelectedCountries(
                 countries
@@ -87,36 +85,17 @@ export default function HotStatistic() {
                 Hot Statistics
                 <i onClick={() => setShow(true)} className="icon icon-expand cdp-inbox__icon-expand cdp-inbox__icon-toggle d-none d-lg-block cursor-pointer"></i>
                 <i className="icon icon-minimize cdp-inbox__icon-minimize cdp-inbox__icon-toggle cursor-pointer" onClick={() => setShow(false)}></i>
-                
                 <i className="fas fa-chart-line d-block d-lg-none"></i>
             </h5>
             <div className="px-3 pt-3 shadow-sm hot-statistics__box-wrap">
                 <div className="row">
                     <div className="col-12 mb-3">
-                        <Select
-                            defaultValue={[]}
-                            isMulti={true}
-                            closeMenuOnSelect={false}
-                            name="countries"
-                            components={{ Option: CustomOption }}
-                            hideSelectedOptions={false}
-                            options={getCountriesOptions()}
-                            className="multiselect"
-                            menuPlacement="top"
-                            classNamePrefix="multiselect"
-                            value={selectedCountries}
-                            isClearable={false}
-                            onChange={selectedOption => {
-                                setSelectedCountries(selectedOption);
-                            }}
-                        />
-                    </div>
-                    <div className="col-12 mb-3">
-                        {/*<span className="badge badge-secondary mr-1">New</span>*/}
-                        {/*<span className="badge badge-secondary mr-1">New</span>*/}
-                        {/*<span className="badge badge-secondary mr-1">New</span>*/}
-                        {/*<span className="badge badge-secondary mr-1">New</span>*/}
-                        {/*<span className="badge badge-secondary mr-1">New</span>*/}
+                        <div className="bg-white border rounded p-2">
+                            {countryOptions.map((country, key) => {
+                                return <span key={key} title={country.checked ? "Click to deselect" : "Click to select"} className={country.checked ? "badge hot-statistics__badge-selected text-white mr-2 mb-1 font-weight-normal cursor-pointer hot-statistics__badge" : "badge mr-2 mb-1 font-weight-normal cursor-pointer hot-statistics__badge text-dark"} onClick={() => { getSelectedCountries(country) }}>{country.label}
+                                </span>
+                            })}
+                        </div>
                     </div>
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i className="far fa-user hot-statistics__icon"></i>

@@ -332,7 +332,10 @@ const MultiFilter = (props, ref) => {
             showSidePanel &&
             <div className="filter" onClick={handleOnClick}>
                 <div className="filter__panel">
-                    <h3 className="px-3 pt-3 cdp-text-primary filter__header">Filters</h3>
+                    <h3 className="px-3 pt-3 cdp-text-primary filter__header d-flex align-items-center justify-content-between">
+                        Filters
+                        <i className="fas fa-times cursor-pointer cdp-text-secondary hover-opacity" title="Close Filter" onClick={() => handleClose(formikProps)}></i>
+                    </h3>
                     <div className="bg-light p-3 filter__section">
                         {filterPresets && filterPresets.length > 0 && <div role="group" aria-labelledby="my-radio-group">
                             <div role="group" aria-labelledby="my-radio-group">
@@ -416,7 +419,7 @@ const MultiFilter = (props, ref) => {
                                 />
                             }
                             <span className="cdp-text-primary filter__add-filter cursor-pointer" onClick={() => setShow({ ...show, addFilter: true })}>
-                                <i class="fas fa-plus"></i> Manage Filter
+                                <i className="fas fa-cog"></i> Manage Filter
                                     </span>
                             {formikProps.values.filters.length > 0 &&
                                 <span className="small cursor-pointer" onClick={() => handleRemoveAll(formikProps)}>Remove All</span>

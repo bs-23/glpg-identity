@@ -37,7 +37,7 @@ const VendorPartnerRequests = () => {
     const userCountries = useSelector(state => state.userReducer.loggedInUser.countries);
     const localizations = useSelector(state => state.localizationReducer.localizations);
 
-    const partnerTypes = ['SUPL', 'CUST', 'HCP', 'HCO', 'POR', 'ZVST'];
+    const partnerTypes = ['SUPL', 'ZVST'];
     const [requestToDelete, setRequestToDelete] = useState(null);
 
     const [showFaq, setShowFaq] = useState(false);
@@ -267,11 +267,11 @@ const VendorPartnerRequests = () => {
                                                     <td data-for="Name">{`${row.first_name} ${row.last_name}`}</td>
                                                     <td data-for="Status" class="text-capitalize">{row.status.split('_').join(' ')}</td>
                                                     <td data-for="Company Code">
-                                                    {
-                                                        row.company_codes && row.company_codes.length && row.company_codes.map((companyCode, idx) => (
-                                                            <span className="badge badge-pill badge-light mr-1" key={idx}>{companyCode}</span>
-                                                        ))
-                                                    }
+                                                        {
+                                                            row.company_codes && row.company_codes.length && row.company_codes.map((companyCode, idx) => (
+                                                                <span className="badge badge-pill badge-light mr-1" key={idx}>{companyCode}</span>
+                                                            ))
+                                                        }
                                                     </td>
                                                     <td data-for="Partner Type">{row.partner_type}</td>
                                                     <td data-for="Email Address">{row.email}</td>
