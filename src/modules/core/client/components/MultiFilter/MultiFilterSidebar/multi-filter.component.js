@@ -419,7 +419,7 @@ const MultiFilter = (props, ref) => {
                                 />
                             }
                             <span className="cdp-text-primary filter__add-filter cursor-pointer" onClick={() => setShow({ ...show, addFilter: true })}>
-                                <i class="fas fa-plus"></i> Manage Filter
+                                <i className="fas fa-cog"></i> Manage Filter
                                     </span>
                             {formikProps.values.filters.length > 0 &&
                                 <span className="small cursor-pointer" onClick={() => handleRemoveAll(formikProps)}>Remove All</span>
