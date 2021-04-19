@@ -515,7 +515,7 @@ async function mergeProcessData(req, res) {
                             var inclusion_nested_sections = inclusion_html_single_list.match(/:<\/li>(<li><\/li>.+?<li><\/li>)/g);
                             var inclusion_html_nested_list = inclusion_html_single_list.split(/:<\/li><li><\/li>.+?<li><\/li>/g);
                             var inclusion_counter = 0;
-                            var inclusion_html = inclusion_html_nested_list.reduce((a,b)=>`${a}:</li><li><ul>${inclusion_nested_sections[inclusion_counter++].replace(/<li><\/li>/g,'').replace(/:<\/li>/g,'')}</ul></li>${b}`);
+                            var inclusion_html = inclusion_html_nested_list.reduce((a,b)=>`${a}:<ul>${inclusion_nested_sections[inclusion_counter++].replace(/<li><\/li>/g,'').replace(/:<\/li>/g,'')}</ul></li>${b}`);
                             inclusion_html = inclusion_html.replace(/<li><\/li>/g,'');
                             return inclusion_html;
                         }catch(ex){
@@ -532,7 +532,7 @@ async function mergeProcessData(req, res) {
                             var exclusion_nested_sections = exclusion_html_single_list.match(/:<\/li>(<li><\/li>.+?<li><\/li>)/g);
                             var exclusion_html_nested_list = exclusion_html_single_list.split(/:<\/li><li><\/li>.+?<li><\/li>/g);
                             var exclusion_counter = 0;
-                            var exclusion_html = exclusion_html_nested_list.reduce((a,b)=>`${a}:</li><li><ul>${exclusion_nested_sections[exclusion_counter++].replace(/<li><\/li>/g,'').replace(/:<\/li>/g,'')}</ul></li>${b}`);
+                            var exclusion_html = exclusion_html_nested_list.reduce((a,b)=>`${a}:<ul>${exclusion_nested_sections[exclusion_counter++].replace(/<li><\/li>/g,'').replace(/:<\/li>/g,'')}</ul></li>${b}`);
                             exclusion_html = exclusion_html.replace(/<li><\/li>/g,'');
                             return exclusion_html
                         }catch(ex){
