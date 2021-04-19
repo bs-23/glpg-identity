@@ -515,7 +515,7 @@ async function mergeProcessData(req, res) {
                             var inclusion_nested_sections = inclusion_html_single_list.match(/:<\/li>(<li><\/li>.+?<li><\/li>)/g);
                             var inclusion_html_nested_list = inclusion_html_single_list.split(/:<\/li><li><\/li>.+?<li><\/li>/g);
                             var inclusion_counter = 0;
-                            var inclusion_html = inclusion_html_nested_list.reduce((a,b)=>`${a}:</li><li>${inclusion_nested_sections[inclusion_counter++].replace(/<li><\/li>/g,'').replace(/:<\/li>/g,'')}</li>${b}`);
+                            var inclusion_html = inclusion_html_nested_list.reduce((a,b)=>`${a}:</li><li><ul>${inclusion_nested_sections[inclusion_counter++].replace(/<li><\/li>/g,'').replace(/:<\/li>/g,'')}</ul></li>${b}`);
                             inclusion_html = inclusion_html.replace(/<li><\/li>/g,'');
                             return inclusion_html;
                         }catch(ex){
@@ -532,7 +532,7 @@ async function mergeProcessData(req, res) {
                             var exclusion_nested_sections = exclusion_html_single_list.match(/:<\/li>(<li><\/li>.+?<li><\/li>)/g);
                             var exclusion_html_nested_list = exclusion_html_single_list.split(/:<\/li><li><\/li>.+?<li><\/li>/g);
                             var exclusion_counter = 0;
-                            var exclusion_html = exclusion_html_nested_list.reduce((a,b)=>`${a}:</li><li>${exclusion_nested_sections[exclusion_counter++].replace(/<li><\/li>/g,'').replace(/:<\/li>/g,'')}</li>${b}`);
+                            var exclusion_html = exclusion_html_nested_list.reduce((a,b)=>`${a}:</li><li><ul>${exclusion_nested_sections[exclusion_counter++].replace(/<li><\/li>/g,'').replace(/:<\/li>/g,'')}</ul></li>${b}`);
                             exclusion_html = exclusion_html.replace(/<li><\/li>/g,'');
                             return exclusion_html
                         }catch(ex){
@@ -1013,7 +1013,7 @@ async function getConditionsWithDetails(req, res) {
         <p>Although this is a rare disease, which can sometimes feel isolating, it’s thought to affect 1% of US adults (1.7 million people), with global levels varying. Along with support from your doctor, there are specific patient association websites that can help you understand more about your condition and give ideas on how to manage it. They can also provide you with access to a network of others who have the same condition.</p>
         <p>Galapagos is committed to developing treatments for rare medical conditions with an unmet need, such as ankylosing spondylitis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.</p> `},
         {indication: 'Atopic Dermatitis', description: `
-        <p>Atopic dermatitis is common a skin disorder that occurs when the immune system becomes overactive, and results in symptoms including itchy and red skin. It can have a significant impact on day-to-day life, and as symptoms can come and go over time it can be difficult to manage. While the exact cause is unknown and there is currently no cure, symptoms can be reduced or controlled through a range of treatments.</p>
+        <p>Atopic dermatitis is a common skin disorder that occurs when the immune system becomes overactive, and results in symptoms including itchy and red skin. It can have a significant impact on day-to-day life, and as symptoms can come and go over time it can be difficult to manage. While the exact cause is unknown and there is currently no cure, symptoms can be reduced or controlled through a range of treatments.</p>
         <p>Along with support from your doctor, there are specific patient association websites that can help you understand more about your condition and give ideas on how to manage it. They can also provide you with access to a network of others who have the same condition.</p>
         <p>Galapagos is committed to developing treatments for rare medical conditions with an unmet need, such as atopic dermatitis. To find out if there is a clinical trial relevant to you, speak to your doctor. You can also search for relevant Galapagos clinical trials on this site.</p>
         `},
