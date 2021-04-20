@@ -170,7 +170,9 @@ async function init() {
                         ];
 
                         const marketingAndPromotionalServices = [
-                            { title: 'Manage Mass Mailing', slug: 'mass-mailing-management', parent_id: marketingAndPromotional.id, created_by: admin.id, updated_by: admin.id }
+                            { title: 'Manage Mass Mailing', slug: 'mass-mailing-management', parent_id: marketingAndPromotional.id, created_by: admin.id, updated_by: admin.id },
+                            { title: 'Manage Audience', slug: 'audience-management', parent_id: marketingAndPromotional.id, created_by: admin.id, updated_by: admin.id },
+                            { title: 'Manage Templates', slug: 'templates-management', parent_id: marketingAndPromotional.id, created_by: admin.id, updated_by: admin.id }
                         ];
 
                         const allServices = [
