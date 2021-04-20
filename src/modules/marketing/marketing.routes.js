@@ -11,6 +11,8 @@ export default function MarketingRoutes() {
         <Switch>
             <PrivateRoute exact path={path} component={MarketingManagement} module={'marketing-and-promotional'} />
             <PrivateRoute path={`${path}/mass-mailing`} component={Campaigns} module={'mass-mailing-management'} />
+            <PrivateRoute path={`${path}/manage-audience`} component={Campaigns} module={'audience-management'} />
+            <PrivateRoute path={`${path}/manage-templates`} component={Campaigns} module={'templates-management'} />
         </Switch>
     );
 }
