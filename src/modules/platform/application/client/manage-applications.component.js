@@ -185,7 +185,7 @@ export default function ManageApplications() {
                                                                     Details
                                                                 </Dropdown.Item>
                                                             </LinkContainer>
-                                                            {/* <LinkContainer to="#">
+                                                            <LinkContainer to="#">
                                                                 <Dropdown.Item
                                                                     onClick={() => {
                                                                         setApplicationId(row.id);
@@ -194,7 +194,7 @@ export default function ManageApplications() {
                                                                 >
                                                                     Log
                                                                 </Dropdown.Item>
-                                                            </LinkContainer> */}
+                                                            </LinkContainer>
                                                         </Dropdown.Menu>
                                                     </Dropdown>
                                                 </td>

@@ -27,7 +27,7 @@ const ApplicationLog = (props) => {
         if (event_type === 'DELETE') {
             return `Deleted a record in the table ${table_name}.`;
         }
-        if (event_type === 'UPDATED') {
+        if (event_type === 'UPDATE') {
             return `Updated a record in the table ${table_name}.`;
         }
         if (event_type === 'LOGIN') {
