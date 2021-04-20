@@ -139,6 +139,7 @@ const SearchProfessionalHcp = (props) => {
     }
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         const fetchSpecialties = async () => {
             const codbases = selectedCountries.map(item => `codbases=${item.value}`);
             const parameters = codbases.join('&');
