@@ -49,7 +49,7 @@ export default function Inbox() {
 
     useEffect(() => {
         getHcps();
-        dispatch(getPartnersToBeApproved('?status=not_approved&limit=5'));
+        // dispatch(getPartnersToBeApproved('?status=not_approved&limit=5'));
     }, []);
 
     return (
@@ -86,12 +86,12 @@ export default function Inbox() {
                                                     <button className="btn cdp-btn-secondary btn-sm text-white" onClick={() => { setModalId(key); setShowModal(true) }}><i className="fas fa-user-edit d-block d-sm-none"></i><span className="d-none d-sm-inline-block">Update Status</span></button>
                                                 </span>
                                             </li>
-                                            {(showModal && modalId === key) && <StatusupdateModal user={user} show={showModal} onHide={() => { setShowModal(false) }} type={'inbox'}/>}
+                                            {(showModal && modalId === key) && <StatusupdateModal user={user} show={showModal} onHide={() => { setShowModal(false) }} type={'inbox'} />}
                                         </ul>
-                                    )}
+                                        )}
 
                                     {hcps.users !== undefined && hcps.users.length !== 0 ?
-                                        <Link to={{ pathname: "/information/list/cdp",  state: { filterSetting } }} className="d-inline-block p-2 p-lg-3 text-uppercase cdp-text-secondary active small font-weight-bold">
+                                        <Link to={{ pathname: "/information/list/cdp", state: { filterSetting } }} className="d-inline-block p-2 p-lg-3 text-uppercase cdp-text-secondary active small font-weight-bold">
                                             {hcps.total > 5 && 'More Pending'}
                                         </Link>
                                         : <h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5>
@@ -106,22 +106,22 @@ export default function Inbox() {
                         <Panel>
                             {
                                 <div className="cdp-inbox__tab-detail">
-                                    { partners !== null && partners.length !== 0 ? partners.map((partner, key) => {
-                                           return <ul key={key} className="cdp-inbox__list p-0 m-0">
+                                    {partners !== null && partners.length !== 0 ? partners.map((partner, key) => {
+                                        return <ul key={key} className="cdp-inbox__list p-0 m-0">
                                             <li key={key} className="cdp-inbox__list-item d-flex justify-content-between  align-items-center border-bottom p-2 p-lg-3">
                                                 <span className="cdp-inbox__list-item-col large cdp-text-primary font-weight-bold text-break">{partner.email}</span>
                                                 <span className="cdp-inbox__list-item-col cdp-text-primary font-weight-bold px-3 text-break">{new Date(partner.created_at).toLocaleDateString('en-GB', {
                                                     day: 'numeric', month: 'short', year: 'numeric'
                                                 }).replace(/ /g, ' ')}</span>
                                                 <span className="cdp-inbox__list-item-col small text-break">
-                                                    <button className="btn cdp-btn-secondary btn-sm text-white" onClick={() => { setStatusModalId(key); setStatusShow(true)}}><i className="fas fa-user-edit d-block d-sm-none"></i><span className="d-none d-sm-inline-block">Update Status</span></button>
+                                                    <button className="btn cdp-btn-secondary btn-sm text-white" onClick={() => { setStatusModalId(key); setStatusShow(true) }}><i className="fas fa-user-edit d-block d-sm-none"></i><span className="d-none d-sm-inline-block">Update Status</span></button>
                                                 </span>
                                             </li>
                                             {(statusShow && statusModalId === key) && <PartnerStatusManage partnerInfo={partner} detailType={`${partner.entity_type}s`} changeStatusShow={(val) => setStatusShow(val)} statusShow={statusShow} from={'Inbox'}></PartnerStatusManage>}
                                         </ul>
-                                       }
+                                    }
 
-                                    ): <h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5>}
+                                    ) : <h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5>}
 
                                     {totalPartners > 5 &&
                                         <Link to={{ pathname: `/business-partner/partner-management/${partners[0].entity_type}s` }} className="d-inline-block p-2 p-lg-3 text-uppercase cdp-text-secondary active small font-weight-bold">
@@ -129,7 +129,7 @@ export default function Inbox() {
                                         </Link>
                                     }
                                 </div>}
-                                </Panel>
+                        </Panel>
                         <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5></div></Panel>
                         <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5></div></Panel>
                         <Panel><div className="cdp-inbox__tab-detail"><h5 className="d-block py-5 px-2 text-uppercase text-center mb-0"><i className="far fa-clock mr-2 cdp-text-secondary"></i>No data found</h5></div></Panel>
