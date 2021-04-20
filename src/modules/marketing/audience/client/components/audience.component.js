@@ -52,10 +52,10 @@ const AudienceComponent = () => {
                 <div className="row">
                     <div className="col-12">
                         <div className="d-flex justify-content-between align-items-center py-3 cdp-table__responsive-sticky-panel">
-                            <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">List of Templates</h4>
+                            <h4 className="cdp-text-primary font-weight-bold mb-0 mb-sm-0 d-flex align-items-end pr-2">List of Audience</h4>
                             <div class="d-flex justify-content-between align-items-center">
                                 <NavLink to="#" className="btn cdp-btn-secondary text-white ml-2">
-                                    <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Create Template</span>
+                                    <i className="icon icon-plus"></i> <span className="d-none d-sm-inline-block pl-1">Create Audience</span>
                                 </NavLink>
                             </div>
                         </div>

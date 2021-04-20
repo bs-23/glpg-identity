@@ -1,15 +1,15 @@
-import Types from './campaign.types';
+import Types from './audience.types';
 
 const initialState = {
-    campaignList: {}
+    audiences: {}
 };
 
 export default function reducer(state = initialState, action) {
     switch (action.type) {
-        case Types.GET_CAMPAIGNS_FULFILLED: {
+        case Types.GET_AUDIENCES_FULFILLED: {
             return {
                 ...state,
-                campaignList: action.payload.data
+                audiences: action.payload.data
             };
         }
     }

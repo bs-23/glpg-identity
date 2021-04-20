@@ -44,6 +44,22 @@ const MarketingManagement = () => {
                                                 <span className="d-block cdp-list-group__link-activity">within 30 minutes</span>
                                             </span>
                                         </NavLink>
+                                        <NavLink to="/marketing/manage-templates" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
+                                            <i className="icon icon-secure icon-3x icon-3x cdp-list-group__icon"></i>
+                                            <span>
+                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Manage Templates</strong>
+                                                <span className="d-block cdp-list-group__link-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i city</span>
+                                                <span className="d-block cdp-list-group__link-activity">within 15 minutes</span>
+                                            </span>
+                                        </NavLink>
+                                        <NavLink to="/marketing/manage-audience" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
+                                            <i className="icon icon-secure icon-3x icon-3x cdp-list-group__icon"></i>
+                                            <span>
+                                                <strong className="mb-2 h4 d-block cdp-list-group__link-title">Manage Audience</strong>
+                                                <span className="d-block cdp-list-group__link-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i city</span>
+                                                <span className="d-block cdp-list-group__link-activity">within 15 minutes</span>
+                                            </span>
+                                        </NavLink>
                                         <NavLink to="/marketing/mass-mailing" className="p-3 border-bottom pb-0 mb-0 w-100 d-flex align-items-center cdp-list-group__link">
                                             <i className="icon icon-secure icon-3x icon-3x cdp-list-group__icon"></i>
                                             <span>

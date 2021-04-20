@@ -1,7 +1,7 @@
 import Types from './templates.types';
 
 const initialState = {
-    campaignList: {}
+    templates: {}
 };
 
 export default function reducer(state = initialState, action) {
