@@ -1,8 +1,12 @@
-import React from 'react';
+import React,{ useEffect }  from 'react';
 import { NavLink } from 'react-router-dom';
 import { Faq } from '../../../platform';
 
 const ClinicalTrials = () => {
+    useEffect(()=>{
+       window.scrollTo(0, 0)
+    },[]);
+
     return (
         <main className="app__content cdp-light-bg h-100">
             <div className="container-fluid">

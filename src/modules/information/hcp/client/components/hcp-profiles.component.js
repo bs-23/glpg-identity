@@ -627,7 +627,7 @@ export default function hcpUsers() {
                                             >
                                                 <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
                                                 <i className={`fas fa-times ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
-                                                Reset
+                                                <span className="d-none d-sm-inline-block ml-2"> Reset</span>
                                             </button>
                                         </div>
                                     }
