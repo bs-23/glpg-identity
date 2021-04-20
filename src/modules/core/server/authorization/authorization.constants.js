@@ -18,7 +18,8 @@ const Services = {
     MANAGE_CLINICAL_TRIALS: 'manage-clinical-trials',
     MANAGE_VENDOR_REQUEST: 'manage-vendor-request',
     MANAGE_ENTITY_REQUEST: 'manage-entity-request',
-    MANAGE_BUSINESS_PARTNER: 'manage-business-partners'
+    MANAGE_BUSINESS_PARTNER: 'manage-business-partners',
+    MANAGE_MASS_MAILING: 'mass-mailing-management'
 }
 
 module.exports = {

@@ -5,6 +5,7 @@ module.exports = {
     },
     server: {
         routes: [
+            "src/modules/marketing/campaign/server/campaign.routes.js",
             "src/modules/partner/manage-partners/server/manage-partners.routes.js",
             "src/modules/partner/manage-requests/server/manage-requests.routes.js",
             "src/modules/!(core)/server/**/*.routes.js",

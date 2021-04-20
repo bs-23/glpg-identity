@@ -22,6 +22,7 @@ import { getAllCountries } from '../../core/client/country/country.actions';
 import HelpComponent from '../../core/client/components/help.component';
 import { InformationRoutes } from '../../information';
 import clinicalTrialsRoutes from '../../clinical-trials/client/clinical-trials.routes';
+import { MarketingRoutes } from '../../marketing';
 
 const { getSignedInUserProfile } = userActions;
 
@@ -105,6 +106,8 @@ export default function App() {
                 <PrivateRoute path="/help" component={HelpComponent}/>
 
                 <Route path="/clinical-trials" component={clinicalTrialsRoutes}/>
+
+                <Route path="/marketing" component={MarketingRoutes}/>
 
                 <Route component={NoMatch} />
             </Switch>

@@ -119,7 +119,8 @@ async function init() {
                 { title: "Information Management", slug: "information", created_by: admin.id, updated_by: admin.id },
                 { title: "Data Privacy & Consent Management", slug: "privacy", created_by: admin.id, updated_by: admin.id },
                 { title: "Business Partner Management", slug: "business-partner", created_by: admin.id, updated_by: admin.id },
-                { title: "Clinical Trials Management", slug: "clinical-trials", created_by: admin.id, updated_by: admin.id }
+                { title: "Clinical Trials Management", slug: "clinical-trials", created_by: admin.id, updated_by: admin.id },
+                { title: "Marketing and Promotional", slug: "marketing-and-promotional", created_by: admin.id, updated_by: admin.id },
             ];
 
             Service.destroy({ truncate: { cascade: true } }).then(() => {
@@ -132,9 +133,10 @@ async function init() {
                     const privacy = Service.findOne({ where: { slug: 'privacy' }});
                     const businessPartner = Service.findOne({ where: { slug: 'business-partner' }});
                     const clinicalTrials = Service.findOne({ where: { slug: 'clinical-trials' }});
+                    const marketingAndPromotional = Service.findOne({ where: { slug: 'marketing-and-promotional' }});
 
-                    Promise.all([platform, information, privacy, businessPartner, clinicalTrials]).then(values => {
-                        const [platform, information, privacy, businessPartner, clinicalTrials] = values;
+                    Promise.all([platform, information, privacy, businessPartner, clinicalTrials, marketingAndPromotional]).then(values => {
+                        const [platform, information, privacy, businessPartner, clinicalTrials, marketingAndPromotional] = values;
 
                         const platformServices = [
                             { title: "User & Access Management", slug: "manage-user", parent_id: platform.id, created_by: admin.id, updated_by: admin.id },
@@ -167,12 +169,17 @@ async function init() {
                             { title: "Business Partner Management to Submit to ERP Systems", slug: "manage-business-partners", parent_id: businessPartner.id, created_by: admin.id, updated_by: admin.id },
                         ];
 
+                        const marketingAndPromotionalServices = [
+                            { title: 'Manage Mass Mailing', slug: 'mass-mailing-management', parent_id: marketingAndPromotional.id, created_by: admin.id, updated_by: admin.id }
+                        ];
+
                         const allServices = [
                             ...platformServices,
                             ...informationServices,
                             ...privacyServices,
                             ...clinicalTrialsServices,
-                            ...businessPartnerServices
+                            ...businessPartnerServices,
+                            ...marketingAndPromotionalServices
                         ];
 
                         Service.bulkCreate(allServices, { returning: true, ignoreDuplicates: false }).then(res => { callback() });
@@ -231,6 +238,7 @@ async function init() {
                 Service.findOne({ where: { slug: 'privacy' }, include: { model: Service, as: 'childServices' } }),
                 Service.findOne({ where: { slug: 'business-partner' }, include: { model: Service, as: 'childServices' } }),
                 Service.findOne({ where: { slug: 'clinical-trials' }, include: { model: Service, as: 'childServices' } }),
+                Service.findOne({ where: { slug: 'marketing-and-promotional' }, include: { model: Service, as: 'childServices' } }),
 
                 PermissionSet.findOne({ where: { slug: 'system_admin' } }),
                 PermissionSet.findOne({ where: { slug: 'site_admin' } }),
@@ -244,6 +252,7 @@ async function init() {
                     privacyServiceCategory,
                     businessPartnerServiceCategory,
                     clinicalTrialServiceCategory,
+                    marketingAndPromotionalServiceCategory,
                     systemAdmin_permissionSet,
                     siteAdmin_permissionSet,
                     dpo_permissionSet,
@@ -257,6 +266,7 @@ async function init() {
                     { permissionset_id: systemAdmin_permissionSet.id, service_id: privacyServiceCategory.id },
                     { permissionset_id: systemAdmin_permissionSet.id, service_id: businessPartnerServiceCategory.id },
                     { permissionset_id: systemAdmin_permissionSet.id, service_id: clinicalTrialServiceCategory.id },
+                    { permissionset_id: systemAdmin_permissionSet.id, service_id: marketingAndPromotionalServiceCategory.id },
 
                     { permissionset_id: siteAdmin_permissionSet.id, service_id: informationServiceCategory.id },
                     { permissionset_id: siteAdmin_permissionSet.id, service_id: platformServiceCategory.id },
@@ -301,6 +311,12 @@ async function init() {
 
                 if (clinicalTrialServiceCategory.childServices) {
                     clinicalTrialServiceCategory.childServices.forEach(service => {
+                        permissionSet_serviceCategory.push({ permissionset_id: systemAdmin_permissionSet.id, service_id: service.id });
+                    });
+                }
+
+                if (marketingAndPromotionalServiceCategory.childServices) {
+                    marketingAndPromotionalServiceCategory.childServices.forEach(service => {
                         permissionSet_serviceCategory.push({ permissionset_id: systemAdmin_permissionSet.id, service_id: service.id });
                     });
                 }
