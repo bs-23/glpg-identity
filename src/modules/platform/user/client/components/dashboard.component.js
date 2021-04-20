@@ -44,19 +44,19 @@ export default function Dashboard() {
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/" className="d-flex align-items-center d-sm-block px-3 py-lg-5 service__link disabled">
+                                        <NavLink to="/" className="d-flex align-items-center d-sm-block px-3 py-lg-5 service__link">
                                             <i className="icon icon-marketing-promotion d-block service__icon"></i>
                                             Marketing and Promotional
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/" className="d-flex align-items-center d-sm-block px-3 py-lg-5 service__link disabled">
+                                        <NavLink to="/" className="d-flex align-items-center d-sm-block px-3 py-lg-5 service__link">
                                             <i className="icon icon-market-research d-block service__icon"></i>
                                             Market Research
                                         </NavLink>
                                     </li>
                                     <li className="pr-sm-4 pb-4 service__item">
-                                        <NavLink to="/" className="d-flex align-items-center d-sm-block px-3 py-lg-5 service__link disabled">
+                                        <NavLink to="/" className="d-flex align-items-center d-sm-block px-3 py-lg-5 service__link">
                                             <i className="icon icon-infield-team d-block service__icon"></i>
                                             InField-Team Effectiveness
                                         </NavLink>
