@@ -133,14 +133,14 @@ describe('Veeva consent performance report component', () => {
         render(wrapperComponent());
 
         await waitFor(async () => {
-            expect(screen.getByText('Customer Data Platform')).toBeTruthy();
-            expect(screen.getByText('Filter by Country')).toBeTruthy();
-            expect(screen.getByText('Filter by Opt Type')).toBeTruthy();
-            expect(screen.getByText('Name')).toBeTruthy();
-            expect(screen.getByText('Email')).toBeTruthy();
-            expect(screen.getByText('Content Type')).toBeTruthy();
-            expect(screen.getByText('Legal Basis')).toBeTruthy();
-            expect(screen.getByText('Date')).toBeTruthy();
+            expect(screen.getAllByText('Customer Data Platform')).toBeTruthy();
+            expect(screen.getAllByText('Filter by Country')).toBeTruthy();
+            expect(screen.getAllByText('Filter by Opt Type')).toBeTruthy();
+            expect(screen.getAllByText('Name')).toBeTruthy();
+            expect(screen.getAllByText('Email')).toBeTruthy();
+            expect(screen.getAllByText('Content Type')).toBeTruthy();
+            expect(screen.getAllByText('Legal Basis')).toBeTruthy();
+            expect(screen.getAllByText('Date')).toBeTruthy();
         });
     });
 });
