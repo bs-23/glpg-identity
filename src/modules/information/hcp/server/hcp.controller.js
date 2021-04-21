@@ -141,33 +141,11 @@ async function getHcps(req, res) {
 
         const hcps = await Hcp.findAll({
             where: filterOptions,
-            include: !fields || fields.includes('hcpConsent')
-                ? [{
-                    model: HcpConsents,
-                    as: 'hcpConsents',
-                    attributes: ['consent_id', /*'consent_confirmed',*/ 'opt_type'], // Niloy check here
-                }]
-                : null,
             attributes: getAttributes(),
             offset,
             limit,
             order
         });
-
-        if (!fields || !fields.length) {
-            hcps.map(hcp => {
-                const opt_types = new Set();
-
-                hcp['hcpConsents'].map(hcpConsent => {
-                    if (/*hcpConsent.consent_confirmed || */hcpConsent.opt_type === 'opt-out') { // Niloy check here
-                        opt_types.add(hcpConsent.opt_type);
-                    }
-                });
-
-                hcp.dataValues.opt_types = [...opt_types];
-                delete hcp.dataValues['hcpConsents'];
-            });
-        }
 
         const totalUser = await Hcp.count({ where: filterOptions });
 
