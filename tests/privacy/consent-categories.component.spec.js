@@ -120,7 +120,7 @@ describe('Consent categories component', () => {
             fireEvent.click(edit_btn);
         });
 
-        const title_input = screen.getByRole('textbox', { name: 'title' });
+        const title_input = screen.getByRole('textbox', { name: 'Title *' });
         const save_btn = screen.getByRole('button', { name: 'Save changes' });
 
         fireEvent.change(title_input, { target: { value: 'cc' } });
