@@ -61,7 +61,18 @@ const applicationSchema = {
             key: string().required('This field must not be empty'),
             value: string().required('This field must not be empty')
         })
-    )
+    ),
+    logo: object().shape({})
+        .test('is-valid-image', 'Must provide an image.',
+            function() {
+                if (!this.originalValue) return true;
+
+                const logoType = this.originalValue.type;
+
+                return ['image/jpeg', 'image/jpg', 'image/png'].includes(logoType);
+            }
+        )
+        .nullable()
 }
 
 export const createApplicationSchema = object().shape({ ...applicationSchema });

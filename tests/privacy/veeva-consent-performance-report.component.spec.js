@@ -8,7 +8,7 @@ import { BrowserRouter } from 'react-router-dom';
 import MockAdapter from 'axios-mock-adapter'
 import { ToastProvider } from 'react-toast-notifications';
 import store from '../../src/modules/core/client/store.js';
-import { VeevaConsentPermanceReport } from '../../src/modules/privacy/';
+import { VeevaConsentPermanceReport } from '../../src/modules/privacy';
 import { act } from 'react-dom/test-utils';
 import { screen } from '@testing-library/dom'
 import { login } from '../../src/modules/platform/user/client/user.actions';
@@ -133,14 +133,14 @@ describe('Veeva consent performance report component', () => {
         const {debug} = render(wrapperComponent());
 
         await waitFor(async () => {
-            expect(screen.getByText('Customer Data Platform')).toBeTruthy();
-            expect(screen.getByText('Filter by Country')).toBeTruthy();
-            expect(screen.getByText('Filter by Opt Type')).toBeTruthy();
-            expect(screen.getByText('Name')).toBeTruthy();
-            expect(screen.getByText('Email')).toBeTruthy();
-            expect(screen.getByText('Content Type')).toBeTruthy();
-            expect(screen.getByText('Legal Basis')).toBeTruthy();
-            expect(screen.getByText('Date')).toBeTruthy();
+            expect(screen.getAllByText('Customer Data Platform')).toBeTruthy();
+            expect(screen.getAllByText('Filter by Country')).toBeTruthy();
+            expect(screen.getAllByText('Filter by Opt Type')).toBeTruthy();
+            expect(screen.getAllByText('Name')).toBeTruthy();
+            expect(screen.getAllByText('Email')).toBeTruthy();
+            expect(screen.getAllByText('Content Type')).toBeTruthy();
+            expect(screen.getAllByText('Legal Basis')).toBeTruthy();
+            expect(screen.getAllByText('Date')).toBeTruthy();
         });
     });
 });
