@@ -79,6 +79,7 @@ export default function Users() {
     }
 
     useEffect(() => {
+        window.scrollTo(0, 0)
         setCodBase(params.get('codbase') ? params.get('codbase') : null);
         const searchObj = {};
         const searchParams = location.search.slice(1).split("&");
