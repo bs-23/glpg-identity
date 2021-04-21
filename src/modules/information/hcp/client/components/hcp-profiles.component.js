@@ -60,7 +60,7 @@ const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
                 <p className="">Please comment and continue to save the changes to the HCP profile</p>
                 <div>
                     <div>
-                        <label className="font-weight-bold">Comment <span className="text-danger">*</span></label>
+                        <label className="font-weight-bold">Reason for change <span className="text-danger">*</span></label>
                     </div>
                     <div>
                         <textarea className="form-control" rows="4" cols="45" value={comment} onBlur={handleOnBlur} onChange={(e) => setComment(e.target.value)} />

@@ -283,37 +283,43 @@ async function updateHcps(req, res) {
                     bind: { uuid: uuidWithoutSpecialCharacter },
                     type: QueryTypes.SELECT
                 });
-                master_data = master_data && master_data.length ? master_data[0] : {};
 
-                const uuid_1_from_master_data = (master_data.uuid_1 || '');
-                const uuid_2_from_master_data = (master_data.uuid_2 || '');
+                if (master_data && master_data.length === 0) {
+                    response.errors.push(new Error(_rowIndex, 'uuid', 'UUID is not valid or not in the contract.'));
+                }
+                else {
+                    master_data = master_data && master_data.length ? master_data[0] : {};
 
-                uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
-                    .find(hcp_id => hcp_id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+                    const uuid_1_from_master_data = (master_data.uuid_1 || '');
+                    const uuid_2_from_master_data = (master_data.uuid_2 || '');
 
-                const doesUUIDExist = await Hcp.findOne({
-                    where: {
-                        id: {
-                            [Op.ne]: id
-                        },
-                        uuid: uuid_from_master_data || uuid
+                    uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
+                        .find(hcp_id => hcp_id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+
+                    const doesUUIDExist = await Hcp.findOne({
+                        where: {
+                            id: {
+                                [Op.ne]: id
+                            },
+                            uuid: uuid_from_master_data || uuid
+                        }
+                    });
+
+                    if (doesUUIDExist) {
+                        response.errors.push(new Error(_rowIndex, 'uuid', 'UUID already exists.'));
                     }
-                });
 
-                if (doesUUIDExist) {
-                    response.errors.push(new Error(_rowIndex, 'uuid', 'UUID already exists.'));
-                }
+                    if (Object.keys(master_data).length) {
+                        individual_id_onekey_from_UUID = master_data.individual_id_onekey || null;
+                    } else {
+                        individual_id_onekey_from_UUID = null;
+                    }
 
-                if (Object.keys(master_data).length) {
-                    individual_id_onekey_from_UUID = master_data.individual_id_onekey || null;
-                } else {
-                    individual_id_onekey_from_UUID = null;
-                }
-
-                if (uuidsToUpdate.has(uuid_from_master_data || uuid)) {
-                    uuidsToUpdate.get(uuid_from_master_data || uuid).push(_rowIndex);
-                } else {
-                    uuidsToUpdate.set(uuid_from_master_data || uuid, [_rowIndex]);
+                    if (uuidsToUpdate.has(uuid_from_master_data || uuid)) {
+                        uuidsToUpdate.get(uuid_from_master_data || uuid).push(_rowIndex);
+                    } else {
+                        uuidsToUpdate.set(uuid_from_master_data || uuid, [_rowIndex]);
+                    }
                 }
             }
 
