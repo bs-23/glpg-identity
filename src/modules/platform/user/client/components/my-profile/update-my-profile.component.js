@@ -60,7 +60,7 @@ const UpdateMyProfile = () => {
         first_name: myProfileInfo && myProfileInfo.first_name,
         last_name: myProfileInfo && myProfileInfo.last_name,
         email: myProfileInfo && myProfileInfo.email,
-        phone: myProfileInfo && myProfileInfo.phone,
+        phone: myProfileInfo && myProfileInfo.phone || '',
         isCountryFlagActive: myProfileInfo && (myProfileInfo.phone === '' || isCountryDetectedFromPhone(myProfileInfo.phone))
     }
 
@@ -71,8 +71,8 @@ const UpdateMyProfile = () => {
 
     const onChangePhonefield = (formicProps) => {
         const { values } = formicProps;
-        const phoneNumber = values.phone;
-        const phoneNumberCountryISO = new PhoneNumber(phoneNumber).getRegionCode();
+        const phoneNumber = values.phone || '';
+        const phoneNumberCountryISO = phoneNumber!= '' && new PhoneNumber(phoneNumber).getRegionCode();
         let selectedCountry = desiredCountryList.find(country => country.countryCode === phoneNumberCountryISO);
         if (selectedCountry === undefined) {
             setcountryInfo(null);

@@ -18,10 +18,25 @@ async function getPartnerRequests(req, res) {
         const offset = page * limit;
         const entitytype = req.query.entitytype;
 
+        const orderBy = req.query.orderBy === 'null'
+            ? null
+            : req.query.orderBy;
+        const orderType = req.query.orderType === 'asc' || req.query.orderType === 'desc'
+            ? req.query.orderType
+            : 'asc';
+
         const order = [
             ['created_at', 'DESC'],
             ['id', 'DESC']
         ];
+
+        const sortableColumns = ['first_name', 'last_name', 'email', 'mdr_id', 'country_iso2', 'locale', 'is_supplier', 'is_customer',
+            'procurement_contact', 'partner_type', 'uuid', 'onekey_id', 'workplace_name', 'workplace_type', 'specialty', 'iqvia_wholesaler_id',
+            'status', 'created_by', 'updated_by'];
+
+        if (orderBy && sortableColumns.includes(orderBy)) {
+            order.splice(0, 0, [orderBy, orderType]);
+        }
 
         const partnerRequests = await PartnerRequest.findAll({
             where: { entity_type: entitytype },

@@ -11,6 +11,6 @@ module.exports = {
         ".+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "jest-transform-stub"
     },
     moduleNameMapper: {
-        "\\.(css)$": path.join(process.cwd(), '/tests/client/_mocks_/stub.js')
+        "\\.(css)$": path.join(process.cwd(), '/tests/_mocks_/stub.js')
     }
 }
