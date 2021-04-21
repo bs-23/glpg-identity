@@ -17,7 +17,7 @@ import Faq from '../../../platform/faq/client/faq.component';
 
 const ConsentPerformanceReport = () => {
     const dispatch = useDispatch();
-    const [allOptTypes, ] = useState(["single-opt-in", "double-opt-in", "opt-out"]);
+    const [allOptTypes, ] = useState(['Opt_In_vod', 'Opt_In_Pending_vod', 'Opt_Out_vod']);
     const [show, setShow] = useState({ profileManage: false, updateStatus: false });
     const [ , setCurrentAction] = useState({ userId: null, action: null });
     const [currentUser, setCurrentUser] = useState({});
@@ -69,7 +69,6 @@ const ConsentPerformanceReport = () => {
     function makeUrl(url_parameters) {
         let url = '';
         if (!Array.isArray(url_parameters)) return url;
-
 
         url_parameters.forEach(item => {
             if (item.value) {
@@ -215,15 +214,6 @@ const ConsentPerformanceReport = () => {
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
                                                     </LinkContainer>
 
-                                                    <LinkContainer to={getUrl('legal_basis')}>
-                                                        <span
-                                                            className={consents_report.orderBy === 'legal_basis' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                            onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'legal_basis', getorderType('legal_basis')))}
-                                                        >
-                                                            Legal Basis
-                                                            <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
-                                                    </LinkContainer>
-
                                                     <LinkContainer to={getUrl('date')}>
                                                         <span
                                                             className={consents_report.orderBy === 'date' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
@@ -356,7 +346,7 @@ const ConsentPerformanceReport = () => {
                                                                 <Card.Body className="">
                                                                     <div>{parse(consent.rich_text)}</div>
                                                                     <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Opt Type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
-                                                                    <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Consent given date:</span>{consent.given_time ? (new Date(consent.given_time)).toLocaleDateString('en-GB').replace(/\//g, '.') : 'Not available'}</div>
+                                                                    <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Capture date:</span>{consent.given_time ? (new Date(consent.given_time)).toLocaleDateString('en-GB').replace(/\//g, '.') : 'Not available'}</div>
                                                                 </Card.Body>
                                                             </Accordion.Collapse>
                                                             <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
@@ -384,7 +374,7 @@ const ConsentPerformanceReport = () => {
                                                                 className={consents_report.orderBy === 'name' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
                                                                 onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'name', getorderType('name')))}
                                                             >
-                                                                Name
+                                                                Account Name
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
                                                         </LinkContainer>
                                                     </th>
@@ -395,7 +385,7 @@ const ConsentPerformanceReport = () => {
                                                                 className={consents_report.orderBy === 'email' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
                                                                 onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'email', getorderType('email')))}
                                                             >
-                                                                Email
+                                                                Channel Value
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
                                                         </LinkContainer>
                                                     </th>
@@ -423,17 +413,6 @@ const ConsentPerformanceReport = () => {
                                                     </th>
 
                                                     <th>
-                                                        <LinkContainer to={getUrl('legal_basis')}>
-                                                            <span
-                                                                className={consents_report.orderBy === 'legal_basis' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
-                                                                onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'legal_basis', getorderType('legal_basis')))}
-                                                            >
-                                                                Legal Basis
-                                                            <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
-                                                        </LinkContainer>
-                                                    </th>
-
-                                                    <th>
                                                         <LinkContainer to={getUrl('date')}>
                                                             <span
                                                                 className={consents_report.orderBy === 'date' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
@@ -450,12 +429,11 @@ const ConsentPerformanceReport = () => {
                                             <tbody className="cdp-table__body bg-white">
                                                 {consents_report['hcp_consents'].map((row, index) => (
                                                     <tr key={index}>
-                                                        <td data-for="Name">{row.name}</td>
-                                                        <td data-for="Email">{row.email}</td>
-                                                        <td data-for="Content Type">{row.preference}</td>
+                                                        <td data-for="Account Name">{row.account_name}</td>
+                                                        <td data-for="Channel Value">{row.channel_value}</td>
+                                                        <td data-for="Content Type">{row.content_type}</td>
                                                         <td data-for="Opt Type">{titleCase(row.opt_type)}</td>
-                                                        <td data-for="Legal Basis">{titleCase(row.legal_basis)}</td>
-                                                        <td data-for="Date">{(new Date(row.given_date)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
+                                                        <td data-for="Capture Date">{(new Date(row.capture_datetime)).toLocaleDateString('en-GB').replace(/\//g, '.')}</td>
                                                         <td data-for="Action">
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">

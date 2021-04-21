@@ -62,7 +62,7 @@ async function getStatistics(req, res) {
         const captured_consents_count = await HcpProfile.count({
             where: {
                 country_iso2: countryIgnoreCase,
-                '$hcpConsents.consent_confirmed$': true
+                '$hcpConsents.opt_type$': 'opt-in'
             },
             include: [
                 { model: HcpConsent, as: 'hcpConsents', required: true }
@@ -130,7 +130,7 @@ async function exportHotStatistics(req, res) {
         const captured_consents_count = await HcpProfile.count({
             where: {
                 country_iso2: countryIgnoreCase,
-                '$hcpConsents.consent_confirmed$': true
+                '$hcpConsents.opt_type$': 'opt-in'
             },
             include: [
                 { model: HcpConsent, as: 'hcpConsents', required: true }

@@ -145,7 +145,7 @@ async function getHcps(req, res) {
                 ? [{
                     model: HcpConsents,
                     as: 'hcpConsents',
-                    attributes: ['consent_id', 'consent_confirmed', 'opt_type'],
+                    attributes: ['consent_id', /*'consent_confirmed',*/ 'opt_type'], // Niloy check here
                 }]
                 : null,
             attributes: getAttributes(),
@@ -159,7 +159,7 @@ async function getHcps(req, res) {
                 const opt_types = new Set();
 
                 hcp['hcpConsents'].map(hcpConsent => {
-                    if (hcpConsent.consent_confirmed || hcpConsent.opt_type === 'opt-out') {
+                    if (/*hcpConsent.consent_confirmed || */hcpConsent.opt_type === 'opt-out') { // Niloy check here
                         opt_types.add(hcpConsent.opt_type);
                     }
                 });
@@ -639,8 +639,7 @@ async function createHcpProfile(req, res) {
 
                 consentArr.push({
                     consent_id: consentDetails.id,
-                    consent_confirmed: consentCountry.opt_type === 'double-opt-in' ? false : true,
-                    opt_type: consentCountry.opt_type,
+                    opt_type: consentCountry.opt_type === 'double-opt-in' ? 'opt-in-pending' : 'opt-in',
                     rich_text: validator.unescape(consentLocale.rich_text),
                     consent_locale: richTextLocale,
                     created_by: req.user.id,
@@ -739,11 +738,11 @@ async function confirmConsents(req, res) {
             userConsents = userConsents.map(consent => ({
                 ...consent.dataValues,
                 rich_text: consent.rich_text,
-                consent_confirmed: true
+                opt_type: 'opt-in'
             }));
 
             await HcpConsents.bulkCreate(userConsents, {
-                updateOnDuplicate: ['consent_confirmed']
+                updateOnDuplicate: ['opt_type']
             });
         }
 
@@ -788,15 +787,15 @@ async function approveHCPUser(req, res) {
             return res.status(400).send(response);
         }
 
-        let userConsents = await HcpConsents.findAll({ where: { [Op.and]: [{ user_id: id }, { consent_confirmed: false }] } });
+        let hcpConsents = await HcpConsents.findAll({ where: { [Op.and]: [{ user_id: id }, { opt_type: 'opt-in-pending' }] } });
 
-        let hasDoubleOptIn = false;
+        let consentPending = false;
 
-        if (userConsents && userConsents.length) {
-            hasDoubleOptIn = true;
+        if (hcpConsents && hcpConsents.length) {
+            consentPending = true;
         }
 
-        hcpUser.status = hasDoubleOptIn ? 'consent_pending' : 'manually_verified';
+        hcpUser.status = consentPending ? 'consent_pending' : 'manually_verified';
         await hcpUser.save();
 
         if (hcpUser.dataValues.status === 'manually_verified') {
@@ -897,12 +896,12 @@ async function getHcpProfile(req, res) {
         response.data = getHcpViewModel(doc.dataValues);
 
         const userConsents = await HcpConsents.findAll({
-            where: { user_id: doc.id },
+            where: { user_id: doc.id, expired_at: null },
             include: {
                 model: Consent,
                 as: 'consent'
             },
-            attributes: ['consent_id', 'consent_confirmed', 'opt_type', 'updated_at']
+            attributes: ['consent_id', 'opt_type', 'updated_at']
         });
 
         if (!userConsents) return res.json([]);
@@ -924,7 +923,7 @@ async function getHcpProfile(req, res) {
                     : { rich_text: 'Localized text not found for this consent.' };
 
                 const consentData = {
-                    consent_given: userConsent.consent_confirmed,
+                    consent_given: userConsent.opt_type === 'opt-in',
                     consent_given_time: userConsent.updated_at,
                     id: userConsent.consent_id,
                     opt_type: userConsent.opt_type,
@@ -957,12 +956,12 @@ async function getHCPUserConsents(req, res) {
         }
 
         const userConsents = await HcpConsents.findAll({
-            where: { user_id: doc.id },
+            where: { user_id: doc.id, expired_at: null },
             include: {
                 model: Consent,
                 as: 'consent'
             },
-            attributes: ['consent_id', 'consent_confirmed', 'rich_text', 'opt_type', 'updated_at', 'veeva_multichannel_consent_id']
+            attributes: ['consent_id', 'rich_text', 'opt_type', 'updated_at', 'veeva_multichannel_consent_id']
         });
 
         if (!userConsents.length) return res.json([]);
@@ -976,7 +975,7 @@ async function getHCPUserConsents(req, res) {
 
         response.data = userConsents.map(userConsent => {
             return {
-                consent_given: userConsent.consent_confirmed,
+                consent_given: userConsent.opt_type === 'opt-in',
                 consent_given_time: userConsent.updated_at,
                 id: userConsent.consent_id,
                 opt_type: userConsent.opt_type,
@@ -1451,8 +1450,8 @@ async function updateHCPConsents(req, res) {
         response.data = {
             id: req.params.id,
             consents: await HcpConsents.findAll({
-                where: { user_id: req.params.id },
-                attributes: { exclude: ['created_by', 'updated_by'] }
+                where: { user_id: req.params.id, expired_at: null },
+                attributes: { exclude: ['expired_at', 'created_by', 'updated_by', 'updated_at'] }
             })
         };
 
