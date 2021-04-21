@@ -58,6 +58,10 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
         return metadataObject;
     }
 
+    const addFallbackImage = (e) => {
+        e.target.src = '';
+    };
+
     const handleFileChange = (e, formikProps) => {
         const selectedLogoFile = e.target.files[0];
         formikProps.setFieldValue('logo', selectedLogoFile);
@@ -305,7 +309,7 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                             </div>
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <img src={(application || {}).logo_url} id="logo" width="300" />
+                                                    <img src={(application || {}).logo_url} id="logo" width="300" onError={addFallbackImage} />
                                                 </div>
                                             </div>
                                         </div>
