@@ -140,7 +140,7 @@ const Row = ({ rowIndex, columns, row, onCellSwitchToEdit, onCellBlur, editingCe
                             columnID={column.id}
                             formikProps={formikProps}
                             hasRowChanged={rowChangeStatus}
-                            editableTableProps={editableTableProps}
+                            editableTableProps={{ ...editableTableProps, finalizeUpdate: editableTableProps.generateUpdateFinalizer(values, formikProps) }}
                         />
                         : <Cell
                             value={customOrCurrentCellValue || '--'}

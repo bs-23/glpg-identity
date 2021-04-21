@@ -188,9 +188,20 @@ export default function hcpUsers() {
     }
 
     const onTableRowSave = (user, tableProps) => {
-        setShow({ ...show, saveConfirmation: true });
-        setCurrentUser(user);
-        setEditableTableProps({ ...editableTableProps, ...tableProps });
+        console.log(user, tableProps);
+        const { editableTableProps: { finalizeUpdate, getUpdatedRows }, rowIndex } = tableProps;
+        const updatedRows = getUpdatedRows();
+        const currentRowUpdatedValues = updatedRows[rowIndex];
+
+        axios.post('/api/hcp-profiles/is-valid', currentRowUpdatedValues)
+            .then(() => {
+                setShow({ ...show, saveConfirmation: true });
+                setCurrentUser(user);
+                setEditableTableProps({ ...editableTableProps, ...tableProps });
+            })
+            .catch(err => {
+                finalizeUpdate(null, err.response.data.errors);
+            });
     }
 
     const getCountryName = (country_iso2) => {
