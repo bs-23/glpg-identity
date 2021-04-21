@@ -44,7 +44,7 @@ const ApplicationDetails = ({ applicationId }) => {
                 </span>
             </div>
             {
-                applicationDetails && applicationDetails.metadata && Object.keys(applicationDetails.metadata).length &&
+                applicationDetails && applicationDetails.metadata && Object.keys(applicationDetails.metadata).length > 0 &&
                 Object.keys(applicationDetails.metadata).map(key => {
                     return <div className="col-6 col-md-4 pb-3" key={key}>
                         <span className="mr-2 d-block profile-detail__label">{key}</span>

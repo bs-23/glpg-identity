@@ -223,27 +223,29 @@ async function createApplication(req, res) {
             updated_by: req.user.id
         });
 
-        const bucketURL = nodecache.getValue('S3_BUCKET_URL');
-        const bucketName = bucketURL.split('.')[0].split('//')[1];
+        if (logo) {
+            const bucketURL = nodecache.getValue('S3_BUCKET_URL');
+            const bucketName = bucketURL.split('.')[0].split('//')[1];
 
-        const uploadOptions = {
-            bucket: bucketName,
-            folder: `application/${application.id}/`,
-            fileName: `logo${path.extname(logo.originalname)}`,
-            fileContent: logo.buffer
-        };
+            const uploadOptions = {
+                bucket: bucketName,
+                folder: `application/${application.id}/`,
+                fileName: `logo${path.extname(logo.originalname)}`,
+                fileContent: logo.buffer
+            };
 
-        const storageServiceResponse = await storageService.upload(uploadOptions);
+            const storageServiceResponse = await storageService.upload(uploadOptions);
 
-        await File.create({
-            name: `logo${path.extname(logo.originalname)}`,
-            bucket_name: bucketName,
-            key: storageServiceResponse.key,
-            owner_id: application.id,
-            table_name: 'applications'
-        });
+            await File.create({
+                name: `logo${path.extname(logo.originalname)}`,
+                bucket_name: bucketName,
+                key: storageServiceResponse.key,
+                owner_id: application.id,
+                table_name: 'applications'
+            });
 
-        await application.update({ logo_url: `logo${path.extname(logo.originalname)}` });
+            await application.update({ logo_url: `logo${path.extname(logo.originalname)}` });
+        }
 
         res.json(application);
     } catch (err) {
