@@ -47,6 +47,9 @@ module.exports = app => {
     app.route('/api/hcp-profiles/update-hcps')
         .put(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.updateHcps);
 
+    app.route('/api/hcp-profiles/is-valid')
+        .post(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.isHCPValid);
+
     app.route('/api/hcp-profiles/:id/approve')
         .put(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.approveHCPUser);
 
