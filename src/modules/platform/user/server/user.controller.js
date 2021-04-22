@@ -18,7 +18,8 @@ const PasswordPolicies = require(path.join(process.cwd(), "src/modules/core/serv
 const { getRequestingUserPermissions, getUserWithPermissionRelations } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
 const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
-const userService = require('./user.service');
+const userService = require('./services/user.service');
+const userFilterService = require('./services/user-filter.service');
 
 var trimRequestBody = function(reqBody){
     Object.keys(reqBody).forEach(key => {
@@ -290,7 +291,7 @@ async function getUsers(req, res) {
 
         const currentFilter = req.body;
 
-        const filterOptions = userService.generateFilterOptions(currentFilter, defaultFilter, countries);
+        const filterOptions = userFilterService.generateFilterOptions(currentFilter, defaultFilter, countries);
 
         const {count: countByUser, rows: users} = await User.findAndCountAll({
             where: filterOptions,

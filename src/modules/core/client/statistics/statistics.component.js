@@ -18,9 +18,9 @@ export default function HotStatistic() {
 
     const getSelectedCountries = (country) => {
         countryOptions.map(countryOption => {
-          if(countryOption.value === country.value){
-              countryOption.checked = !countryOption.checked;
-          }
+            if (countryOption.value === country.value) {
+                countryOption.checked = !countryOption.checked;
+            }
         });
         setCountryOptions(countryOptions);
         let activeCountries = countryOptions.filter(activeCountry =>  activeCountry.checked);
