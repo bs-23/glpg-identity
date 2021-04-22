@@ -877,18 +877,17 @@ async function confirmConsents(req, res) {
             return res.status(400).send(response);
         }
 
-        let userConsents = await HcpConsents.findAll({ where: { user_id: payload.id } });
+        let userConsents = await HcpConsents.findAll({
+            where: {
+                user_id: payload.id,
+                opt_type: 'opt-in-pending'
+            }
+        });
 
         if (userConsents && userConsents.length) {
-            userConsents = userConsents.map(consent => ({
-                ...consent.dataValues,
-                rich_text: consent.rich_text,
-                opt_type: 'opt-in'
+            await Promise.all(userConsents.map(async consent => {
+                await consent.update({ opt_type: 'opt-in' });
             }));
-
-            await HcpConsents.bulkCreate(userConsents, {
-                updateOnDuplicate: ['opt_type']
-            });
         }
 
         await hcpUser.update({ is_email_verified: true });
