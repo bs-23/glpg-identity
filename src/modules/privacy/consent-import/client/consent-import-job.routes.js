@@ -9,7 +9,7 @@ export default function ClientRoutes() {
 
     return (
         <Switch>
-            <PrivateRoute path={`${path}/consent-import-jobs`} component={ConsentImportJobsComponent} />
+            <PrivateRoute path={`${path}/consent-import-jobs`} component={ConsentImportJobsComponent} module={'manage-consent-import-jobs'}/>
         </Switch>
     );
 }

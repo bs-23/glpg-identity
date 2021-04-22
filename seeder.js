@@ -152,11 +152,11 @@ async function init() {
                         ];
 
                         const privacyServices = [
-                            { title: "Manage New Consent", slug: "manage-consent", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
-                            { title: "Configure Consent Category", slug: "consent-category", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
-                            { title: "Assign Consent to Country", slug: "consent-country", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
-                            { title: "Generate Data Privacy & Consent Performance Report", slug: "consent-performance", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
-                            { title: "Import Consents", slug: "import-consents", parent_id: privacy.id, created_by: admin.id, updated_by: admin.id }
+                            { title: 'Manage New Consent', slug: 'manage-consent', parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
+                            { title: 'Configure Consent Category', slug: 'consent-category', parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
+                            { title: 'Assign Consent to Country', slug: 'consent-country', parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
+                            { title: 'Generate Consent Performance Report', slug: 'consent-performance', parent_id: privacy.id, created_by: admin.id, updated_by: admin.id },
+                            { title: 'Manage Consent Import Jobs', slug: 'manage-consent-import-jobs', parent_id: privacy.id, created_by: admin.id, updated_by: admin.id }
                         ];
 
                         const clinicalTrialsServices = [
