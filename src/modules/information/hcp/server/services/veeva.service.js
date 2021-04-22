@@ -131,7 +131,6 @@ async function syncHcpConsentsInVeeva(hcp, actor) {
             }));
         }
     } catch(err) {
-        console.log(err);
         logger.error(err);
     }
 }

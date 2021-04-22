@@ -843,7 +843,7 @@ async function createHcpProfile(req, res) {
             response.data.retention_period = '1 hour';
         }
 
-        //await veevaService.syncHcpConsentsInVeeva(hcpUser, req.user);
+        await veevaService.syncHcpConsentsInVeeva(hcpUser, req.user);
 
         await logService.log({
             event_type: 'CREATE',
