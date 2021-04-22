@@ -3293,6 +3293,11 @@ country-codes-list@^1.6.8:
   resolved "https://registry.yarnpkg.com/country-codes-list/-/country-codes-list-1.6.8.tgz#c6ff506d3c0511f645fdc0997d0b4fa6773d043e"
   integrity sha512-wsqH44Yx3pTyPA77jYt2Nxso6kXziMwxI37fJFQLcd/3ome8Gqz6areaeG1w8zfeU9i+cZvJA3k2Mo5EW7rAtg==
 
+countup.js@^1.9.3:
+  version "1.9.3"
+  resolved "https://registry.yarnpkg.com/countup.js/-/countup.js-1.9.3.tgz#ce3e50cd7160441e478f07da31895edcc0f1c9dd"
+  integrity sha1-zj5QzXFgRB5HjwfaMYle3MDxyd0=
+
 crc-32@~1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/crc-32/-/crc-32-1.2.0.tgz#cb2db6e29b88508e32d9dd0ec1693e7b41a18208"
@@ -8497,6 +8502,15 @@ react-cookie@^4.0.3:
     "@types/hoist-non-react-statics" "^3.0.1"
     hoist-non-react-statics "^3.0.0"
     universal-cookie "^4.0.0"
+
+react-countup@^4.3.3:
+  version "4.3.3"
+  resolved "https://registry.yarnpkg.com/react-countup/-/react-countup-4.3.3.tgz#143a8d854d47290b73d6915eac20a12d839153c2"
+  integrity sha512-pWnxpwdPNRyJFha/YKKbyc4RLAw8PzmULdgCziGIgw6vxhT1VdccrvQgj38HBSoM2qF/MoLmn4M2klvDWVIdaw==
+  dependencies:
+    countup.js "^1.9.3"
+    prop-types "^15.7.2"
+    warning "^4.0.3"
 
 react-dnd-html5-backend@3.0.2:
   version "3.0.2"

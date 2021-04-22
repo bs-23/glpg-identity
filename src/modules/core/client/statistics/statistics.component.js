@@ -4,11 +4,13 @@ import Select, { components } from 'react-select';
 import { getStatistics, clearStatistics } from './statistics.actions';
 import axios from 'axios';
 import fileDownload from 'js-file-download';
+import CountUp from 'react-countup';
 
 export default function HotStatistic() {
     const dispatch = useDispatch();
     const [show, setShow] = React.useState();
     const statistics = useSelector(state => state.statisticsReducer.statistics);
+    const prevousStatistics = useSelector(state => state.statisticsReducer.statistics);
     const permittedCountries = useSelector(state => state.userReducer.loggedInUser.countries) || [];
     const countries = useSelector(state => state.countryReducer.countries);
     const [selectedCountries, setSelectedCountries] = useState([]);
@@ -99,27 +101,27 @@ export default function HotStatistic() {
                     </div>
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i className="far fa-user hot-statistics__icon"></i>
-                        <div className="hot-statistics__amount">{statistics.hcps_count || 0}</div>
+                        <CountUp className="hot-statistics__amount" start={0} end={statistics.hcps_count || 0}  duration={1.5}/>
                         <div className="hot-statistics__title">Total HCP Users</div>
                     </div>
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i class="icon icon-data-consent-management hot-statistics__icon"></i>
-                        <div className="hot-statistics__amount">{statistics.consents_count || 0}</div>
+                        <CountUp className="hot-statistics__amount" start={0} end={statistics.consents_count || 0}  duration={1.5}/>
                         <div className="hot-statistics__title">Total Consents</div>
                     </div>
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i class="icon icon-accept hot-statistics__icon"></i>
-                        <div className="hot-statistics__amount">{statistics.captured_consents_count || 0}</div>
+                        <CountUp className="hot-statistics__amount" start={0} end={statistics.captured_consents_count || 0}  duration={1.5}/>
                         <div className="hot-statistics__title"> Total Captured Consents</div>
                     </div>
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i class="icon icon-partner hot-statistics__icon"></i>
-                        <div className="hot-statistics__amount">{statistics.business_partner_count || 0}</div>
+                        <CountUp className="hot-statistics__amount" start={0} end={statistics.business_partner_count || 0}  duration={1.5}/>
                         <div className="hot-statistics__title"> Total Business Partners</div>
                     </div>
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i class="icon icon-marketing-promotion hot-statistics__icon"></i>
-                        <div className="hot-statistics__amount">0</div>
+                       <CountUp className="hot-statistics__amount" start={0} end={0} duration={1.5}/>
                         <div className="hot-statistics__title">Total Campaigns</div>
                     </div>
                 </div>
