@@ -2,7 +2,7 @@ const path = require("path");
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
-const userService = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.service'));
+const userService = require(path.join(process.cwd(), 'src/modules/platform/user/server/services/user.service'));
 const { getUserWithPermissionRelations } = require(path.join(process.cwd(), "src/modules/platform/user/server/permission/permissions.js"));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 

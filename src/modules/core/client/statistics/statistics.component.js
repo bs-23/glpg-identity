@@ -16,11 +16,11 @@ export default function HotStatistic() {
 
     let getCountryOptions = countries.filter(c => permittedCountries.map(c => c.toLowerCase()).includes(c.country_iso2.toLowerCase())).map(c => ({ value: c.country_iso2.toLowerCase(), label: c.countryname, checked: true}));
 
-    const getSelectedCountries = (country,index) => {
+    const getSelectedCountries = (country) => {
         countryOptions.map(countryOption => {
-          if(countryOption.value === country.value){
-              countryOption.checked = !countryOption.checked;
-          }
+            if (countryOption.value === country.value) {
+                countryOption.checked = !countryOption.checked;
+            }
         });
         setCountryOptions(countryOptions);
         let activeCountries = countryOptions.filter(activeCountry =>  activeCountry.checked);
@@ -91,8 +91,8 @@ export default function HotStatistic() {
                 <div className="row">
                     <div className="col-12 mb-3">
                         <div className="bg-white border rounded p-2">
-                            {countryOptions.map((country, key) => {
-                                return <span title={country.checked ? "Click to deselect" : "Click to select"} className={country.checked ? "badge hot-statistics__badge-selected text-white mr-2 mb-1 font-weight-normal cursor-pointer hot-statistics__badge" : "badge mr-2 mb-1 font-weight-normal cursor-pointer hot-statistics__badge text-dark"} onClick={(e) => { getSelectedCountries(country, key) }}>{country.label}
+                            {countryOptions.map((country, index) => {
+                                return <span key={index} title={country.checked ? "Click to deselect" : "Click to select"} className={country.checked ? "badge hot-statistics__badge-selected text-white mr-2 mb-1 font-weight-normal cursor-pointer hot-statistics__badge" : "badge mr-2 mb-1 font-weight-normal cursor-pointer hot-statistics__badge text-dark"} onClick={(e) => { getSelectedCountries(country) }}>{country.label}
                                 </span>
                             })}
                         </div>

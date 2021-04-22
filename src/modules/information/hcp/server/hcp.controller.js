@@ -25,7 +25,7 @@ const hcpService = require('./services/hcp.service');
 const veevaService = require('./services/veeva.service');
 const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
 const Audit = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.model'));
-const { generateFilterOptions } = require('./hcp.service');
+const { generateFilterOptions } = require('./services/hcp-filter.service');
 
 function generateAccessToken(doc) {
     return jwt.sign({
