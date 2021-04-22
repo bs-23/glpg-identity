@@ -903,7 +903,7 @@ async function confirmConsents(req, res) {
             retention_period: '1 hour'
         };
 
-        //await veevaService.syncHcpConsentsInVeeva(hcpUser, req.user);
+        await veevaService.syncHcpConsentsInVeeva(hcpUser, req.user);
 
         res.json(response);
     } catch (err) {
@@ -1589,7 +1589,7 @@ async function updateHCPConsents(req, res) {
 
         if (req.body.consents && req.body.consents.length) {
             await hcpService.updateConsents(hcpUser, req.body.consents, req.user);
-            //await veevaService.syncHcpConsentsInVeeva(hcpUser, req.user);
+            await veevaService.syncHcpConsentsInVeeva(hcpUser, req.user);
         }
 
         response.data = {
@@ -1727,7 +1727,7 @@ async function syncHCPConsentsInVeeva(req, res) {
 
         if(!hcp) res.status(404).send('Hcp not found.');
 
-        //await veevaService.syncHcpConsentsInVeeva(hcp, req.user);
+        await veevaService.syncHcpConsentsInVeeva(hcp, req.user);
 
         logService.log({
             event_type: 'VEEVA_CONSENT_SYNC',

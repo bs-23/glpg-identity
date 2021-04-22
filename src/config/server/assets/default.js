@@ -12,6 +12,7 @@ module.exports = {
             "src/modules/core/server/statistics/statistics.route.js",
             "src/modules/core/server/filter/filter.routes.js",
             "src/modules/core/server/localization/localization.routes.js",
+            "src/modules/core/server/crdlp/crdlp.routes.js",
             "src/modules/information/hcp/server/**/*.routes.js",
             "src/modules/platform/faq/server/**/*.routes.js",
             "src/modules/platform/application/server/**/*.routes.js",

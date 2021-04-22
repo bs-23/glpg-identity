@@ -1,6 +1,6 @@
 const path = require('path');
 const _ = require('lodash');
-const { QueryTypes, Op } = require('sequelize');
+const { Op } = require('sequelize');
 const validator = require('validator');
 const uniqueSlug = require('unique-slug');
 
@@ -9,7 +9,6 @@ const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/mana
 const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model'));
 const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model'));
 const ConsentLanguage = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model'));
-const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/server/user.model.js'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const logService = require(path.join(process.cwd(), 'src/modules/core/server/audit/audit.service'));
@@ -127,43 +126,6 @@ async function getConsents(req, res) {
     } catch (err) {
         logger.error(err);
         console.error(err);
-        response.errors.push(new CustomError('Internal server error', 500));
-        res.status(500).send(response);
-    }
-}
-
-async function getUserConsents(req, res) {
-    const response = new Response({}, []);
-    const userOneKeyID = req.params.id;
-
-    try {
-        const userConsents = await sequelize.datasyncConnector.query(`
-            SELECT *
-            FROM ciam.vw_veeva_consent_master
-            where ciam.vw_veeva_consent_master.onekeyid = $userOneKeyID;`,
-            {
-                bind: { userOneKeyID: userOneKeyID },
-                type: QueryTypes.SELECT
-            }
-        );
-
-        if (!userConsents) return res.json([]);
-
-        let id = 0;
-
-        userConsents.forEach(consent => {
-            consent.id = ++id;
-            consent.title = consent.default_consent_text_vod ? consent.default_consent_text_vod : '';
-            consent.rich_text = consent.disclaimer_text_vod ? consent.disclaimer_text_vod : '';
-            consent.given_time = consent.capture_datetime;
-            consent.opt_type = consent.opt_type === 'Opt_In_vod' ? consent.double_opt_in ? 'double-opt-in' : 'single-opt-in' : 'opt-out';
-        });
-
-        response.data = userConsents;
-
-        res.json(response);
-    } catch (err) {
-        logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
     }
@@ -537,7 +499,6 @@ async function updateCdpConsent(req, res) {
 }
 
 exports.getConsents = getConsents;
-exports.getUserConsents = getUserConsents;
 exports.getCdpConsents = getCdpConsents;
 exports.getCdpConsent = getCdpConsent;
 exports.createConsent = createConsent;

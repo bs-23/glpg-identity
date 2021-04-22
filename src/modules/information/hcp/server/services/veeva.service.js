@@ -55,7 +55,8 @@ async function syncHcpConsentsInVeeva(hcp, actor) {
         const hcp_consents = await HcpConsents.findAll({
             where: {
                 user_id: hcp.id,
-                opt_type: 'opt-in'
+                opt_type: 'opt-in',
+                expired_at: null
             },
             attributes: ['id', 'consent_id', 'created_at', 'veeva_multichannel_consent_id', 'consent_source'],
             include: [{
@@ -80,9 +81,7 @@ async function syncHcpConsentsInVeeva(hcp, actor) {
 
             if(!account) return;
 
-            const isEmailDifferent = await isEmailDifferent(onekey_id, hcp.email);
-
-            if(isEmailDifferent) return;
+            if(await isEmailDifferent(account, hcp.email)) return;
 
             if(!account.PersonEmail) {
                 await axios.patch(`${serviceUrl}/data/v48.0/sobjects/Account/${account.Id}`, { PersonEmail: hcp.email }, { headers });
@@ -132,6 +131,7 @@ async function syncHcpConsentsInVeeva(hcp, actor) {
             }));
         }
     } catch(err) {
+        console.log(err);
         logger.error(err);
     }
 }

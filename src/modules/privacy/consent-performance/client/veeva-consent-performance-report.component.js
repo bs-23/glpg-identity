@@ -8,7 +8,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { LinkContainer } from 'react-router-bootstrap';
 import axios from 'axios';
 import _ from 'lodash';
-import parse from 'html-react-parser';
 import fileDownload from 'js-file-download';
 
 import { getAllCountries } from '../../../core/client/country/country.actions';
@@ -50,21 +49,21 @@ const ConsentPerformanceReport = () => {
     }
 
     const getConsentsForCurrentUser = async () => {
-        const { data } = await axios.get(`/api/consents/${currentUser.onekeyid}`);
+        const { data } = await axios.get(`/api/crdlp/${currentUser.onekeyid}/multichannel-consents`);
         setCurrentUser({ ...currentUser, consents: data.data });
-    }
+    };
 
     const onManageProfile = (user) => {
         setCurrentAction({ userId: user.onekeyid, action: 'Manage Profile' });
         setShow({ ...show, profileManage: true });
         setCurrentUser(user);
-    }
+    };
 
     const getCountryName = (country_iso2) => {
         if (!allCountries || !country_iso2) return null;
         const country = allCountries.find(c => c.country_iso2.toLowerCase() === country_iso2.toLowerCase());
         return country && country.countryname;
-    }
+    };
 
     function makeUrl(url_parameters) {
         let url = '';
@@ -159,7 +158,7 @@ const ConsentPerformanceReport = () => {
                             <Modal.Header closeButton>
                                 <Modal.Title>Questions You May Have</Modal.Title>
                             </Modal.Header>
-                            <Modal.Body className="faq__in-modal"><Faq topic="consent-performance-report" /></Modal.Body>
+                            <Modal.Body className="faq__in-modal"><Faq topic="consent-performance-report"/></Modal.Body>
                         </Modal>
                     </div>
                 </div>
@@ -256,7 +255,6 @@ const ConsentPerformanceReport = () => {
                                                             ])}`}>
                                                                 <Dropdown.Item className={consents_report.countries.includes(item.country_iso2) && consents_report.codbase === item.codbase ? 'd-none' : ''} onClick={() => dispatch(getVeevaConsentReport('', item.codbase, consents_report.opt_type, consents_report.orderBy, consents_report.orderType))}>
                                                                     {
-
                                                                         consents_report.countries.includes(item.country_iso2) ? item.codbase_desc : null
                                                                     }
                                                                 </Dropdown.Item>
@@ -311,50 +309,50 @@ const ConsentPerformanceReport = () => {
                                         <div className="px-4 py-3">
                                             <div className="row">
                                                 <div className="col">
-                                                    <h4 className="mt-1 font-weight-bold">{`${currentUser.name || ''}`}</h4>
-                                                    <div className="">{currentUser.specialty_description}</div>
+                                                    <h4 className="mt-1 font-weight-bold">{`${currentUser.account_name || ''}`}</h4>
+                                                    <div>{currentUser.specialty_description}</div>
                                                 </div>
                                             </div>
                                             <div className="row mt-3">
                                                 <div className="col-6">
                                                     <div className="mt-1 font-weight-bold">UUID</div>
-                                                    <div className="">{currentUser.uuid_mixed || '--'}</div>
+                                                    <div>{currentUser.uuid_mixed || '--'}</div>
                                                 </div>
                                                 <div className="col-6">
                                                     <div className="mt-1 font-weight-bold">OneKeyID</div>
-                                                    <div className="">{currentUser.onekeyid || '--'}</div>
+                                                    <div>{currentUser.onekeyid || '--'}</div>
                                                 </div>
                                             </div>
                                             <div className="row mt-3">
                                                 <div className="col-6">
                                                     <div className="mt-1 font-weight-bold">Email</div>
-                                                    <div className="">{currentUser.email || '--'}</div>
+                                                    <div>{currentUser.email || '--'}</div>
                                                 </div>
 
                                                 <div className="col-6">
                                                     <div className="mt-1 font-weight-bold">Country</div>
-                                                    <div className="">{getCountryName(currentUser.country_code) || '--'}</div>
+                                                    <div>{getCountryName(currentUser.country_code) || '--'}</div>
                                                 </div>
                                             </div>
 
                                             <div className="row mt-4">
                                                 <div className="col accordion-consent rounded shadow-sm p-0">
-                                                    <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
-                                                    {currentUser.consents && currentUser.consents.length ? <Accordion>{currentUser.consents.map(consent =>
-                                                        <Card key={consent.id} className="">
-                                                            <Accordion.Collapse eventKey={consent.id}>
-                                                                <Card.Body className="">
-                                                                    <div>{parse(consent.rich_text)}</div>
+                                                    <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Multichannel Consents</h4>
+                                                    {currentUser.consents && currentUser.consents.length ? <Accordion>{currentUser.consents.map((consent, index) =>
+                                                        <Card key={index+1}>
+                                                            <Accordion.Collapse eventKey={index+1}>
+                                                                <Card.Body>
+                                                                    <div>{consent.default_consent_text_vod}</div>
                                                                     <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Opt Type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
-                                                                    <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Capture date:</span>{consent.given_time ? (new Date(consent.given_time)).toLocaleDateString('en-GB').replace(/\//g, '.') : 'Not available'}</div>
+                                                                    <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Capture date:</span>{consent.capture_datetime ? (new Date(consent.capture_datetime)).toLocaleDateString('en-GB').replace(/\//g, '.') : 'Not available'}</div>
                                                                 </Card.Body>
                                                             </Accordion.Collapse>
-                                                            <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
+                                                            <Accordion.Toggle as={Card.Header} eventKey={index+1} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
                                                                 <span className="d-flex align-items-center"><i class={`icon icon-check-filled cdp-text-primary mr-4 consent-check`}></i> <span className="consent-summary">{consent.content_type}</span></span>
                                                                 <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                                             </Accordion.Toggle>
                                                         </Card>
-                                                    )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent.</div>}
+                                                    )}</Accordion> : <div className="m-3 alert alert-warning">No data found.</div>}
                                                 </div>
                                             </div>
                                         </div>
@@ -437,12 +435,11 @@ const ConsentPerformanceReport = () => {
                                                         <td data-for="Action">
                                                             <span>
                                                                 <Dropdown className="ml-auto dropdown-customize">
-                                                                    <Dropdown.Toggle variant="" className="cdp-btn-outline-primary font-weight-bold-light dropdown-toggle-without-icon btn-sm py-0 px-1 ">
+                                                                    <Dropdown.Toggle variant className="cdp-btn-outline-primary font-weight-bold-light dropdown-toggle-without-icon btn-sm py-0 px-1">
                                                                         <i className="icon icon-setting"></i> Action
                                                                     </Dropdown.Toggle>
                                                                     <Dropdown.Menu>
                                                                         <LinkContainer to="#"><Dropdown.Item onClick={() => onManageProfile(row)}>Profile</Dropdown.Item></LinkContainer>
-                                                                        {row.status === 'not_verified' && <LinkContainer to="#"><Dropdown.Item onClick={() => onUpdateStatus(row)}>Manage Status</Dropdown.Item></LinkContainer>}
                                                                     </Dropdown.Menu>
                                                                 </Dropdown>
                                                             </span>
