@@ -55,7 +55,7 @@ async function syncHcpConsentsInVeeva(hcp, actor) {
         const hcp_consents = await HcpConsents.findAll({
             where: {
                 user_id: hcp.id,
-                consent_confirmed: true
+                opt_type: 'opt-in'
             },
             attributes: ['id', 'consent_id', 'created_at', 'veeva_multichannel_consent_id', 'consent_source'],
             include: [{

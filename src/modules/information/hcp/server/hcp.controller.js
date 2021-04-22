@@ -141,33 +141,11 @@ async function getHcps(req, res) {
 
         const hcps = await Hcp.findAll({
             where: filterOptions,
-            include: !fields || fields.includes('hcpConsent')
-                ? [{
-                    model: HcpConsents,
-                    as: 'hcpConsents',
-                    attributes: ['consent_id', 'consent_confirmed', 'opt_type'],
-                }]
-                : null,
             attributes: getAttributes(),
             offset,
             limit,
             order
         });
-
-        if (!fields || !fields.length) {
-            hcps.map(hcp => {
-                const opt_types = new Set();
-
-                hcp['hcpConsents'].map(hcpConsent => {
-                    if (hcpConsent.consent_confirmed || hcpConsent.opt_type === 'opt-out') {
-                        opt_types.add(hcpConsent.opt_type);
-                    }
-                });
-
-                hcp.dataValues.opt_types = [...opt_types];
-                delete hcp.dataValues['hcpConsents'];
-            });
-        }
 
         const totalUser = await Hcp.count({ where: filterOptions });
 
@@ -199,6 +177,167 @@ async function getHcps(req, res) {
         };
 
         response.data = data;
+        res.json(response);
+    } catch (err) {
+        logger.error(err);
+        response.errors.push(new CustomError('Internal server error', 500));
+        res.status(500).send(response);
+    }
+}
+
+async function isHCPValid(req, res) {
+    const hcp = req.body;
+    const response = new Response([], []);
+
+    function Error(rowIndex, property, message) {
+        this.rowIndex = rowIndex;
+        this.property = property;
+        this.message = message;
+    }
+
+    try {
+        const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, individual_id_onekey, _rowIndex } = trimRequestBody(hcp);
+
+        let UUID_from_individual_id_onekey;
+
+        if (!id) {
+            response.errors.push(new Error(_rowIndex, 'id', 'ID is missing.'));
+        }
+
+        const HcpUser = await Hcp.findOne({ where: { id: id } });
+
+        if (!HcpUser) {
+            response.errors.push(new Error(_rowIndex, 'id', 'User not found.'));
+        }
+
+        if (!first_name) {
+            response.errors.push(new Error(_rowIndex, 'first_name', 'Firts is missing.'));
+        }
+
+        if (!last_name) {
+            response.errors.push(new Error(_rowIndex, 'last_name', 'Last name is missing.'));
+        }
+
+        if (!country_iso2) {
+            response.errors.push(new Error(_rowIndex, 'country_iso2', 'Country ISO2 is missing.'));
+        }
+
+        if (!specialty_onekey) {
+            response.errors.push(new Error(_rowIndex, 'specialty_onekey', 'Specialty Onekey is missing.'));
+        }
+
+        if (!email) {
+            response.errors.push(new Error(_rowIndex, 'email', 'Email is missing.'));
+        }
+
+        if (!uuid) {
+            response.errors.push(new Error(_rowIndex, 'uuid', 'UUID is missing.'));
+        }
+
+        if (email) {
+            if (!validator.isEmail(email)) {
+                response.errors.push(new Error(_rowIndex, 'email', 'Invalid email'));
+            } else {
+                const doesEmailExist = await Hcp.findOne({
+                    where: {
+                        id: { [Op.ne]: id },
+                        email: { [Op.iLike]: `${email}` }
+                    }
+                }
+                );
+
+                if (doesEmailExist) {
+                    response.errors.push(new Error(_rowIndex, 'email', 'Email already exists'));
+                }
+            }
+        }
+
+        let uuid_from_master_data;
+
+        if (uuid) {
+            let master_data = {};
+
+            const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
+
+            master_data = await sequelize.datasyncConnector.query(`select * from ciam.vwhcpmaster
+                    where regexp_replace(uuid_1, '[-]', '', 'gi') = $uuid
+                    OR regexp_replace(uuid_2, '[-]', '', 'gi') = $uuid`, {
+                bind: { uuid: uuidWithoutSpecialCharacter },
+                type: QueryTypes.SELECT
+            });
+
+            if (master_data && master_data.length === 0) {
+                response.errors.push(new Error(_rowIndex, 'uuid', 'UUID is not valid or not in the contract.'));
+            }
+            else {
+                master_data = master_data && master_data.length ? master_data[0] : {};
+
+                const uuid_1_from_master_data = (master_data.uuid_1 || '');
+                const uuid_2_from_master_data = (master_data.uuid_2 || '');
+
+                uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
+                    .find(hcp_id => hcp_id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+
+                const doesUUIDExist = await Hcp.findOne({
+                    where: {
+                        id: {
+                            [Op.ne]: id
+                        },
+                        uuid: uuid_from_master_data || uuid
+                    }
+                });
+
+                if (doesUUIDExist) {
+                    response.errors.push(new Error(_rowIndex, 'uuid', 'UUID already exists.'));
+                }
+            }
+        }
+
+        if (individual_id_onekey) {
+            const doesOnekeyExists = await Hcp.findOne({
+                where: {
+                    id: { [Op.ne]: id },
+                    individual_id_onekey
+                }
+            });
+
+            if (doesOnekeyExists) {
+                response.errors.push(new Error(_rowIndex, 'individual_id_onekey', 'Individual Onekey ID already exists.'));
+            } else {
+                const master_data = await sequelize.datasyncConnector.query(
+                    `SELECT * from ciam.vwhcpmaster
+                    WHERE individual_id_onekey = $individual_id_onekey`, {
+                    bind: { individual_id_onekey },
+                    type: QueryTypes.SELECT
+                });
+
+                if (master_data && master_data.length) {
+                    UUID_from_individual_id_onekey = master_data[0].uuid_1 || master_data[0].uuid_2 || '';
+
+                    if (UUID_from_individual_id_onekey && !uuid) {
+                        const doesUUIDExist = await Hcp.findOne({
+                            where: {
+                                id: {
+                                    [Op.ne]: id
+                                },
+                                uuid: UUID_from_individual_id_onekey
+                            }
+                        });
+
+                        if (doesUUIDExist) {
+                            response.errors.push(new Error(_rowIndex, 'uuid', 'UUID already exists.'));
+                        }
+                    }
+                } else {
+                    response.errors.push(new Error(_rowIndex, 'individual_id_onekey', 'Individual Onekey ID is not valid or not in the contract.'));
+                }
+            }
+        }
+
+        if (response.errors && response.errors.length) {
+            return res.status(400).send(response);
+        }
+
         res.json(response);
     } catch (err) {
         logger.error(err);
@@ -286,37 +425,43 @@ async function updateHcps(req, res) {
                     bind: { uuid: uuidWithoutSpecialCharacter },
                     type: QueryTypes.SELECT
                 });
-                master_data = master_data && master_data.length ? master_data[0] : {};
 
-                const uuid_1_from_master_data = (master_data.uuid_1 || '');
-                const uuid_2_from_master_data = (master_data.uuid_2 || '');
+                if (master_data && master_data.length === 0) {
+                    response.errors.push(new Error(_rowIndex, 'uuid', 'UUID is not valid or not in the contract.'));
+                }
+                else {
+                    master_data = master_data && master_data.length ? master_data[0] : {};
 
-                uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
-                    .find(hcp_id => hcp_id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+                    const uuid_1_from_master_data = (master_data.uuid_1 || '');
+                    const uuid_2_from_master_data = (master_data.uuid_2 || '');
 
-                const doesUUIDExist = await Hcp.findOne({
-                    where: {
-                        id: {
-                            [Op.ne]: id
-                        },
-                        uuid: uuid_from_master_data || uuid
+                    uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data]
+                        .find(hcp_id => hcp_id.replace(/[-]/gi, '') === uuidWithoutSpecialCharacter);
+
+                    const doesUUIDExist = await Hcp.findOne({
+                        where: {
+                            id: {
+                                [Op.ne]: id
+                            },
+                            uuid: uuid_from_master_data || uuid
+                        }
+                    });
+
+                    if (doesUUIDExist) {
+                        response.errors.push(new Error(_rowIndex, 'uuid', 'UUID already exists.'));
                     }
-                });
 
-                if (doesUUIDExist) {
-                    response.errors.push(new Error(_rowIndex, 'uuid', 'UUID already exists.'));
-                }
+                    if (Object.keys(master_data).length) {
+                        individual_id_onekey_from_UUID = master_data.individual_id_onekey || null;
+                    } else {
+                        individual_id_onekey_from_UUID = null;
+                    }
 
-                if (Object.keys(master_data).length) {
-                    individual_id_onekey_from_UUID = master_data.individual_id_onekey || null;
-                } else {
-                    individual_id_onekey_from_UUID = null;
-                }
-
-                if (uuidsToUpdate.has(uuid_from_master_data || uuid)) {
-                    uuidsToUpdate.get(uuid_from_master_data || uuid).push(_rowIndex);
-                } else {
-                    uuidsToUpdate.set(uuid_from_master_data || uuid, [_rowIndex]);
+                    if (uuidsToUpdate.has(uuid_from_master_data || uuid)) {
+                        uuidsToUpdate.get(uuid_from_master_data || uuid).push(_rowIndex);
+                    } else {
+                        uuidsToUpdate.set(uuid_from_master_data || uuid, [_rowIndex]);
+                    }
                 }
             }
 
@@ -639,8 +784,7 @@ async function createHcpProfile(req, res) {
 
                 consentArr.push({
                     consent_id: consentDetails.id,
-                    consent_confirmed: consentCountry.opt_type === 'double-opt-in' ? false : true,
-                    opt_type: consentCountry.opt_type,
+                    opt_type: consentCountry.opt_type === 'double-opt-in' ? 'opt-in-pending' : 'opt-in',
                     rich_text: validator.unescape(consentLocale.rich_text),
                     consent_locale: richTextLocale,
                     created_by: req.user.id,
@@ -739,11 +883,11 @@ async function confirmConsents(req, res) {
             userConsents = userConsents.map(consent => ({
                 ...consent.dataValues,
                 rich_text: consent.rich_text,
-                consent_confirmed: true
+                opt_type: 'opt-in'
             }));
 
             await HcpConsents.bulkCreate(userConsents, {
-                updateOnDuplicate: ['consent_confirmed']
+                updateOnDuplicate: ['opt_type']
             });
         }
 
@@ -788,15 +932,15 @@ async function approveHCPUser(req, res) {
             return res.status(400).send(response);
         }
 
-        let userConsents = await HcpConsents.findAll({ where: { [Op.and]: [{ user_id: id }, { consent_confirmed: false }] } });
+        let hcpConsents = await HcpConsents.findAll({ where: { [Op.and]: [{ user_id: id }, { opt_type: 'opt-in-pending' }] } });
 
-        let hasDoubleOptIn = false;
+        let consentPending = false;
 
-        if (userConsents && userConsents.length) {
-            hasDoubleOptIn = true;
+        if (hcpConsents && hcpConsents.length) {
+            consentPending = true;
         }
 
-        hcpUser.status = hasDoubleOptIn ? 'consent_pending' : 'manually_verified';
+        hcpUser.status = consentPending ? 'consent_pending' : 'manually_verified';
         await hcpUser.save();
 
         if (hcpUser.dataValues.status === 'manually_verified') {
@@ -897,12 +1041,12 @@ async function getHcpProfile(req, res) {
         response.data = getHcpViewModel(doc.dataValues);
 
         const userConsents = await HcpConsents.findAll({
-            where: { user_id: doc.id },
+            where: { user_id: doc.id, expired_at: null },
             include: {
                 model: Consent,
                 as: 'consent'
             },
-            attributes: ['consent_id', 'consent_confirmed', 'opt_type', 'updated_at']
+            attributes: ['consent_id', 'opt_type', 'updated_at']
         });
 
         if (!userConsents) return res.json([]);
@@ -924,7 +1068,7 @@ async function getHcpProfile(req, res) {
                     : { rich_text: 'Localized text not found for this consent.' };
 
                 const consentData = {
-                    consent_given: userConsent.consent_confirmed,
+                    consent_given: userConsent.opt_type === 'opt-in',
                     consent_given_time: userConsent.updated_at,
                     id: userConsent.consent_id,
                     opt_type: userConsent.opt_type,
@@ -957,12 +1101,12 @@ async function getHCPUserConsents(req, res) {
         }
 
         const userConsents = await HcpConsents.findAll({
-            where: { user_id: doc.id },
+            where: { user_id: doc.id, expired_at: null },
             include: {
                 model: Consent,
                 as: 'consent'
             },
-            attributes: ['consent_id', 'consent_confirmed', 'rich_text', 'opt_type', 'updated_at', 'veeva_multichannel_consent_id']
+            attributes: ['consent_id', 'rich_text', 'opt_type', 'updated_at', 'veeva_multichannel_consent_id']
         });
 
         if (!userConsents.length) return res.json([]);
@@ -976,14 +1120,14 @@ async function getHCPUserConsents(req, res) {
 
         response.data = userConsents.map(userConsent => {
             return {
-                consent_given: userConsent.consent_confirmed,
+                consent_given: userConsent.opt_type === 'opt-in',
                 consent_given_time: userConsent.updated_at,
                 id: userConsent.consent_id,
                 opt_type: userConsent.opt_type,
                 preference: userConsent.consent.preference,
                 rich_text: userConsent.rich_text,
                 veeva_multichannel_consent_id: userConsent.veeva_multichannel_consent_id,
-                latestConsentSyncTime
+                latestConsentSyncTime: latestConsentSyncTime === 0 ? null : latestConsentSyncTime
             };
         });
 
@@ -1451,8 +1595,8 @@ async function updateHCPConsents(req, res) {
         response.data = {
             id: req.params.id,
             consents: await HcpConsents.findAll({
-                where: { user_id: req.params.id },
-                attributes: { exclude: ['created_by', 'updated_by'] }
+                where: { user_id: req.params.id, expired_at: null },
+                attributes: { exclude: ['expired_at', 'created_by', 'updated_by', 'updated_at'] }
             })
         };
 
@@ -1619,3 +1763,4 @@ exports.updateHCPConsents = updateHCPConsents;
 exports.getSpecialtiesForCdp = getSpecialtiesForCdp;
 exports.getHcpsFromDatasync = getHcpsFromDatasync;
 exports.syncHCPConsentsInVeeva = syncHCPConsentsInVeeva;
+exports.isHCPValid = isHCPValid;

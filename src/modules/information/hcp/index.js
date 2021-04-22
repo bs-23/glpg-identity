@@ -7,7 +7,7 @@ import InformationManagement from './client/components/information-management.co
 import SearchOrganizationHCP from './client/components/search-organization-hcp.component';
 import SearchProfessionalHCP from './client/components/search-professional-hcp.component';
 import HCPFilter from './client/components/hcp-filter.component';
-import VeevaConsentSync from './client/components/veeva-consent-sync.component';
+import HCPConsentSyncInVeeva from './client/components/hcp-consent-sync-in-veeva.component.js';
 
 export function HCPClientRoutes(props) {
     return <ClientRoutes path={props.path}/>;
@@ -21,5 +21,5 @@ export {
     SearchOrganizationHCP,
     SearchProfessionalHCP,
     HCPFilter,
-    VeevaConsentSync
+    HCPConsentSyncInVeeva
 };

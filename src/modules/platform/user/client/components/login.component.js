@@ -43,7 +43,7 @@ export default function Login() {
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-6 col-md-8 col-12 mx-auto">
-                            <h1 className="text-center mb-5">
+                            <h1 className="text-center mb-3 mb-sm-5">
                                 <img alt="CDP LOGO" src="/assets/CDP2x.png" height="102" />
                             </h1>
                             <h3 className="app-login__header text-center py-3">Welcome to CDP</h3>

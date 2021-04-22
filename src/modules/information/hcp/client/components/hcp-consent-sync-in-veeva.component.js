@@ -7,10 +7,12 @@ import Card from 'react-bootstrap/Card';
 import Accordion from 'react-bootstrap/Accordion';
 import { ConsentSyncSchema } from '../hcp.schema';
 
-const VeevaConsentSync = ({ userID, consents, onClose }) => {
+const HCPConsentSyncInVeeva = ({ userID, consents, onClose }) => {
     const { addToast } = useToasts();
 
     const showDateTime = (date) => {
+        if (!date) return '';
+
         var today = new Date(date);
         var date = today.getDate()+'.'+(today.getMonth()+1)+'.'+today.getFullYear();
         var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
@@ -72,7 +74,7 @@ const VeevaConsentSync = ({ userID, consents, onClose }) => {
                                 )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent.</div>}
                             </div>
                         </div>
-                        
+
                     </div>
                     <div className="row">
                         <div className="col-12">
@@ -97,4 +99,4 @@ const VeevaConsentSync = ({ userID, consents, onClose }) => {
     </div>
 }
 
-export default VeevaConsentSync;
+export default HCPConsentSyncInVeeva;

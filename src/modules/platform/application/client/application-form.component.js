@@ -58,6 +58,10 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
         return metadataObject;
     }
 
+    const addFallbackImage = (e) => {
+        e.target.src = '';
+    };
+
     const handleFileChange = (e, formikProps) => {
         const selectedLogoFile = e.target.files[0];
         formikProps.setFieldValue('logo', selectedLogoFile);
@@ -301,11 +305,13 @@ const ApplicationForm = ({ onSuccess, isEditing, applicationId }) => {
                                                 <div className="custom-file">
                                                     <input className="custom-file-input" id="customFile" type="file" name="logo" onChange={e => handleFileChange(e, formikProps)} />
                                                     <label className="custom-file-label" for="customFile">Choose file</label>
+                                                    {formikProps.values.logo && <span className="small text-muted font-weight-bold">{formikProps.values.logo.name}</span>}
+                                                    <div className="invalid-feedback"><ErrorMessage name="logo"/></div>
                                                 </div>
                                             </div>
                                             <div className="col-12 col-sm-6">
                                                 <div className="form-group">
-                                                    <img src={(application || {}).logo_url} id="logo" width="300" />
+                                                    <img src={(application || {}).logo_url} id="logo" width="300" onError={addFallbackImage} />
                                                 </div>
                                             </div>
                                         </div>

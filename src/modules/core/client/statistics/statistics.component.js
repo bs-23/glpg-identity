@@ -91,8 +91,8 @@ export default function HotStatistic() {
                 <div className="row">
                     <div className="col-12 mb-3">
                         <div className="bg-white border rounded p-2">
-                            {countryOptions.map((country, index) => {
-                                return <span key={index} title={country.checked ? "Click to deselect" : "Click to select"} className={country.checked ? "badge hot-statistics__badge-selected text-white mr-2 mb-1 font-weight-normal cursor-pointer hot-statistics__badge" : "badge mr-2 mb-1 font-weight-normal cursor-pointer hot-statistics__badge text-dark"} onClick={(e) => { getSelectedCountries(country) }}>{country.label}
+                            {countryOptions.map((country, key) => {
+                                return <span key={key} title={country.checked ? "Click to deselect" : "Click to select"} className={country.checked ? "badge hot-statistics__badge-selected text-white mr-2 mb-1 font-weight-normal cursor-pointer hot-statistics__badge" : "badge mr-2 mb-1 font-weight-normal cursor-pointer hot-statistics__badge text-dark"} onClick={() => { getSelectedCountries(country) }}>{country.label}
                                 </span>
                             })}
                         </div>

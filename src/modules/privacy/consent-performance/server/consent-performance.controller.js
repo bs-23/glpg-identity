@@ -63,11 +63,10 @@ async function getCdpConsentsReport(req, res) {
         const country_iso2_list = countries.filter(i => codbase_list.includes(i.codbase)).map(i => i.country_iso2);
         const country_iso2_list_with_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
 
-        const opt_types = ['single-opt-in', 'double-opt-in', 'soft-opt-in', 'opt-out'];
+        const opt_types = ['opt-in', 'opt-in-pending', 'opt-out'];
 
         const consent_filter = {
             'opt_type': opt_type ? { [Op.eq]: opt_type } : { [Op.or]: opt_types },
-            [Op.or]: [{ 'consent_confirmed': true }, { 'opt_type': 'opt-out' }],
             '$hcp_profile.application_id$': userPermittedApplications,
             '$hcp_profile.country_iso2$': codbase ? { [Op.any]: [countries_with_ignorecase] } : { [Op.any]: [country_iso2_list_with_ignorecase] },
         };
@@ -77,11 +76,11 @@ async function getCdpConsentsReport(req, res) {
             include: [
                 {
                     model: HCPS,
-                    attributes: { exclude: ['password', 'created_by', 'updated_by'] }
+                    attributes: ['id', 'first_name', 'last_name', 'email', 'is_email_verified', 'uuid', 'individual_id_onekey']
                 },
                 {
                     model: Consent,
-                    attributes: ['preference', 'legal_basis', 'updated_at'],
+                    attributes: ['preference', 'legal_basis'],
                     include: [
                         {
                             model: ConsentCategory,
@@ -90,7 +89,7 @@ async function getCdpConsentsReport(req, res) {
                     ]
                 }
             ],
-            attributes: ['consent_id', 'opt_type', 'consent_confirmed', 'updated_at'],
+            attributes: ['consent_id', 'opt_type', 'created_at'],
             offset,
             limit,
             order: order,
@@ -99,9 +98,8 @@ async function getCdpConsentsReport(req, res) {
 
         hcp_consents.forEach(hcp_consent => {
             hcp_consent.dataValues.consent_id = hcp_consent.consent_id;
-            hcp_consent.dataValues.consent_confirmed = hcp_consent.consent_confirmed;
             hcp_consent.dataValues.legal_basis = hcp_consent.consent.legal_basis;
-            hcp_consent.dataValues.given_date = hcp_consent.updated_at;
+            hcp_consent.dataValues.given_date = hcp_consent.created_at;
             hcp_consent.dataValues.preference = hcp_consent.consent.preference;
             hcp_consent.dataValues.category = hcp_consent.consent.consent_category.title;
             hcp_consent.dataValues.type = hcp_consent.consent.consent_category.slug;
@@ -176,25 +174,21 @@ async function getVeevaConsentsReport(req, res) {
         let sortBy = 'content_type';
 
         if (orderBy && orderType) {
-            if (orderBy === 'name') sortBy = 'ciam.vw_veeva_consent_master.account_name';
-            if (orderBy === 'email') sortBy = 'ciam.vw_veeva_consent_master.channel_value';
-            // if(orderBy === 'consent_type') order.push([Consent, ConsentCategory, 'title', orderType]);
+            if (orderBy === 'account_name') sortBy = 'ciam.vw_veeva_consent_master.account_name';
+            if (orderBy === 'channel_value') sortBy = 'ciam.vw_veeva_consent_master.channel_value';
 
             if (orderBy === 'opt_type') sortBy = 'ciam.vw_veeva_consent_master.opt_type';
 
-            // if(orderBy === 'legal_basis') order.push([Consent, 'legal_basis', orderType]);
-            if (orderBy === 'preferences') sortBy = 'ciam.vw_veeva_consent_master.content_type';
-            if (orderBy === 'date') sortBy = 'ciam.vw_veeva_consent_master.capture_datetime';
+            if (orderBy === 'content_type') sortBy = 'ciam.vw_veeva_consent_master.content_type';
+            if (orderBy === 'capture_datetime') sortBy = 'ciam.vw_veeva_consent_master.capture_datetime';
         }
 
         const getConsentFilter = () => {
-            if(opt_type === 'single-opt-in') return `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
-                ciam.vw_veeva_consent_master.opt_type = 'Opt_In_vod' and
-                (ciam.vw_veeva_consent_master.double_opt_in = false or ciam.vw_veeva_consent_master.double_opt_in IS NULL)`;
-            if(opt_type === 'double-opt-in') return `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
-                ciam.vw_veeva_consent_master.opt_type = 'Opt_In_vod' and
-                ciam.vw_veeva_consent_master.double_opt_in = true`;
-            if(opt_type === 'opt-out') return `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
+            if(opt_type === 'Opt_In_vod') return `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
+                ciam.vw_veeva_consent_master.opt_type = 'Opt_In_vod'`;
+            if(opt_type === 'Opt_In_Pending_vod') return `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
+                ciam.vw_veeva_consent_master.opt_type = 'Opt_In_Pending_vod'`;
+            if(opt_type === 'Opt_Out_vod') return `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
                 ciam.vw_veeva_consent_master.opt_type = 'Opt_Out_vod'`
             return `ciam.vw_veeva_consent_master.country_code = ANY($countries)`;
         }
@@ -210,9 +204,9 @@ async function getVeevaConsentsReport(req, res) {
                 onekeyid,
                 uuid_mixed,
                 country_code,
-                double_opt_in,
                 uuid_mixed,
-                channel_value
+                channel_value,
+                glpg_consent_source
             FROM
                 ciam.vw_veeva_consent_master
             WHERE ${consent_filter}
@@ -242,27 +236,8 @@ async function getVeevaConsentsReport(req, res) {
                 type: QueryTypes.SELECT
             }))[0];
 
-        hcp_consents.forEach(hcp_consent => {
-            hcp_consent.name = hcp_consent.account_name;
-            hcp_consent.first_name = hcp_consent.firstname;
-            hcp_consent.last_name = hcp_consent.lastname;
-            hcp_consent.email = hcp_consent.channel_value;
-            hcp_consent.opt_type = hcp_consent.opt_type === 'Opt_In_vod' ? hcp_consent.double_opt_in ? 'double-opt-in' : 'single-opt-in' : 'opt-out';
-            hcp_consent.legal_basis = 'consent';
-            hcp_consent.preference = hcp_consent.content_type;
-            hcp_consent.given_date = hcp_consent.capture_datetime;
-
-            delete hcp_consent['account_name'];
-            delete hcp_consent['firstname'];
-            delete hcp_consent['lastname'];
-            delete hcp_consent['channel_value'];
-            delete hcp_consent['content_type'];
-            delete hcp_consent['capture_datetime'];
-            delete hcp_consent['double_opt_in'];
-        });
-
         const data = {
-            hcp_consents: hcp_consents,
+            hcp_consents,
             page: page + 1,
             limit,
             total: total_consents.count,
@@ -274,7 +249,6 @@ async function getVeevaConsentsReport(req, res) {
             orderBy: orderBy,
             orderType: orderType,
         };
-
 
         response.data = data;
         res.json(response);
@@ -303,7 +277,6 @@ async function exportCdpConsentsReport(req, res) {
         const country_iso2_list_with_ignorecase = [].concat.apply([], country_iso2_list.map(i => ignoreCaseArray(i)));
 
         const consent_filter = {
-            [Op.or]: [{ 'consent_confirmed': true }, { 'opt_type': 'opt-out' }],
             '$hcp_profile.application_id$': userPermittedApplications,
             '$hcp_profile.country_iso2$': { [Op.any]: [country_iso2_list_with_ignorecase] },
         };
@@ -313,20 +286,20 @@ async function exportCdpConsentsReport(req, res) {
             include: [
                 {
                     model: HCPS,
-                    attributes: ['first_name', 'last_name', 'email'],
+                    attributes: ['first_name', 'last_name', 'email', 'uuid', 'individual_id_onekey', 'country_iso2'],
                 },
                 {
                     model: Consent,
-                    attributes: ['preference', 'legal_basis', 'updated_at'],
+                    attributes: ['preference'],
                     include: [
                         {
                             model: ConsentCategory,
-                            attributes: ['title', 'slug']
+                            attributes: ['title']
                         }
                     ]
                 }
             ],
-            attributes: ['consent_id', 'opt_type', 'consent_confirmed', 'updated_at'],
+            attributes: ['consent_id', 'opt_type', 'created_at'],
             order: order,
             subQuery: false
         });
@@ -334,16 +307,19 @@ async function exportCdpConsentsReport(req, res) {
         if (!hcp_consents || !hcp_consents.length) return res.status(404).send(`No consents found.`);
 
         const data = hcp_consents.map(hcp_consent => ({
+            'Individual OnekeyId': hcp_consent.hcp_profile.individual_id_onekey,
+            'UUID': hcp_consent.hcp_profile.uuid,
             'First Name': hcp_consent.hcp_profile.first_name,
             'Last Name': hcp_consent.hcp_profile.last_name,
             'Email': hcp_consent.hcp_profile.email,
-            'Consent Type': hcp_consent.consent.consent_category.title,
-            'Preferences': hcp_consent.consent.preference,
+            'Country': hcp_consent.hcp_profile.country_iso2.toUpperCase(),
+            'Consent Category': hcp_consent.consent.consent_category.title,
+            'Preference': hcp_consent.consent.preference,
             'Opt Type': hcp_consent.opt_type,
-            'Date': (new Date(hcp_consent.updated_at)).toLocaleDateString('en-GB').replace(/\//g, '.')
+            'Capture Date': (new Date(hcp_consent.created_at)).toLocaleDateString('en-GB').replace(/\//g, '.')
         }));
 
-        const sheetName = 'CDP consents report';
+        const sheetName = 'HCP Consent Performance';
         const fileBuffer = ExportService.exportToExcel(data, sheetName);
 
         res.writeHead(200, {
@@ -374,11 +350,14 @@ async function exportVeevaConsentsReport(req, res) {
         const hcp_consents = await sequelize.datasyncConnector.query(
             `SELECT
                 account_name,
+                uuid_mixed,
+                onekeyid,
                 channel_value,
                 opt_type,
-                double_opt_in,
                 content_type,
-                capture_datetime
+                capture_datetime,
+                country_code,
+                glpg_consent_source
             FROM
                 ciam.vw_veeva_consent_master
             WHERE ciam.vw_veeva_consent_master.country_code = ANY($countries)`
@@ -392,14 +371,18 @@ async function exportVeevaConsentsReport(req, res) {
         if (!hcp_consents || !hcp_consents.length) return res.status(404).send(`No consents found.`);
 
         const data = hcp_consents.map(hcp_consent => ({
+            'Individual OnekeyId': hcp_consent.onekeyid,
+            'UUID': hcp_consent.uuid_mixed,
             'Name': hcp_consent.account_name,
             'Email': hcp_consent.channel_value,
-            'Preferences': hcp_consent.content_type,
-            'Opt Type': hcp_consent.opt_type === 'Opt_In_vod' ? hcp_consent.double_opt_in ? 'double-opt-in' : 'single-opt-in' : 'opt-out',
-            'Date': (new Date(hcp_consent.capture_datetime)).toLocaleDateString('en-GB').replace(/\//g, '.')
+            'Country': hcp_consent.country_code.toUpperCase(),
+            'Content Type': hcp_consent.content_type,
+            'Consent Source': hcp_consent.glpg_consent_source,
+            'Opt Type': hcp_consent.opt_type,
+            'Capture Date': (new Date(hcp_consent.capture_datetime)).toLocaleDateString('en-GB').replace(/\//g, '.')
         }));
 
-        const sheetName = 'Veeva CRM consent report';
+        const sheetName = 'VeevaCRM Consent Performance';
         const fileBuffer = ExportService.exportToExcel(data, sheetName);
 
         res.writeHead(200, {

@@ -45,6 +45,49 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
         rows: yup.array().of(rowSchemaWithOptionalValidation)
     }) : null;
 
+    const generateUpdateFinalizer = (values, formikProps) => (success, error) => {
+        if(success === true){
+            setRawRows(values.rows);
+
+            formikProps.resetForm({
+                values: values,
+                status: { lastCommitedValues: { rows: values.rows }}
+            });
+
+            return;
+        }
+
+        if(Array.isArray(success)) {
+            const updatedData = success;
+            let newIntitialValue = formikBag.values;
+
+            updatedData.forEach(({ rowIndex, property, value }) => {
+                const inputName = `rows[${rowIndex}].${property}`;
+                newIntitialValue = setIn(newIntitialValue, inputName, value);
+            });
+
+            setRawRows(newIntitialValue.rows);
+
+            formikProps.resetForm({
+                values: newIntitialValue,
+                status: {}
+            });
+            return;
+        }
+
+        if(error){
+            const numberOfRows = values.rows.length;
+            const backendErrors = Array(numberOfRows).fill({});
+
+            error.map(({ rowIndex, property, message }) => {
+                const currentErrorObject = backendErrors[rowIndex];
+                backendErrors[rowIndex] = { ...currentErrorObject, [property]: message };
+            });
+
+            formikProps.setStatus({ ...formikProps.status, backendErrors: { rows: backendErrors } });
+        }
+    }
+
     const handleCellSwitchToEdit = (rowIndex, columnIndex) => {
         setEditingCell({ rowIndex, columnIndex })
     }
@@ -74,48 +117,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
     }
 
     const handleSubmit = (values, formikProps) => {
-        const done = (success, error) => {
-            if(success === true){
-                setRawRows(values.rows);
-
-                formikProps.resetForm({
-                    values: values,
-                    status: { lastCommitedValues: { rows: values.rows }}
-                });
-
-                return;
-            }
-
-            if(Array.isArray(success)) {
-                const updatedData = success;
-                let newIntitialValue = formikBag.values;
-
-                updatedData.forEach(({ rowIndex, property, value }) => {
-                    const inputName = `rows[${rowIndex}].${property}`;
-                    newIntitialValue = setIn(newIntitialValue, inputName, value);
-                });
-
-                setRawRows(newIntitialValue.rows);
-
-                formikProps.resetForm({
-                    values: newIntitialValue,
-                    status: {}
-                });
-                return;
-            }
-
-            if(error){
-                const numberOfRows = values.rows.length;
-                const backendErrors = Array(numberOfRows).fill({});
-
-                error.map(({ rowIndex, property, message }) => {
-                    const currentErrorObject = backendErrors[rowIndex];
-                    backendErrors[rowIndex] = { ...currentErrorObject, [property]: message };
-                });
-
-                formikProps.setStatus({ ...formikProps.status, backendErrors: { rows: backendErrors } });
-            }
-        }
+        const done = generateUpdateFinalizer(values, formikProps);
 
         if(onSubmit) {
             onSubmit({
@@ -237,7 +239,7 @@ const EditableTable = ({ columns: rawColumns, rows, schema: rowSchema, children,
                                     onInputChange={handleInputChange}
                                     onCellSwitchToEdit={handleCellSwitchToEdit}
                                     onInputKeyDown={handleInputKeyDown}
-                                    editableTableProps={{ getUpdatedRows, getUpdatedCells }}
+                                    editableTableProps={{ getUpdatedRows, getUpdatedCells, generateUpdateFinalizer }}
                                     selectedRow={selectedRow}
                                 />
                             )}

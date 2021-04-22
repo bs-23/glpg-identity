@@ -143,7 +143,7 @@ const CountryConsents = () => {
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     <Dropdown.Item className="px-2" href="/"><i className="fas fa-link mr-2"></i> Dashboard</Dropdown.Item>
-                                    <Dropdown.Item className="px-2" href="/consent"><i className="fas fa-link mr-2"></i> Data Privacy & Consent Management</Dropdown.Item>
+                                    <Dropdown.Item className="px-2" href="/consent"><i className="fas fa-link mr-2"></i> Data Privacy & Consent Management </Dropdown.Item>
                                     <Dropdown.Item className="px-2" active><i className="fas fa-link mr-2"></i> Manage Consent Per Country</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>

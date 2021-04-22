@@ -255,8 +255,8 @@ describe('HCP Routes', () => {
                     }
                 });
 
-                const numberOfConfirmedConsents = hcpUserConsents.filter(c => c.consent_confirmed === true).length;
-                const numberOfUnConfirmedConsents = hcpUserConsents.filter(c => c.consent_confirmed === false).length;
+                const numberOfConfirmedConsents = hcpUserConsents.filter(c => c.opt_type === 'opt-in').length;
+                const numberOfUnConfirmedConsents = hcpUserConsents.filter(c => c.opt_type !== 'opt-in').length;
 
                 return [numberOfConfirmedConsents, numberOfUnConfirmedConsents];
             }

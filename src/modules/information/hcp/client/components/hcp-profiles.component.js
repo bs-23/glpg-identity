@@ -17,7 +17,7 @@ import { getHcpProfiles, getHCPSpecialities } from '../hcp.actions';
 import { HcpInlineEditSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
 import EditableTable from '../../../../core/client/components/EditableTable/EditableTable';
-import { HCPFilter, VeevaConsentSync } from '../../../../information';
+import { HCPFilter, HCPConsentSyncInVeeva } from '../../../../information';
 
 const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     const [comment, setComment] = useState("");
@@ -59,7 +59,7 @@ const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
                 <p className="">Please comment and continue to save the changes to the HCP profile</p>
                 <div>
                     <div>
-                        <label className="font-weight-bold">Comment <span className="text-danger">*</span></label>
+                        <label className="font-weight-bold">Reason for change <span className="text-danger">*</span></label>
                     </div>
                     <div>
                         <textarea className="form-control" rows="4" cols="45" value={comment} onBlur={handleOnBlur} onChange={(e) => setComment(e.target.value)} />
@@ -191,10 +191,19 @@ export default function hcpUsers() {
     };
 
     const onTableRowSave = (user, tableProps) => {
-        setShow({ ...show, saveConfirmation: true });
-        setCurrentUser(user);
-        setEditableTableProps({ ...editableTableProps, ...tableProps });
-    };
+        const { editableTableProps: { finalizeUpdate, getUpdatedRows }, rowIndex, formikProps } = tableProps;
+        const currentRowUpdatedValues = formikProps.values.rows[rowIndex];
+
+        axios.post('/api/hcp-profiles/is-valid', { ...currentRowUpdatedValues, _rowIndex: rowIndex })
+            .then(() => {
+                setShow({ ...show, saveConfirmation: true });
+                setCurrentUser(user);
+                setEditableTableProps({ ...editableTableProps, ...tableProps });
+            })
+            .catch(err => {
+                finalizeUpdate(null, err.response.data.errors);
+            });
+    }
 
     const getCountryName = (country_iso2) => {
         if (!allCountries || !country_iso2) return null;
@@ -627,7 +636,7 @@ export default function hcpUsers() {
                                             >
                                                 <i className={`fas fa-filter  ${isFilterEnabled ? '' : 'mr-2'}`}></i>
                                                 <i className={`fas fa-times ${isFilterEnabled ? 'd-inline-block filter__sub-icon mr-1' : 'd-none'}`}></i>
-                                                Reset
+                                                <span className="d-none d-sm-inline-block ml-2"> Reset</span>
                                             </button>
                                         </div>
                                     }
@@ -762,7 +771,7 @@ export default function hcpUsers() {
                                     </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    <VeevaConsentSync
+                                    <HCPConsentSyncInVeeva
                                         userID={currentUser.id}
                                         consents={currentUser.consents}
                                         onClose={() => { setShow({ ...show, syncConsent: false }) }}
