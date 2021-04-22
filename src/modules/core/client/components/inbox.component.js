@@ -49,7 +49,7 @@ export default function Inbox() {
 
     useEffect(() => {
         getHcps();
-        // dispatch(getPartnersToBeApproved('?status=not_approved&limit=5'));
+        dispatch(getPartnersToBeApproved('?status=not_approved&limit=5'));
     }, []);
 
     return (

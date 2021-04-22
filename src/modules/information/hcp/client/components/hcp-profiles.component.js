@@ -191,18 +191,19 @@ export default function hcpUsers() {
     };
 
     const onTableRowSave = (user, tableProps) => {
-        const { editableTableProps: { finalizeUpdate, getUpdatedRows }, rowIndex } = tableProps;
-        const updatedRows = getUpdatedRows();
-        const currentRowUpdatedValues = updatedRows[rowIndex];
+        const { editableTableProps: { finalizeUpdate, getUpdatedRows }, rowIndex, formikProps } = tableProps;
+        const currentRowUpdatedValues = formikProps.values.rows[rowIndex];
 
-        axios.post('/api/hcp-profiles/is-valid', currentRowUpdatedValues).then(() => {
-            setShow({ ...show, saveConfirmation: true });
-            setCurrentUser(user);
-            setEditableTableProps({ ...editableTableProps, ...tableProps });
-        }).catch(err => {
-            finalizeUpdate(null, err.response.data.errors);
-        });
-    };
+        axios.post('/api/hcp-profiles/is-valid', { ...currentRowUpdatedValues, _rowIndex: rowIndex })
+            .then(() => {
+                setShow({ ...show, saveConfirmation: true });
+                setCurrentUser(user);
+                setEditableTableProps({ ...editableTableProps, ...tableProps });
+            })
+            .catch(err => {
+                finalizeUpdate(null, err.response.data.errors);
+            });
+    }
 
     const getCountryName = (country_iso2) => {
         if (!allCountries || !country_iso2) return null;
