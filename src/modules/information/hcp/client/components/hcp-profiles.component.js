@@ -17,7 +17,7 @@ import { getHcpProfiles, getHCPSpecialities } from '../hcp.actions';
 import { HcpInlineEditSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
 import EditableTable from '../../../../core/client/components/EditableTable/EditableTable';
-import { HCPFilter, VeevaConsentSync } from '../../../../information';
+import { HCPFilter, HCPConsentSyncInVeeva } from '../../../../information';
 
 const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     const [comment, setComment] = useState("");
@@ -770,7 +770,7 @@ export default function hcpUsers() {
                                     </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    <VeevaConsentSync
+                                    <HCPConsentSyncInVeeva
                                         userID={currentUser.id}
                                         consents={currentUser.consents}
                                         onClose={() => { setShow({ ...show, syncConsent: false }) }}

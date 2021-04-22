@@ -1127,7 +1127,7 @@ async function getHCPUserConsents(req, res) {
                 preference: userConsent.consent.preference,
                 rich_text: userConsent.rich_text,
                 veeva_multichannel_consent_id: userConsent.veeva_multichannel_consent_id,
-                latestConsentSyncTime
+                latestConsentSyncTime: latestConsentSyncTime === 0 ? null : latestConsentSyncTime
             };
         });
 
