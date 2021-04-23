@@ -1,5 +1,7 @@
 const path = require('path');
 const _ = require('lodash');
+
+const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const Application = require(path.join(process.cwd(), 'src/modules/platform/application/server/application.model'));
 const UserProfile = require(path.join(process.cwd(), "src/modules/platform/profile/server/user-profile.model.js"));
 const UserProfile_PermissionSet = require(path.join(process.cwd(), "src/modules/platform/permission-set/server/userProfile-permissionSet.model.js"));
@@ -136,7 +138,12 @@ async function getPermissionsFromPermissionSet(permissionSet) {
         for (const ps_app of permissionSet.ps_app) {
             const { id, name, slug, logo_url } = ps_app.application;
 
-            const userApplication = { id, name, slug, logo_url };
+            const userApplication = {
+                id,
+                name,
+                slug,
+                logo_url: `${nodecache.getValue('S3_BUCKET_URL')}/application/${id}/${logo_url}`
+            };
 
             applications.push(userApplication);
         }
