@@ -48,10 +48,10 @@ const HCPConsentSyncInVeeva = ({ userID, consents, onClose }) => {
         >
             {formikProps => (
                 <Form onSubmit={formikProps.handleSubmit}>
-                    <div className="p-3">
+                    {consents && consents[0].latestConsentSyncTime && <div className="p-3">
                         <span className="text-secondary"><i className="fas fa-info-circle pr-2 cdp-text-secondary"></i>Last execution date: </span>
                         <span className="font-weight-bold-light pl-1">{consents && showDateTime(consents[0].latestConsentSyncTime)}</span>
-                    </div>
+                    </div>}
                     <div className="table-responsive shadow-sm bg-white mb-3 cdp-table__responsive-wrapper">
                         <div className="mt-2 mb-2">
                             <div className="col accordion-consent rounded p-0">
