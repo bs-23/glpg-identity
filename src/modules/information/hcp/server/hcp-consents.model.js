@@ -4,6 +4,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
+const ConsentLocale = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent-locale.model'));
 
 const HcpConsents = sequelize.cdpConnector.define('hcp_consents', {
     id: {
@@ -73,6 +74,12 @@ HcpConsents.belongsTo(Consent, {
 
 Consent.hasMany(HcpConsents, {
     foreignKey: 'consent_id'
+});
+
+HcpConsents.hasMany(ConsentLocale, {
+    foreignKey: 'consent_id',
+    sourceKey: 'consent_id',
+    as: 'hcp_consents_consent_locale'
 });
 
 module.exports = HcpConsents;

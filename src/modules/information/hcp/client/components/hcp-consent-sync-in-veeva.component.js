@@ -54,9 +54,9 @@ const HCPConsentSyncInVeeva = ({ userID, consents, onClose }) => {
                     </div>}
                     <div className="table-responsive shadow-sm bg-white mb-3 cdp-table__responsive-wrapper">
                         <div className="mt-2 mb-2">
-                            <div className="col accordion-consent rounded p-0">
+                            <div className="col accordion-consent rounded p-0 pb-2">
                                 <h4 className="accordion-consent__header p-3 font-weight-bold mb-0 cdp-light-bg">Consents</h4>
-                                {consents && consents.length ? <Accordion>{consents.map(consent =>
+                                {consents && consents.filter(c => c.veeva_consent_type_id).length ? <Accordion>{consents.filter(c => c.veeva_consent_type_id).map(consent =>
                                     <Card key={consent.id}>
                                         <Accordion.Collapse eventKey={consent.id}>
                                             <Card.Body>
@@ -71,7 +71,7 @@ const HCPConsentSyncInVeeva = ({ userID, consents, onClose }) => {
                                             <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                         </Accordion.Toggle>
                                     </Card>
-                                )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent.</div>}
+                                )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent or there is no consent to sync.</div>}
                             </div>
                         </div>
 
@@ -87,7 +87,13 @@ const HCPConsentSyncInVeeva = ({ userID, consents, onClose }) => {
                             </div>
                         </div>
                         <div className="col-8">
-                            <button type="submit" className="btn btn-block cdp-btn-primary my-4 p-2 font-weight-bold text-white" >Sync with VeevaCRM</button>
+                            <button
+                                disabled={!consents || consents.filter(c => c.veeva_consent_type_id).length === 0}
+                                type="submit"
+                                className="btn btn-block cdp-btn-primary my-4 p-2 font-weight-bold text-white"
+                            >
+                                Sync with VeevaCRM
+                            </button>
                         </div>
                         <div className="col-4">
                             <span className="btn btn-block cdp-btn-outline-secondary my-4 p-2 font-weight-bold  " onClick={() => onClose()}>Cancel</span>

@@ -1101,11 +1101,17 @@ async function getHCPUserConsents(req, res) {
 
         const userConsents = await HcpConsents.findAll({
             where: { user_id: doc.id, expired_at: null },
-            include: {
-                model: Consent,
-                as: 'consent'
-            },
-            attributes: ['consent_id', 'rich_text', 'opt_type', 'updated_at', 'veeva_multichannel_consent_id']
+            include: [
+                {
+                    model: Consent,
+                    as: 'consent'
+                },
+                {
+                    model: ConsentLocale,
+                    as: 'hcp_consents_consent_locale'
+                }
+            ],
+            attributes: ['consent_id', 'consent_locale', 'rich_text', 'opt_type', 'updated_at', 'veeva_multichannel_consent_id']
         });
 
         if (!userConsents.length) return res.json([]);
@@ -1118,6 +1124,14 @@ async function getHCPUserConsents(req, res) {
         });
 
         response.data = userConsents.map(userConsent => {
+            const consent_locale = userConsent.hcp_consents_consent_locale && userConsent.hcp_consents_consent_locale.length
+                ? userConsent.hcp_consents_consent_locale.find(consent_locale => consent_locale.locale === userConsent.consent_locale)
+                : null;
+
+            const veeva_consent_type_id = consent_locale
+                ? consent_locale.veeva_consent_type_id
+                : null;
+
             return {
                 consent_given: userConsent.opt_type === 'opt-in',
                 consent_given_time: userConsent.updated_at,
@@ -1126,7 +1140,8 @@ async function getHCPUserConsents(req, res) {
                 preference: userConsent.consent.preference,
                 rich_text: userConsent.rich_text,
                 veeva_multichannel_consent_id: userConsent.veeva_multichannel_consent_id,
-                latestConsentSyncTime: latestConsentSyncTime === 0 ? null : latestConsentSyncTime
+                latestConsentSyncTime: latestConsentSyncTime === 0 ? null : latestConsentSyncTime,
+                veeva_consent_type_id
             };
         });
 
