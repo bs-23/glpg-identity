@@ -120,7 +120,14 @@ const CampaignsComponent = () => {
                                 <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
-                                            <th>Campaign</th>
+                                            <th>Title</th>
+                                            <th>Subject</th>
+                                            <th>Preview Text</th>
+                                            <th>Status</th>
+                                            <th>Type</th>
+                                            <th>Date</th>
+                                            <th>Emails Sent</th>
+                                            {/* <th>Campaign</th> */}
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -128,11 +135,25 @@ const CampaignsComponent = () => {
                                         {campaignList.campaigns.map((campaign, index) => (
                                             <tr key={index}>
                                                 <td data-for="Title">
-                                                    <b>{campaign.title}</b>
-                                                    <br />
-                                                    {getFormattedDate(campaign.sendTime)}
-                                                    <br />
+                                                    {campaign.title}
+                                                </td>
+                                                <td data-for="Subject">
+                                                    {campaign.subject}
+                                                </td>
+                                                <td data-for="PreviewText">
                                                     {campaign.previewText}
+                                                </td>
+                                                <td data-for="Status">
+                                                    {campaign.status}
+                                                </td>
+                                                <td data-for="Type">
+                                                    {campaign.type}
+                                                </td>
+                                                <td data-for="Date">
+                                                    {getFormattedDate(campaign.sendTime)}
+                                                </td>
+                                                <td data-for="EmailsSent">
+                                                    {campaign.emailsSent}
                                                 </td>
                                                 <td data-for="Action">
                                                     <a className="link-with-underline cursor-pointer" onClick={() => setCampaignToDelete(campaign)}>Delete</a>
