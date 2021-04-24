@@ -19,6 +19,7 @@ const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/
 const nodecache = require(path.join(process.cwd(), 'src/config/server/lib/nodecache'));
 const PasswordPolicies = require(path.join(process.cwd(), 'src/modules/core/server/password/password-policies'));
 const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions'));
+const crdlpService = require(path.join(process.cwd(), 'src/modules/core/server/crdlp/crdlp.service'));
 
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
 const hcpService = require('./services/hcp.service');
@@ -150,14 +151,11 @@ async function getHcps(req, res) {
         const totalUser = await Hcp.count({ where: filterOptions });
 
         if (hcps.length && (!fields || !fields.length || fields.includes('specialty_onekey'))) {
-            const specialties = _.uniq(_.map(hcps, 'specialty_onekey')).join("','");
+            const specialties = _.uniq(_.map(hcps, 'specialty_onekey'));
 
-            const specialty_list = await sequelize.datasyncConnector.query(`
-                SELECT cod_id_onekey, cod_description
-                FROM ciam.vwspecialtymaster
-                WHERE cod_id_onekey IN ('${specialties}') AND cod_locale='en'
-            `, {
-                type: QueryTypes.SELECT
+            const specialty_list = await crdlpService.getSpecialties(null, {
+                cod_locale: 'en',
+                cod_id_onekey: specialties
             });
 
             hcps.forEach(h => {
@@ -179,6 +177,7 @@ async function getHcps(req, res) {
         response.data = data;
         res.json(response);
     } catch (err) {
+        console.error(err);
         logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
         res.status(500).send(response);
@@ -660,12 +659,11 @@ async function createHcpProfile(req, res) {
     const response = new Response({}, []);
     const { email, uuid, salutation, first_name, last_name, country_iso2, language_code, specialty_onekey, telephone, birthdate, origin_url } = req.body;
 
-    const specialty_master_data = await sequelize.datasyncConnector.query("SELECT * FROM ciam.vwspecialtymaster WHERE cod_id_onekey = $specialty_onekey", {
-        bind: { specialty_onekey },
-        type: QueryTypes.SELECT
+    const specialties = await crdlpService.getSpecialties(['cod_id_onekey'], {
+        cod_id_onekey: specialty_onekey
     });
 
-    if (!specialty_master_data.length) {
+    if (!specialties || !specialties.length) {
         response.errors.push(new CustomError('specialty_onekey is invalid.', 400, 'specialty_onekey'));
     }
 

@@ -1,18 +1,16 @@
 const path = require('path');
-const fs = require('fs');
-const { QueryTypes, Op } = require('sequelize');
+const { Op } = require('sequelize');
 
 const Country = require(path.join(process.cwd(), 'src/modules/core/server/country/country.model'));
 const Consent = require(path.join(process.cwd(), 'src/modules/privacy/manage-consent/server/consent.model'));
-const ConsentCountry = require(path.join(process.cwd(), 'src/modules/privacy/consent-country/server/consent-country.model'));
 const ConsentCategory = require(path.join(process.cwd(), 'src/modules/privacy/consent-category/server/consent-category.model'));
-const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const HCPS = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-profile.model'));
 const HcpConsents = require(path.join(process.cwd(), 'src/modules/information/hcp/server/hcp-consents.model'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
 const { getUserPermissions } = require(path.join(process.cwd(), 'src/modules/platform/user/server/permission/permissions'));
 const ExportService = require(path.join(process.cwd(), 'src/modules/core/server/export/export.service'));
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
+const crdlpService = require(path.join(process.cwd(), 'src/modules/core/server/crdlp/crdlp.service'));
 
 function ignoreCaseArray(str) {
     return [str.toLowerCase(), str.toUpperCase(), str.charAt(0).toLowerCase() + str.charAt(1).toUpperCase(), str.charAt(0).toUpperCase() + str.charAt(1).toLowerCase()];
@@ -169,94 +167,39 @@ async function getVeevaConsentsReport(req, res) {
         const country_iso2_list_for_codbase = countries.filter(i => i.codbase === codbase).map(i => i.country_iso2);
         const country_iso2_list = await getCountryIso2();
 
-        const orderBy = req.query.orderBy ? req.query.orderBy : '';
-        const orderType = req.query.orderType && req.query.orderType.toLowerCase() === "desc" ? "DESC" : "ASC";
-        let sortBy = 'content_type';
+        const orderBy = req.query.orderBy || 'capture_datetime';
+        const orderType = req.query.orderType || 'DESC';
 
-        if (orderBy && orderType) {
-            if (orderBy === 'account_name') sortBy = 'ciam.vw_veeva_consent_master.account_name';
-            if (orderBy === 'channel_value') sortBy = 'ciam.vw_veeva_consent_master.channel_value';
+        const where = {
+            country_code: codbase ? country_iso2_list_for_codbase : country_iso2_list
+        };
 
-            if (orderBy === 'opt_type') sortBy = 'ciam.vw_veeva_consent_master.opt_type';
+        where.opt_type = req.query.opt_type || {[Op.ne]: null};
 
-            if (orderBy === 'content_type') sortBy = 'ciam.vw_veeva_consent_master.content_type';
-            if (orderBy === 'capture_datetime') sortBy = 'ciam.vw_veeva_consent_master.capture_datetime';
-        }
+        const multichannel_consents = await crdlpService.getMultichannelConsents(null, where, orderBy, orderType, offset, limit);
 
-        const getConsentFilter = () => {
-            if(opt_type === 'Opt_In_vod') return `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
-                ciam.vw_veeva_consent_master.opt_type = 'Opt_In_vod'`;
-            if(opt_type === 'Opt_In_Pending_vod') return `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
-                ciam.vw_veeva_consent_master.opt_type = 'Opt_In_Pending_vod'`;
-            if(opt_type === 'Opt_Out_vod') return `ciam.vw_veeva_consent_master.country_code = ANY($countries) and
-                ciam.vw_veeva_consent_master.opt_type = 'Opt_Out_vod'`
-            return `ciam.vw_veeva_consent_master.country_code = ANY($countries)`;
-        }
-
-        const consent_filter = getConsentFilter();
-
-        const hcp_consents = await sequelize.datasyncConnector.query(
-            `SELECT
-                account_name,
-                content_type,
-                opt_type,
-                capture_datetime,
-                onekeyid,
-                uuid_mixed,
-                country_code,
-                uuid_mixed,
-                channel_value,
-                glpg_consent_source
-            FROM
-                ciam.vw_veeva_consent_master
-            WHERE ${consent_filter}
-            ORDER BY
-                ${sortBy} ${orderType}
-            offset $offset
-            limit $limit;`
-            , {
-                bind: {
-                    countries: codbase ? country_iso2_list_for_codbase : country_iso2_list,
-                    offset: offset,
-                    limit: limit,
-                },
-                type: QueryTypes.SELECT
-            });
-
-        const total_consents = (await sequelize.datasyncConnector.query(
-            `SELECT
-                COUNT(*)
-            FROM
-                ciam.vw_veeva_consent_master
-            WHERE ${consent_filter}`
-            , {
-                bind: {
-                    countries: codbase ? country_iso2_list_for_codbase : country_iso2_list
-                },
-                type: QueryTypes.SELECT
-            }))[0];
+        const total_multichannel_consents = await crdlpService.getMultichannelConsentCount(where);
 
         const data = {
-            hcp_consents,
+            hcp_consents: multichannel_consents,
             page: page + 1,
             limit,
-            total: total_consents.count,
+            total: total_multichannel_consents,
             start: limit * page + 1,
-            end: offset + limit > total_consents.count ? total_consents.count : offset + limit,
+            end: offset + limit > total_multichannel_consents.count ? total_multichannel_consents.count : offset + limit,
             codbase: codbase ? codbase : '',
             opt_type: opt_type ? opt_type : '',
             countries: userPermittedCountries,
             orderBy: orderBy,
-            orderType: orderType,
+            orderType: orderType
         };
 
         response.data = data;
         res.json(response);
-    }
-    catch (err) {
+    } catch (err) {
         logger.error(err);
         response.errors.push(new CustomError('Internal server error', 500));
-        res.status(500).send(response);
+        res.status(500).send(err);
     }
 }
 
@@ -347,30 +290,11 @@ async function exportVeevaConsentsReport(req, res) {
 
         const country_iso2_list = await getCountryIso2();
 
-        const hcp_consents = await sequelize.datasyncConnector.query(
-            `SELECT
-                account_name,
-                uuid_mixed,
-                onekeyid,
-                channel_value,
-                opt_type,
-                content_type,
-                capture_datetime,
-                country_code,
-                glpg_consent_source
-            FROM
-                ciam.vw_veeva_consent_master
-            WHERE ciam.vw_veeva_consent_master.country_code = ANY($countries)`
-            , {
-                bind: {
-                    countries: country_iso2_list
-                },
-                type: QueryTypes.SELECT
-            });
+        const multichannel_consents = await crdlpService.getMultichannelConsents(null, { country_code: country_iso2_list });
 
-        if (!hcp_consents || !hcp_consents.length) return res.status(404).send(`No consents found.`);
+        if (!multichannel_consents || !multichannel_consents.length) return res.status(404).send(`No consents found.`);
 
-        const data = hcp_consents.map(hcp_consent => ({
+        const data = multichannel_consents.map(hcp_consent => ({
             'Individual OnekeyId': hcp_consent.onekeyid,
             'UUID': hcp_consent.uuid_mixed,
             'Name': hcp_consent.account_name,

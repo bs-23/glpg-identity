@@ -228,7 +228,6 @@ const ConsentPerformanceReport = () => {
                                 </div>
 
                                 <div className="d-flex pt-3 pt-sm-0 mb-2">
-
                                     <React.Fragment>
                                         <button className="btn cdp-btn-outline-primary mr-2" onClick={() => exportExcelFile()}><i className="fas fa-download"></i> <span className="d-none d-lg-inline-block pl-1">Export Full Report</span></button>
 
@@ -266,7 +265,7 @@ const ConsentPerformanceReport = () => {
                                         }
 
                                         <Dropdown className="ml-auto dropdown-customize">
-                                            <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center dropdown-toggle position-relative">
+                                            <Dropdown.Toggle variant className="cdp-btn-outline-primary dropdown-toggle fixed-width btn d-flex align-items-center dropdown-toggle position-relative">
                                                 <i className="icon icon-filter mr-2 mb-n1 d-none d-sm-inline-block"></i> {consents_report.opt_type && (allOptTypes.includes(consents_report.opt_type)) ? consents_report.opt_type : 'Filter by Opt Type'}
                                             </Dropdown.Toggle>
                                             <Dropdown.Menu>
@@ -416,7 +415,7 @@ const ConsentPerformanceReport = () => {
                                                                 className={consents_report.orderBy === 'date' ? `cdp-table__col-sorting sorted ${consents_report.orderType.toLowerCase()}` : `cdp-table__col-sorting`}
                                                                 onClick={() => dispatch(getVeevaConsentReport(null, consents_report.codbase, consents_report.opt_type, 'date', getorderType('date')))}
                                                             >
-                                                                Date
+                                                                Capture Date
                                                             <i className="icon icon-sort cdp-table__icon-sorting"></i></span>
                                                         </LinkContainer>
                                                     </th>
@@ -505,6 +504,5 @@ const ConsentPerformanceReport = () => {
         </main >
     );
 }
-
 
 export default ConsentPerformanceReport;
