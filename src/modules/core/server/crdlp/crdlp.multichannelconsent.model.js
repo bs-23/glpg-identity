@@ -2,17 +2,6 @@ const path = require('path');
 const { DataTypes } = require('sequelize');
 const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 
-const Specialty = sequelize.datasyncConnector.define('vwspecialtymaster', {
-    cod_id_onekey: { type: DataTypes.STRING, primaryKey: true },
-    codbase: { type: DataTypes.STRING },
-    cod_locale: { type: DataTypes.STRING },
-    cod_description: { type: DataTypes.STRING }
-}, {
-    schema: `ciam`,
-    tableName: 'vwspecialtymaster',
-    timestamps: false
-});
-
 const MultichannelConsent = sequelize.datasyncConnector.define('vw_veeva_consent_master', {
     onekeyid: { type: DataTypes.STRING(30), primaryKey: true },
     uuid_mixed: { type: DataTypes.STRING },
@@ -33,5 +22,4 @@ const MultichannelConsent = sequelize.datasyncConnector.define('vw_veeva_consent
     timestamps: false
 });
 
-exports.Specialty = Specialty;
 exports.MultichannelConsent = MultichannelConsent;

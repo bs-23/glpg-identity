@@ -1,4 +1,5 @@
-const { Specialty, MultichannelConsent } = require('./crdlp.model');
+const { Specialty } = require('./crdlp.specialty.model');
+const { MultichannelConsent } = require('./crdlp.multichannelconsent.model');
 
 async function getMultichannelConsents(attributes, where, orderBy, orderType, offset, limit) {
     let options = {};
