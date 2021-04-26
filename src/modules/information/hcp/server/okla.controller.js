@@ -28,7 +28,7 @@ async function searchOklaHcps(req, res) {
 
         let page = req.query.page ? +req.query.page - 1 : 0;
         page = page < 0 ? 0 : page;
-        const limit = 30;
+        const limit = 100;
 
         if ((duplicates && typeof duplicates !== 'boolean')
             || (phonetic && typeof phonetic !== 'boolean')
