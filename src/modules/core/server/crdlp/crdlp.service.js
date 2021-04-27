@@ -2,7 +2,7 @@ const { Op, where, col, fn } = require('sequelize');
 
 const { Specialty } = require('./crdlp.specialty.model');
 const { MultichannelConsent } = require('./crdlp.multichannelconsent.model');
-const DatasyncHcp = require('../../../information/hcp/server/datasync-hcp-profile.model');
+const CrdlpHCP = require('./crdlp.hcp.model');
 
 async function getMultichannelConsents(attributes, where, orderBy, orderType, offset, limit) {
     let options = {};
@@ -94,7 +94,7 @@ async function getHCP(attributes, where) {
         options.attributes = attributes;
     }
 
-    const hcp = await DatasyncHcp.findOne(options);
+    const hcp = await CrdlpHCP.findOne(options);
 
     return hcp;
 }
@@ -109,11 +109,11 @@ async function getHCPByUUID(UUID, attributes) {
         }
     };
 
-    if (attributes) {
+    if (attributes && attributes.length) {
         options.attributes = attributes;
     }
 
-    const hcp = await DatasyncHcp.findOne(options);
+    const hcp = await CrdlpHCP.findOne(options);
 
     return hcp;
 }
