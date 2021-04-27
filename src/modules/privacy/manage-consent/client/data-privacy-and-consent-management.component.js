@@ -124,7 +124,7 @@ const ConsentManagement = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="col-12 col-lg-4 col-xl-3 py-3 app__content-panel-right">
+                    <div className="col-12 col-lg-4 col-xl-3 py-3 app__content-panel-right services-right-panel">
                         <Faq topic="data-privacy" />
                     </div>
                 </div>
