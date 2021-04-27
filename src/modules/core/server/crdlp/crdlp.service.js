@@ -99,8 +99,28 @@ async function getHCP(attributes, where) {
     return hcp;
 }
 
+async function getHCPByUUID(UUID, attributes) {
+    if (!UUID) return null;
+
+    const options = {
+        where: {
+            uuid_1: where(fn('regexp_replace', col('uuid_1'), '[-]', '', 'gi'), UUID),
+            uuid_2: where(fn('regexp_replace', col('uuid_1'), '[-]', '', 'gi'), UUID),
+        }
+    };
+
+    if (attributes) {
+        options.attributes = attributes;
+    }
+
+    const hcp = await DatasyncHcp.findOne(options);
+
+    return hcp;
+}
+
 exports.getSpecialties = getSpecialties;
 exports.getMultichannelConsents = getMultichannelConsents;
 exports.getMultichannelConsentCount = getMultichannelConsentCount;
 exports.getSpecialtiesWithEnglishLocale = getSpecialtiesWithEnglishLocale;
 exports.getHCP = getHCP;
+exports.getHCPByUUID = getHCPByUUID;

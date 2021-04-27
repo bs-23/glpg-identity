@@ -258,19 +258,12 @@ async function isHCPValid(req, res) {
 
             const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
 
-            master_data = await sequelize.datasyncConnector.query(`select * from ciam.vwhcpmaster
-                    where regexp_replace(uuid_1, '[-]', '', 'gi') = $uuid
-                    OR regexp_replace(uuid_2, '[-]', '', 'gi') = $uuid`, {
-                bind: { uuid: uuidWithoutSpecialCharacter },
-                type: QueryTypes.SELECT
-            });
+            master_data = await crdlpService.getHCPByUUID(uuidWithoutSpecialCharacter);
 
-            if (master_data && master_data.length === 0) {
+            if (!master_data) {
                 response.errors.push(new Error(_rowIndex, 'uuid', 'UUID is not valid or not in the contract.'));
             }
             else {
-                master_data = master_data && master_data.length ? master_data[0] : {};
-
                 const uuid_1_from_master_data = (master_data.uuid_1 || '');
                 const uuid_2_from_master_data = (master_data.uuid_2 || '');
 
@@ -413,19 +406,12 @@ async function updateHcps(req, res) {
 
                 const uuidWithoutSpecialCharacter = uuid.replace(/[-]/gi, '');
 
-                master_data = await sequelize.datasyncConnector.query(`select * from ciam.vwhcpmaster
-                        where regexp_replace(uuid_1, '[-]', '', 'gi') = $uuid
-                        OR regexp_replace(uuid_2, '[-]', '', 'gi') = $uuid`, {
-                    bind: { uuid: uuidWithoutSpecialCharacter },
-                    type: QueryTypes.SELECT
-                });
+                master_data = await crdlpService.getHCPByUUID(uuidWithoutSpecialCharacter);
 
-                if (master_data && master_data.length === 0) {
+                if (!master_data) {
                     response.errors.push(new Error(_rowIndex, 'uuid', 'UUID is not valid or not in the contract.'));
                 }
                 else {
-                    master_data = master_data && master_data.length ? master_data[0] : {};
-
                     const uuid_1_from_master_data = (master_data.uuid_1 || '');
                     const uuid_2_from_master_data = (master_data.uuid_2 || '');
 
@@ -595,21 +581,13 @@ async function registrationLookup(req, res) {
 
         const uuidWithoutSpecialCharacter = uuid.replace(/[-/]/gi, '');
 
-        const master_data = await sequelize.datasyncConnector.query(`
-            SELECT individual_id_onekey, uuid_1, uuid_2, ind_prefixname_desc, firstname, lastname, country_iso2, telephone, specialty_1_code
-            FROM ciam.vwhcpmaster
-            WHERE regexp_replace(uuid_1, '[-]', '', 'gi') = $uuid
-            OR regexp_replace(uuid_2, '[-]', '', 'gi') = $uuid
-        `, {
-            bind: { uuid: uuidWithoutSpecialCharacter },
-            type: QueryTypes.SELECT
-        });
+        const master_data = await crdlpService.getHCPByUUID(uuidWithoutSpecialCharacter);
 
         let uuid_from_master_data;
 
-        if (master_data && master_data.length) {
-            const uuid_1_from_master_data = (master_data[0].uuid_1 || '');
-            const uuid_2_from_master_data = (master_data[0].uuid_2 || '');
+        if (master_data) {
+            const uuid_1_from_master_data = (master_data.uuid_1 || '');
+            const uuid_2_from_master_data = (master_data.uuid_2 || '');
 
             uuid_from_master_data = [uuid_1_from_master_data, uuid_2_from_master_data].find(id => id.replace(/[-/]/gi, '') === uuidWithoutSpecialCharacter);
         }
@@ -621,16 +599,16 @@ async function registrationLookup(req, res) {
             return res.status(400).send(response);
         }
 
-        if (master_data && master_data.length) {
+        if (master_data) {
             response.data = {
-                salutation: master_data[0].ind_prefixname_desc,
-                individual_id_onekey: master_data[0].individual_id_onekey,
-                uuid: master_data[0].uuid_1 || master_data[0].uuid_2,
-                first_name: master_data[0].firstname,
-                last_name: master_data[0].lastname,
-                country_iso2: master_data[0].country_iso2,
-                telephone: master_data[0].telephone,
-                specialty_onekey: master_data[0].specialty_1_code
+                salutation: master_data.ind_prefixname_desc,
+                individual_id_onekey: master_data.individual_id_onekey,
+                uuid: master_data.uuid_1 || master_data.uuid_2,
+                first_name: master_data.firstname,
+                last_name: master_data.lastname,
+                country_iso2: master_data.country_iso2,
+                telephone: master_data.telephone,
+                specialty_onekey: master_data.specialty_1_code
             };
         } else {
             response.errors.push(new CustomError('Invalid UUID.', 4100, 'uuid'));
@@ -672,13 +650,9 @@ async function createHcpProfile(req, res) {
         if (uuid) {
             const uuidWithoutSpecialCharacter = uuid.replace(/[-/]/gi, '');
 
-            master_data = await sequelize.datasyncConnector.query(`select * from ciam.vwhcpmaster
-                    where regexp_replace(uuid_1, '[-]', '', 'gi') = $uuid
-                    OR regexp_replace(uuid_2, '[-]', '', 'gi') = $uuid`, {
-                bind: { uuid: uuidWithoutSpecialCharacter },
-                type: QueryTypes.SELECT
-            });
-            master_data = master_data && master_data.length ? master_data[0] : {};
+            master_data = await crdlpService.getHCPByUUID(uuidWithoutSpecialCharacter);
+
+            master_data = master_data || {};
 
             const uuid_1_from_master_data = (master_data.uuid_1 || '');
             const uuid_2_from_master_data = (master_data.uuid_2 || '');
