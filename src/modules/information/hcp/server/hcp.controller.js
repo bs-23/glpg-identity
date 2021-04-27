@@ -1394,34 +1394,26 @@ async function getSpecialties(req, res) {
             return res.status(204).send(response);
         }
 
-        let masterDataSpecialties = await sequelize.datasyncConnector.query(`
-            SELECT codbase, cod_id_onekey, cod_locale, cod_description
-            FROM ciam.vwspecialtymaster as Specialty
-            WHERE LOWER(cod_locale) = $locale AND LOWER(codbase) = $codbase
-            ORDER BY cod_description ASC;
-            `, {
-            bind: {
-                locale: locale.toLowerCase(),
-                codbase: countries[0].codbase.toLowerCase()
+        let masterDataSpecialties = await crdlpService.getSpecialties(
+            ['codbase', 'cod_id_onekey', 'cod_locale', 'cod_description'],
+            {
+                cod_locale: where(fn('lower', col('cod_locale')), fn('lower', locale)),
+                codbase: where(fn('lower', col('codbase')), fn('lower', countries[0].codbase))
             },
-            type: QueryTypes.SELECT
-        });
+            [['cod_description', 'ASC']]
+        );
 
         if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
             const languageCode = locale.split('_')[0];
 
-            masterDataSpecialties = await sequelize.datasyncConnector.query(`
-            SELECT codbase, cod_id_onekey, cod_locale, cod_description
-            FROM ciam.vwspecialtymaster as Specialty
-            WHERE LOWER(cod_locale) = $locale AND LOWER(codbase) = $codbase
-            ORDER BY cod_description ASC;
-            `, {
-                bind: {
-                    locale: languageCode.toLowerCase(),
-                    codbase: countries[0].codbase.toLowerCase()
+            masterDataSpecialties = await crdlpService.getSpecialties(
+                ['codbase', 'cod_id_onekey', 'cod_locale', 'cod_description'],
+                {
+                    cod_locale: where(fn('lower', col('cod_locale')), fn('lower', languageCode)),
+                    codbase: where(fn('lower', col('codbase')), fn('lower', countries[0].codbase))
                 },
-                type: QueryTypes.SELECT
-            });
+                [['cod_description', 'ASC']]
+            );
         }
 
         if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
@@ -1458,42 +1450,14 @@ async function getSpecialtiesWithEnglishTranslation(req, res) {
             return res.status(204).send(response);
         }
 
-        let masterDataSpecialties = await sequelize.datasyncConnector.query(`
-            SELECT cod_id_onekey, codbase, cod_description, cod_locale
-            FROM ciam.vwspecialtymaster as Specialty
-            WHERE cod_id_onekey in
-                    (SELECT cod_id_onekey
-                    FROM ciam.vwspecialtymaster as Specialty
-                    WHERE LOWER(cod_locale) = $locale AND LOWER(codbase) = $codbase)
-                AND (LOWER(cod_locale) = 'en' OR LOWER(cod_locale) = $locale)
-            `, {
-            bind: {
-                locale: locale.toLowerCase(),
-                codbase: currentCountry.codbase.toLowerCase()
-            },
-            type: QueryTypes.SELECT
-        });
+        let masterDataSpecialties = await crdlpService.getSpecialtiesWithEnglishLocale(locale.toLowerCase(), currentCountry.codbase.toLowerCase());
 
         if (!masterDataSpecialties.length) {
             const codbaseCountry = countries.filter(c => c.countryname === c.codbase_desc && c.codbase === currentCountry.codbase);
 
             const localeUsingParentCountryISO = `${locale.split('_')[0]}_${codbaseCountry[0].country_iso2}`;
 
-            masterDataSpecialties = await sequelize.datasyncConnector.query(`
-                SELECT cod_id_onekey, codbase, cod_description, cod_locale
-                FROM ciam.vwspecialtymaster as Specialty
-                WHERE cod_id_onekey in
-                        (SELECT cod_id_onekey
-                        FROM ciam.vwspecialtymaster as Specialty
-                        WHERE LOWER(cod_locale) = $locale AND LOWER(codbase) = $codbase)
-                    AND (LOWER(cod_locale) = 'en' OR LOWER(cod_locale) = $locale)
-                `, {
-                bind: {
-                    locale: localeUsingParentCountryISO.toLowerCase(),
-                    codbase: currentCountry.codbase.toLowerCase()
-                },
-                type: QueryTypes.SELECT
-            });
+            masterDataSpecialties = await crdlpService.getSpecialtiesWithEnglishLocale(localeUsingParentCountryISO.toLowerCase(), currentCountry.codbase.toLowerCase());
         }
 
         if (!masterDataSpecialties || masterDataSpecialties.length === 0) {
@@ -1624,24 +1588,16 @@ async function getSpecialtiesForCdp(req, res) {
     try {
         const { codbases } = req.query;
 
-        const specialties = await sequelize.datasyncConnector.query(`
-            SELECT codbase, cod_id_onekey, cod_locale, cod_description
-            FROM ciam.vwspecialtymaster as Specialty
-            WHERE LOWER(cod_locale) = 'en'
-            ${codbases
-                ? 'AND LOWER(codbase) = ' + (Array.isArray(codbases)
-                    ? 'ANY($codbases)'
-                    : '$codbases')
-                : ''}
-            ORDER BY cod_description ASC;
-            `, {
-            bind: {
-                codbases: codbases && Array.isArray(codbases)
-                    ? codbases.map(c => c.toLowerCase())
-                    : (codbases || '').toLowerCase()
+        const specialties = await crdlpService.getSpecialties(
+            ['codbase', 'cod_id_onekey', 'cod_locale', 'cod_description'],
+            {
+                cod_locale: where(fn('lower', col('cod_locale')), 'en'),
+                codbase: where(fn('lower', col('codbase')), codbases && Array.isArray(codbases)
+                    ? { [Op.any]: codbases.map(c => c.toLowerCase()) }
+                    : (codbases || '').toLowerCase())
             },
-            type: QueryTypes.SELECT
-        });
+            [['cod_description', 'ASC']]
+        );
 
         const viewModels = (specialties || []).map(({ codbase, cod_id_onekey, cod_description }) => ({
             codbase,
