@@ -127,7 +127,8 @@ export default function HotStatistic() {
                 </div>
             </div>
             <div className="bg-white">
-                <div className="p-3 pb-0 mb-0 w-100 d-flex align-items-center bg-white cdp-btn-link-secondary cursor-pointer" onClick={() => exportExcelFile()}><i className="fas fa-download pr-2"></i> Export Statistics</div>
+                {/*Note - due to compliance issue the export functionality off in Tablet and Phone*/}
+                <div className="p-3 pb-0 mb-0 w-100 d-none d-lg-flex align-items-center bg-white cdp-btn-link-secondary cursor-pointer" onClick={() => exportExcelFile()}><i className="fas fa-download pr-2"></i> Export Statistics</div>
             </div>
         </div>
     )

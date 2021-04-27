@@ -1,13 +1,14 @@
 import React from 'react';
-import parse from 'html-react-parser';
-import { Form, Formik, Field, ErrorMessage } from 'formik';
 import axios from 'axios';
-import { useToasts } from 'react-toast-notifications';
+import parse from 'html-react-parser';
 import Card from 'react-bootstrap/Card';
 import Accordion from 'react-bootstrap/Accordion';
-import { ConsentSyncSchema } from '../hcp.schema';
+import { useToasts } from 'react-toast-notifications';
+import { Form, Formik, Field, ErrorMessage } from 'formik';
 
-const HCPConsentSyncInVeeva = ({ userID, consents, onClose }) => {
+import { MultichannelConsentSyncSchema } from '../hcp.schema';
+
+const MultichannelConsentSync = ({ userID, consents, onClose }) => {
     const { addToast } = useToasts();
 
     const showDateTime = (date) => {
@@ -18,18 +19,18 @@ const HCPConsentSyncInVeeva = ({ userID, consents, onClose }) => {
         var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
         var dateTime = date+' '+time;
         return dateTime;
-    }
+    };
 
     return <div>
         <Formik
             initialValues={{
                 comment: ''
             }}
-            displayName="ConsentSyncForm"
-            validationSchema={ConsentSyncSchema}
+            displayName="MultichannelConsentSyncForm"
+            validationSchema={MultichannelConsentSyncSchema}
             onSubmit={async (values, actions) => {
                 try {
-                    await axios.put(`/api/hcp-profiles/${userID}/sync-consents-with-veeva`, values);
+                    await axios.put(`/api/hcp-profiles/${userID}/multichannel-consents`, values);
 
                     addToast('Consents are successfully synced with Veeva CRM.', {
                         appearance: 'success',
@@ -56,6 +57,7 @@ const HCPConsentSyncInVeeva = ({ userID, consents, onClose }) => {
                                 : <span className="pl-1 text-secondary">Not yet synced.</span>
                         }
                     </div>
+
                     <div className="table-responsive shadow-sm bg-white mb-3 cdp-table__responsive-wrapper">
                         <div className="mt-2 mb-2">
                             <div className="col accordion-consent rounded p-0 pb-2">
@@ -67,7 +69,7 @@ const HCPConsentSyncInVeeva = ({ userID, consents, onClose }) => {
                                                 <div>{parse(consent.rich_text)}</div>
                                                 <div className="pt-2"><span className="pr-1 text-dark"><i className="icon icon-check-square mr-1 small"></i>Opt-Type:</span> <span className="text-capitalize">{consent.opt_type}</span></div>
                                                 <div><span className="pr-1 text-dark"><i className="icon icon-calendar-check mr-1 small"></i>Capture date:</span>{(new Date(consent.consent_given_time)).toLocaleDateString('en-GB').replace(/\//g, '.')}</div>
-                                                <div><span className="pr-1 text-dark"><i className="fas fa-cogs mr-1 small"></i>Veeva multi channel consent id:</span>{consent.veeva_multichannel_consent_id}</div>
+                                                <div><span className="pr-1 text-dark"><i className="fas fa-cogs mr-1 small"></i>Multichannel consent:</span>{consent.veeva_multichannel_consent_id}</div>
                                             </Card.Body>
                                         </Accordion.Collapse>
                                         <Accordion.Toggle as={Card.Header} eventKey={consent.id} className="p-3 d-flex align-items-baseline justify-content-between border-0" role="button">
@@ -75,15 +77,15 @@ const HCPConsentSyncInVeeva = ({ userID, consents, onClose }) => {
                                             <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                         </Accordion.Toggle>
                                     </Card>
-                                )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent or there is no consent to sync.</div>}
+                                )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent or there are no consent to sync.</div>}
                             </div>
                         </div>
-
                     </div>
+
                     <div className="row">
                         <div className="col-12">
                             <div className="form-group mb-0">
-                                <label className="font-weight-bold" htmlFor="comment">Comment <span className="text-danger">*</span></label>
+                                <label className="font-weight-bold" htmlFor="comment">Remarks <span className="text-danger">*</span></label>
                                 <div>
                                     <Field className="form-control" data-testid='comment' component="textarea" rows="4" name="comment" />
                                 </div>
@@ -100,13 +102,13 @@ const HCPConsentSyncInVeeva = ({ userID, consents, onClose }) => {
                             </button>
                         </div>
                         <div className="col-4">
-                            <span className="btn btn-block cdp-btn-outline-secondary my-4 p-2 font-weight-bold  " onClick={() => onClose()}>Cancel</span>
+                            <span className="btn btn-block cdp-btn-outline-secondary my-4 p-2 font-weight-bold" onClick={() => onClose()}>Cancel</span>
                         </div>
                     </div>
                 </Form>
             )}
         </Formik>
     </div>
-}
+};
 
-export default HCPConsentSyncInVeeva;
+export default MultichannelConsentSync;
