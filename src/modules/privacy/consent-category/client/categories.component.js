@@ -27,6 +27,7 @@ const ConsentCategories = () => {
     const consent_categories = useSelector(state => state.consentCategoryReducer.consent_categories);
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         dispatch(getConsentCategories());
     }, []);
 
@@ -45,7 +46,7 @@ const ConsentCategories = () => {
                             <ol className="rounded-0 m-0 p-0 d-none d-sm-flex">
                                 <li className="breadcrumb-item"><NavLink to="/">Dashboard</NavLink></li>
                                 <li className="breadcrumb-item"><NavLink to="/consent">Data Privacy & Consent Management</NavLink></li>
-                                <li className="breadcrumb-item active"><span>Consent Categories</span></li>
+                                <li className="breadcrumb-item active"><span>Consent Categories </span></li>
                             </ol>
                             <Dropdown className="dropdown-customize breadcrumb__dropdown d-block d-sm-none ml-2">
                                 <Dropdown.Toggle variant="" className="cdp-btn-outline-primary dropdown-toggle btn d-flex align-items-center border-0">
