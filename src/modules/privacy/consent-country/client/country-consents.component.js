@@ -122,6 +122,7 @@ const CountryConsents = () => {
     }
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         dispatch(getCdpConsents(null, null));
         dispatch(getCountryConsents());
     }, []);
