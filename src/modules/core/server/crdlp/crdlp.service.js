@@ -2,6 +2,7 @@ const { Op, where, col, fn } = require('sequelize');
 
 const { Specialty } = require('./crdlp.specialty.model');
 const { MultichannelConsent } = require('./crdlp.multichannelconsent.model');
+const DatasyncHcp = require('../../../information/hcp/server/datasync-hcp-profile.model');
 
 async function getMultichannelConsents(attributes, where, orderBy, orderType, offset, limit) {
     let options = {};
@@ -84,7 +85,22 @@ async function getSpecialtiesWithEnglishLocale(locale, codbase) {
     return specialtiesWithEnglishLocale;
 }
 
+async function getHCP(attributes, where) {
+    if (!where) return null;
+
+    const options = { where };
+
+    if (attributes && attributes.length) {
+        options.attributes = attributes;
+    }
+
+    const hcp = await DatasyncHcp.findOne(options);
+
+    return hcp;
+}
+
 exports.getSpecialties = getSpecialties;
 exports.getMultichannelConsents = getMultichannelConsents;
 exports.getMultichannelConsentCount = getMultichannelConsentCount;
 exports.getSpecialtiesWithEnglishLocale = getSpecialtiesWithEnglishLocale;
+exports.getHCP = getHCP;

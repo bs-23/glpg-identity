@@ -303,15 +303,10 @@ async function isHCPValid(req, res) {
             if (doesOnekeyExists) {
                 response.errors.push(new Error(_rowIndex, 'individual_id_onekey', 'Individual Onekey ID already exists.'));
             } else {
-                const master_data = await sequelize.datasyncConnector.query(
-                    `SELECT * from ciam.vwhcpmaster
-                    WHERE individual_id_onekey = $individual_id_onekey`, {
-                    bind: { individual_id_onekey },
-                    type: QueryTypes.SELECT
-                });
+                const master_data = await crdlpService.getHCP(['uuid_1', 'uuid_2'], { individual_id_onekey });
 
-                if (master_data && master_data.length) {
-                    UUID_from_individual_id_onekey = master_data[0].uuid_1 || master_data[0].uuid_2 || '';
+                if (master_data) {
+                    UUID_from_individual_id_onekey = master_data.uuid_1 || master_data.uuid_2 || '';
 
                     if (UUID_from_individual_id_onekey && !uuid) {
                         const doesUUIDExist = await Hcp.findOne({
@@ -475,15 +470,10 @@ async function updateHcps(req, res) {
                 if (doesOnekeyExists) {
                     response.errors.push(new Error(_rowIndex, 'individual_id_onekey', 'Individual Onekey ID already exists.'));
                 } else {
-                    const master_data = await sequelize.datasyncConnector.query(
-                        `SELECT * from ciam.vwhcpmaster
-                        WHERE individual_id_onekey = $individual_id_onekey`, {
-                        bind: { individual_id_onekey },
-                        type: QueryTypes.SELECT
-                    });
+                    const master_data = await crdlpService.getHCP(['uuid_1', 'uuid_2'], { individual_id_onekey });
 
-                    if (master_data && master_data.length) {
-                        UUID_from_individual_id_onekey = master_data[0].uuid_1 || master_data[0].uuid_2 || '';
+                    if (master_data) {
+                        UUID_from_individual_id_onekey = master_data.uuid_1 || master_data.uuid_2 || '';
 
                         if (UUID_from_individual_id_onekey && !uuid) {
                             const doesUUIDExist = await Hcp.findOne({
