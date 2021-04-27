@@ -118,7 +118,7 @@ export const HcpInlineEditSchema = object().shape({
             phone => invalidPhone(phone))
 });
 
-export const ConsentSyncSchema = object().shape({
+export const MultichannelConsentSyncSchema = object().shape({
     comment: string()
         .transform(value => value.trim())
         .max(500, 'This field must be at most 500 characters long.')

@@ -1116,7 +1116,7 @@ async function getHCPUserConsents(req, res) {
 
         const latestConsentSyncTime = await Audit.max('event_time', {
             where: {
-                event_type: 'VEEVA_CONSENT_SYNC',
+                event_type: 'VEEVA_MULTICHANNEL_CONSENT_SYNC',
                 object_id: doc.id
             }
         });
@@ -1739,15 +1739,7 @@ async function syncHCPConsentsInVeeva(req, res) {
 
         if(!hcp) res.status(404).send('Hcp not found.');
 
-        await veevaService.syncHcpConsentsInVeeva(hcp, req.user);
-
-        logService.log({
-            event_type: 'VEEVA_CONSENT_SYNC',
-            object_id: hcp.id,
-            table_name: 'hcp_consents',
-            actor: req.user.id,
-            remarks: req.body.comment.trim()
-        });
+        await veevaService.syncHcpConsentsInVeeva(hcp, req.user, req.body.comment.trim());
 
         res.sendStatus(200);
     } catch(err) {

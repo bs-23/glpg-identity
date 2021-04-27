@@ -17,7 +17,7 @@ import { getHcpProfiles, getHCPSpecialities } from '../hcp.actions';
 import { HcpInlineEditSchema } from '../hcp.schema';
 import uuidAuthorities from '../uuid-authorities.json';
 import EditableTable from '../../../../core/client/components/EditableTable/EditableTable';
-import { HCPFilter, HCPConsentSyncInVeeva } from '../../../../information';
+import { HCPFilter, MultichannelConsentSync } from '../../../../information';
 
 const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
     const [comment, setComment] = useState("");
@@ -73,7 +73,7 @@ const SaveConfirmation = ({ show, onHideHandler, tableProps }) => {
             </div>
         </Modal.Body>
     </Modal>
-}
+};
 
 export default function hcpUsers() {
     const dispatch = useDispatch();
@@ -662,34 +662,34 @@ export default function hcpUsers() {
                                         <div className="row">
                                             <div className="col">
                                                 <h4 className="mt-1 font-weight-bold">{`${currentUser.first_name || ''} ${currentUser.last_name || ''}`}</h4>
-                                                <div className="">{currentUser.specialty_description}</div>
+                                                <div>{currentUser.specialty_description}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-3">
 
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Email</div>
-                                                <div className="">{currentUser.email || '--'}</div>
+                                                <div>{currentUser.email || '--'}</div>
                                             </div>
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">UUID</div>
-                                                <div className="">{currentUser.uuid || '--'}</div>
+                                                <div>{currentUser.uuid || '--'}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-3">
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Phone Number</div>
-                                                <div className="">{currentUser.telephone || '--'}</div>
+                                                <div>{currentUser.telephone || '--'}</div>
                                             </div>
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">OneKeyID</div>
-                                                <div className="">{currentUser.individual_id_onekey || '--'}</div>
+                                                <div>{currentUser.individual_id_onekey || '--'}</div>
                                             </div>
                                         </div>
                                         <div className="row mt-3">
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Date of Birth</div>
-                                                <div className="">{currentUser.birthdate ? currentUser.birthdate : '--'}</div>
+                                                <div>{currentUser.birthdate ? currentUser.birthdate : '--'}</div>
                                             </div>
                                             <div className="col-6">
                                                 <div className="mt-1 font-weight-bold">Status</div>
@@ -771,7 +771,7 @@ export default function hcpUsers() {
                                     </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    <HCPConsentSyncInVeeva
+                                    <MultichannelConsentSync
                                         userID={currentUser.id}
                                         consents={currentUser.consents}
                                         onClose={() => { setShow({ ...show, syncConsent: false }) }}

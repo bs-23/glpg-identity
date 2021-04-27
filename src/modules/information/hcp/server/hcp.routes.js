@@ -4,7 +4,7 @@ const controller = require('./hcp.controller');
 const { validate } = require(path.join(process.cwd(), 'src/modules/core/server/middlewares/validator.middleware'));
 const { Services } = require('../../../core/server/authorization/authorization.constants');
 const { ServiceGuard } = require('../../../core/server/authorization/authorization.middleware');
-const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware.js'));
+const { CDPAuthStrategy } = require(path.join(process.cwd(), 'src/modules/platform/user/server/user-authentication.middleware'));
 const { hcpProfile, registrationLookup, getAccessToken, updateHCPUserConsents, changePassword, forgetPassword, resetPassword, confirmConsents } = require('./hcp.schema');
 
 module.exports = app => {
@@ -60,7 +60,7 @@ module.exports = app => {
         .get(CDPAuthStrategy, ServiceGuard([Services.MANAGE_HCP]), controller.getHCPUserConsents)
         .put(passport.authenticate('application-jwt', { session: false }), validate(updateHCPUserConsents), controller.updateHCPConsents);
 
-    app.route('/api/hcp-profiles/:id/sync-consents-with-veeva')
+    app.route('/api/hcp-profiles/:id/multichannel-consents')
         .put(CDPAuthStrategy, controller.syncHCPConsentsInVeeva)
 
     app.route('/api/hcp-profiles/:id')
