@@ -195,7 +195,7 @@ async function isHCPValid(req, res) {
     }
 
     try {
-        const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, individual_id_onekey, _rowIndex } = trimRequestBody(hcp);
+        const { id, email, uuid, individual_id_onekey, _rowIndex } = trimRequestBody(hcp);
 
         let UUID_from_individual_id_onekey;
 
@@ -207,30 +207,6 @@ async function isHCPValid(req, res) {
 
         if (!HcpUser) {
             response.errors.push(new Error(_rowIndex, 'id', 'User not found.'));
-        }
-
-        if (!first_name) {
-            response.errors.push(new Error(_rowIndex, 'first_name', 'Firts is missing.'));
-        }
-
-        if (!last_name) {
-            response.errors.push(new Error(_rowIndex, 'last_name', 'Last name is missing.'));
-        }
-
-        if (!country_iso2) {
-            response.errors.push(new Error(_rowIndex, 'country_iso2', 'Country ISO2 is missing.'));
-        }
-
-        if (!specialty_onekey) {
-            response.errors.push(new Error(_rowIndex, 'specialty_onekey', 'Specialty Onekey is missing.'));
-        }
-
-        if (!email) {
-            response.errors.push(new Error(_rowIndex, 'email', 'Email is missing.'));
-        }
-
-        if (!uuid) {
-            response.errors.push(new Error(_rowIndex, 'uuid', 'UUID is missing.'));
         }
 
         if (email) {
