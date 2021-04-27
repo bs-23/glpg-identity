@@ -197,6 +197,7 @@ async function isHCPValid(req, res) {
     try {
         const { id, email, uuid, individual_id_onekey, _rowIndex } = trimRequestBody(hcp);
 
+        let uuid_from_master_data;
         let UUID_from_individual_id_onekey;
 
         if (!id) {
@@ -226,8 +227,6 @@ async function isHCPValid(req, res) {
                 }
             }
         }
-
-        let uuid_from_master_data;
 
         if (uuid) {
             let master_data = {};
@@ -307,6 +306,10 @@ async function isHCPValid(req, res) {
                     response.errors.push(new Error(_rowIndex, 'individual_id_onekey', 'Individual Onekey ID is not valid or not in the contract.'));
                 }
             }
+        }
+
+        if (uuid_from_master_data && UUID_from_individual_id_onekey && uuid_from_master_data !== UUID_from_individual_id_onekey) {
+            response.errors.push(new Error(_rowIndex, 'error', 'The UUID and OnekeyID correspond to different HCP.'));
         }
 
         if (response.errors && response.errors.length) {

@@ -210,6 +210,15 @@ export default function hcpUsers() {
                 }
             })
             .catch(err => {
+                const globalError = err.response.data.errors.find(e => e.property === 'error');
+
+                if (globalError) {
+                    addToast(globalError.message, {
+                        appearance: 'error',
+                        autoDismiss: true
+                    });
+                }
+
                 finalizeUpdate(null, err.response.data.errors);
             });
     }
