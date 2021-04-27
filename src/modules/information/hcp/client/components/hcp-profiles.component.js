@@ -191,7 +191,7 @@ export default function hcpUsers() {
     };
 
     const onTableRowSave = (user, tableProps) => {
-        const { editableTableProps: { finalizeUpdate, getUpdatedCells }, rowIndex } = tableProps;
+        const { editableTableProps: { finalizeUpdate, getUpdatedCells }, rowIndex, formikProps } = tableProps;
 
         const currentUpdatedCells = getUpdatedCells();
 
@@ -200,6 +200,14 @@ export default function hcpUsers() {
                 setShow({ ...show, saveConfirmation: true });
                 setCurrentUser(user);
                 setEditableTableProps({ ...editableTableProps, ...tableProps });
+
+                if (formikProps.status && formikProps.status.backendErrors && formikProps.status.backendErrors.rows) {
+                    const backendErrorsRows = [...formikProps.status.backendErrors.rows];
+
+                    backendErrorsRows[rowIndex] = {};
+
+                    formikProps.setStatus({ ...formikProps.status, backendErrors: { rows: backendErrorsRows } });
+                }
             })
             .catch(err => {
                 finalizeUpdate(null, err.response.data.errors);
