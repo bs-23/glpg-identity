@@ -125,8 +125,7 @@ async function logout(req, res) {
         event_type: 'LOGOUT',
         object_id: req.user.id,
         table_name: 'users',
-        actor: req.user.id,
-        remarks: 'CDP user logged out'
+        actor: req.user.id
     });
 
     res.clearCookie('access_token');

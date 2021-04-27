@@ -77,7 +77,7 @@ const MultichannelConsentSync = ({ userID, consents, onClose }) => {
                                             <i className="icon icon-arrow-down ml-2 accordion-consent__icon-down"></i>
                                         </Accordion.Toggle>
                                     </Card>
-                                )}</Accordion> : <div className="m-3 alert alert-warning">The HCP has not given any consent or there are no consent to sync.</div>}
+                                )}</Accordion> : <div className="m-3 alert alert-warning">The HCP does not have any promotional consents.</div>}
                             </div>
                         </div>
                     </div>
