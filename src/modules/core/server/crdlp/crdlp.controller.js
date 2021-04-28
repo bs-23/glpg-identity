@@ -1,23 +1,14 @@
 const path = require('path');
-const { QueryTypes } = require('sequelize');
 const logger = require(path.join(process.cwd(), 'src/config/server/lib/winston'));
-const sequelize = require(path.join(process.cwd(), 'src/config/server/lib/sequelize'));
 const { Response, CustomError } = require(path.join(process.cwd(), 'src/modules/core/server/response'));
+const crdlpService = require(path.join(process.cwd(), 'src/modules/core/server/crdlp/crdlp.service'));
 
 async function getMultichannelConsentsByOnekeyId(req, res) {
     const response = new Response({}, []);
     const oneKeyId = req.params.id;
 
     try {
-        const multichannel_consents = await sequelize.datasyncConnector.query(`
-            SELECT *
-            FROM ciam.vw_veeva_consent_master
-            where ciam.vw_veeva_consent_master.onekeyid = $oneKeyId;`,
-            {
-                bind: { oneKeyId: oneKeyId },
-                type: QueryTypes.SELECT
-            }
-        );
+        const multichannel_consents = await crdlpService.getMultichannelConsents(null, { onekeyid: oneKeyId });
 
         if (!multichannel_consents) return res.sendStatus(204);
 
