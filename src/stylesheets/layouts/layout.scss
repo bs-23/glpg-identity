@@ -21,6 +21,13 @@
     &-panel {
         &-right {
             position: inherit;
+
+            &.services-right-panel {
+                .faq-expand {
+                    top: 60px;
+                    height: calc(100% - 76px) !important;
+                }
+            }
         }
     }
 }

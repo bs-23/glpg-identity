@@ -109,6 +109,7 @@ const UserDetails = (props) => {
     };
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         async function getRoles() {
             const response = await axios.get('/api/roles');
             setRoles(response.data);

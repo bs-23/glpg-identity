@@ -194,8 +194,9 @@ async function isHCPValid(req, res) {
     }
 
     try {
-        const { id, email, first_name, last_name, uuid, specialty_onekey, country_iso2, individual_id_onekey, _rowIndex } = trimRequestBody(hcp);
+        const { id, email, uuid, individual_id_onekey, _rowIndex } = trimRequestBody(hcp);
 
+        let uuid_from_master_data;
         let UUID_from_individual_id_onekey;
 
         if (!id) {
@@ -206,30 +207,6 @@ async function isHCPValid(req, res) {
 
         if (!HcpUser) {
             response.errors.push(new Error(_rowIndex, 'id', 'User not found.'));
-        }
-
-        if (!first_name) {
-            response.errors.push(new Error(_rowIndex, 'first_name', 'Firts is missing.'));
-        }
-
-        if (!last_name) {
-            response.errors.push(new Error(_rowIndex, 'last_name', 'Last name is missing.'));
-        }
-
-        if (!country_iso2) {
-            response.errors.push(new Error(_rowIndex, 'country_iso2', 'Country ISO2 is missing.'));
-        }
-
-        if (!specialty_onekey) {
-            response.errors.push(new Error(_rowIndex, 'specialty_onekey', 'Specialty Onekey is missing.'));
-        }
-
-        if (!email) {
-            response.errors.push(new Error(_rowIndex, 'email', 'Email is missing.'));
-        }
-
-        if (!uuid) {
-            response.errors.push(new Error(_rowIndex, 'uuid', 'UUID is missing.'));
         }
 
         if (email) {
@@ -249,8 +226,6 @@ async function isHCPValid(req, res) {
                 }
             }
         }
-
-        let uuid_from_master_data;
 
         if (uuid) {
             let master_data = {};
@@ -318,6 +293,10 @@ async function isHCPValid(req, res) {
                     response.errors.push(new Error(_rowIndex, 'individual_id_onekey', 'Individual Onekey ID is not valid or not in the contract.'));
                 }
             }
+        }
+
+        if (uuid_from_master_data && UUID_from_individual_id_onekey && uuid_from_master_data !== UUID_from_individual_id_onekey) {
+            response.errors.push(new Error(_rowIndex, 'error', 'The UUID and OnekeyID correspond to different HCP.'));
         }
 
         if (response.errors && response.errors.length) {

@@ -135,6 +135,34 @@
                 display: none !important;
             }
         }
+
+        .cdp-inbox__list-item {
+            padding: 1rem 2rem !important;
+
+            &-col {
+                flex: 0 40%;
+                word-break: break-word !important;
+                word-wrap: break-word !important;
+
+                &.large {
+                    flex: 0 35%;
+                }
+
+                &.small {
+                    flex: 0 25%;
+                    text-align: right;
+                }
+            }
+        }
+
+        .jpSBJZ {
+            padding: 0 25px 0 25px;
+        }
+
+        .cdp-inbox__tab div > div > div > div > div:before,
+        .cdp-inbox__tab div > div > div > div > div + div:before {
+            display: none;
+        }
     }
 
     @media (max-width: $screen-phone) {

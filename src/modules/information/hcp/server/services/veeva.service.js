@@ -130,7 +130,7 @@ async function syncHcpConsentsInVeeva(hcp, actor, remarks='Automatic synchroniza
         }));
     }
 
-    logService.log({
+    auditService.log({
         event_type: 'VEEVA_MULTICHANNEL_CONSENT_SYNC',
         object_id: hcp.id,
         table_name: 'hcp_consents',

@@ -191,16 +191,34 @@ export default function hcpUsers() {
     };
 
     const onTableRowSave = (user, tableProps) => {
-        const { editableTableProps: { finalizeUpdate, getUpdatedRows }, rowIndex, formikProps } = tableProps;
-        const currentRowUpdatedValues = formikProps.values.rows[rowIndex];
+        const { editableTableProps: { finalizeUpdate, getUpdatedCells }, rowIndex, formikProps } = tableProps;
 
-        axios.post('/api/hcp-profiles/is-valid', { ...currentRowUpdatedValues, _rowIndex: rowIndex })
+        const currentUpdatedCells = getUpdatedCells();
+
+        axios.post('/api/hcp-profiles/is-valid', { ...currentUpdatedCells[0], _rowIndex: rowIndex })
             .then(() => {
                 setShow({ ...show, saveConfirmation: true });
                 setCurrentUser(user);
                 setEditableTableProps({ ...editableTableProps, ...tableProps });
+
+                if (formikProps.status && formikProps.status.backendErrors && formikProps.status.backendErrors.rows) {
+                    const backendErrorsRows = [...formikProps.status.backendErrors.rows];
+
+                    backendErrorsRows[rowIndex] = {};
+
+                    formikProps.setStatus({ ...formikProps.status, backendErrors: { rows: backendErrorsRows } });
+                }
             })
             .catch(err => {
+                const globalError = err.response.data.errors.find(e => e.property === 'error');
+
+                if (globalError) {
+                    addToast(globalError.message, {
+                        appearance: 'error',
+                        autoDismiss: true
+                    });
+                }
+
                 finalizeUpdate(null, err.response.data.errors);
             });
     }
