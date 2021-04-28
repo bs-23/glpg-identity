@@ -5,6 +5,7 @@ import { getStatistics, clearStatistics } from './statistics.actions';
 import axios from 'axios';
 import fileDownload from 'js-file-download';
 import CountUp from 'react-countup';
+import { getAllCountries } from '../country/country.actions';
 
 export default function HotStatistic() {
     const dispatch = useDispatch();
@@ -14,9 +15,10 @@ export default function HotStatistic() {
     const permittedCountries = useSelector(state => state.userReducer.loggedInUser.countries) || [];
     const countries = useSelector(state => state.countryReducer.countries);
     const [selectedCountries, setSelectedCountries] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
     const [countryOptions, setCountryOptions] = useState([]);
 
-    let getCountryOptions = countries.filter(c => permittedCountries.map(c => c.toLowerCase()).includes(c.country_iso2.toLowerCase())).map(c => ({ value: c.country_iso2.toLowerCase(), label: c.countryname, checked: true}));
+    let getCountryOptions = countries.filter(c => permittedCountries.map(c => c.toLowerCase()).includes(c.country_iso2.toLowerCase())).map(c => ({ value: c.country_iso2.toLowerCase(), label: c.countryname, checked: true }));
 
     const getSelectedCountries = (country) => {
         countryOptions.map(countryOption => {
@@ -25,8 +27,17 @@ export default function HotStatistic() {
             }
         });
         setCountryOptions(countryOptions);
-        let activeCountries = countryOptions.filter(activeCountry =>  activeCountry.checked);
+        let activeCountries = countryOptions.filter(activeCountry => activeCountry.checked);
+        if (activeCountries.length > 0) setSelectAll(true);
         setSelectedCountries(activeCountries);
+    }
+
+    const getAllCountries = (countryOptions, checked) => {
+        countryOptions.map(countryOption => { countryOption.checked = checked });
+        setCountryOptions(countryOptions);
+        let activeCountries = countryOptions.filter(activeCountry => activeCountry.checked);
+        setSelectedCountries(activeCountries);
+        setSelectAll(checked ? false : true);
     }
 
     useEffect(() => {
@@ -97,31 +108,32 @@ export default function HotStatistic() {
                                 return <span key={key} title={country.checked ? "Click to deselect" : "Click to select"} className={country.checked ? "badge hot-statistics__badge-selected text-white mr-2 mb-1 font-weight-normal cursor-pointer hot-statistics__badge" : "badge mr-2 mb-1 font-weight-normal cursor-pointer hot-statistics__badge text-dark"} onClick={() => { getSelectedCountries(country) }}>{country.label}
                                 </span>
                             })}
+                            <span className={selectAll ? "badge hot-statistics__badge-selected text-white mr-2 mb-1 font-weight-normal cursor-pointer hot-statistics__badge" : "badge mr-2 mb-1 font-weight-normal cursor-pointer hot-statistics__badge text-dark"} onClick={() => selectAll ? getAllCountries(countryOptions, true) : getAllCountries(countryOptions, false)}>{selectAll ? 'Select All' : 'Deselect All'}</span>
                         </div>
                     </div>
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i className="far fa-user hot-statistics__icon"></i>
-                        <CountUp className="hot-statistics__amount" start={0} end={statistics.hcps_count || 0}  duration={1.5}/>
+                        <CountUp className="hot-statistics__amount" start={0} end={statistics.hcps_count || 0} duration={1.5} />
                         <div className="hot-statistics__title">Total HCP Users</div>
                     </div>
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i class="icon icon-data-consent-management hot-statistics__icon"></i>
-                        <CountUp className="hot-statistics__amount" start={0} end={statistics.consents_count || 0}  duration={1.5}/>
+                        <CountUp className="hot-statistics__amount" start={0} end={statistics.consents_count || 0} duration={1.5} />
                         <div className="hot-statistics__title">Total Consents</div>
                     </div>
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i class="icon icon-accept hot-statistics__icon"></i>
-                        <CountUp className="hot-statistics__amount" start={0} end={statistics.captured_consents_count || 0}  duration={1.5}/>
+                        <CountUp className="hot-statistics__amount" start={0} end={statistics.captured_consents_count || 0} duration={1.5} />
                         <div className="hot-statistics__title"> Total Captured Consents</div>
                     </div>
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i class="icon icon-partner hot-statistics__icon"></i>
-                        <CountUp className="hot-statistics__amount" start={0} end={statistics.business_partner_count || 0}  duration={1.5}/>
+                        <CountUp className="hot-statistics__amount" start={0} end={statistics.business_partner_count || 0} duration={1.5} />
                         <div className="hot-statistics__title"> Total Business Partners</div>
                     </div>
                     <div className="col-6 col-sm-4 hot-statistics__box py-3">
                         <i class="icon icon-marketing-promotion hot-statistics__icon"></i>
-                       <CountUp className="hot-statistics__amount" start={0} end={0} duration={1.5}/>
+                        <CountUp className="hot-statistics__amount" start={0} end={0} duration={1.5} />
                         <div className="hot-statistics__title">Total Campaigns</div>
                     </div>
                 </div>
