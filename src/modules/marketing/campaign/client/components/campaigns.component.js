@@ -120,20 +120,22 @@ const CampaignsComponent = () => {
                                 <table className="table table-hover table-sm mb-0 cdp-table cdp-table__responsive">
                                     <thead className="cdp-bg-primary text-white cdp-table__header">
                                         <tr>
-                                            <th>Title</th>
-                                            <th>Subject</th>
-                                            <th>Preview Text</th>
-                                            <th>Status</th>
-                                            <th>Type</th>
-                                            <th>Date</th>
-                                            <th>Emails Sent</th>
-                                            {/* <th>Campaign</th> */}
-                                            <th>Action</th>
+                                            <th width="8%">Campaign ID</th>
+                                            <th width="15%">Title</th>
+                                            <th width="15%">Subject of Campaign</th>
+                                            <th width="20%">Preview Text</th>
+                                            <th width="8%">Status</th>
+                                            <th width="8%">Type</th>
+                                            <th width="10%">Date</th>
+                                            <th width="8%">Emails Sent</th>
+                                            <th width="8%">Opening Rate</th>
+                                            <th width="8%">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="cdp-table__body bg-white">
                                         {campaignList.campaigns.map((campaign, index) => (
                                             <tr key={index}>
+                                                <td data-for="Id">{campaign.id}</td>
                                                 <td data-for="Title">
                                                     {campaign.title}
                                                 </td>
@@ -154,6 +156,9 @@ const CampaignsComponent = () => {
                                                 </td>
                                                 <td data-for="EmailsSent">
                                                     {campaign.emailsSent}
+                                                </td>
+                                                <td data-for="OpenRate">
+                                                    {`${Number(campaign.open_rate).toFixed(2)}%`}
                                                 </td>
                                                 <td data-for="Action">
                                                     <a className="link-with-underline cursor-pointer" onClick={() => setCampaignToDelete(campaign)}>Delete</a>

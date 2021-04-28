@@ -27,7 +27,8 @@ async function getCampaigns(req, res) {
                 status: campaign.status,
                 type: campaign.type,
                 emailsSent: campaign.delivery_status.emails_sent,
-                sendTime: campaign.send_time
+                sendTime: campaign.send_time,
+                open_rate: campaign.report_summary.open_rate
             };
         });
         const total = response.data.total_items;
