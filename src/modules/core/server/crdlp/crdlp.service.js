@@ -105,7 +105,7 @@ async function getHCPByUUID(UUID, attributes) {
     const options = {
         where: {
             uuid_1: where(fn('regexp_replace', col('uuid_1'), '[-]', '', 'gi'), UUID),
-            uuid_2: where(fn('regexp_replace', col('uuid_1'), '[-]', '', 'gi'), UUID),
+            uuid_2: where(fn('regexp_replace', col('uuid_2'), '[-]', '', 'gi'), UUID)
         }
     };
 
